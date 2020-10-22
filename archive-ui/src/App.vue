@@ -1,0 +1,110 @@
+<template>
+  <div id="app" v-title :data-title="$t('application.name')">
+    <transition name="moveToTop">
+      <router-view></router-view>
+    </transition>
+  </div>
+</template>
+
+<script>
+import "vue-transition.css";
+export default {
+  name: "app",
+};
+</script>
+
+<style>
+.el-table--striped .el-table__body tr.el-table__row--striped td {
+  background: rgb(233, 233, 233);
+}
+.el-table--striped .el-table__body tr.el-table__row--striped.current-row td,
+.el-table__body tr.current-row > td,
+.el-table__body tr.hover-row.current-row > td,
+.el-table__body tr.hover-row.el-table__row--striped.current-row > td,
+.el-table__body tr.hover-row.el-table__row--striped > td,
+.el-table__body tr.hover-row > td {
+  background-color: #ebe6de !important;
+}
+.el-date-editor.el-input,
+.el-date-editor.el-input__inner {
+  width: 140px;
+}
+.el-table .cell,
+.el-table th div {
+  padding-right: 5px !important;
+}
+.el-table thead {
+  color: #2c2c2c !important;
+}
+.el-date-editor.el-input__inner {
+  padding-left: 25px !important;
+}
+.el-table {
+  margin-left: 0px !important;
+}
+.el-table td {
+  padding: 1px 0 !important;
+}
+.el-table th {
+  padding: 1px 0 !important;
+  background-color: #eef1f6 !important;
+}
+.el-form-item {
+  margin-top: 1px !important;
+  margin-bottom: 1px !important;
+}
+.el-input__inner {
+  height: 30px !important;
+  border-radius: 4px !important;
+  padding-left: 10px;
+  vertical-align: middle  !important;
+  line-height: 0  !important;
+}
+.el-dialog__body {
+  padding: 5px 20px !important;
+}
+.el-dialog__header {
+  padding: 10px 10px !important;
+}
+.el-dialog__footer {
+  padding: 10px 10px !important;
+}
+.el-tree-node:focus > .el-tree-node__content {
+  background-color: #92c6fd;
+  font-weight: bold;
+  color: #000000 !important;
+}
+.el-main {
+  padding: 2px !important;
+}
+.el-header {
+  padding: 0 15px !important;
+  box-sizing: border-box;
+}
+.el-tabs__header {
+  padding: 0;
+  position: relative;
+  margin: 0 0 2px !important;
+}
+.el-card__header {
+  padding: 8px 5px !important;
+  border-bottom: 1px solid #ebeef5;
+  box-sizing: border-box;
+}
+
+.el-collapse-item__header {
+    height: 40px !important;
+    line-height: 40px !important;
+    background-color: #ebeef5 !important;
+    border-bottom: 1px solid #ccc !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+}
+.el-button {
+  height: 30px !important;
+  padding: 2px 12px !important;
+  border-radius: 4px !important;
+  vertical-align: middle  !important;
+  line-height: 0  !important;
+}
+</style>
