@@ -6,6 +6,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
@@ -21,7 +22,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 	"com.ecm.core.cache.*","com.ecm.core.util","com.ecm.portal.*","com.ecm.flowable.*"})
 @MapperScan("com.ecm.core.dao")
 @EnableTransactionManagement//(proxyTargetClass = true)
-public class ZisEcmArchiveApplication {
+public class ZisEcmArchiveApplication extends SpringBootServletInitializer{
 
 	public static void main(String[] args) {
 		SpringApplication.run(ZisEcmArchiveApplication.class, args);
