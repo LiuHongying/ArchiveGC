@@ -22,10 +22,10 @@ import com.alibaba.druid.pool.DruidDataSource;
 	"com.ecm.core.cache.*","com.ecm.core.util","com.ecm.portal.*","com.ecm.flowable.*"})
 @MapperScan("com.ecm.core.dao")
 @EnableTransactionManagement//(proxyTargetClass = true)
-public class ZisEcmArchiveApplication extends SpringBootServletInitializer{
+public class ZisEcmArchiveGCApplication extends SpringBootServletInitializer{
 
 	public static void main(String[] args) {
-		SpringApplication.run(ZisEcmArchiveApplication.class, args);
+		SpringApplication.run(ZisEcmArchiveGCApplication.class, args);
 	}
 	
 	@Bean
