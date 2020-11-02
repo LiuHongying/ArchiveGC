@@ -34,6 +34,14 @@
         <el-button type="primary" @click="additem(form)">确 定</el-button>
       </div>
     </el-dialog>
+    <el-dialog :title="$t('application.Import')" :visible.sync="FormImportDialogVisible" :close-on-click-modal="false" width="80%" >
+        <FormImport ref="FormImport"  @onImported="onFormImport" width="100%"></FormImport>
+        <div slot="footer" class="dialog-footer">
+        <el-button @click="ImporClose()" size="medium">{{
+          $t("application.close")
+        }}</el-button>
+      </div>
+    </el-dialog>
     <el-container>
       <el-header>
         <!-- <el-breadcrumb separator="/" class="navbar">
@@ -49,7 +57,7 @@
               prefix-icon="el-icon-search"
             ></el-input>
           </el-col>
-          <el-col :span="20" style="text-align:left;">
+          <el-col :span="16" style="text-align:left;">
             &nbsp; 
             <el-button
               type="primary"
@@ -57,6 +65,8 @@
               plain
               @click="dialogVisible = true"
             >{{$t('application.new')}}</el-button>
+            <el-button type="primary" @click="beforImport()">
+              {{$t('application.Import')}}</el-button>
           </el-col>
         </el-row>
       </el-header>
@@ -155,6 +165,7 @@
 //   contentType: "application/json"
 // });
 
+import FormImport from '@/components/controls/ImportForm';
 export default {
   name: "FormManager",
   permit: 9,
@@ -173,7 +184,8 @@ export default {
         columnCount: 2,
         isDefault: 0
       },
-      formLabelWidth: "120px"
+      formLabelWidth: "120px",
+      FormImportDialogVisible:false
     };
   },
   created() {
@@ -192,6 +204,13 @@ export default {
       });
   },
   methods: {
+    ImporClose(){
+      this.FormImportDialogVisible=false;
+      this.refreshData();
+    },
+    beforImport(){
+            this.FormImportDialogVisible=true;
+        },
     refreshData() {
       let _self = this;
       _self.loading = true;
@@ -267,6 +286,9 @@ export default {
         });
       }
     }
+  },
+  components:{
+    FormImport:FormImport
   }
 };
 </script>
