@@ -89,6 +89,7 @@
                   gridViewName="WorkflowFileGrid"
                   condition=" and a.NAME='流程文件'"
                   :optionWidth="1"
+                  :itemDataList="files"
                   :isShowMoreOption="false"
                   :isshowCustom="false"
                   :isEditProperty="allowEdit"
@@ -125,11 +126,13 @@ export default {
     AttachmentFile: AttachmentFile
   },
    model: {
+     prop:"files",
     event: "change",
   },
   props: {
     allowEdit: { type: Boolean, default: true },
-    isShowPage:{type:Boolean,default:true}
+    isShowPage:{type:Boolean,default:true},
+    files:{type:Array,default:[]}
   },
   data() {
     return {
@@ -159,6 +162,7 @@ export default {
     };
   },
   mounted() {
+    debugger;
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
@@ -188,6 +192,7 @@ export default {
             });
             // this.$refs.fileList.itemDataList=this.$refs.fileList.itemDataList.concat(this.selectedFiles);
         }
+        _self.files=_self.$refs.fileList.itemDataList;
         _self.$emit('change',_self.$refs.fileList.itemDataList);
         this.butt=false;
         this.propertyVisible=false;

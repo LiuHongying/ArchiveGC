@@ -71,16 +71,18 @@
                     typeName:this.workflowObj.FORMNAME,
                     isOnly:false,
                     butt:false,
-                    workflowFileList:[],
+                    
                     saveButt:false
                 }
             },
             props:{
                 workflowObj:{type:Object,default:{}},
-                showUploadFile:{type:Boolean,default:true}
+                showUploadFile:{type:Boolean,default:true},
+                workflowFileList:{type:Array,default:[]}
             },
             mounted(){
                 // this.getWorkflows();
+                console.log(workflowFileList);
             },
             methods:{
                 loadFormInfo(){

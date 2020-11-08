@@ -35,7 +35,6 @@
                             :optionWidth = "2"
                             isInitData
                             :isShowChangeList="false"
-                            @selectchange="selectChange"
                         >
                            
                            <template slot="optionButton" slot-scope="scope">

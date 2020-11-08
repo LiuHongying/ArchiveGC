@@ -376,6 +376,7 @@
     "Drafts":"drafts",
     "FilesInWorkflow":"Files in workflow",
     "AddFile":"Add files",
+    "WorkflowSelect":"Workflow Select",
     "approve":"Approve",
     "reject":"Reject"
 },
@@ -619,7 +620,8 @@
     "timeOut":"TimeOut!",
     "RemoveUserSuccess":"Remove User Successful!",
     "enterContent":"Please Enter Content",
-    "PleaseSelectDC":"Please select document"
+    "PleaseSelectDC":"Please select document",
+    "PleaseSelectOneData":"Please select only one data"
 },
 "field": {
     "indexNumber":"S/N",

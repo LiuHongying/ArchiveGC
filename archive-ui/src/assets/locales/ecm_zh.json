@@ -362,6 +362,7 @@
     "Drafts":"草稿箱",
     "FilesInWorkflow":"流程文件",
     "AddFile":"添加文件",
+    "WorkflowSelect":"流程选择",
     "approve":"通过",
     "reject":"驳回"
 },
@@ -630,7 +631,8 @@
     "timeOut":"操作超时！",
     "RemoveUserSuccess":"移除用户成功",
     "enterContent":"请输入内容",
-    "PleaseSelectDC":"请选择文件"
+    "PleaseSelectDC":"请选择文件",
+    "PleaseSelectOneData":"请选择一条数据"
     
 },
 "field": {
