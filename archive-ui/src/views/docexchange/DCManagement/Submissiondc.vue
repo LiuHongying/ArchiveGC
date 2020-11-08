@@ -1349,30 +1349,29 @@ export default {
         },
         // 保存结果事件
         onSaved(indata) {
-        let _self=this;
-        if (indata == "update") {
-            // _self.$message(_self.$t("message.saveSuccess"));
-            _self.$message({
-                showClose: true,
-                message: _self.$t("message.saveSuccess"),
-                duration: 2000,
-                type: 'success'
-            });
-            _self.butt=false
-        } else {
-            // _self.$message("新建成功!");
-            _self.$message({
-                showClose: true,
-                message: _self.$t('message.operationSuccess'),
-                duration: 2000,
-                type: 'success'
-            });
-            _self.butt=false
-        }
-        _self.propertyVisible = false;
-        _self.propertyrela=false;
-        this.butt=false
-        
+            let _self=this;
+            if (indata == "update") {
+                // _self.$message(_self.$t("message.saveSuccess"));
+                _self.$message({
+                    showClose: true,
+                    message: _self.$t("message.saveSuccess"),
+                    duration: 2000,
+                    type: 'success'
+                });
+                _self.butt=false
+            } else {
+                // _self.$message("新建成功!");
+                _self.$message({
+                    showClose: true,
+                    message: _self.$t('message.operationSuccess'),
+                    duration: 2000,
+                    type: 'success'
+                });
+                _self.butt=false
+            }
+            _self.propertyVisible = false;
+            _self.propertyrela=false;
+            this.butt=false
         },
         loadOptionList(queryName,val){
             let _self = this;

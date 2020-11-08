@@ -355,7 +355,15 @@
     "removeusers":"移出用户",
     "langset":"语言设置",
     "UPzip":"上传ZIP包",
-    "PackDownload4TRS":"Json包下载"
+    "PackDownload4TRS":"Json包下载",
+    "StartUpWorkflow":"发起流程",
+    "Draft":"起草",
+    "SaveTo":"保存至",
+    "Drafts":"草稿箱",
+    "FilesInWorkflow":"流程文件",
+    "AddFile":"添加文件",
+    "approve":"通过",
+    "reject":"驳回"
 },
 "skin": {
     "Blue": "天空蓝",
@@ -527,7 +535,8 @@
     "currentid":"当前ID",
     "desfolderid":"目标文件夹ID",
     "importJson":"Json包导入",
-    "filelist":"文件列表"
+    "filelist":"文件列表",
+    "workflowCenter":"流程中心"
 },
 "message": {
     "conditionS":"条件选择",

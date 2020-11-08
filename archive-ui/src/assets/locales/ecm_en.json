@@ -369,7 +369,15 @@
     "removeusers":"Remove Users",
     "langset":"Language Setting",
     "UPzip":"Upload Zip",
-    "PackDownload4TRS":"JsonPackage"
+    "PackDownload4TRS":"JsonPackage",
+    "StartUpWorkflow":"Startup workflow",
+    "Draft":"Draft",
+    "SaveTo":"Save to ",
+    "Drafts":"drafts",
+    "FilesInWorkflow":"Files in workflow",
+    "AddFile":"Add files",
+    "approve":"Approve",
+    "reject":"Reject"
 },
 "skin": {
     "Blue": "Blue",
@@ -517,7 +525,8 @@
     "currentid":"Current ID",
     "desfolderid":"Destinction Folder ID",
     "importJson":"Import Json",
-    "filelist":"File List"
+    "filelist":"File List",
+    "workflowCenter":"Workflow Center"
 },
 "message": {
     "conditionS":"Select Condition",

@@ -106,8 +106,8 @@ export default {
       );
   },
   props: {
-    itemId: {type:String},
-    typeName: {type:String},
+    itemId: {type:String,default:""},
+    typeName: {type:String,default:""},
     folderId: {type:String},
     folderPath:{type:String},
     showUploadFile: {type:Boolean, default:true}
@@ -210,10 +210,14 @@ export default {
     {
       let _self = this;
       _self.loading = true;
-      if(_self.myItemId != '')
+      if(!_self.myItemId&&!_self.myTypeName){
+        return;
+      }
+      if(_self.myItemId&&_self.myItemId != '')
       {
         _self.myTypeName = "";
       }
+      
       var m = new Map();
       m.set('itemInfo',_self.myItemId+_self.myTypeName);//ID 或类型
       m.set('formName',_self.formName);

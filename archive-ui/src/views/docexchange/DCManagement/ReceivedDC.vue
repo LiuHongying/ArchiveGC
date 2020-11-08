@@ -8,22 +8,22 @@
             </el-dialog>
 
             <!-- 回复窗口 -->
-        <el-dialog
-            :title="$t('application.Reply')+': '+replyTypeName"
-            :visible.sync="replyVisible"
-            width="90%"
-            >
-            <ShowProperty
-                ref="replyProperty"
-                width="100%"
-                itemId=""
-                v-bind:typeName="replyTypeName"
-            ></ShowProperty>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="saveReplyItem">{{$t('application.save')}}</el-button>
-                <el-button @click="replyVisible = false">{{$t('application.cancel')}}</el-button>
-            </div>
-        </el-dialog>
+            <el-dialog
+                :title="$t('application.Reply')+': '+replyTypeName"
+                :visible.sync="replyVisible"
+                width="90%"
+                >
+                <ShowProperty
+                    ref="replyProperty"
+                    width="100%"
+                    itemId=""
+                    v-bind:typeName="replyTypeName"
+                ></ShowProperty>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="saveReplyItem">{{$t('application.save')}}</el-button>
+                    <el-button @click="replyVisible = false">{{$t('application.cancel')}}</el-button>
+                </div>
+            </el-dialog>
 
             <!-- 创建附件 -->
             <el-dialog :title="$t('application.Import')" :visible.sync="importdialogVisible" width="70%">
