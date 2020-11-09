@@ -1,62 +1,6 @@
 <template>
   <el-container>
     <el-container>
-      <el-aside :width="asideWidth" class="">
-        <div style="text-align:left;cursor:pointer;" @click="handleClose">
-          <i v-if="isCollapse==false" class="el-icon-s-fold"></i>
-          <i v-else class="el-icon-s-unfold"></i>
-        </div>
-        <div v-bind:style="{height: menuHeight +'px'}">
-          <!--左侧导航-->
-          <el-menu
-            default-active="$route.path"
-            :collapse="isCollapse"
-            :default-openeds="opens"
-            style="background-color:#6959CD"
-            text-color="white"
-      		  active-text-color="#42b983"
-            ref = "searchMenu"
-          >
-
-            <router-link to="/search/fulltextsearch">
-              <el-menu-item index="/search/fulltextsearch">
-                <i class="el-icon-document  menu-white"></i>
-                <span slot="title"  style="font-size:16px">{{$t('route.fullTextSearch')}}</span>
-              </el-menu-item>
-            </router-link>
-            <el-submenu index="1000">
-              <template slot="title">
-                <i class="el-icon-document-copy  menu-white"></i>
-                <span  style="font-size:16px">{{$t('route.cardSearch')}}</span>
-              </template>
-              <template v-for="(item,index) in cardList">
-                <router-link :to="{path:'/search/cardSearch',query:{id:item.id}}" :key="item.id">
-                  <el-menu-item :index="'/search/cardSearch?id='+item.id">
-                    <i class="el-icon-tickets  menu-white"></i>
-                    <span slot="title">{{item.label}}</span>
-                  </el-menu-item>
-                </router-link>
-              </template>
-            </el-submenu>
-            <router-link to="/search/advsearch">
-            <el-menu-item index="/search/advsearch">
-              <i class="el-icon-s-grid  menu-white"></i>
-              <span slot="title"  style="font-size:16px">
-                {{$t('route.advSearch')}}
-              </span>
-            </el-menu-item>
-            </router-link>
-            <!--
-            <el-menu-item index="4">
-              <i class="el-icon-user"></i>
-              <span slot="title">
-                <router-link to="/search/mysearch">{{$t('menu.mySearch')}}</router-link>
-              </span>
-            </el-menu-item>
-            -->
-          </el-menu>
-        </div>
-      </el-aside>
       <el-main>
         <transition name="fade" mode="out-in">
           <router-view :key="$route.fullPath"></router-view>
