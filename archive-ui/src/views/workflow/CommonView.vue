@@ -21,9 +21,15 @@
         ></ShowPropertyReadOnly>
       </el-row>
       <el-row>
-        <FormFileViewTask ref="workflowFile" :allowEdit="false" :isShowPage="false"
-        v-model="workflowFileList"
-        :parentId="formId"></FormFileViewTask>
+        <FormFileViewTask
+          ref="workflowFile"
+          :allowEdit="false"
+          :isShowPage="false"
+          v-model="workflowFileList"
+          :activityName="activityName"
+          :processDefinitionId="processDefinitionId"
+          :parentId="formId"
+        ></FormFileViewTask>
       </el-row>
     </el-main>
   </el-container>
@@ -80,20 +86,22 @@ export default {
       default: ""
     },
     allowEdit: { type: Boolean, default: false },
-    showUploadFile: { type: Boolean, default: true }
+    showUploadFile: { type: Boolean, default: true },
+    processDefinitionId: { type: String, default: "" },
+    activityName: { type: String, default: "" }
   },
   mounted() {
     // this.getWorkflows();
   },
 
   methods: {
+    
     loadFormInfo() {
       //   this.$refs.ShowProperty.myItemId = this.formId;
       this.$refs.ShowProperty.loadFormInfo();
     },
-    sendData(){
-        
-        this.$emit('click',this.$refs.ShowProperty.getFormData())
+    sendData() {
+      this.$emit("click", this.$refs.ShowProperty.getFormData());
     },
     startUpWorkflow(workflow) {
       let _self = this;

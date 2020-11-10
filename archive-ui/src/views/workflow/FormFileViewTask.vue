@@ -41,6 +41,7 @@
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
           gridViewName="WorkflowFileGrid"
+          :condition="searchFileCondition"
           :optionWidth="1"
           :isShowMoreOption="false"
           :isshowCustom="false"
@@ -131,7 +132,9 @@ export default {
   props: {
     allowEdit: { type: Boolean, default: true },
     isShowPage:{type:Boolean,default:true},
-    parentId:{type:String,default:""}
+    parentId:{type:String,default:""},
+    processDefinitionId:{type:String,default:""},
+    activityName:{type:String,default:""}
   },
   data() {
     return {
@@ -158,14 +161,21 @@ export default {
       },
       selectedFiles:[],
       butt:false,
+      searchFileCondition:""
     };
   },
   mounted() {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
+    
     beforeAddFile() {
-        this.propertyVisible=true;
+      let _self=this;
+      this.getEcmcfgActive(this.processDefinitionId,this.activityName,function(ecmCfgActivity){
+        _self.searchFileCondition=ecmCfgActivity.formCondition;
+        _self.propertyVisible=true;
+      });
+        
     },
     fileSelect(val){
         this.selectedFiles=val;
@@ -197,7 +207,9 @@ export default {
     searchItem() {
       let _self = this;
       let key = " 1=1 ";
-      
+      if(_self.searchFileCondition!=""){
+        key+=" and ("+searchFileCondition+")";
+      }
       if (_self.filters.docType != "") {
         key += " and TYPE_NAME = '" + _self.filters.docType + "'";
       }

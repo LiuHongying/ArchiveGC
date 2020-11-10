@@ -193,4 +193,22 @@ function deleteItem(url,selectedItems,dataGridObj,_this) {
       console.log(error);
     });
 }
+
+// 删除文档事件
+Vue.prototype.getEcmcfgActive=function(processDefinitionId,activityName,callback) {
+  
+  //动态获取表单 显示查看或编辑页面
+  var m = new Map();
+  m.set("processDefinitionId", processDefinitionId);
+  m.set("activityName",activityName );
+  axios
+    .post("/workflow/getEcmCfgActivity", JSON.stringify(m))
+    .then(function(response) {
+      let ecmCfgActivity = response.data.data;
+      
+      if(callback){
+        callback(ecmCfgActivity);
+      }
+    });
+}
   

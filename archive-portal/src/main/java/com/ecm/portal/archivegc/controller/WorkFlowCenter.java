@@ -25,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ecm.common.util.FileUtils;
 import com.ecm.common.util.JSONUtils;
 import com.ecm.core.ActionContext;
+import com.ecm.core.cache.manager.impl.CacheManagerCfgActivity;
+import com.ecm.core.entity.EcmCfgActivity;
 import com.ecm.core.entity.EcmContent;
 import com.ecm.core.entity.EcmDocument;
 import com.ecm.core.entity.EcmFolder;
@@ -84,8 +86,10 @@ public class WorkFlowCenter extends ControllerAbstract {
 
 		Map<String, Object> mp = new HashMap<String, Object>();
 		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		Object saveType=args.get("saveType");
 		Object childObj=args.get("childFileId");
 		args.keySet().remove("childFileId");
+		args.keySet().remove("saveType");
 		EcmContent en = null; 
 		EcmDocument doc = new EcmDocument();
 		doc.setAttributes(args);
@@ -98,9 +102,11 @@ public class WorkFlowCenter extends ControllerAbstract {
 			en.setInputStream(uploadFile.getInputStream());
 		}
 		Object fid= args.get("folderId");
+		 
 		String folderId="";
 		if(fid==null) {
-			folderId= folderPathService.getFolderId(getToken(), doc.getAttributes(), "3");
+			folderId= folderPathService.getFolderId(getToken(), doc.getAttributes(), 
+					(saveType!=null&&!"".equals(saveType.toString()))?saveType.toString():"3");
 		}else {
 			folderId=fid.toString();
 		}
@@ -188,7 +194,8 @@ public class WorkFlowCenter extends ControllerAbstract {
     		row.put("NAME", workflow.getName());
     		row.put("KEY", workflow.getKey());
     		row.put("REVISION", workflow.getVersion());
-    		row.put("FORMNAME", workflow.getDescription());//流程表单名放在description中
+    		EcmCfgActivity ecmCfgActivityObj = CacheManagerCfgActivity.getCfgActivity(workflow.getName(), "start");
+    		row.put("FORMNAME", ecmCfgActivityObj==null?workflow.getDescription():ecmCfgActivityObj.getFormAttribute());//流程表单名放在description中
     		workflowData.add(row);
 		}
     	Pager pager = new Pager();
