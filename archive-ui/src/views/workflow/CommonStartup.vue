@@ -14,6 +14,7 @@
                     allowEdit
                     :isShowPage="false"
                     v-model="workflowFileList"
+                    :workflowObj="workflowObj"
                 >
                 </FormFile>
                 <div class="dialog-footer" style="float:right">
@@ -264,6 +265,7 @@
                         fileIds.push(_self.workflowFileList[n].ID);
                     }
                     m.set("childFileId",fileIds);
+                    m.set("saveType","1");
                     var c;
                     for(c in _self.$refs.ShowProperty.dataList)
                     {

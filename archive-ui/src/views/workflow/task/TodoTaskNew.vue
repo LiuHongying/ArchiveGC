@@ -328,7 +328,13 @@ export default {
             break;
         }
         // if(_self.currentData.processDefinitionId.split(":")[0]=="BianJiaoShenPi"){
-        _self.$refs.propertiesComp.sendData();
+          try{
+            
+            _self.$refs.propertiesComp.sendData();
+          }catch(e){
+            _self.completetaskFinal(_self);
+            return;
+          }
         let docMap = _self.getFormdataMap();
         axios
           .post("/dc/saveDocument", docMap)

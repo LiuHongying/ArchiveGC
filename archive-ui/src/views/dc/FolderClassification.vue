@@ -269,6 +269,7 @@
               icon="el-icon-upload2"
               @click="importDialogVisible = true"
             >{{$t('application.Import')}}</el-button>
+            <StartupComponent :selectedFiles="selectedItems"></StartupComponent>
           </el-col>
         </el-row>
       <div :style="{position:'relative',height: asideHeight+'px'}">
@@ -400,6 +401,7 @@ import ObjectAcl from '@/components/controls/ObjectAcl';
 import SystemInfo from '@/components/controls/SystemInfo';
 import FolderAcl from '@/components/controls/FolderAcl';
 import StartWorkflow from '@/views/workflow/StartWorkflow';
+import StartupComponent from '@/views/workflow/StartupComponent.vue'
 
 import "url-search-params-polyfill";
 
@@ -413,7 +415,8 @@ export default {
     ObjectAcl: ObjectAcl,
     SystemInfo: SystemInfo,
     FolderAcl:FolderAcl,
-    StartWorkflow: StartWorkflow
+    StartWorkflow: StartWorkflow,
+    StartupComponent:StartupComponent
   },
   data() {
     return {

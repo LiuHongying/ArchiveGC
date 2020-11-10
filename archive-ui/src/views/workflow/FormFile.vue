@@ -40,6 +40,7 @@
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
+          :condition="searchFileCondition"
           gridViewName="WorkflowFileGrid"
           :optionWidth="1"
           :isShowMoreOption="false"
@@ -132,7 +133,8 @@ export default {
   props: {
     allowEdit: { type: Boolean, default: true },
     isShowPage:{type:Boolean,default:true},
-    files:{type:Array,default:[]}
+    files:{type:Array,default:[]},
+    workflowObj:{type:Object,default:{}}
   },
   data() {
     return {
@@ -159,15 +161,21 @@ export default {
       },
       selectedFiles:[],
       butt:false,
+      searchFileCondition:""
     };
   },
   mounted() {
-    debugger;
+   
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
     beforeAddFile() {
-        this.propertyVisible=true;
+      let _self=this;
+      this.getEcmcfgActive(this.workflowObj.ID,"start",function(ecmCfgActivity){
+        _self.searchFileCondition=ecmCfgActivity.formCondition;
+        _self.propertyVisible=true;
+      });
+        
     },
     fileSelect(val){
         this.selectedFiles=val;
