@@ -105,6 +105,7 @@
                         fileIds.push(_self.workflowFileList[n].ID);
                     }
                     m.set("childFileId",fileIds);
+                    // m.set("STATUS","流程中")
                     var c;
                     for(c in _self.$refs.ShowProperty.dataList)
                     {
