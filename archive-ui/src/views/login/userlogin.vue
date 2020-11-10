@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import md5 from 'js-md5';
 export default {
   data() {
     return {
@@ -106,11 +107,15 @@ export default {
       if (!tocomp) {
         tocomp = "/";
       }
+      var userAccount = {
+          username: _self.account.username,
+          password: md5(_self.account.password)
+      };
       _self.$refs.AccountFrom.validate(valid => {
         if (valid) {
           _self.loading = true;
           axios
-            .post("/userLogin", JSON.stringify(_self.account))
+            .post("/userLogin", JSON.stringify(userAccount))
             .then(function(response) {
               //console.log(response.data);
               if (response.data.code == 1) {
