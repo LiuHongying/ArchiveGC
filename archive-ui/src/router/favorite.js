@@ -6,6 +6,6 @@ export const favoriteRouter = {
         },
         path: '/ShopingCart',
         name: '收藏夹',
-        component: () => import('@/components/form/ShopingCart.vue')
+        component: () => import('@/components/ShoppingCart.vue')
         
 }
