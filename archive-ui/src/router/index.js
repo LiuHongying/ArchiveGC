@@ -4,6 +4,7 @@ import { adminRouter } from "@/router/admin.js";
 import { recordRouter } from "@/router/record.js";
 import { searchRouter } from "@/router/search.js";
 import { dcRouter } from "@/router/doccenter.js";
+import { favoriteRouter} from "@/router/favorite.js";
 import { reportRouter } from "@/router/report.js";
 import { userRouter } from "@/router/user.js";
 import { workflowRouter } from "@/router/workflow.js";
@@ -49,6 +50,7 @@ const router = new Router({
         ...workflowCenter,
         reportRouter,
         userRouter,
+        favoriteRouter,
         // docexchange,
         ...testRouter,
         ...adminRouter,
