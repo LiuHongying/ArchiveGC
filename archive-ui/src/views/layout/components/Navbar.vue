@@ -28,6 +28,9 @@
       <ecm-lang-select class="international right-menu-item"></ecm-lang-select>
       <ecm-skin class="theme-switch right-menu-item"></ecm-skin>
       <span class="ecm-help">
+        <router-link to="/ShopingCart">{{$t('route.favorite')}}</router-link>&nbsp;
+      </span>
+      <span class="ecm-help">
         <router-link to="/user/userinfo">{{currentUser().userName}}</router-link>&nbsp;
       </span>
 
@@ -102,7 +105,7 @@ export default {
           _self.$router.push({ path: "/login" });
         }
       });
-    }
+    },
   }
 }
 </script>

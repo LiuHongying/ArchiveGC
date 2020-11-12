@@ -1,307 +1,451 @@
-     <template>
+<template>
   <div>
-    <el-form ref="borrowForm" :model="borrowForm" style="width:100%" :rules="rules">
-      <el-row style="width:100%">
-        <div v-if="(istask==1 && formEditPermision==0)||istask==0">
-          <el-col>
-            <el-form-item
-              label="借阅单号"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >{{borrowForm.CODING}}</el-form-item>
-            <el-form-item :label-width="formLabelWidth" style="float:right">
-              <el-button @click="getBorrowHelpDoc()">帮助</el-button>
-            </el-form-item>
-          </el-col>
-          <el-col>
-            <el-form-item label="姓名" :label-width="formLabelWidth" style="float:left">
-              <el-input v-model="borrowForm.C_DRAFTER" auto-complete="off" readonly></el-input>
-            </el-form-item>
-            <el-form-item label="电话" :label-width="formLabelWidth" style="float:left">
-              <el-input v-model="borrowForm.TITLE" auto-complete="off"></el-input>
-            </el-form-item>
-            <el-form-item
-              prop="C_DESC1"
-              label="用户部门"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >
-              <el-input v-model="borrowForm.C_DESC1" auto-complete="off"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col>
-            <el-form-item label="借阅类型" :label-width="formLabelWidth" style="float:left">
-              <el-radio-group v-model="borrowForm.SUB_TYPE">
-                <el-radio-button label="在线浏览">在线浏览</el-radio-button>
-                <el-radio-button label="纸质借阅">纸质借阅</el-radio-button>
-                <el-radio-button label="下载">下载</el-radio-button>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col>
-            <el-form-item
-              prop="C_START_DATE"
-              label="借阅开始时间"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >
-              <el-date-picker
-                :picker-options="expireTimeOption"
-                v-model="borrowForm.C_START_DATE"
-                auto-complete="off"
-                value-format="yyyy-MM-dd HH:mm:ss"
-              ></el-date-picker>
-            </el-form-item>
-            <el-form-item
-              prop="C_END_DATE"
-              label="借阅结束时间"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >
-              <el-date-picker
-                :picker-options="expireTimeOption"
-                v-model="borrowForm.C_END_DATE"
-                auto-complete="off"
-                value-format="yyyy-MM-dd HH:mm:ss"
-              ></el-date-picker>
-            </el-form-item>
-          </el-col>
-          <el-col>
-            <el-table :data="tabledata" border v-loading="loading" @selection-change="selectChange">
-              <el-table-column type="selection" width="40"></el-table-column>
-              <el-table-column type="index" label="#" width="50"></el-table-column>
-              <el-table-column prop="id" label="id" v-if="1==2" min-width="15%" sortable></el-table-column>
-              <el-table-column width="40">
-                <template slot-scope="scope">
-                  <img
-                    v-if="scope.row.TYPE_NAME=='图册'"
-                    :src="'./static/img/drawing.gif'"
-                    :title="scope.row.TYPE_NAME"
-                    border="0"
-                  />
-                  <img
-                    v-else-if="scope.row.TYPE_NAME=='卷盒'"
-                    :src="'./static/img/box.gif'"
-                    :title="scope.row.TYPE_NAME"
-                    border="0"
-                  />
-                  <img
-                    v-else-if="scope.row.FORMAT_NAME==null || scope.row.FORMAT_NAME==''"
-                    :src="'./static/img/format/f_undefined_16.gif'"
-                    title="无电子文件"
-                    border="0"
-                  />
-                  <img
-                    v-else
-                    :src="'./static/img/format/f_'+scope.row.FORMAT_NAME+'_16.gif'"
-                    :title="scope.row.FORMAT_NAME"
-                    border="0"
-                  />
-                </template>
-              </el-table-column>>
-              <template v-for="item in gridList">
-                <el-table-column :key="item.id" :label="item.label" :prop="item.attrName">
+    <el-button
+      type="primary"
+      plain
+      size="medium"
+      :title="$t('application.openShopingCart')"
+      icon="el-icon-info"
+      @click="dialogVisible = true"
+    >{{$t('application.openShopingCart')}}</el-button>
+    <el-dialog
+      :title="$t('application.openShopingCart')"
+      :visible.sync="dialogVisible"
+    >
+      <el-form
+        ref="borrowForm"
+        :model="borrowForm"
+        style="width: 100%"
+        :rules="rules"
+      >
+        <el-row style="width: 100%">
+          <div v-if="(istask == 1 && formEditPermision == 0) || istask == 0">
+            <el-col>
+              <el-form-item
+                label="借阅单号"
+                :label-width="formLabelWidth"
+                style="float: left"
+                >{{ borrowForm.CODING }}</el-form-item
+              >
+              <el-form-item :label-width="formLabelWidth" style="float: right">
+                <el-button @click="getBorrowHelpDoc()">帮助</el-button>
+              </el-form-item>
+            </el-col>
+            <el-col>
+              <el-form-item
+                label="姓名"
+                :label-width="formLabelWidth"
+                style="float: left"
+              >
+                <el-input
+                  v-model="borrowForm.C_DRAFTER"
+                  auto-complete="off"
+                  readonly
+                ></el-input>
+              </el-form-item>
+              <el-form-item
+                label="电话"
+                :label-width="formLabelWidth"
+                style="float: left"
+              >
+                <el-input
+                  v-model="borrowForm.TITLE"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
+              <el-form-item
+                prop="C_DESC1"
+                label="用户部门"
+                :label-width="formLabelWidth"
+                style="float: left"
+              >
+                <el-input
+                  v-model="borrowForm.C_DESC1"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col>
+              <el-form-item
+                label="借阅类型"
+                :label-width="formLabelWidth"
+                style="float: left"
+              >
+                <el-radio-group v-model="borrowForm.SUB_TYPE">
+                  <el-radio-button label="在线浏览">在线浏览</el-radio-button>
+                  <el-radio-button label="纸质借阅">纸质借阅</el-radio-button>
+                  <el-radio-button label="下载">下载</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+            <el-col>
+              <el-form-item
+                prop="C_START_DATE"
+                label="借阅开始时间"
+                :label-width="formLabelWidth"
+                style="float: left"
+              >
+                <el-date-picker
+                  :picker-options="expireTimeOption"
+                  v-model="borrowForm.C_START_DATE"
+                  auto-complete="off"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                ></el-date-picker>
+              </el-form-item>
+              <el-form-item
+                prop="C_END_DATE"
+                label="借阅结束时间"
+                :label-width="formLabelWidth"
+                style="float: left"
+              >
+                <el-date-picker
+                  :picker-options="expireTimeOption"
+                  v-model="borrowForm.C_END_DATE"
+                  auto-complete="off"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                ></el-date-picker>
+              </el-form-item>
+            </el-col>
+            <el-col>
+              <el-table
+                :data="tabledata"
+                border
+                v-loading="loading"
+                @selection-change="selectChange"
+              >
+                <el-table-column type="selection" width="40"></el-table-column>
+                <el-table-column
+                  type="index"
+                  label="#"
+                  width="50"
+                ></el-table-column>
+                <el-table-column
+                  prop="id"
+                  label="id"
+                  v-if="1 == 2"
+                  min-width="15%"
+                  sortable
+                ></el-table-column>
+                <el-table-column width="40">
                   <template slot-scope="scope">
-                    <template
-                      v-if="item.attrName=='C_ARCHIVE_DATE'"
-                    >{{dateFormat(scope.row.C_ARCHIVE_DATE)}}</template>
-                    <template v-else>{{scope.row[item.attrName]}}</template>
+                    <img
+                      v-if="scope.row.TYPE_NAME == '图册'"
+                      :src="'./static/img/drawing.gif'"
+                      :title="scope.row.TYPE_NAME"
+                      border="0"
+                    />
+                    <img
+                      v-else-if="scope.row.TYPE_NAME == '卷盒'"
+                      :src="'./static/img/box.gif'"
+                      :title="scope.row.TYPE_NAME"
+                      border="0"
+                    />
+                    <img
+                      v-else-if="
+                        scope.row.FORMAT_NAME == null ||
+                        scope.row.FORMAT_NAME == ''
+                      "
+                      :src="'./static/img/format/f_undefined_16.gif'"
+                      title="无电子文件"
+                      border="0"
+                    />
+                    <img
+                      v-else
+                      :src="
+                        './static/img/format/f_' +
+                        scope.row.FORMAT_NAME +
+                        '_16.gif'
+                      "
+                      :title="scope.row.FORMAT_NAME"
+                      border="0"
+                    />
+                  </template> </el-table-column
+                >>
+                <template v-for="item in gridList">
+                  <el-table-column
+                    :key="item.id"
+                    :label="item.label"
+                    :prop="item.attrName"
+                  >
+                    <template slot-scope="scope">
+                      <template v-if="item.attrName == 'C_ARCHIVE_DATE'">{{
+                        dateFormat(scope.row.C_ARCHIVE_DATE)
+                      }}</template>
+                      <template v-else>{{ scope.row[item.attrName] }}</template>
+                    </template>
+                  </el-table-column>
+                </template>
+                <el-table-column align="right">
+                  <template slot-scope="scope">
+                    <el-button size="mini" @click="viewdoc(scope.row)"
+                      >查看</el-button
+                    >
+                    <el-button
+                      size="mini"
+                      @click="removeItemFromForm(scope.row)"
+                      >移除</el-button
+                    >
                   </template>
                 </el-table-column>
-              </template>
-              <el-table-column align="right">
-                <template slot-scope="scope">
-                  <el-button size="mini" @click="viewdoc(scope.row)">查看</el-button>
-                  <el-button size="mini" @click="removeItemFromForm(scope.row)">移除</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-col>
-          <el-col
-            v-if="istask==1 && formEditPermision==1"
-            slot="footer"
-            style="float:left;padding-top:10px;padding-bottom:10px;width:100%;height:100%"
-          >
-            <el-button @click="showOrCloseShopingCart()" style>{{showOrCloseShopingCartLabel}}</el-button>
-            <div v-if="vshowShopingCart==true">
-              <ShowShopingCart
-                ref="ShowShopingCart"
-                width="100%"
-                v-bind:formId="formId"
-                v-bind:excludeRows="tabledata"
-              ></ShowShopingCart>
-              <el-button ref="add" style="float:left" @click="addToFormFromShopingCart()">添加到表单</el-button>
-            </div>
-          </el-col>
-           <el-col style="padding-top:3px;">
-            <div v-for="(approver,index)  in approvalUserList" :key="'approver_'+index">
-            <el-form-item :label="approver.activityName"  :label-width="formLabelWidth" style="float:left">
-              <UserSelectInput
-                v-model="borrowForm[approver.formAttribute]"
-                v-bind:inputValue="borrowForm[approver.formAttribute]"
-                v-bind:roleName="approver.roleName"
-              ></UserSelectInput>
-            </el-form-item>
+              </el-table>
+            </el-col>
+            <el-col
+              v-if="istask == 1 && formEditPermision == 1"
+              slot="footer"
+              style="
+                float: left;
+                padding-top: 10px;
+                padding-bottom: 10px;
+                width: 100%;
+                height: 100%;
+              "
+            >
+              <el-button @click="showOrCloseShopingCart()" style>{{
+                showOrCloseShopingCartLabel
+              }}</el-button>
+              <div v-if="vshowShopingCart == true">
+                <ShowShopingCart
+                  ref="ShowShopingCart"
+                  width="100%"
+                  v-bind:formId="formId"
+                  v-bind:excludeRows="tabledata"
+                ></ShowShopingCart>
+                <el-button
+                  ref="add"
+                  style="float: left"
+                  @click="addToFormFromShopingCart()"
+                  >添加到表单</el-button
+                >
+              </div>
+            </el-col>
+            <el-col style="padding-top: 3px">
+              <div
+                v-for="(approver, index) in approvalUserList"
+                :key="'approver_' + index"
+              >
+                <el-form-item
+                  :label="approver.activityName"
+                  :label-width="formLabelWidth"
+                  style="float: left"
+                >
+                  <UserSelectInput
+                    v-model="borrowForm[approver.formAttribute]"
+                    v-bind:inputValue="borrowForm[approver.formAttribute]"
+                    v-bind:roleName="approver.roleName"
+                  ></UserSelectInput>
+                </el-form-item>
+              </div>
+            </el-col>
+            <el-col>
+              <el-form-item
+                label="借阅目的"
+                :label-width="formLabelWidth"
+                style="text-align: left"
+              >
+                <el-input
+                  type="textarea"
+                  :autosize="{ minRows: 3 }"
+                  v-model="borrowForm.C_COMMENT"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
+            </el-col>
           </div>
-          </el-col>
-          <el-col>
-            <el-form-item label="借阅目的" :label-width="formLabelWidth" style="text-align:left">
-              <el-input
-                type="textarea"
-                :autosize="{minRows:3}"
-                v-model="borrowForm.C_COMMENT"
-                auto-complete="off"
-              ></el-input>
-            </el-form-item>
-          </el-col>
-        </div>
-        <div v-if="istask==1 && formEditPermision==0">
-          <el-col>
-            <el-form-item
-              label="借阅单号"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >{{borrowForm.CODING}}</el-form-item>
-            <el-form-item :label-width="formLabelWidth" style="float:right">
-              <el-button @click="getBorrowHelpDoc()">帮助</el-button>
-            </el-form-item>
-          </el-col>
-          <el-col>
-            <el-form-item
-              label="姓名"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >{{borrowForm.C_DRAFTER}}</el-form-item>
-            <el-form-item
-              label="电话"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >{{borrowForm.TITLE}}</el-form-item>
-            <el-form-item
-              label="用户部门"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >{{borrowForm.C_DESC1}}</el-form-item>
-            <el-form-item
-              label="编制部门"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >{{borrowForm.C_CREATION_UNIT}}</el-form-item>
-            <!-- <el-form-item label="日期" :label-width="formLabelWidth" style="float:left">
+          <div v-if="istask == 1 && formEditPermision == 0">
+            <el-col>
+              <el-form-item
+                label="借阅单号"
+                :label-width="formLabelWidth"
+                style="float: left"
+                >{{ borrowForm.CODING }}</el-form-item
+              >
+              <el-form-item :label-width="formLabelWidth" style="float: right">
+                <el-button @click="getBorrowHelpDoc()">帮助</el-button>
+              </el-form-item>
+            </el-col>
+            <el-col>
+              <el-form-item
+                label="姓名"
+                :label-width="formLabelWidth"
+                style="float: left"
+                >{{ borrowForm.C_DRAFTER }}</el-form-item
+              >
+              <el-form-item
+                label="电话"
+                :label-width="formLabelWidth"
+                style="float: left"
+                >{{ borrowForm.TITLE }}</el-form-item
+              >
+              <el-form-item
+                label="用户部门"
+                :label-width="formLabelWidth"
+                style="float: left"
+                >{{ borrowForm.C_DESC1 }}</el-form-item
+              >
+              <el-form-item
+                label="编制部门"
+                :label-width="formLabelWidth"
+                style="float: left"
+                >{{ borrowForm.C_CREATION_UNIT }}</el-form-item
+              >
+              <!-- <el-form-item label="日期" :label-width="formLabelWidth" style="float:left">
                   {{borrowForm." :formatter="dateFormatter" auto-complete="off"></el-input> 
                 </el-form-item>
                   <el-form-item label="文件归档单位" :label-width="formLabelWidth" style="float:left">
                   {{borrowForm.cCreationUnit" auto-complete="off"></el-input>
             </el-form-item>-->
-          </el-col>
-          <el-col>
-            <el-form-item
-              label="借阅类型"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >{{borrowForm.SUB_TYPE}}</el-form-item>
-          </el-col>
-          <el-col class="topbar-button">
-            <el-form-item
-              label="借阅开始时间"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >{{dateFormat(borrowForm.C_START_DATE)}}</el-form-item>
-            <el-form-item
-              label="借阅结束时间"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >{{dateFormat(borrowForm.C_END_DATE)}}</el-form-item>
-           <el-form-item :label-width="formLabelWidth" style="float:right">
-              <el-button
-              v-show="borrowForm.SUB_TYPE=='下载' && borrowForm.STATUS=='已完成' "
-              ref="downloadAllFile"
-              @click="downloadAllFile()"
-            >打包下载</el-button>
-            </el-form-item>
-            
-          </el-col>
-          <el-col>
-            <el-table :data="tabledata">
-              <el-table-column type="index" label="#" width="50"></el-table-column>
-              <el-table-column prop="id" label="id" v-if="1==2" min-width="15%" sortable></el-table-column>
-              <el-table-column width="40">
-                <template slot-scope="scope">
-                  <img
-                    v-if="scope.row.TYPE_NAME=='图册'"
-                    :src="'./static/img/drawing.gif'"
-                    :title="scope.row.TYPE_NAME"
-                    border="0"
-                  />
-                  <img
-                    v-else-if="scope.row.TYPE_NAME=='卷盒'"
-                    :src="'./static/img/box.gif'"
-                    :title="scope.row.TYPE_NAME"
-                    border="0"
-                  />
-                   <img
-                  v-else-if="scope.row.FORMAT_NAME==null || scope.row.FORMAT_NAME==''"
-                  :src="'./static/img/format/f_undefined_16.gif'"
-                  title="无电子文件"
-                  border="0"
-                />
-                <img
-                  v-else
-                  :src="'./static/img/format/f_'+scope.row.FORMAT_NAME+'_16.gif'"
-                  :title="scope.row.FORMAT_NAME"
-                  border="0"
-                />
-                </template>
-              </el-table-column>>
-              <template v-for="item in gridList">
-                <el-table-column :key="item.id" :label="item.label" :prop="item.attrName">
+            </el-col>
+            <el-col>
+              <el-form-item
+                label="借阅类型"
+                :label-width="formLabelWidth"
+                style="float: left"
+                >{{ borrowForm.SUB_TYPE }}</el-form-item
+              >
+            </el-col>
+            <el-col class="topbar-button">
+              <el-form-item
+                label="借阅开始时间"
+                :label-width="formLabelWidth"
+                style="float: left"
+                >{{ dateFormat(borrowForm.C_START_DATE) }}</el-form-item
+              >
+              <el-form-item
+                label="借阅结束时间"
+                :label-width="formLabelWidth"
+                style="float: left"
+                >{{ dateFormat(borrowForm.C_END_DATE) }}</el-form-item
+              >
+              <el-form-item :label-width="formLabelWidth" style="float: right">
+                <el-button
+                  v-show="
+                    borrowForm.SUB_TYPE == '下载' &&
+                    borrowForm.STATUS == '已完成'
+                  "
+                  ref="downloadAllFile"
+                  @click="downloadAllFile()"
+                  >打包下载</el-button
+                >
+              </el-form-item>
+            </el-col>
+            <el-col>
+              <el-table :data="tabledata">
+                <el-table-column
+                  type="index"
+                  label="#"
+                  width="50"
+                ></el-table-column>
+                <el-table-column
+                  prop="id"
+                  label="id"
+                  v-if="1 == 2"
+                  min-width="15%"
+                  sortable
+                ></el-table-column>
+                <el-table-column width="40">
                   <template slot-scope="scope">
-                    <template
-                      v-if="item.attrName=='C_ARCHIVE_DATE'"
-                    >{{dateFormat(scope.row.C_ARCHIVE_DATE)}}</template>
-                    <template v-else>{{scope.row[item.attrName]}}</template>
+                    <img
+                      v-if="scope.row.TYPE_NAME == '图册'"
+                      :src="'./static/img/drawing.gif'"
+                      :title="scope.row.TYPE_NAME"
+                      border="0"
+                    />
+                    <img
+                      v-else-if="scope.row.TYPE_NAME == '卷盒'"
+                      :src="'./static/img/box.gif'"
+                      :title="scope.row.TYPE_NAME"
+                      border="0"
+                    />
+                    <img
+                      v-else-if="
+                        scope.row.FORMAT_NAME == null ||
+                        scope.row.FORMAT_NAME == ''
+                      "
+                      :src="'./static/img/format/f_undefined_16.gif'"
+                      title="无电子文件"
+                      border="0"
+                    />
+                    <img
+                      v-else
+                      :src="
+                        './static/img/format/f_' +
+                        scope.row.FORMAT_NAME +
+                        '_16.gif'
+                      "
+                      :title="scope.row.FORMAT_NAME"
+                      border="0"
+                    />
+                  </template> </el-table-column
+                >>
+                <template v-for="item in gridList">
+                  <el-table-column
+                    :key="item.id"
+                    :label="item.label"
+                    :prop="item.attrName"
+                  >
+                    <template slot-scope="scope">
+                      <template v-if="item.attrName == 'C_ARCHIVE_DATE'">{{
+                        dateFormat(scope.row.C_ARCHIVE_DATE)
+                      }}</template>
+                      <template v-else>{{ scope.row[item.attrName] }}</template>
+                    </template>
+                  </el-table-column>
+                </template>
+                <el-table-column align="right">
+                  <template slot-scope="scope">
+                    <el-button size="mini" @click="viewdoc(scope.row)"
+                      >查看</el-button
+                    >
                   </template>
                 </el-table-column>
-              </template>
-              <el-table-column align="right">
-                <template slot-scope="scope">
-                  <el-button size="mini" @click="viewdoc(scope.row)">查看</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-col>
-          <el-col>
-            <el-form-item
-              label="申请人领导"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >{{borrowForm.C_REVIEWER1}}</el-form-item>
-            <el-form-item
-              label="形成部门领导"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >{{borrowForm.C_REVIEWER2}}</el-form-item>
-            <el-form-item
-              label="分管领导"
-              :label-width="formLabelWidth"
-              style="float:left"
-            >{{borrowForm.C_REVIEWER3}}</el-form-item>
-          </el-col>
-          <el-col>
-            <el-form-item
-              label="借阅目的"
-              :label-width="formLabelWidth"
-              style="text-align:left"
-            >{{borrowForm.C_COMMENT}}</el-form-item>
-          </el-col>
-        </div>
-      </el-row>
-    </el-form>
+              </el-table>
+            </el-col>
+            <el-col>
+              <el-form-item
+                label="申请人领导"
+                :label-width="formLabelWidth"
+                style="float: left"
+                >{{ borrowForm.C_REVIEWER1 }}</el-form-item
+              >
+              <el-form-item
+                label="形成部门领导"
+                :label-width="formLabelWidth"
+                style="float: left"
+                >{{ borrowForm.C_REVIEWER2 }}</el-form-item
+              >
+              <el-form-item
+                label="分管领导"
+                :label-width="formLabelWidth"
+                style="float: left"
+                >{{ borrowForm.C_REVIEWER3 }}</el-form-item
+              >
+            </el-col>
+            <el-col>
+              <el-form-item
+                label="借阅目的"
+                :label-width="formLabelWidth"
+                style="text-align: left"
+                >{{ borrowForm.C_COMMENT }}</el-form-item
+              >
+            </el-col>
+          </div>
+        </el-row>
+      </el-form>
 
-    <div slot="footer" class="dialog-footer" style="text-align:center" v-if="istask==false">
-      <el-button ref="borrowCancel" type="primary" @click="cancel()">{{$t('application.cancel')}}</el-button>
-      <el-button ref="borrowStartwf" @click="startWorkflow(borrowForm)">启动流程</el-button>
-    </div>
+      <div
+        slot="footer"
+        class="dialog-footer"
+        style="text-align: center"
+        v-if="istask == false"
+      >
+        <el-button ref="borrowCancel" type="primary" @click="cancel()">{{
+          $t("application.cancel")
+        }}</el-button>
+        <el-button ref="borrowStartwf" @click="startWorkflow(borrowForm)"
+          >启动流程</el-button
+        >
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -312,7 +456,7 @@ import UserSelectInput from "@/components/controls/UserSelectInput";
 export default {
   components: {
     ShowShopingCart: ShowShopingCart,
-    UserSelectInput: UserSelectInput
+    UserSelectInput: UserSelectInput,
   },
   name: "BorrwoForm",
   data() {
@@ -328,7 +472,7 @@ export default {
       approvalUserList: [],
       dialogTitle: "借阅",
       borrowDialogVisible: false,
-      componentName: "borrow", 
+      componentName: "borrow",
       borrowForm: {
         C_DRAFTER: sessionStorage.getItem("access-userName"),
         C_DESC1: sessionStorage.getItem("access-department"),
@@ -341,15 +485,15 @@ export default {
         C_REVIEWER3: "",
         C_COMMENT: "",
         C_CREATION_UNIT: "",
-        STATUS: ""
+        STATUS: "",
       },
       rules: {
         C_DESC1: [
           {
             required: true,
             message: this.$t("message.pleaseInput") + "用户部门",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
           // { validator: validaePass }
         ],
         // C_CREATION_UNIT: [
@@ -360,18 +504,18 @@ export default {
           {
             required: true,
             message: this.$t("message.pleaseInput") + "借阅开始时间",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
           // { validator: validaePass2 }
         ],
         C_END_DATE: [
           {
             required: true,
             message: this.$t("message.pleaseInput") + "借阅结束时间",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
           // { validator: validaePass2 }
-        ]
+        ],
       },
       formId: "",
       istask: 0,
@@ -383,13 +527,14 @@ export default {
       expireTimeOption: this.dateCheck(),
       defaultProps: {
         children: "children",
-        label: "name"
+        label: "name",
       },
       deptList: [],
       showDepartMentList: 0,
       currentGroupData: "",
       selectedGroupItemId: "",
-      currentRootGroupData: ""
+      currentRootGroupData: "",
+      dialogVisible: false,
     };
   },
 
@@ -401,7 +546,7 @@ export default {
       _self.istask = _self.$route.query.istask;
       _self.processDefinitionId = _self.$route.query.processDefinitionId;
       _self.activityName = _self.$route.query.activityName;
-  }
+    }
     _self.getApprovalUserList();
     // _self.loadGridView();
   },
@@ -411,24 +556,23 @@ export default {
   },
 
   methods: {
-    getApprovalUserList(){
-            let _self = this;
-       var m = new Map();
+    getApprovalUserList() {
+      let _self = this;
+      var m = new Map();
       m.set("processDefinitionId", _self.processDefinitionId);
       m.set("activityName", _self.activityName);
-    axios
+      axios
         .post("/workflow/getApprovalUserList", JSON.stringify(m))
-        .then(function(response) {
-         _self.approvalUserList = response.data.data;
+        .then(function (response) {
+          _self.approvalUserList = response.data.data;
         });
-     
     },
     dateCheck() {
       let _self = this;
       return {
         disabledDate(date) {
           return date.getTime() + 86400000 < Date.now();
-        }
+        },
       };
     },
 
@@ -439,7 +583,7 @@ export default {
       m.set("lang", _self.currentLanguage);
       axios
         .post("/dc/getGridViewInfo", JSON.stringify(m))
-        .then(function(response) {
+        .then(function (response) {
           _self.gridList = response.data.data;
           if (typeof _self.formId == "undefined") {
             _self.tabledata = _self.$route.query.tabledata;
@@ -452,7 +596,7 @@ export default {
     },
     loadData() {
       let _self = this;
-      axios.post("/dc/getDocumentById", _self.formId).then(function(response) {
+      axios.post("/dc/getDocumentById", _self.formId).then(function (response) {
         let result = response.data;
         if (result.code == 1) {
           _self.borrowForm = result.data;
@@ -460,7 +604,7 @@ export default {
       });
       axios
         .post("/dc/getFormRelateDocument", _self.formId)
-        .then(function(response) {
+        .then(function (response) {
           let result = response.data;
           if (result.code == 1) {
             _self.tabledata = result.data;
@@ -485,7 +629,7 @@ export default {
     startWorkflow() {
       let _self = this;
       let formMap = new Map();
-      _self.$refs.borrowForm.validate(valid => {
+      _self.$refs.borrowForm.validate((valid) => {
         if (valid) {
           formMap = _self.validateBorrowForm(_self);
           if (formMap == null) {
@@ -494,7 +638,7 @@ export default {
           _self.loading = true;
           axios
             .post("/dc/saveBorrowForm", JSON.stringify(formMap))
-            .then(function(response) {
+            .then(function (response) {
               _self.formId = response.data.data;
               console.log(response);
               let m = new Map();
@@ -508,30 +652,30 @@ export default {
 
               axios
                 .post("/workflow/startWorkflow", JSON.stringify(m))
-                .then(function(response) {
+                .then(function (response) {
                   console.log(response);
                   _self.$message({
                     showClose: true,
                     message: "流程发起成功!",
                     duration: 2000,
-                    type: "success"
+                    type: "success",
                   });
 
                   _self.loading = false;
                   _self.cancel();
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                   _self.$message({
                     showClose: true,
                     message: "流程发起失败!",
                     duration: 2000,
-                    type: "warning"
+                    type: "warning",
                   });
                   console.log(error);
                   _self.loading = false;
                 });
             })
-            .catch(function(error) {
+            .catch(function (error) {
               console.log(error);
               _self.loading = false;
             });
@@ -634,7 +778,7 @@ export default {
             showClose: true,
             message: "结束日期不能小于开始日期！",
             duration: 5000,
-            type: "error"
+            type: "error",
           });
           return;
         }
@@ -646,7 +790,7 @@ export default {
             showClose: true,
             message: "根据您借阅档案的信息：" + alertStr + "  必填",
             duration: 5000,
-            type: "warning"
+            type: "warning",
           });
           return;
         }
@@ -657,7 +801,7 @@ export default {
           showClose: true,
           message: "所借阅文件包含不在库文件，不能发起借阅流程",
           duration: 5000,
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -713,10 +857,10 @@ export default {
 
       axios
         .post("/dc/saveBorrowForm", m)
-        .then(function(response) {
+        .then(function (response) {
           console.log(response.data.data);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
           _self.loading = false;
         });
@@ -727,7 +871,7 @@ export default {
       var arg = [];
       axios
         .post("/dc/openShopingCart", JSON.stringify(arg))
-        .then(function(response) {
+        .then(function (response) {
           if (response.data.code) {
             // _self.shopingCartDialogVisible = true;
             // setTimeout(()=>{
@@ -749,7 +893,7 @@ export default {
               showClose: true,
               message: "打开失败!",
               duration: 2000,
-              type: "warning"
+              type: "warning",
             });
           }
         });
@@ -783,9 +927,9 @@ export default {
             if (typeof allTableData[i].C_ARCHIVE_UNIT == "undefined") {
               _self.$message({
                 showClose: true,
-                message: _self.$t('message.EmptyPlaceOnFile'),
+                message: _self.$t("message.EmptyPlaceOnFile"),
                 duration: 5000,
-                type: "warning"
+                type: "warning",
               });
               return;
             }
@@ -794,9 +938,9 @@ export default {
             if (C_ARCHIVE_UNIT != allTableData[i].C_ARCHIVE_UNIT) {
               _self.$message({
                 showClose: true,
-                message: _self.$t('message.SameFiledUnit'),
+                message: _self.$t("message.SameFiledUnit"),
                 duration: 5000,
-                type: "warning"
+                type: "warning",
               });
               return;
             }
@@ -805,9 +949,9 @@ export default {
       } else {
         _self.$message({
           showClose: true,
-          message:_self.$t('message.PleaseSelectOneBorrow'),
+          message: _self.$t("message.PleaseSelectOneBorrow"),
           duration: 5000,
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -816,7 +960,7 @@ export default {
       setTimeout(() => {
         axios
           .post("/dc/getFormRelateDocument", _self.formId)
-          .then(function(response) {
+          .then(function (response) {
             let result = response.data;
             if (result.code == 1) {
               _self.tabledata = result.data;
@@ -834,7 +978,7 @@ export default {
       let _self = this;
       if (typeof _self.formId == "undefined" || _self.formId == "") {
         let a = [];
-        a = _self.tabledata.filter(function(item) {
+        a = _self.tabledata.filter(function (item) {
           return item.ID != varArg.ID;
         });
         _self.tabledata = a;
@@ -842,21 +986,21 @@ export default {
         let _self = this;
         let m = new Map();
         m.set("relateId", varArg.RELATE_ID);
-        axios.post("/dc/removeItemFromForm", m).then(function(response) {
+        axios.post("/dc/removeItemFromForm", m).then(function (response) {
           let result = response.data;
           if (result.code == 1) {
             _self.$message({
               showClose: true,
               message: "操作成功!",
               duration: 2000,
-              type: "success"
+              type: "success",
             });
           }
         });
         setTimeout(() => {
           axios
             .post("/dc/getFormRelateDocument", _self.formId)
-            .then(function(response) {
+            .then(function (response) {
               let result = response.data;
               if (result.code == 1) {
                 _self.tabledata = result.data;
@@ -867,12 +1011,12 @@ export default {
     },
     getBorrowHelpDoc() {
       let _self = this;
-      axios.post("/dc/getBorrowHelpDoc", new Map()).then(function(response) {
+      axios.post("/dc/getBorrowHelpDoc", new Map()).then(function (response) {
         let href = _self.$router.resolve({
           path: "/viewdoc",
           query: {
-            id: response.data.data
-          }
+            id: response.data.data,
+          },
         });
         window.open(href.href, "_blank");
       });
@@ -895,9 +1039,9 @@ export default {
       let href = this.$router.resolve({
         path: "/viewdoc",
         query: {
-          id: condition
+          id: condition,
           //token: sessionStorage.getItem('access-token')
-        }
+        },
       });
       //console.log(href);
       window.open(href.href, "_blank");
@@ -911,13 +1055,13 @@ export default {
       m.set("groupType", 1);
       axios
         .post("/admin/getGroups", JSON.stringify(m))
-        .then(function(response) {
+        .then(function (response) {
           _self.deptList = response.data.data;
           _self.currentRootGroupData = response.data.data;
           //_self.handleNodeClick(_self.deptList[0]);
           //console.log(JSON.stringify(_self.deptList));
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
     },
@@ -939,17 +1083,17 @@ export default {
       if (indata.extended == false) {
         axios
           .post("/admin/getGroups", JSON.stringify(m))
-          .then(function(response) {
+          .then(function (response) {
             // _self.$message("获取子节点成功!");
             indata.children = response.data.data;
             indata.extended = true;
             //console.log(JSON.stringify(indata));
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.log(error);
           });
       }
-    }
-  }
+    },
+  },
 };
 </script>

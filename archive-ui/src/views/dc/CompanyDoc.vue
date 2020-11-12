@@ -120,8 +120,8 @@
               prefix-icon="el-icon-search"
             ></el-input>
           </el-col>
-          <el-col :span="20" class="topbar-button">
-            &nbsp;&nbsp;
+          <el-col :span="8" class="topbar-button">
+            &nbsp;&nbsp;&nbsp;&nbsp;
             <!-- <el-button
                 type="primary"
                 plain
@@ -136,6 +136,7 @@
               icon="el-icon-upload2"
               @click="exportExcel()"
             >{{$t('application.export')+'Excel'}}</el-button>
+            &nbsp;&nbsp;&nbsp;&nbsp;
             <template v-if="isFileAdmin">
               <el-button
                 type="primary"
@@ -152,21 +153,19 @@
                 @click="destroyItem()"
               >{{$t('application.destroy')}}</el-button>
             </template>
-            &nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;
             <el-button
               type="primary"
               plain
               size="medium"
               icon="el-icon-folder-add"
               @click="addToShopingCart()"
-            >{{$t('application.addToShopingCart')}}</el-button>&nbsp;&nbsp;&nbsp;
-            <el-button
-              type="primary"
-              plain
-              size="medium"
-              icon="el-icon-shopping-cart-2"
-              @click="openShopingCart()"
-            >{{$t('application.openShopingCart')}}</el-button>&nbsp;&nbsp;&nbsp;
+            >{{$t('application.addToShopingCart')}}</el-button>
+          </el-col>
+          <el-col :span="3" class="topbar-button">
+            <BorrwoForm></BorrwoForm>
+          </el-col>
+          <el-col>
             <template v-if="isFileAdmin">
               <!-- `checked` 为 true显示卷宗 或 false不显示卷宗 -->
               <el-checkbox
@@ -307,13 +306,13 @@
 </template>
 <script>
 import ShowProperty from "@/components/ShowProperty";
-import ShowBorrowForm from "@/components/form/Borrow";
 import InnerItemViewer from "./InnerItemViewer.vue";
+import BorrwoForm from "@/components/form/Borrow";
 export default {
   components: {
     ShowProperty: ShowProperty,
-    ShowBorrowForm: ShowBorrowForm,
-    InnerItemViewer: InnerItemViewer
+    InnerItemViewer: InnerItemViewer,
+    BorrwoForm: BorrwoForm
   },
   data() {
     return {
@@ -831,14 +830,14 @@ export default {
       let _self = this;
       _self.shopingCartDialogVisible = true;
       _self.$router.push({
-        path: "/ShopingCart"
+        path: "/borrow"
       });
-      if (
+/*       if (
         _self.$refs.ShowShopingCart &&
         _self.$refs.ShowShopingCart.componentName == "shopingCart"
       ) {
         _self.$refs.ShowShopingCart.openShopingCart();
-      }
+      } */
       // var arg = [];
       //   axios
       //     .post("/dc/openShopingCart", JSON.stringify(arg))

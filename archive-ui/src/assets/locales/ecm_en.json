@@ -417,6 +417,7 @@
     "fileManage":"FileManage",
     "recycleBin":"RecycleBin",
     "companyDoc":"CompanyDoc",
+    "favorite":"Favorite",
     "userRoleInfo":"MyRoles",
     "archiveTool":"ArchiveTool",
     "batchUpdate":"BatchUpdate",
