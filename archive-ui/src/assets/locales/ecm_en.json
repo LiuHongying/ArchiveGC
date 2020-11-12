@@ -621,7 +621,8 @@
     "RemoveUserSuccess":"Remove User Successful!",
     "enterContent":"Please Enter Content",
     "PleaseSelectDC":"Please select document",
-    "PleaseSelectOneData":"Please select only one data"
+    "PleaseSelectOneData":"Please select only one data",
+    "classicName":"Classic Name"
 },
 "field": {
     "indexNumber":"S/N",

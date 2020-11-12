@@ -89,7 +89,7 @@
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
                   gridViewName="WorkflowFileGrid"
-                  condition=" and a.NAME='流程文件'"
+                  condition=" and a.NAME='irel_children'"
                   :optionWidth="1"
                   :isShowMoreOption="false"
                   :isshowCustom="false"

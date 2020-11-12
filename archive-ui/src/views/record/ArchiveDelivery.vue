@@ -39,6 +39,19 @@
         <el-form-item :label="$t('application.fileType')" :rules="[{required:true,message:'必填',trigger:'blur'}]">
           <el-select
             name="selectName"
+            v-model="selectedClassic"
+            :placeholder="$t('application.selectFileType')"
+            style="display:block;"
+            @change="getTypeNameByClassic(selectedClassic)"
+          >
+            <div v-for="(name,nameIndex) in classicNames" :key="'T_'+nameIndex">
+              <el-option :label="name" :value="name" :key="nameIndex"></el-option>
+            </div>
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('application.fileType')" :rules="[{required:true,message:'必填',trigger:'blur'}]">
+          <el-select
+            name="selectName"
             v-model="selectedTypeName"
             :placeholder="$t('application.selectFileType')"
             style="display:block;"
@@ -155,20 +168,20 @@
 
       <el-col :span="13" class="topbar-button">
         &nbsp; 
-        <el-button
+        <!-- <el-button
           type="primary"
           plain
           size="small"
           icon="el-icon-edit"
           @click="newArchiveItem('卷盒',selectedOneTransfer)"
-        >{{$t('application.newArchive')}}</el-button>
-        <el-button
+        >{{$t('application.newArchive')}}</el-button> -->
+        <!-- <el-button
           type="primary"
            plain
             size="small"
           icon="el-icon-edit"
           @click="newArchiveItem('图册',selectedOneTransfer)"
-        >{{$t('application.newVolume')}}</el-button>
+        >{{$t('application.newVolume')}}</el-button> -->
         <el-button
           type="primary"
            plain
@@ -208,6 +221,7 @@
           v-bind:columnList="transferColumnList"
           @pagesizechange="handleSizeChange"
           @pagechange="handleCurrentChange"
+          gridViewName="DeliveryGrid"
           v-bind:itemCount="transferCount"
           v-bind:tableHeight="leftTableHeight"
           @rowclick="beforeLoadGridData"
@@ -277,6 +291,7 @@
           v-bind:columnList="innerGridList"
           v-bind:itemCount="innerCount"
           v-bind:loading="uploadFileLoding"
+          gridViewName="ArchiveGrid"
           v-bind:tableHeight="rightTableHeight"
           v-bind:isshowOption="true" v-bind:isshowSelection ="false"
           @pagesizechange="innerPageSizeChange"
@@ -401,7 +416,9 @@ export default {
       defaultProps: {
         children: "children",
         label: "name"
-      }
+      },
+      classicNames:[],
+      selectedClassic:""
     };
   },
   watch: {
@@ -423,7 +440,8 @@ export default {
   },
   mounted() {
     let _self=this;
-    this.getTypeNames("innerTransferDocType");
+    this.getClassicNames("ClassicNames");
+    // this.getTypeNames("innerTransferDocType");
     this.loadTransferGridInfo();
     this.loadTransferGridData();
     this.loadGridInfo();
@@ -591,6 +609,50 @@ export default {
           _self.typeNames = response.data.data.innerTransferDocType;
         })
         .catch(function(error) {
+          console.log(error);
+        });
+    },
+    getTypeNameByClassic(keyName){
+      let _self = this;
+      axios
+        .post("/dc/getEcmDefTypes", keyName)
+        .then(function(response) {
+          if(response.data.code==1){
+            response.data.data.forEach(element => {
+              _self.typeNames.push(element.name);
+            });
+          }
+          
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
+    
+
+    getClassicNames(keyName) {
+      let _self = this;
+      let pm = new Map();
+      pm.set("configName", keyName);
+      // pm.set('parentId',"'"+p+"'");
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+          },
+          method: "post",
+          data: JSON.stringify(pm),
+          url: "/dc/getObjectsByConfigClauseNoPage",
+        })
+        .then(function (response) {
+          var i;
+          let temp = response.data.data;
+          for (i = 0; i < temp.length; i++) {
+            _self.classicNames.push(temp[i].NAME)
+          }
+          console.log(_self.contractors);
+        })
+        .catch(function (error) {
           console.log(error);
         });
     },

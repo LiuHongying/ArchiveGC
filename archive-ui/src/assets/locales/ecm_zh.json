@@ -364,7 +364,8 @@
     "AddFile":"添加文件",
     "WorkflowSelect":"流程选择",
     "approve":"通过",
-    "reject":"驳回"
+    "reject":"驳回",
+    "classicName":"分类名称"
 },
 "skin": {
     "Blue": "天空蓝",

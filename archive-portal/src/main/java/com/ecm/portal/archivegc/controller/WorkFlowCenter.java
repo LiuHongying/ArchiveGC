@@ -123,7 +123,7 @@ public class WorkFlowCenter extends ControllerAbstract {
 			String relationName="irel_children";
 			relationName=(args.get("relationName")!=null
 					&&!"".equals(args.get("relationName").toString()))
-					?args.get("relationName").toString():"流程文件";
+					?args.get("relationName").toString():"irel_children";
 			String childFileIds=childObj.toString();
 			id = documentService.newObject(getToken(),doc,en);
 			if(id!=null&&!"".equals(id)) {

@@ -21,7 +21,7 @@
                     <slot name="footerButton">
                         <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
                         
-                        <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button>
+                        <!-- <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button> -->
                         <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
                     </slot>
                     
@@ -105,6 +105,7 @@
                         fileIds.push(_self.workflowFileList[n].ID);
                     }
                     m.set("childFileId",fileIds);
+                    m.set("C_ITEM_TYPE",'表单');
                     // m.set("STATUS","流程中")
                     var c;
                     for(c in _self.$refs.ShowProperty.dataList)
@@ -266,6 +267,7 @@
                         fileIds.push(_self.workflowFileList[n].ID);
                     }
                     m.set("childFileId",fileIds);
+                    m.set("C_ITEM_TYPE",'表单');
                     m.set("saveType","1");
                     var c;
                     for(c in _self.$refs.ShowProperty.dataList)
