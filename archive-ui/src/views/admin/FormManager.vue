@@ -34,14 +34,6 @@
         <el-button type="primary" @click="additem(form)">确 定</el-button>
       </div>
     </el-dialog>
-    <el-dialog :title="$t('application.Import')" :visible.sync="FormImportDialogVisible" :close-on-click-modal="false" width="80%" >
-        <FormImport ref="FormImport"  @onImported="onFormImport" width="100%"></FormImport>
-        <div slot="footer" class="dialog-footer">
-        <el-button @click="ImporClose()" size="medium">{{
-          $t("application.close")
-        }}</el-button>
-      </div>
-    </el-dialog>
     <el-container>
       <el-header>
         <!-- <el-breadcrumb separator="/" class="navbar">
@@ -57,7 +49,7 @@
               prefix-icon="el-icon-search"
             ></el-input>
           </el-col>
-          <el-col :span="16" style="text-align:left;">
+          <el-col :span="20" style="text-align:left;">
             &nbsp; 
             <el-button
               type="primary"
@@ -65,8 +57,6 @@
               plain
               @click="dialogVisible = true"
             >{{$t('application.new')}}</el-button>
-            <el-button type="primary" @click="beforImport()">
-              {{$t('application.Import')}}</el-button>
           </el-col>
         </el-row>
       </el-header>
@@ -81,12 +71,12 @@
           style="width: 100%"
         >
           <el-table-column label="行号" type="index" width="60"></el-table-column>
-          <el-table-column label="类型名" min-width="20%" sortable>
+          <el-table-column label="类型名" min-width="30%" sortable>
             <template slot-scope="scope">
               <el-input v-model="scope.row.typeName"></el-input>
             </template>
           </el-table-column>
-          <el-table-column label="说明" min-width="30%">
+          <el-table-column label="说明" min-width="20%">
             <template slot-scope="scope">
               <el-input v-model="scope.row.description"></el-input>
             </template>
@@ -165,7 +155,6 @@
 //   contentType: "application/json"
 // });
 
-import FormImport from '@/components/controls/ImportForm';
 export default {
   name: "FormManager",
   permit: 9,
@@ -184,12 +173,20 @@ export default {
         columnCount: 2,
         isDefault: 0
       },
-      formLabelWidth: "120px",
-      FormImportDialogVisible:false
+      formLabelWidth: "120px"
     };
   },
   created() {
-    let _self = this;
+     let _self = this;
+    let systemPermission = Number(
+        this.currentUser().systemPermission
+      );
+    if(systemPermission<9){
+      //跳转至权限提醒页
+      _self.$nextTick(()=>{
+         _self.$router.push({ path: '/NoPermission' })
+      })     
+    }
     _self.loading = true;
     axios
       .get("/admin/getForm")
@@ -204,13 +201,6 @@ export default {
       });
   },
   methods: {
-    ImporClose(){
-      this.FormImportDialogVisible=false;
-      this.refreshData();
-    },
-    beforImport(){
-            this.FormImportDialogVisible=true;
-        },
     refreshData() {
       let _self = this;
       _self.loading = true;
@@ -286,9 +276,6 @@ export default {
         });
       }
     }
-  },
-  components:{
-    FormImport:FormImport
   }
 };
 </script>
