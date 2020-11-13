@@ -147,7 +147,16 @@ export default {
     };
   },
   created() {
-    let _self = this;
+     let _self = this;
+    let systemPermission = Number(
+        this.currentUser().systemPermission
+      );
+    if(systemPermission<9){
+      //跳转至权限提醒页
+      _self.$nextTick(()=>{
+         _self.$router.push({ path: '/NoPermission' })
+      })     
+    }
     _self.loading = true;
     axios
       .get("/admin/getType")

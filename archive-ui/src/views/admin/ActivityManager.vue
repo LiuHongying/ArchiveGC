@@ -42,13 +42,6 @@
         </el-col>
         </el-row>
         <el-row>
-          <el-col :span="24">
-          <el-form-item label="文件查询条件" :label-width="formLabelWidth">
-            <el-input v-model="form.formCondition" auto-complete="off"></el-input>
-          </el-form-item>
-        </el-col>
-        </el-row>
-        <el-row>
         <el-col :span="18">
           <el-form-item label="选人活动" :label-width="formLabelWidth">
             <el-input v-model="form.selectActivities" placeholder="开始：start，多个用英文分号分隔" auto-complete="off"></el-input>
@@ -270,13 +263,22 @@ export default {
         rejectActivityLabel:"",
         enableDelegate:true,
         enableRepeat:false,
-        enableEdit:true,
-        formCondition:""
+        enableEdit:true
       },
       formLabelWidth: "120px"
     };
   },
   mounted() {
+    let _self = this;
+    let systemPermission = Number(
+        this.currentUser().systemPermission
+      );
+    if(systemPermission<9){
+      //跳转至权限提醒页
+      _self.$nextTick(()=>{
+         _self.$router.push({ path: '/NoPermission' })
+      })     
+    }
     this.refreshData();
   },
   methods: {
