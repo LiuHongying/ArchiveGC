@@ -11,11 +11,13 @@ import org.flowable.engine.HistoryService;
 import javax.sql.DataSource;
 
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -55,7 +57,8 @@ public class DocAuth implements ExecutionListener, JavaDelegate, TaskListener {
 
 	@Autowired
 	private AuthService authService;
-
+	@Autowired
+	private TaskService taskService;
 	@Autowired
 	private ServiceDocMail serviceDocMail;
 	@Autowired
@@ -271,7 +274,8 @@ public class DocAuth implements ExecutionListener, JavaDelegate, TaskListener {
 				EcmUser user= userService.getObjectByName(ecmSession.getToken(), assignee);
 				String email= user.getEmail();
 				if(email!=null&&!"".equals(email)) {
-					serviceDocMail.sendTaskMail(email);
+					Task tsk= taskService.createTaskQuery().taskId(arg0.getId()).singleResult();
+					serviceDocMail.sendTaskMail(email,tsk);
 				}
 				
 			} catch (Exception e) {

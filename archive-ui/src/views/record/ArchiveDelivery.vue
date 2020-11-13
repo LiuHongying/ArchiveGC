@@ -291,7 +291,7 @@
           v-bind:columnList="innerGridList"
           v-bind:itemCount="innerCount"
           v-bind:loading="uploadFileLoding"
-          gridViewName="ArchiveGrid"
+          gridViewName="DrawingGrid"
           v-bind:tableHeight="rightTableHeight"
           v-bind:isshowOption="true" v-bind:isshowSelection ="false"
           @pagesizechange="innerPageSizeChange"
@@ -716,7 +716,8 @@ export default {
       // }
       _self.loadInnerGridInfo();
       var m = new Map();
-      m.set("gridName", "DeliveryInnerGrid");
+      // m.set("gridName", "DeliveryInnerGrid");
+      m.set("gridName","DrawingGrid");
       m.set("condition", "");
       if (_self.selectRow) {
         _self.archiveId = _self.selectRow.ID;
@@ -915,7 +916,8 @@ export default {
       let _self = this;
       _self.loading = true;
       var m = new Map();
-      m.set("gridName", "DeliveryInnerGrid");
+      // m.set("gridName", "DeliveryInnerGrid");
+      m.set("gridName","DrawingGrid");
       m.set("lang", _self.currentLanguage);
       _self
         .axios({
@@ -1233,7 +1235,8 @@ export default {
       // }
       _self.loadGridInfo();
       var m = new Map();
-      m.set("gridName", "DeliveryInnerGrid");
+      // m.set("gridName", "DeliveryInnerGrid");
+      m.set("gridName","DrawingGrid");
       m.set("condition", "");
       if (_self.selectRow) {
         _self.archiveId = _self.selectRow.ID;
@@ -1367,17 +1370,33 @@ export default {
       let _self = this;
       var m = new Map();
       let dataRows = this.$refs.ShowProperty.dataList;
-      var i;
-      for (i in dataRows) {
-        if (dataRows[i].attrName && dataRows[i].attrName != "") {
-          if (
-            dataRows[i].attrName != "FOLDER_ID" &&
-            dataRows[i].attrName != "ID"
-          ) {
-            m.set(dataRows[i].attrName, dataRows[i].defaultValue);
-          }
+      var c;
+        for(c in _self.$refs.ShowProperty.dataList)
+        {
+            let dataRows = _self.$refs.ShowProperty.dataList[c].ecmFormItems;
+            var i;
+            for (i in dataRows) {
+            if(dataRows[i].attrName && dataRows[i].attrName !='')
+            {
+                if(dataRows[i].attrName !='FOLDER_ID'&&dataRows[i].attrName !='ID')
+                {
+                var val = dataRows[i].defaultValue;
+                if(val && dataRows[i].isRepeat){
+                    var temp = "";
+                // console.log(val);
+                    for(let j=0,len=val.length;j<len;j++){
+                    temp = temp + val[j]+";";
+                    //console.log(temp);
+                    }
+                    temp = temp.substring(0,temp.length-1);
+                    val = temp;
+                    console.log(val);
+                }
+                m.set(dataRows[i].attrName, val);
+                }
+            }
+            }
         }
-      }
       if (_self.$refs.ShowProperty.myItemId != "") {
         m.set("ID", _self.$refs.ShowProperty.myItemId);
       }
