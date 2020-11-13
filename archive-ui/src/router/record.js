@@ -13,6 +13,26 @@ export const recordRouter =  [
         meta: {
             requireAuth: true,
             permit: 1,
+            title:"TC归档"
+        },
+        path: '/record/ReceivingTC',
+        name: 'TC归档',
+        component: () => import('@/views/record/receive/ReceivingTC.vue')
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:"OA归档"
+        },
+        path: '/record/ReceivingOA',
+        name: 'OA归档',
+        component: () => import('@/views/record/receive/ReceivingOA.vue')
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
             title:'archiveReceive'
         },
         path: '/record/archivereceive',

@@ -213,6 +213,15 @@ export default {
   },
   mounted() {
     let _self = this;
+    let systemPermission = Number(
+        this.currentUser().systemPermission
+      );
+    if(systemPermission<9){
+      //跳转至权限提醒页
+      _self.$nextTick(()=>{
+         _self.$router.push({ path: '/NoPermission' })
+      })     
+    }
     _self.loading = true;
     var pid = _self.$route.query.parentid;
     _self.gridViewName = _self.$route.query.name;

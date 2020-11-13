@@ -65,22 +65,22 @@
                 type="index"
                 width="60">
               </el-table-column>
-        <el-table-column label="名称" width="180" >
+        <el-table-column label="名称" width="200" >
            <template slot-scope="scope">
             <el-input  v-model="scope.row.name"></el-input>
           </template>
         </el-table-column>
-        <el-table-column label="说明" width="180">
+        <el-table-column label="说明" width="20%">
           <template slot-scope="scope">
             <el-input  v-model="scope.row.description"></el-input>
           </template>
         </el-table-column>
-        <el-table-column label="条件"  min-width="20%">
+        <el-table-column label="条件"  min-width="160">
           <template slot-scope="scope">
             <el-input  v-model="scope.row.condition"></el-input>
           </template>
         </el-table-column>
-        <el-table-column label="排序"  min-width="20%">
+        <el-table-column label="排序"  min-width="90">
           <template slot-scope="scope">
             <el-input  v-model="scope.row.orderBy"></el-input>
           </template>
@@ -137,8 +137,16 @@ export default {
     };
   },
    created(){
-     
     let _self = this;
+    let systemPermission = Number(
+        this.currentUser().systemPermission
+      );
+    if(systemPermission<9){
+      //跳转至权限提醒页
+      _self.$nextTick(()=>{
+         _self.$router.push({ path: '/NoPermission' })
+      })     
+    }
     _self.loading = true;
     axios.get('/admin/getGridView')
       .then(function(response) {

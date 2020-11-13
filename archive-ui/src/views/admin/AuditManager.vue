@@ -122,7 +122,16 @@ export default {
     };
   },
   mounted() {
-    let _self = this;
+     let _self = this;
+    let systemPermission = Number(
+        this.currentUser().systemPermission
+      );
+    if(systemPermission<5){
+      //跳转至权限提醒页
+      _self.$nextTick(()=>{
+         _self.$router.push({ path: '/NoPermission' })
+      })     
+    }
     var psize = localStorage.getItem("auditPageSize");
     if (psize) {
       _self.pageSize = parseInt(psize);
