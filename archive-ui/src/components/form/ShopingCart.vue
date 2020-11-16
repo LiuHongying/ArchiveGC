@@ -66,6 +66,7 @@
       <!-- <div v-if="formId==''"> -->
         <div v-if="showFooter == true">
         <el-button type="primary" @click="cancel(false)">{{$t('application.cancel')}}</el-button>
+        <el-button type="primary" @click="openShopingCart()">获取列表</el-button>
         <el-button @click="cleanShopingCart()">清空借阅单</el-button>
         <el-button @click="removeShopingCart()">移除所选</el-button>
         <!-- <el-button @click="showDrawingItem()">调晒</el-button> -->
@@ -86,7 +87,7 @@ export default {
   },
   data() {
     return {
-      gridviewName: "shopingCartGrid",
+      gridviewName: "favoriteGrid",
       gridList: [],
       currentLanguage: "zh-cn",
       tabledata: [],
@@ -126,7 +127,7 @@ export default {
       let _self = this;
       var m = new Map();
       _self.loadingTodoData = true;
-      m.set("condition", "");
+      m.set("condition", "TYPE_NAME='收藏夹'");
       m.set("pageSize", 7);
       m.set("pageIndex", 0);
       m.set("userId", sessionStorage.getItem("access-userName"));
