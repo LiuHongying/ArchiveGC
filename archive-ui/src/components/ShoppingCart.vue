@@ -13,6 +13,7 @@
 
     <DataGrid
       ref="shoppingcartDataGrid"
+      gridviewName ="favoriteGrid"
       key="favoriteGrid"
       v-bind:isshowPage="false"
       v-bind:itemDataList="itemDataList"

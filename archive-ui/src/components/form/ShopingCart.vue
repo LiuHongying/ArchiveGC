@@ -15,7 +15,7 @@
       <el-row style="width:100%">
         <div v-if="1==1">
           <el-col>
-            <el-table :data="tabledata" border v-loading="loading" @selection-change="selectChange">
+            <el-table :height="tableHeight" :data="tabledata" border v-loading="loading" @selection-change="selectChange">
               <el-table-column type="selection" width="40"></el-table-column>
               <el-table-column type="index" label="#" width="50"></el-table-column>
               <el-table-column prop="id" label="id" v-if="1==2" min-width="15%" sortable></el-table-column>
@@ -110,6 +110,7 @@ export default {
         result: "在线浏览",
         message: "",
       },
+      tableHeight: window.innerHeight - 124,
     };
   },
   props: {
