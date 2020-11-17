@@ -8,13 +8,21 @@
       :close-on-click-modal="false"
       v-dialogDrag
     >
-      <CommonStartup
+      <component
+        ref="startup"
+        :is="componentName"
+        :workflowObj="workflowObj"
+        @close="closeDialog()"
+        :showUploadFile="false"
+        :workflowFileList="selectedFiles"
+      ></component>
+      <!-- <CommonStartup
         ref="startup"
         :workflowObj="workflowObj"
         @close="closeDialog()"
         :showUploadFile="false"
         :workflowFileList="selectedFiles"
-      ></CommonStartup>
+      ></CommonStartup> -->
     </el-dialog>
     <el-dialog
       :title="$t('application.WorkflowSelect')"
@@ -66,7 +74,7 @@ export default {
       workflowSelectVisible: false,
       workflowObj: {},
       selectFlows: [],
-      
+      componentName:""
     };
   },
   props:{
@@ -90,7 +98,10 @@ export default {
 
       let _self = this;
       _self.workflowObj = _self.selectFlows[0];
-      _self.propertyVisible = true;
+      this.getEcmcfgActive(this.workflowObj.ID,"start",function(ecmCfgActivity){
+        _self.componentName=ecmCfgActivity.componentName;
+        _self.propertyVisible=true;
+      });
     },
     closeDialog() {
       this.propertyVisible = false;

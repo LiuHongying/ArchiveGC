@@ -53,6 +53,11 @@
           </el-form-item>
         </el-col>
         </el-row>
+         <el-form-item label="表单条件" :label-width="formLabelWidth">
+           <el-input v-model="form.formCondition" auto-complete="off"></el-input>
+          </el-form-item>
+        <el-row>
+        </el-row>
         <el-row>
         <el-col :span="12">
           <el-form-item label="通过活动名" :label-width="formLabelWidth" required>
@@ -263,7 +268,8 @@ export default {
         rejectActivityLabel:"",
         enableDelegate:true,
         enableRepeat:false,
-        enableEdit:true
+        enableEdit:true,
+        formCondition: ""
       },
       formLabelWidth: "120px"
     };

@@ -89,12 +89,17 @@ export default {
       myItemId: this.itemId,
       myTypeName: this.typeName,
       myFolderId: this.folderId,
-      formName:"",
+      
       parentDocId:'',
       clientPermission: 1,
       mainObject:[],
       mainSubRelation:[]
     };
+  },
+  watch: {
+    typeName() {
+      this.myTypeName = this.typeName;
+    }
   },
   mounted() {
     this.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
@@ -108,8 +113,9 @@ export default {
   props: {
     itemId: {type:String,default:""},
     typeName: {type:String,default:""},
-    folderId: {type:String},
-    folderPath:{type:String},
+    formName:{type:String,default:""},
+    folderId: {type:String,default:""},
+    folderPath:{type:String,default:""},
     showUploadFile: {type:Boolean, default:true}
   },
   methods: {

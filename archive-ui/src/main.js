@@ -9,9 +9,11 @@ import './plugins/axios.js'
 import './plugins/formatter.js'
 import './plugins/userInfo.js'
 import './plugins/packageDownload.js'
+import './plugins/workflowFunctions.js'
 import echarts from 'echarts'
 import addToShoppingCar from './plugins/shoppingcar'
 import validataPermission from './plugins/validatapermission'
+
 import {onDeleleItem,nextStatus,previousStatus,withdraw,previousStatusCnpe,nextStatusCnpe} from './plugins/exchange'
 
 import ImgViewer from 'v-viewer'

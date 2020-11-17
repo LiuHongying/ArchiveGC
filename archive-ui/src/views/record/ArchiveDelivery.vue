@@ -139,9 +139,14 @@
     </el-dialog>
     <el-row v-loading="loading">
       <el-col :span="7" class="topbar-button">
+          <!-- <el-button type="primary" icon="el-icon-circle-plus" 
+          plain
+          size="small" @click="onNewFolder()" :title="$t('application.newTransfer')">{{$t('application.new')}}</el-button> -->
+          
           <el-button type="primary" icon="el-icon-circle-plus" 
           plain
-          size="small" @click="onNewFolder()" :title="$t('application.newTransfer')">{{$t('application.new')}}</el-button>
+          size="small" @click="onNewTransfer('移交单')" 
+          :title="$t('application.newTransfer')">{{$t('application.new')}}</el-button>
           <el-button
           type="primary"
            plain
@@ -149,9 +154,13 @@
           icon="el-icon-printer"
           @click="beforePrint(selectedOneTransfer,'PrintDelivery','文件清单')"
         >打印</el-button>
+          <!-- <el-button type="primary"
+          plain
+          size="small" icon="el-icon-right" @click="onArchived">移交</el-button> -->
           <el-button type="primary"
           plain
-          size="small" icon="el-icon-right" @click="onArchived">移交</el-button>
+          size="small" icon="el-icon-right" @click="startworkflow()">发起流程</el-button>
+          
           <el-button type="primary"
           plain
           size="small" icon="el-icon-delete"  @click="onDeleteTransfer()">{{$t('application.delete')}}</el-button>
@@ -255,7 +264,7 @@
             type="primary"
             plain
             size="small"
-            @click="beforeCreateFile"
+            @click="beforeCreateFile(selectRow)"
           >{{$t('application.createDocument')}}</el-button>
           <el-button
             type="primary"
@@ -347,7 +356,7 @@ export default {
       reuseVisible: false,
       uploadFileLoding:false,
       typeName: "卷盒",
-      folderPath: "/表单/移交单",
+      folderPath: "/移交库",
       selectTransferRow: [],
       selectedOneTransfer:[],
       gridList: [],
@@ -408,7 +417,7 @@ export default {
       transferForm: {
         id: 0,
         title: "",
-        folderPath: "/表单/移交单",
+        folderPath: "/移交库",
         typeName: "移交单",
         status: "产生"
       },
@@ -418,7 +427,8 @@ export default {
         label: "name"
       },
       classicNames:[],
-      selectedClassic:""
+      selectedClassic:"",
+      parentId:""
     };
   },
   watch: {
@@ -459,6 +469,7 @@ export default {
       
       if(selectTrRow.ID==undefined){
         // _self.$message(_self.$t("message.pleaseSelectOneTransfer"));
+        
         _self.$message({
                 showClose: true,
                 message: _self.$t("message.pleaseSelectOneTransfer"),
@@ -467,6 +478,7 @@ export default {
               });
         return;
       }
+      _self.parentId=selectTrRow.ID;
       _self.typeSelectVisible=true;
     },
     beforeAddreuse(){
@@ -484,11 +496,12 @@ export default {
       _self.reuseVisible=true;
     },
     //著录文件
-    beforeCreateFile(){
+    beforeCreateFile(row){
       let _self=this;
       
       if(_self.selectRow.ID==undefined){
         // _self.$message('请选择一条图册或卷盒数据！')
+        
          _self.$message({
                 showClose: true,
                 message: '请选择一条图册或卷盒数据！',
@@ -497,13 +510,41 @@ export default {
               });
         return;
       }
-       _self.selectedChildrenType=[];
-      if(_self.selectRow.TYPE_NAME=='图册'){
-        _self.getTypeNamesByMainList("图册");
-      }else{
-        _self.getTypeNamesByMainList(_self.selectRow.SUB_TYPE);
-      }
-      _self.childrenTypeSelectVisible=true;
+      _self.parentId=row.ID;
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: row.TYPE_NAME,
+          url: "/dc/getArchiveFileConfig"
+        })
+        .then(function(response) {
+          let code=response.data.code;
+          if(code=='1'){
+            let data=response.data.data;
+            let fileType=data[0].C_TO;
+            _self.newArchiveItem(fileType,row);
+          }else{
+            _self.$message({
+                showClose: true,
+                message: response.data.msg,
+                duration: 5000,
+                type: "error"
+              });
+          }
+        })
+        .catch(function(error) {
+          // _self.$message("添加失败！");
+          _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          console.log(error);
+        });
       
 
     },
@@ -614,6 +655,7 @@ export default {
     },
     getTypeNameByClassic(keyName){
       let _self = this;
+      _self.typeNames=[];
       axios
         .post("/dc/getEcmDefTypes", keyName)
         .then(function(response) {
@@ -802,6 +844,21 @@ export default {
       // console.log(JSON.stringify(val));
       this.selectTransferRow = val;
     },
+    startworkflow(){
+      let _self=this;
+      if(_self.selectTransferRow==null||_self.selectTransferRow.length==0){
+        _self.$message({
+                showClose: true,
+                message: '请选择一条或多条移交单数据！',
+                duration: 2000,
+                type: "warning"
+              });
+      }
+      for(let i=0;i<_self.selectTransferRow.length;i++){
+        _self.startWorkflowFun(_self.selectTransferRow[i].ID,"文档提交归档流程测试",null,"SubmissionDC测试");
+      }
+      
+    },
     // 表格行选择
     selectChange(val) {
       // console.log(JSON.stringify(val));
@@ -989,7 +1046,7 @@ export default {
       m.set("condition", "creator='@currentuser' and status='产生'");
       // m.set('folderId',indata.id);
       // m.set('status','产生')
-      m.set("folderPath", "/表单/移交单");
+      m.set("folderPath", "/移交库");
       m.set("pageSize", _self.transferPageSize);
       m.set(
         "pageIndex",
@@ -1314,20 +1371,25 @@ export default {
         _self.selectedItemId = "";
 
         _self.dialogName = typeName;
+        _self.typeName=typeName;
+        
+        _self.folderPath = '/移交库';
+        // _self.deliverDocId=selectedRow.ID
+        _self.selectedItemId="";
         _self.propertyVisible = true;
-
-        setTimeout(()=>{
-          if(_self.$refs.ShowProperty){
-          _self.$refs.ShowProperty.myItemId = "";
-          _self.dialogName=typeName;
-          _self.$refs.ShowProperty.myTypeName =typeName;
-          _self.typeName=typeName;
-          _self.$refs.ShowProperty.parentDocId=selectedRow.ID;
-          _self.$refs.ShowProperty.folderPath = '/表单/移交单';
-          // _self.$refs.ShowProperty.myFolderId = _self.selectTransferRow.id;
+        _self.$nextTick(()=>{
           _self.$refs.ShowProperty.loadFormInfo();
-        }
-        },10);
+        });
+        // setTimeout(()=>{
+        //   if(_self.$refs.ShowProperty){
+        //   // _self.$refs.ShowProperty.myTypeName =typeName;
+          
+        //   _self.$refs.ShowProperty.parentDocId=selectedRow.ID;
+        //   _self.$refs.ShowProperty.folderPath = '/表单/移交单';
+        //   // _self.$refs.ShowProperty.myFolderId = _self.selectTransferRow.id;
+        //   _self.$refs.ShowProperty.loadFormInfo();
+        // }
+        // },10);
 
       } else {
         // _self.$message(_self.$t("message.pleaseSelectOneTransfer"));
@@ -1403,7 +1465,7 @@ export default {
       if (_self.$refs.ShowProperty.myTypeName != "") {
         m.set("TYPE_NAME", _self.$refs.ShowProperty.myTypeName);
         m.set("folderPath", _self.$refs.ShowProperty.folderPath);
-        m.set("transferId", _self.$refs.ShowProperty.parentDocId);
+        m.set("transferId", _self.parentId);
       }
       let formdata = new FormData();
       formdata.append("metaData", JSON.stringify(m));
@@ -1437,10 +1499,23 @@ export default {
                 type: "success"
               });
               _self.propertyVisible = false;
-
-              // _self.loadTransferGridData();
-              _self.loadGridData(null);
-              _self.showInnerFile(null);
+              if('移交单'==_self.$refs.ShowProperty.myTypeName){
+                _self.loadTransferGridData();
+                _self.innerDataList=[];
+                _self.selectedFileItem=[];
+                _self.selectRow=[];
+                _self.itemDataList = [];
+                _self.itemDataListFull = [];
+                _self.itemCount = 0;
+                _self.innerDataList = [];
+                _self.innerDataListFull = [];
+                _self.innerCount = 0;
+              }else{
+                _self.loadGridData(null);
+                _self.showInnerFile(null);
+              }
+              
+              
             } else {
               // _self.$message(_self.$t('message.newFailured'));
               _self.$message({
@@ -1767,13 +1842,29 @@ export default {
           console.log(error);
         });
     },
+    //新建移交单
+    onNewTransfer(typeName){
+      let _self = this;
+      _self.selectedItemId = "";
+
+        _self.dialogName = typeName;
+        _self.typeName=typeName;
+        
+        _self.folderPath = '/移交库';
+        // _self.deliverDocId=selectedRow.ID
+        _self.selectedItemId="";
+        _self.propertyVisible = true;
+        _self.$nextTick(()=>{
+          _self.$refs.ShowProperty.loadFormInfo();
+        });
+    },
     // 新建文件夹事件
     onNewFolder() {
       this.folderAction = this.$t("application.newTransfer");
       this.transferForm = {
         id: null,
         title: "",
-        folderPath: "/表单/移交单",
+        folderPath: "/移交库",
         typeName: "移交单",
         status: "产生"
       };
