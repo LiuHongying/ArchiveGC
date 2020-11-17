@@ -12,18 +12,26 @@
         :indeterminate="columnsInfo.isIndeterminate"
         v-model="columnsInfo.checkAll"
         @change="handleCheckAllChange"
-      >{{$t('application.selectAll')}}</el-checkbox>
-      <div style="margin: 15px 0;"></div>
+        >{{ $t("application.selectAll") }}</el-checkbox
+      >
+      <div style="margin: 15px 0"></div>
       <el-checkbox-group v-model="showFields" @change="handleCheckedColsChange">
         <el-checkbox
           v-for="item in gridList"
           :label="item.attrName"
           :key="item.attrName"
-        >{{item.label}}</el-checkbox>
+          >{{ item.label }}</el-checkbox
+        >
       </el-checkbox-group>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="columnsInfo.dialogFormVisible=false" size="medium">{{$t('application.cancel')}}</el-button>
-        <el-button type="primary" @click="confirmShow" size="medium">{{$t('application.ok')}}</el-button>
+        <el-button
+          @click="columnsInfo.dialogFormVisible = false"
+          size="medium"
+          >{{ $t("application.cancel") }}</el-button
+        >
+        <el-button type="primary" @click="confirmShow" size="medium">{{
+          $t("application.ok")
+        }}</el-button>
       </div>
     </el-dialog>
     <el-dialog
@@ -32,32 +40,34 @@
       @close="propertyVisible = false"
       width="96%"
     >
-    <el-tabs type="border-card" >
-      <el-tab-pane :label="$t('route.userInfo')">
-        <ShowProperty
-          ref="ShowProperty"
-          @onSaved="onSaved"
-          width="100%"
-          v-bind:itemId="selectedItemId"
-          v-bind:folderId="currentFolder.id"
-          v-bind:typeName="currentFolder.typeName"
-        ></ShowProperty>
-      </el-tab-pane>
-      <el-tab-pane :label="$t('route.sysinfo')">
-        <SystemInfo   ref="SystemInfo"
-          width="100%"
-          v-bind:itemData="currentDocument">
-        </SystemInfo>
-      </el-tab-pane>
-      <el-tab-pane :label="$t('route.authmanage')">
-        <ObjectAcl
-          ref="ObjectAcl"
-          width="100%"
-          v-bind:name="currentDocument.ACL_NAME"
-          v-bind:docId="currentDocument.ID"
-        ></ObjectAcl>
-      </el-tab-pane>
-      <!--
+      <el-tabs type="border-card">
+        <el-tab-pane :label="$t('route.userInfo')">
+          <ShowProperty
+            ref="ShowProperty"
+            @onSaved="onSaved"
+            width="100%"
+            v-bind:itemId="selectedItemId"
+            v-bind:folderId="currentFolder.id"
+            v-bind:typeName="currentFolder.typeName"
+          ></ShowProperty>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('route.sysinfo')">
+          <SystemInfo
+            ref="SystemInfo"
+            width="100%"
+            v-bind:itemData="currentDocument"
+          >
+          </SystemInfo>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('route.authmanage')">
+          <ObjectAcl
+            ref="ObjectAcl"
+            width="100%"
+            v-bind:name="currentDocument.ACL_NAME"
+            v-bind:docId="currentDocument.ID"
+          ></ObjectAcl>
+        </el-tab-pane>
+        <!--
       <el-tab-pane label="启动流程" >
         <StartWorkflow
           ref="StartWorkflow"
@@ -69,86 +79,154 @@
         ></StartWorkflow>
       </el-tab-pane>
       -->
-    </el-tabs>
-      
+      </el-tabs>
+
       <div slot="footer" class="dialog-footer">
-        <el-button @click="saveItem">{{$t('application.save')}}</el-button>
-        <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
+        <el-button @click="saveItem">{{ $t("application.save") }}</el-button>
+        <el-button @click="propertyVisible = false">{{
+          $t("application.cancel")
+        }}</el-button>
       </div>
     </el-dialog>
     <el-dialog
       :title="folderAction"
       :visible.sync="folderDialogVisible"
-      @close="folderDialogVisible = false" width="80%"
+      @close="folderDialogVisible = false"
+      width="80%"
     >
-    <el-tabs type="border-card">
-      <el-tab-pane :label="$t('route.userInfo')">
-      <el-form :model="folderForm">
-        <el-form-item :label="$t('field.name')" :label-width="formLabelWidth">
-          <el-input v-model="folderForm.name" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item :label="$t('field.description')" :label-width="formLabelWidth">
-          <el-input v-model="folderForm.description" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-col :span="12" v-show="clientPermission>3">
-          <el-form-item :label="$t('route.code')" :label-width="formLabelWidth">
-            <el-input v-model="folderForm.coding" auto-complete="off"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12" v-show="clientPermission>3">
-          <el-form-item v-show="clientPermission>3" :label="$t('route.fullcode')" :label-width="formLabelWidth">
-            <el-input v-model="folderForm.fullCoding" auto-complete="off"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12" v-show="clientPermission>4">
-          <el-form-item :label="$t('route.aclname')" :label-width="formLabelWidth">
-            <el-input v-model="folderForm.aclName" auto-complete="off"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12" v-show="clientPermission>4">
-          <el-form-item  :label="$t('route.listname')" :label-width="formLabelWidth">
-            <el-input v-model="folderForm.gridView" auto-complete="off"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="24" v-show="clientPermission>3">
-            <el-form-item :label="$t('route.sort')" :label-width="formLabelWidth">
-              <el-input v-model="folderForm.orderIndex" auto-complete="off"></el-input>
+      <el-tabs type="border-card">
+        <el-tab-pane :label="$t('route.userInfo')">
+          <el-form :model="folderForm">
+            <el-form-item
+              :label="$t('field.name')"
+              :label-width="formLabelWidth"
+            >
+              <el-input
+                v-model="folderForm.name"
+                auto-complete="off"
+              ></el-input>
             </el-form-item>
+            <el-form-item
+              :label="$t('field.description')"
+              :label-width="formLabelWidth"
+            >
+              <el-input
+                v-model="folderForm.description"
+                auto-complete="off"
+              ></el-input>
+            </el-form-item>
+            <el-col :span="12" v-show="clientPermission > 3">
+              <el-form-item
+                :label="$t('route.code')"
+                :label-width="formLabelWidth"
+              >
+                <el-input
+                  v-model="folderForm.coding"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
             </el-col>
-      </el-form>
-      </el-tab-pane>
-      <el-tab-pane :label="$t('route.authmanage')">
-        <FolderAcl
-          ref="FolderAcl"
-          width="100%"
-          v-bind:name="folderForm.aclName"
-          v-bind:folderId="folderForm.id"
-        ></FolderAcl>
+            <el-col :span="12" v-show="clientPermission > 3">
+              <el-form-item
+                v-show="clientPermission > 3"
+                :label="$t('route.fullcode')"
+                :label-width="formLabelWidth"
+              >
+                <el-input
+                  v-model="folderForm.fullCoding"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12" v-show="clientPermission > 4">
+              <el-form-item
+                :label="$t('route.aclname')"
+                :label-width="formLabelWidth"
+              >
+                <el-input
+                  v-model="folderForm.aclName"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12" v-show="clientPermission > 4">
+              <el-form-item
+                :label="$t('route.listname')"
+                :label-width="formLabelWidth"
+              >
+                <el-input
+                  v-model="folderForm.gridView"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24" v-show="clientPermission > 3">
+              <el-form-item
+                :label="$t('route.sort')"
+                :label-width="formLabelWidth"
+              >
+                <el-input
+                  v-model="folderForm.orderIndex"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+          </el-form>
         </el-tab-pane>
-    </el-tabs>
+        <el-tab-pane :label="$t('route.authmanage')">
+          <FolderAcl
+            ref="FolderAcl"
+            width="100%"
+            v-bind:name="folderForm.aclName"
+            v-bind:folderId="folderForm.id"
+          ></FolderAcl>
+        </el-tab-pane>
+      </el-tabs>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="saveFolder(folderForm)">{{$t('application.ok')}}</el-button>
-        <el-button @click="folderDialogVisible = false">{{$t('application.cancel')}}</el-button>
-      </div>
-    </el-dialog>
-    <el-dialog :title="$t('route.movepos')" :visible.sync="moveDialogVisible" @close="moveDialogVisible = false">
-      <el-form>
-        <el-form-item :label="$t('route.currentid')" :label-width="formLabelWidth">{{getSelectedIds()}}</el-form-item>
-        <el-form-item :label="$t('route.desfolderid')" :label-width="formLabelWidth">
-          <FolderSelector v-model="targetFolderId" v-bind:inputValue="targetFolderId"></FolderSelector>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleMoveItem()">{{$t('application.ok')}}</el-button>
-        <el-button @click="moveDialogVisible = false">{{$t('application.cancel')}}</el-button>
+        <el-button type="primary" @click="saveFolder(folderForm)">{{
+          $t("application.ok")
+        }}</el-button>
+        <el-button @click="folderDialogVisible = false">{{
+          $t("application.cancel")
+        }}</el-button>
       </div>
     </el-dialog>
     <el-dialog
-      :title="uploadType==0?'更新主文件':'更新格式副本'"
+      :title="$t('route.movepos')"
+      :visible.sync="moveDialogVisible"
+      @close="moveDialogVisible = false"
+    >
+      <el-form>
+        <el-form-item
+          :label="$t('route.currentid')"
+          :label-width="formLabelWidth"
+          >{{ getSelectedIds() }}</el-form-item
+        >
+        <el-form-item
+          :label="$t('route.desfolderid')"
+          :label-width="formLabelWidth"
+        >
+          <FolderSelector
+            v-model="targetFolderId"
+            v-bind:inputValue="targetFolderId"
+          ></FolderSelector>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleMoveItem()">{{
+          $t("application.ok")
+        }}</el-button>
+        <el-button @click="moveDialogVisible = false">{{
+          $t("application.cancel")
+        }}</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog
+      :title="uploadType == 0 ? '更新主文件' : '更新格式副本'"
       :visible.sync="udialogVisible"
       v-loading="uploading"
     >
-      <el-form  label-position="right" label-width="120px">
+      <el-form label-position="right" label-width="120px">
         <el-form-item :label="$t('message.file')" :label-width="formLabelWidth">
           <el-upload
             :limit="1"
@@ -158,13 +236,19 @@
             :auto-upload="false"
             :multiple="false"
           >
-            <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
+            <el-button slot="trigger" size="small" type="primary">{{
+              $t("application.selectFile")
+            }}</el-button>
           </el-upload>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="udialogVisible = false">{{$t('application.cancel')}}</el-button>
-        <el-button type="primary" @click="updateNewFile()">{{$t('application.ok')}}</el-button>
+        <el-button @click="udialogVisible = false">{{
+          $t("application.cancel")
+        }}</el-button>
+        <el-button type="primary" @click="updateNewFile()">{{
+          $t("application.ok")
+        }}</el-button>
       </div>
     </el-dialog>
     <el-dialog
@@ -172,7 +256,7 @@
       :visible.sync="importDialogVisible"
       v-loading="uploading"
     >
-      <el-form  label-position="right" label-width="120px">
+      <el-form label-position="right" label-width="120px">
         <el-form-item :label="$t('message.file')" :label-width="formLabelWidth">
           <el-upload
             :limit="1"
@@ -182,12 +266,16 @@
             :auto-upload="false"
             :multiple="false"
           >
-            <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
+            <el-button slot="trigger" size="small" type="primary">{{
+              $t("application.selectFile")
+            }}</el-button>
           </el-upload>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="importDialogVisible = false">{{$t('application.cancel')}}</el-button>
+        <el-button @click="importDialogVisible = false">{{
+          $t("application.cancel")
+        }}</el-button>
         <el-button type="primary" @click="importPackage()">确 定</el-button>
       </div>
     </el-dialog>
@@ -199,209 +287,312 @@
     >
       <InnerItemViewer v-bind:id="currentId"></InnerItemViewer>
     </el-dialog>
- 
-        <el-row style="padding-top:10px;padding-bottom:10px;">
-          <el-col :span="4" style="text-align: left">
-            <el-tooltip
-              class="item"
-              effect="dark"
-              :content="$t('application.newFolder')"
-              placement="top"
-            >
-              <el-button type="primary" icon="el-icon-circle-plus" circle @click="onNewFolder()"></el-button>
-            </el-tooltip>
-            <el-tooltip
-              class="item"
-              effect="dark"
-              :content="$t('application.edit')+$t('application.folder')"
-              placement="top"
-            >
-              <el-button type="primary" icon="el-icon-info" circle @click="onEditFolder()"></el-button>
-            </el-tooltip>
-            <el-tooltip
-              class="item"
-              effect="dark"
-              :content="$t('application.delete')+$t('application.folder')"
-              placement="top"
-            >
-              <el-button type="primary" icon="el-icon-delete" circle @click="onDeleleFolder()"></el-button>
-            </el-tooltip>
-             <el-tooltip
-              class="item"
-              effect="dark"
-              :content="$t('application.move')+$t('application.folder')"
-              placement="top"
-            >
-              <el-button type="primary" icon="el-icon-top-right" circle @click="moveFolder()"></el-button>
-            </el-tooltip>
-          </el-col>
-          <el-col :span="4" style="text-align: left">
-            <el-input
-              v-model="inputkey"
-              :placeholder="$t('message.pleaseInput')+$t('application.keyword')"
-              @change="searchItem"
-              prefix-icon="el-icon-search"
-            ></el-input>
-          </el-col>
-          <el-col :span="15" style="text-align: left">
-            &nbsp; &nbsp; 
-            <el-button
-              type="primary"
-              icon="el-icon-edit"
-              @click="newItem()"
-            >{{$t('application.new')}}</el-button>
-            <el-button
-              type="primary"
-              icon="el-icon-delete"
-              @click="onDeleleItem()"
-            >{{$t('application.delete')}}</el-button>
-            <el-button type="primary" icon="el-icon-top-right" @click="moveItem()">{{$t('application.move')}}</el-button>
-            <el-button type="primary" icon="el-icon-document-copy" @click="copyItem()">{{$t('application.copy')}}</el-button>
-            <el-button type="primary" icon="el-icon-upload2" @click="showUpdateFile(0)">{{$t('application.update')}}</el-button>
-            <el-button type="primary" icon="el-icon-upload2" @click="showUpdateFile(1)">{{$t('application.transcript')}}</el-button>
-            <el-button
-              type="primary"
-              icon="el-icon-download"
-              @click="handleExportItem()"
-            >{{$t('application.export')}}</el-button>
-            <el-button
-              type="primary"
-              icon="el-icon-upload2"
-              @click="importDialogVisible = true"
-            >{{$t('application.Import')}}</el-button>
-            <StartupComponent :selectedFiles="selectedItems"></StartupComponent>
-          </el-col>
-        </el-row>
-      <div :style="{position:'relative',height: asideHeight+'px'}">
-      <split-pane split="vertical" @resize="resize" :min-percent='10' :default-percent='15'>
-      <template slot="paneL">
-         <el-container :style="{height:treeHeight+'px',width:asideWidth,overflow:'auto'}">
-          <el-tree
-            :props="defaultProps"
-            :data="dataList"
-            node-key="id"
-            style="width:100%;"
-            :render-content="renderContent"
-            default-expand-all
-            highlight-current
-            @node-click="handleNodeClick"
-          ></el-tree>
-       </el-container>
-      </template>
-     <template slot="paneR">
-          <el-row>
-            <el-table
-              :height="tableHeight"
-              :data="itemDataList"
-              border
-              v-loading="loading"
-              @selection-change="selectChange"
-              @sort-change="sortchange"
-              @header-dragend="onHeaderDragend"
-              
+
+    <el-row style="padding-top: 10px; padding-bottom: 10px">
+      <el-col :span="4" style="text-align: left">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          :content="$t('application.newFolder')"
+          placement="top"
+        >
+          <el-button
+            type="primary"
+            icon="el-icon-circle-plus"
+            circle
+            @click="onNewFolder()"
+          ></el-button>
+        </el-tooltip>
+        <el-tooltip
+          class="item"
+          effect="dark"
+          :content="$t('application.edit') + $t('application.folder')"
+          placement="top"
+        >
+          <el-button
+            type="primary"
+            icon="el-icon-info"
+            circle
+            @click="onEditFolder()"
+          ></el-button>
+        </el-tooltip>
+        <el-tooltip
+          class="item"
+          effect="dark"
+          :content="$t('application.delete') + $t('application.folder')"
+          placement="top"
+        >
+          <el-button
+            type="primary"
+            icon="el-icon-delete"
+            circle
+            @click="onDeleleFolder()"
+          ></el-button>
+        </el-tooltip>
+        <el-tooltip
+          class="item"
+          effect="dark"
+          :content="$t('application.move') + $t('application.folder')"
+          placement="top"
+        >
+          <el-button
+            type="primary"
+            icon="el-icon-top-right"
+            circle
+            @click="moveFolder()"
+          ></el-button>
+        </el-tooltip>
+      </el-col>
+      <el-col :span="4" style="text-align: left">
+        <el-input
+          v-model="inputkey"
+          :placeholder="$t('message.pleaseInput') + $t('application.keyword')"
+          @change="searchItem"
+          prefix-icon="el-icon-search"
+        ></el-input>
+      </el-col>
+      <el-col :span="15" style="text-align: left">
+        &nbsp; &nbsp;
+        <el-button type="primary" icon="el-icon-edit" @click="newItem()">{{
+          $t("application.new")
+        }}</el-button>
+        <el-button
+          type="primary"
+          icon="el-icon-delete"
+          @click="onDeleleItem()"
+          >{{ $t("application.delete") }}</el-button
+        >
+        <el-button
+          type="primary"
+          icon="el-icon-top-right"
+          @click="moveItem()"
+          >{{ $t("application.move") }}</el-button
+        >
+        <el-button
+          type="primary"
+          icon="el-icon-document-copy"
+          @click="copyItem()"
+          >{{ $t("application.copy") }}</el-button
+        >
+        <el-button
+          type="primary"
+          icon="el-icon-upload2"
+          @click="showUpdateFile(0)"
+          >{{ $t("application.update") }}</el-button
+        >
+        <el-button
+          type="primary"
+          icon="el-icon-upload2"
+          @click="showUpdateFile(1)"
+          >{{ $t("application.transcript") }}</el-button
+        >
+        <el-button
+          type="primary"
+          icon="el-icon-download"
+          @click="handleExportItem()"
+          >{{ $t("application.export") }}</el-button
+        >
+        <el-button
+          type="primary"
+          icon="el-icon-upload2"
+          @click="importDialogVisible = true"
+          >{{ $t("application.Import") }}</el-button
+        >
+        <StartupComponent :selectedFiles="selectedItems"></StartupComponent>
+      </el-col>
+    </el-row>
+    <div :style="{ position: 'relative', height: asideHeight + 'px' }">
+      <split-pane
+        split="vertical"
+        @resize="resize"
+        :min-percent="10"
+        :default-percent="15"
+      >
+        <template slot="paneL">
+          <el-container
+            :style="{
+              height: treeHeight + 'px',
+              width: asideWidth,
+              overflow: 'auto',
+            }"
+          >
+            <el-tree
+              :props="defaultProps"
+              :data="dataList"
+              node-key="id"
               style="width: 100%"
-            >
-              <el-table-column type="selection" width="40" @selection-change="selectChange"></el-table-column>
-              <el-table-column :label="$t('field.indexNumber')" width="70">
-                <template slot-scope="scope">
-                  <span>{{(currentPage-1) * pageSize + scope.$index+1}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column width="40">
-                <template slot-scope="scope">
-                  <img :src="'./static/img/format/f_'+scope.row.FORMAT_NAME+'_16.gif'" border="0" />
-                </template>
-              </el-table-column>
-              <div v-for="(citem,idx) in gridList" :key="'C_'+idx">
-                <div v-if="citem.visibleType==1">
-                  <div v-if="(citem.width+'').indexOf('%')>0">
-                    <el-table-column
-                      :label="citem.label"
-                      :prop="citem.attrName"
-                      :min-width="citem.width"
-                      :sortable="citem.allowOrderby"
-                    >
-                      <template slot-scope="scope">
-                        <div v-if="citem.attrName.indexOf('DATE')>0">
-                          <span>{{dateFormat(scope.row[citem.attrName])}}</span>
-                        </div>
-                        <div v-else>
-                          <span @click="rowClick(scope.row)">{{scope.row[citem.attrName]}}</span>
-                        </div>
-                      </template>
-                    </el-table-column>
+              :render-content="renderContent"
+              default-expand-all
+              highlight-current
+              @node-click="handleNodeClick"
+            ></el-tree>
+          </el-container>
+        </template>
+        <template slot="paneR">
+          <split-pane
+            v-on:resize="onSplitResize"
+            :min-percent="20"
+            :default-percent="topPercent"
+            split="horizontal"
+          >
+            <template slot="paneL">
+              <el-row>
+                <el-table
+                  :height="tableHeight"
+                  :data="itemDataList"
+                  border
+                  v-loading="loading"
+                  @rowclick="onTabelRowClick"
+                  @selection-change="selectChange"
+                  @sort-change="sortchange"
+                  @header-dragend="onHeaderDragend"
+                  style="width: 100%"
+                >
+                  <el-table-column
+                    type="selection"
+                    width="40"
+                    @selection-change="selectChange"
+                  ></el-table-column>
+                  <el-table-column :label="$t('field.indexNumber')" width="70">
+                    <template slot-scope="scope">
+                      <span>{{
+                        (currentPage - 1) * pageSize + scope.$index + 1
+                      }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column width="40">
+                    <template slot-scope="scope">
+                      <img
+                        :src="
+                          './static/img/format/f_' +
+                          scope.row.FORMAT_NAME +
+                          '_16.gif'
+                        "
+                        border="0"
+                      />
+                    </template>
+                  </el-table-column>
+                  <div v-for="(citem, idx) in gridList" :key="'C_' + idx">
+                    <div v-if="citem.visibleType == 1">
+                      <div v-if="(citem.width + '').indexOf('%') > 0">
+                        <el-table-column
+                          :label="citem.label"
+                          :prop="citem.attrName"
+                          :min-width="citem.width"
+                          :sortable="citem.allowOrderby"
+                        >
+                          <template slot-scope="scope">
+                            <div v-if="citem.attrName.indexOf('DATE') > 0">
+                              <span>{{
+                                dateFormat(scope.row[citem.attrName])
+                              }}</span>
+                            </div>
+                            <div v-else>
+                              <span @click="rowClick(scope.row)">{{
+                                scope.row[citem.attrName]
+                              }}</span>
+                            </div>
+                          </template>
+                        </el-table-column>
+                      </div>
+                      <div v-else>
+                        <el-table-column
+                          :label="citem.label"
+                          :width="citem.width"
+                          :prop="citem.attrName"
+                          :sortable="citem.allowOrderby"
+                        >
+                          <template slot-scope="scope">
+                            <div v-if="citem.attrName.indexOf('DATE') > 0">
+                              <span>{{
+                                dateFormat(scope.row[citem.attrName])
+                              }}</span>
+                            </div>
+                            <div v-else>
+                              <span @click="rowClick(scope.row)">{{
+                                scope.row[citem.attrName]
+                              }}</span>
+                            </div>
+                          </template>
+                        </el-table-column>
+                      </div>
+                    </div>
                   </div>
-                  <div v-else>
-                    <el-table-column
-                      :label="citem.label"
-                      :width="citem.width"
-                      :prop="citem.attrName"
-                      :sortable="citem.allowOrderby"
-                    >
-                      <template slot-scope="scope">
-                        <div v-if="citem.attrName.indexOf('DATE')>0">
-                          <span>{{dateFormat(scope.row[citem.attrName])}}</span>
-                        </div>
-                        <div v-else>
-                          <span @click="rowClick(scope.row)">{{scope.row[citem.attrName]}}</span>
-                        </div>
-                      </template>
-                    </el-table-column>
-                  </div>
-                </div>
-              </div>
-              <el-table-column :label="$t('application.operation')" width="130">
-                <template slot="header">
-                  <el-button icon="el-icon-s-grid" size="small" @click="dialogFormShow"></el-button>
-                </template>
-                <template slot-scope="scope">
-                  <el-button
-                    type="primary"
-                    plain
-                    size="small"
-                    :title="$t('application.view')"
-                    icon="el-icon-picture-outline"
-                    @click="showNewWindow(scope.row.ID)"
-                  ></el-button>
-                  <el-button
-                    type="primary"
-                    plain
-                    size="small"
-                    :title="$t('application.property')"
-                    icon="el-icon-info"
-                    @click="showItemProperty(scope.row)"
-                  ></el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-row>
-          <el-row>
-            <el-pagination
-              background
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-              :current-page="currentPage"
-              :page-sizes="[10, 20, 50, 100, 200]"
-              :page-size="pageSize"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="itemCount"
-            ></el-pagination>
-          </el-row>
-         </template>
+                  <el-table-column
+                    :label="$t('application.operation')"
+                    width="130"
+                  >
+                    <template slot="header">
+                      <el-button
+                        icon="el-icon-s-grid"
+                        size="small"
+                        @click="dialogFormShow"
+                      ></el-button>
+                    </template>
+                    <template slot-scope="scope">
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        :title="$t('application.view')"
+                        icon="el-icon-picture-outline"
+                        @click="showNewWindow(scope.row.ID)"
+                      ></el-button>
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        :title="$t('application.property')"
+                        icon="el-icon-info"
+                        @click="showItemProperty(scope.row)"
+                      ></el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-row>
+              <el-row>
+                <el-pagination
+                  background
+                  @size-change="handleSizeChange"
+                  @current-change="handleCurrentChange"
+                  :current-page="currentPage"
+                  :page-sizes="[10, 20, 50, 100, 200]"
+                  :page-size="pageSize"
+                  layout="total, sizes, prev, pager, next, jumper"
+                  :total="itemCount"
+                ></el-pagination>
+              </el-row>
+            </template>
+            <template slot="paneR" v-if="tempShow">
+              <el-tabs v-model="tabs.activeNum">
+                <el-tab-pane label="案卷" name="relevantFile">
+                  <DataGrid
+                    ref="relevantFileDataGrid"
+                    key="relevantFile"
+                    v-bind="tables.RelevantFileGrid"
+                  >
+                  </DataGrid>
+                </el-tab-pane>
+                <el-tab-pane label="文件" name="initFile"> </el-tab-pane>
+              </el-tabs>
+            </template>
+          </split-pane>
+        </template>
       </split-pane>
     </div>
   </div>
 </template>
 
 <script type="text/javascript">
+import DataGrid from "@/components/DataGrid";
 import ShowProperty from "@/components/ShowProperty";
 import FolderSelector from "@/components/controls/FolderSelector";
 import InnerItemViewer from "./InnerItemViewer.vue";
-import ObjectAcl from '@/components/controls/ObjectAcl';
-import SystemInfo from '@/components/controls/SystemInfo';
-import FolderAcl from '@/components/controls/FolderAcl';
-import StartWorkflow from '@/views/workflow/StartWorkflow';
-import StartupComponent from '@/views/workflow/StartupComponent.vue'
+import ObjectAcl from "@/components/controls/ObjectAcl";
+import SystemInfo from "@/components/controls/SystemInfo";
+import FolderAcl from "@/components/controls/FolderAcl";
+import StartWorkflow from "@/views/workflow/StartWorkflow";
+import StartupComponent from "@/views/workflow/StartupComponent.vue";
 
 import "url-search-params-polyfill";
 
@@ -409,18 +600,24 @@ export default {
   name: "FolderClassification",
 
   components: {
+    DataGrid: DataGrid,
     ShowProperty: ShowProperty,
     InnerItemViewer: InnerItemViewer,
     FolderSelector: FolderSelector,
     ObjectAcl: ObjectAcl,
     SystemInfo: SystemInfo,
-    FolderAcl:FolderAcl,
+    FolderAcl: FolderAcl,
     StartWorkflow: StartWorkflow,
-    StartupComponent:StartupComponent
+    StartupComponent: StartupComponent,
   },
   data() {
     return {
-      activeTab:"基本信息",
+      RelevantFile: {
+        gridViewName: "RelevantFileGrid",
+        dataUrl: "/dc/getDocuments",
+        condition: "C_ITEM_TYPE='案卷' and STATUS = '归档'",
+      },
+      activeTab: "基本信息",
       targetFolderId: "",
       moveDialogVisible: false,
       udialogVisible: false,
@@ -430,17 +627,20 @@ export default {
       jsonFile: null,
       newFileList: [],
       currentId: "",
-      isMoveFolder:false,
+      isMoveFolder: false,
       columnsInfo: {
         checkAll: true,
         checkedCities: [],
         temCol: [],
         dialogFormVisible: false,
-        isIndeterminate: false
+        isIndeterminate: false,
+      },
+      tabs: {
+        activeNum: "",
       },
       currentLanguage: "zh-cn",
-      clientPermission:0,
-      systemPermission:0,
+      clientPermission: 0,
+      systemPermission: 0,
       dataList: [],
       showFields: [],
       itemDataList: [],
@@ -449,7 +649,7 @@ export default {
       currentFolder: [],
       currentDocument: [],
       dataListFull: "",
-      uploadFile:null,
+      uploadFile: null,
       inputkey: "",
       loading: false,
       uploading: false,
@@ -463,9 +663,9 @@ export default {
       dialogFormVisible: false,
       selectedItems: [],
       asideHeight: window.innerHeight - 150,
-      treeHeight:window.innerHeight - 160,
+      treeHeight: window.innerHeight - 160,
       tableHeight: window.innerHeight - 180,
-      asideWidth: '100%',
+      asideWidth: "100%",
       folderAction: "",
       folderDialogVisible: false,
       imageArray: [""],
@@ -480,16 +680,17 @@ export default {
         parentId: 0,
         typeName: "Folder",
         gridView: "",
-        aclName: ""
+        aclName: "",
       },
       formLabelWidth: "120px",
       defaultData: {
-        gridView: "GeneralGrid"
+        gridView: "GeneralGrid",
       },
       defaultProps: {
         children: "children",
-        label: "name"
-      }
+        label: "name",
+      },
+      tempShow: false,
     };
   },
   watch: {
@@ -497,17 +698,17 @@ export default {
       //普通的watch监听
       //console.log("a: "+val, oldVal);
       let _self = this;
-      _self.gridList.forEach(element => {
+      _self.gridList.forEach((element) => {
         element.visibleType = 2;
       });
-      val.forEach(element => {
+      val.forEach((element) => {
         let item = _self.getgriditem(element);
         if (item) {
           //console.log(element);
           item.visibleType = 1;
         }
       });
-    }
+    },
   },
   created() {
     let _self = this;
@@ -517,19 +718,18 @@ export default {
     }
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
-      if(_self.currentUser())
-      {
-        _self.clientPermission = Number(_self.currentUser().clientPermission);
-        _self.systemPermission = Number(_self.currentUser().systemPermission);
-      }
+    if (_self.currentUser()) {
+      _self.clientPermission = Number(_self.currentUser().clientPermission);
+      _self.systemPermission = Number(_self.currentUser().systemPermission);
+    }
     axios
       .post("/admin/getFolder", 0)
-      .then(function(response) {
+      .then(function (response) {
         _self.dataList = response.data.data;
         //console.log(JSON.stringify(_self.dataList));
         _self.loading = false;
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error);
         _self.loading = false;
       });
@@ -538,7 +738,7 @@ export default {
   methods: {
     resize() {
       //console.log('resize')
-      this.asideWidth = '100%';
+      this.asideWidth = "100%";
     },
     showUpdateFile(indata) {
       if (this.selectedItems && this.selectedItems.length > 0) {
@@ -563,7 +763,7 @@ export default {
         }
       }
     },
-    importPackage(){
+    importPackage() {
       let _self = this;
       _self.uploading = true;
       let formdata = new FormData();
@@ -573,15 +773,17 @@ export default {
       }
       axios
         .post("/admin/importPackage", formdata, {
-          "Content-Type": "multipart/form-data"
+          "Content-Type": "multipart/form-data",
         })
-        .then(function(response) {
+        .then(function (response) {
           _self.importDialogVisible = false;
           _self.loadGridData(_self.currentFolder);
-          _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
+          _self.$message(
+            _self.$t("application.Import") + _self.$t("message.success")
+          );
           _self.uploading = false;
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
           _self.uploading = false;
         });
@@ -596,15 +798,15 @@ export default {
       }
       axios
         .post("/dc/updatePrimaryContent", formdata, {
-          "Content-Type": "multipart/form-data"
+          "Content-Type": "multipart/form-data",
         })
-        .then(function(response) {
+        .then(function (response) {
           _self.udialogVisible = false;
           _self.loadGridData(_self.currentFolder);
           _self.$message("更新成功!");
           _self.uploading = false;
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
           _self.uploading = false;
         });
@@ -622,14 +824,14 @@ export default {
       }
       axios
         .post("/dc/addRendition", formdata, {
-          "Content-Type": "multipart/form-data"
+          "Content-Type": "multipart/form-data",
         })
-        .then(function(response) {
+        .then(function (response) {
           _self.udialogVisible = false;
           _self.$message("更新成功!");
           _self.uploading = false;
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
           _self.uploading = false;
         });
@@ -640,40 +842,43 @@ export default {
         this.moveDialogVisible = true;
       }
     },
-    moveFolder(){
-      if(this.currentFolder){
+    moveFolder() {
+      if (this.currentFolder) {
         this.isMoveFolder = true;
         this.moveDialogVisible = true;
       }
     },
     handleMoveItem() {
-      if(this.isMoveFolder){
+      if (this.isMoveFolder) {
         this.handleMoveFolder();
-      }else{
+      } else {
         this.handleMoveDocument();
       }
     },
-    handleMoveFolder(){
-       let _self = this;
-       if(_self.targetFolderId==_self.currentFolder.id || _self.targetFolderId==_self.currentFolder.parentId ){
-          _self.$message("目标文件夹不能更当前文件夹相同!");
-          return;
-       }
-       var fld = _self.currentFolder;
-       fld.parentId = _self.targetFolderId;
-        axios
-          .post("/admin/updateFolder", JSON.stringify(fld))
-          .then(function(response) {
-            _self.$message(_self.$t("message.saveSuccess"));
-            _self.moveDialogVisible = false;
-            _self.loading = false;
-            _self.refreshFolderData();
-          })
-          .catch(function(error) {
-            console.log(error);
-          });
+    handleMoveFolder() {
+      let _self = this;
+      if (
+        _self.targetFolderId == _self.currentFolder.id ||
+        _self.targetFolderId == _self.currentFolder.parentId
+      ) {
+        _self.$message("目标文件夹不能更当前文件夹相同!");
+        return;
+      }
+      var fld = _self.currentFolder;
+      fld.parentId = _self.targetFolderId;
+      axios
+        .post("/admin/updateFolder", JSON.stringify(fld))
+        .then(function (response) {
+          _self.$message(_self.$t("message.saveSuccess"));
+          _self.moveDialogVisible = false;
+          _self.loading = false;
+          _self.refreshFolderData();
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     },
-    handleMoveDocument(){
+    handleMoveDocument() {
       let _self = this;
       _self.loading = true;
       var m = new Map();
@@ -681,7 +886,7 @@ export default {
       m.set("folderId", _self.targetFolderId);
       axios
         .post("/dc/moveDocument", JSON.stringify(m))
-        .then(function(response) {
+        .then(function (response) {
           if (response.data.code == 1) {
             _self.$message("目录移动成功。");
             _self.loadGridData(_self.currentFolder);
@@ -691,18 +896,17 @@ export default {
           _self.moveDialogVisible = false;
           _self.loading = false;
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
           _self.loading = false;
         });
     },
     getSelectedIds() {
-      if(this.isMoveFolder)
-      {
+      if (this.isMoveFolder) {
         return this.currentFolder.id;
-      }else{
+      } else {
         var str = "";
-        this.selectedItems.forEach(function(val) {
+        this.selectedItems.forEach(function (val) {
           str += val.ID + ";";
         });
         return str;
@@ -714,7 +918,18 @@ export default {
         this.itemDialogVisible = true;
       }
     },
-    renderContent: function(h, { node, data, store }) {
+    onTabelRowClick(row) {
+      this.tempShow = true;
+      this.currentId = row.ID;
+      if (row.C_ITEM_TYPE == "案卷") {
+        this.tabs.activeNum = "relevantFile";
+        $ref.RelevantFile.condition += " ID = '"+ this.currentId +"'";
+        $ref.relevantFileDataGrid.currentPage = 1;
+        $ref.relevantFileDataGrid.loadGridInfo();
+        $ref.relevantFileDataGrid.loadGridData();
+      }
+    },
+    renderContent: function (h, { node, data, store }) {
       //console.log(data);
       if (data.extended) {
         return (
@@ -737,9 +952,9 @@ export default {
       let href = this.$router.resolve({
         path: "/viewdoc",
         query: {
-          id: condition
+          id: condition,
           //token: sessionStorage.getItem('access-token')
-        }
+        },
       });
       //console.log(href);
       window.open(href.href, "_blank");
@@ -747,7 +962,7 @@ export default {
     getgriditem(attrName) {
       let _self = this;
       let ret = null;
-      _self.gridList.forEach(element => {
+      _self.gridList.forEach((element) => {
         if (element.attrName == attrName) {
           ret = element;
           return;
@@ -783,20 +998,21 @@ export default {
       var m = new Map();
       m.set("gridName", indata.gridView);
       m.set("lang", _self.currentLanguage);
+      console.log(indata.gridView);
       axios
         .post("/dc/getGridViewInfo", JSON.stringify(m))
-        .then(function(response) {
+        .then(function (response) {
           _self.showFields = [];
           _self.gridList = response.data.data;
           //console.log(JSON.stringify(_self.gridList));
-          _self.gridList.forEach(element => {
+          _self.gridList.forEach((element) => {
             if (element.visibleType == 1) {
               _self.showFields.push(element.attrName);
             }
           });
           _self.loading = false;
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
           _self.loading = false;
         });
@@ -819,20 +1035,20 @@ export default {
       _self
         .axios({
           headers: {
-            "Content-Type": "application/json;charset=UTF-8"
+            "Content-Type": "application/json;charset=UTF-8",
           },
           method: "post",
           data: JSON.stringify(m),
-          url: "/dc/getDocuments"
+          url: "/dc/getDocuments",
         })
-        .then(function(response) {
+        .then(function (response) {
           _self.itemDataList = response.data.data;
           _self.itemDataListFull = response.data.data;
           _self.itemCount = response.data.pager.total;
           //console.log(JSON.stringify(response.data.datalist));
           _self.loading = false;
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
           _self.loading = false;
         });
@@ -856,12 +1072,12 @@ export default {
       _self.loading = true;
       axios
         .post("/admin/getFolder", 0)
-        .then(function(response) {
+        .then(function (response) {
           _self.dataList = response.data.data;
           //console.log(_self.dataList);
           _self.loading = false;
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
           _self.loading = false;
         });
@@ -876,13 +1092,13 @@ export default {
         _self.loading = true;
         axios
           .post("/admin/getFolder", indata.id)
-          .then(function(response) {
+          .then(function (response) {
             indata.children = response.data.data;
             //console.log(JSON.stringify(indata));
             indata.extended = true;
             _self.loading = false;
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.log(error);
             _self.loading = false;
           });
@@ -920,7 +1136,7 @@ export default {
       this.propertyVisible = false;
       this.loadGridData(this.currentFolder);
     },
-    handleExportItem(){
+    handleExportItem() {
       let _self = this;
       var m = [];
       let tab = _self.selectedItems;
@@ -930,28 +1146,30 @@ export default {
       }
       axios
         .post("/admin/getPackage", JSON.stringify(m))
-        .then(function(response) {
-          const content = JSON.stringify(response.data)
+        .then(function (response) {
+          const content = JSON.stringify(response.data);
           //_self.exportRaw("package.txt", content)
-        
-          const blob = new Blob([content]) // 构造一个blob对象来处理数据
-          const fileName = 'package.json' // 导出文件名
+
+          const blob = new Blob([content]); // 构造一个blob对象来处理数据
+          const fileName = "package.json"; // 导出文件名
           // 对于<a>标签，只有 Firefox 和 Chrome（内核） 支持 download 属性
           // IE10以上支持blob但是依然不支持download
-          if ('download' in document.createElement('a')) { // 支持a标签download的浏览器
-            const link = document.createElement('a') // 创建a标签
-            link.download = fileName // a标签添加属性
-            link.style.display = 'none'
-            link.href = URL.createObjectURL(blob)
-            document.body.appendChild(link)
-            link.click() // 执行下载
-            URL.revokeObjectURL(link.href) // 释放url
-            document.body.removeChild(link) // 释放标签
-          } else { // 其他浏览器
-            navigator.msSaveBlob(blob, fileName)
+          if ("download" in document.createElement("a")) {
+            // 支持a标签download的浏览器
+            const link = document.createElement("a"); // 创建a标签
+            link.download = fileName; // a标签添加属性
+            link.style.display = "none";
+            link.href = URL.createObjectURL(blob);
+            document.body.appendChild(link);
+            link.click(); // 执行下载
+            URL.revokeObjectURL(link.href); // 释放url
+            document.body.removeChild(link); // 释放标签
+          } else {
+            // 其他浏览器
+            navigator.msSaveBlob(blob, fileName);
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           _self.$message("打包失败");
           console.log(error);
         });
@@ -976,7 +1194,7 @@ export default {
         {
           confirmButtonText: _self.$t("application.ok"),
           cancelButtonText: _self.$t("application.cancel"),
-          type: "warning"
+          type: "warning",
         }
       )
         .then(() => {
@@ -1000,11 +1218,11 @@ export default {
       }
       axios
         .post("/dc/delDocument", JSON.stringify(m))
-        .then(function(response) {
+        .then(function (response) {
           _self.loadGridData(_self.currentFolder);
           _self.$message(_self.$t("message.deleteSuccess"));
         })
-        .catch(function(error) {
+        .catch(function (error) {
           _self.$message(_self.$t("message.deleteFailured"));
           console.log(error);
         });
@@ -1035,7 +1253,7 @@ export default {
       _self.currentDocument = indata;
       _self.selectedItemId = indata.ID;
       _self.propertyVisible = true;
-      _self.activeTab="启动流程";
+      _self.activeTab = "启动流程";
       if (_self.$refs.StartWorkflow) {
         _self.$refs.StartWorkflow.docId = indata.ID;
       }
@@ -1070,11 +1288,11 @@ export default {
       } else {
         axios
           .post("/admin/updateFolder", JSON.stringify(indata))
-          .then(function(response) {
+          .then(function (response) {
             _self.$message(_self.$t("message.saveSuccess"));
             _self.folderDialogVisible = false;
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.log(error);
           });
       }
@@ -1084,7 +1302,7 @@ export default {
       let _self = this;
       axios
         .post("/admin/deleteFolder", JSON.stringify(_self.currentFolder))
-        .then(function(response) {
+        .then(function (response) {
           if (response.data.code == 1) {
             _self.$message(_self.$t("message.deleteSuccess"));
             _self.refreshFolderData();
@@ -1092,7 +1310,7 @@ export default {
             _self.$message(response.data.msg);
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
     },
@@ -1110,7 +1328,7 @@ export default {
         parentId: this.currentFolder.id,
         typeName: this.currentFolder.typeName,
         gridView: this.currentFolder.gridView,
-        aclName: this.currentFolder.aclName
+        aclName: this.currentFolder.aclName,
       };
       this.folderDialogVisible = true;
     },
@@ -1143,7 +1361,7 @@ export default {
           {
             confirmButtonText: _self.$t("application.ok"),
             cancelButtonText: _self.$t("application.cancel"),
-            type: "warning"
+            type: "warning",
           }
         )
         .then(() => {
@@ -1161,13 +1379,13 @@ export default {
       let _self = this;
       axios
         .post("/admin/newFolder", JSON.stringify(indata))
-        .then(function(response) {
+        .then(function (response) {
           _self.folderDialogVisible = false;
           _self.currentFolder.children = [];
           _self.currentFolder.extended = false;
           //_self.refreshFolderData();
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
     },
@@ -1180,12 +1398,12 @@ export default {
         m.set("folderId", "");
         axios
           .post("/dc/copyDocument", JSON.stringify(m))
-          .then(function(response) {
+          .then(function (response) {
             _self.$message(_self.$t("message.copySuccess"));
             _self.dialogVisible = false;
             _self.loadGridData(_self.currentFolder);
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.log(error);
           });
       }
@@ -1202,7 +1420,7 @@ export default {
     handleCheckAllChange(val) {
       this.showFields = [];
       if (val) {
-        this.gridList.forEach(element => {
+        this.gridList.forEach((element) => {
           this.showFields.push(element.attrName);
         });
       }
@@ -1217,18 +1435,18 @@ export default {
     },
     confirmShow() {
       let _self = this;
-      _self.gridList.forEach(element => {
+      _self.gridList.forEach((element) => {
         element.visibleType = 2;
       });
-      _self.showFields.forEach(element => {
+      _self.showFields.forEach((element) => {
         let item = _self.getgriditem(element);
         if (item) {
           item.visibleType = 1;
         }
       });
       this.columnsInfo.dialogFormVisible = false;
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -1263,7 +1481,7 @@ a {
   -moz-osx-font-smoothing: grayscale;
 }
 .el-header {
-    background-color: #e8eaeb;
-    color: #333;
+  background-color: #e8eaeb;
+  color: #333;
 }
 </style>
