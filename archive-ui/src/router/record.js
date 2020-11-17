@@ -59,6 +59,16 @@ export const recordRouter =  [
         name: '专题管理',
         component: () => import('@/views/record/ThematicManagement.vue')
     },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:'档案专题'
+        },
+        path: '/record/ShowThematic',
+        name: '档案专题',
+        component: () => import('@/views/record/ShowThematic.vue')
+    },
 		{
 			meta: {
 				requireAuth: true,
