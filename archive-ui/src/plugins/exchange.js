@@ -41,7 +41,7 @@ export function onDeleleItem(selectedItems,dataGridObj) {
       m.push(tab[i]["ID"]);
     }
    
-    axios.post("/dc/delDocumentAndRelationCommon",JSON.stringify(m),{
+    axios.post("/dc/delDocumentAndRelation",JSON.stringify(m),{
         headers: {
             "Content-Type": "application/json;charset=UTF-8"
           }
