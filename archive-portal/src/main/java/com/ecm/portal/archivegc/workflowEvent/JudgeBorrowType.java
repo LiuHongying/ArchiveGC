@@ -16,8 +16,8 @@ import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
 import com.ecm.icore.service.IEcmSession;
-@Component(value = "docRentEndListener")
-public class docRentEnd implements JavaDelegate {
+@Component(value = "JudgeBorrowTypeListener")
+public class JudgeBorrowType implements JavaDelegate {
 	@Autowired
 	private AuthService authService;
 	@Autowired
@@ -41,12 +41,10 @@ public class docRentEnd implements JavaDelegate {
 			EcmDocument ecmObject = documentService.getObjectById(ecmSession.getToken(), formId);
 			String type = varMap.get("SUB_TYPE").toString();
 			if(!type.equals("纸质借阅")) {
-				ecmObject.setStatus("已完成");
-				documentService.updateObject(ecmSession.getToken(), ecmObject,null);
+				execution.setVariable("C_INCLUDE_PAPER", "否");
 			}
 			if(type.equals("纸质借阅")) {
-				ecmObject.setStatus("待出库");
-				documentService.updateObject(ecmSession.getToken(), ecmObject,null);
+				execution.setVariable("C_INCLUDE_PAPER", "是");
 			}
 	}
 		catch (Exception e) {

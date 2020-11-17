@@ -47,13 +47,15 @@ public class IsCurrentCompany implements JavaDelegate{
 			String creator = form.getCreator();			//表单创建人
 			String sqlCreate="select * from ecm_user where Name = '" + creator + "'";
 			List<Map<String,Object>> createRes = documentService.getMapList(ecmSession.getToken(), sqlCreate);
-			String creatorGroup = createRes.get(0).get("GROUP_NAME").toString();	//表单创建人所属部门
+			String creatorGroup = "数字化信息部";
+			//String creatorGroup = createRes.get(0).get("GROUP_NAME").toString();	//表单创建人所属部门
 			
-			String sql = "select distinct C_CREATE_UNIT from ecm_document where id in(select CHILD_ID from ecm_relation where parent_id = '"+formId+"')";
+			String sql = "select distinct * from ecm_document where id in(select CHILD_ID from ecm_relation where parent_id = '"+formId+"')";
 			List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);
 			for(Map<String,Object> mp : mps) {
 				if(mp.get("C_CREATE_UNIT")==null){			//要是文件没所属部门就当是自己部门的
 					execution.setVariable("IS_CURRENT_COMPANY", "是");
+					continue;
 				}
 				if(mp.get("C_CREATE_UNIT")!=null){
 				String department = mp.get("C_CREATE_UNIT").toString();

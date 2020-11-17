@@ -19,6 +19,8 @@ import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.delegate.DelegateTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
@@ -39,7 +41,9 @@ import com.ecm.portal.service.ServiceDocMail;
 import com.ecm.portal.test.flowable.TODOApplication;
 
 @Component(value = "authListener")
-public class DocAuth implements ExecutionListener, JavaDelegate, TaskListener {
+public class DocAuth implements JavaDelegate {
+	
+	private static final Logger logger = LoggerFactory.getLogger(DocAuth.class);
 	/**
 	 * 
 	 */
@@ -67,40 +71,66 @@ public class DocAuth implements ExecutionListener, JavaDelegate, TaskListener {
 	/**
 	 * 监听 for executionListener
 	 */
-	@Override
 	public void notify(DelegateExecution arg0) {
+		if (arg0.getVariable("processInstanceID") == null) {
+			arg0.setVariable("processInstanceID", arg0.getProcessInstanceId());
+			arg0.setVariable("processName", arg0.getProcessDefinitionId().split(":")[0]);
+		}
+
 		IEcmSession ecmSession = null;
 		String workflowSpecialUserName = env.getProperty("ecm.username");
 		try {
 			ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
-			extracted(ecmSession, arg0);
-			//流程结束发送邮件
-			if("endevent1".equals(arg0.getCurrentActivityId())) {
-				try {
-					HistoricProcessInstance hi = historyService.createHistoricProcessInstanceQuery()
-					        .processInstanceId(arg0.getProcessInstanceId())
-					        .singleResult();
-					String startUserId = hi.getStartUserId();
-					EcmUser user= userService.getObjectByName(ecmSession.getToken(), startUserId);
-					String email= user.getEmail();
-					if(email!=null&&!"".equals(email)) {
-						serviceDocMail.sendEndMail(email);
+			Map<String, Object> varMap = extracted(ecmSession, arg0);
+			//String processName = varMap.get("processName").toString();
+//			if ("process_borrow".equals(processName)) {
+				String flowElementId = arg0.getCurrentFlowElement().getId();
+				String formId = varMap.get("formId").toString();
+				List<Map<String, Object>> childList = null;
+				String sql = "select a.ID as RELATE_ID ,b.ID,a.NAME as RELATION_NAME,a.PARENT_ID,a.CHILD_ID,a.ORDER_INDEX,b.NAME,b.CODING,b.C_SECURITY_LEVEL,b.REVISION,b.TITLE,b.CREATOR,b.TYPE_NAME,b.SUB_TYPE,b.CREATION_DATE,b.C_ARCHIVE_DATE,b.C_ARCHIVE_UNIT"
+						+ " from ecm_relation a, ecm_document b where  a.CHILD_ID=b.ID " + " and a.PARENT_ID='"
+						+ formId + "'  and a.NAME='irel_borrow' ";
+				childList = documentService.getMapList(ecmSession.getToken(), sql);
+				Map<String, Object> formObj = documentService.getObjectMapById(ecmSession.getToken(), formId);
+				Date now = new Date();
+				Date grantDate = DateUtils.addDays(now, 30);
+				
+				//if ("automaticAuthorization".equals(flowElementId)) {
+					String userName=varMap.get("startUser").toString();
+					int permit=PermissionContext.ObjectPermission.READ;
+					if ("在线浏览".equals(varMap.get("SUB_TYPE").toString())){
+						permit=PermissionContext.ObjectPermission.READ;
+					}else if("下载".equals(varMap.get("SUB_TYPE").toString())) {
+						permit=PermissionContext.ObjectPermission.DOWNLOAD;
 					}
-					
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			//end
+					for (int i = 0; i < childList.size(); i++) {
+						EcmDocument docObj = documentService.getObjectById(ecmSession.getToken(),
+								childList.get(i).get("CHILD_ID").toString());
+						logger.info("ID:"+docObj.getId());
+						logger.info("userName:"+userName);
+						logger.info("permit:"+permit);
+						logger.info("grantDate:"+grantDate.toString());
+						documentService.grantUser(ecmSession.getToken(), docObj, userName,permit, grantDate, true);
+						grantRelationPermit(ecmSession,docObj, "irel_children", userName, grantDate, permit);
+					}
+					//documentService.updateStatus(ecmSession.getToken(), formId, "已完成");
+				//} 
+//				else if ("updateStatus".equals(flowElementId)) {
+////					for (int i = 0; i < childList.size(); i++) {
+//						documentService.updateStatus(ecmSession.getToken(), formId, "待出库");
+////						documentService.updateStatus(ecmSession.getToken(), childList.get(i).get("CHILD_ID").toString(), "待出库");
+////					}
+//				}
+
+		//	}
 		} catch (Exception e) {
+			e.printStackTrace();
 			// TODO: handle exception
 		} finally {
 			if (ecmSession != null) {
 				authService.logout(workflowSpecialUserName);
 			}
 		}
-		System.out.println("DelegateExecution_notify");
 	}
 
 	private Map<String, Object> extracted(IEcmSession ecmSession,
@@ -116,61 +146,61 @@ public class DocAuth implements ExecutionListener, JavaDelegate, TaskListener {
 		try {
 			EcmDocument ecmObject = documentService.getObjectById(ecmSession.getToken(), formId);
 
-			// 初始化变量栈
-			varMap.put("borrowType", ecmObject.getSubType());
+//			// 初始化变量栈
+//			varMap.put("borrowType", ecmObject.getSubType());
+//
+//			// 是否本部门文档
+//			varMap.put("departmentDoc",
+//					ecmObject.getAttributes().get("C_CREATION_UNIT").equals(ecmObject.getAttributes().get("C_DESC1")));
+//
+//			// 批次文件是否有商密文件
+//			String fileTopestSecurityLevel = varMap.get("fileTopestSecurityLevel") == null ? ""
+//					: varMap.get("fileTopestSecurityLevel").toString();
+//
+//			// 图纸或文件借阅数量
+//			int drawingNumber = varMap.get("drawingNumber") == null ? 0
+//					: Integer.valueOf(varMap.get("drawingNumber").toString());
+//			int fileNumber = varMap.get("fileNumber") == null ? 0
+//					: Integer.valueOf(varMap.get("fileNumber").toString());
+//
+//			varMap.put("beyondLeaderPermision", false);
+//			switch (fileTopestSecurityLevel) {
+//			case "普通商密":
+//			case "核心商密":
+//				// 20个图册或100个文件以上
+//				if (drawingNumber > 20 || fileNumber > 100) {
+//					varMap.put("beyondLeaderPermision", true);
+//				}
+//				break;
+//
+//			case "受限":
+//				// 30个图册或150个文件以上
+//				if (drawingNumber > 30 || fileNumber > 150) {
+//					varMap.put("beyondLeaderPermision", true);
+//				}
+//				break;
+//
+//			default:
+//				varMap.put("beyondLeaderPermision", false);
+//				break;
+//			}
 
-			// 是否本部门文档
-			varMap.put("departmentDoc",
-					ecmObject.getAttributes().get("C_CREATION_UNIT").equals(ecmObject.getAttributes().get("C_DESC1")));
-
-			// 批次文件是否有商密文件
-			String fileTopestSecurityLevel = varMap.get("fileTopestSecurityLevel") == null ? ""
-					: varMap.get("fileTopestSecurityLevel").toString();
-
-			// 图纸或文件借阅数量
-			int drawingNumber = varMap.get("drawingNumber") == null ? 0
-					: Integer.valueOf(varMap.get("drawingNumber").toString());
-			int fileNumber = varMap.get("fileNumber") == null ? 0
-					: Integer.valueOf(varMap.get("fileNumber").toString());
-
-			varMap.put("beyondLeaderPermision", false);
-			switch (fileTopestSecurityLevel) {
-			case "普通商密":
-			case "核心商密":
-				// 20个图册或100个文件以上
-				if (drawingNumber > 20 || fileNumber > 100) {
-					varMap.put("beyondLeaderPermision", true);
-				}
-				break;
-
-			case "受限":
-				// 30个图册或150个文件以上
-				if (drawingNumber > 30 || fileNumber > 150) {
-					varMap.put("beyondLeaderPermision", true);
-				}
-				break;
-
-			default:
-				varMap.put("beyondLeaderPermision", false);
-				break;
-			}
-
-			varMap.put("securityLevel", fileTopestSecurityLevel);
-			String process_name = arg0.getVariable("processName").toString();
-			switch (process_name) {
-			case "process_borrow":
-				// runtimeService.getVariables("1995ac1d-1259-11ea-9171-00505622af9b")
-				varMap.put("taskUser_owner",
-						runtimeService.getVariable(arg0.getVariable("processInstanceID").toString(), "startUser"));
-				varMap.put("taskUser_owner_leader", ecmObject.getAttributes().get("C_REVIEWER1"));
-				varMap.put("taskUser_doc_leader", ecmObject.getAttributes().get("C_REVIEWER2"));
-				varMap.put("taskUser_leader_in_charge", ecmObject.getAttributes().get("C_REVIEWER3"));
-				break;
-
-			default:
-				break;
-			}
-			arg0.setTransientVariables(varMap);
+			//varMap.put("securityLevel", fileTopestSecurityLevel);
+//			String process_name = arg0.getVariable("processName").toString();
+//			switch (process_name) {
+//			case "process_borrow":
+//				// runtimeService.getVariables("1995ac1d-1259-11ea-9171-00505622af9b")
+//				varMap.put("taskUser_owner",
+//						runtimeService.getVariable(arg0.getVariable("processInstanceID").toString(), "startUser"));
+//				varMap.put("taskUser_owner_leader", ecmObject.getAttributes().get("C_REVIEWER1"));
+//				varMap.put("taskUser_doc_leader", ecmObject.getAttributes().get("C_REVIEWER2"));
+//				varMap.put("taskUser_leader_in_charge", ecmObject.getAttributes().get("C_REVIEWER3"));
+//				break;
+//
+//			default:
+//				break;
+//			}
+//			arg0.setTransientVariables(varMap);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -186,50 +216,53 @@ public class DocAuth implements ExecutionListener, JavaDelegate, TaskListener {
 			arg0.setVariable("processInstanceID", arg0.getProcessInstanceId());
 			arg0.setVariable("processName", arg0.getProcessDefinitionId().split(":")[0]);
 		}
-		
 
-		
 		IEcmSession ecmSession = null;
 		String workflowSpecialUserName = env.getProperty("ecm.username");
 		try {
 			ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
 			Map<String, Object> varMap = extracted(ecmSession, arg0);
-			String processName = varMap.get("processName").toString();
-			if ("process_borrow".equals(processName)) {
+			//String processName = varMap.get("processName").toString();
+//			if ("process_borrow".equals(processName)) {
 				String flowElementId = arg0.getCurrentFlowElement().getId();
 				String formId = varMap.get("formId").toString();
 				List<Map<String, Object>> childList = null;
 				String sql = "select a.ID as RELATE_ID ,b.ID,a.NAME as RELATION_NAME,a.PARENT_ID,a.CHILD_ID,a.ORDER_INDEX,b.NAME,b.CODING,b.C_SECURITY_LEVEL,b.REVISION,b.TITLE,b.CREATOR,b.TYPE_NAME,b.SUB_TYPE,b.CREATION_DATE,b.C_ARCHIVE_DATE,b.C_ARCHIVE_UNIT"
 						+ " from ecm_relation a, ecm_document b where  a.CHILD_ID=b.ID " + " and a.PARENT_ID='"
-						+ formId + "'  and a.NAME='irel_borrow' ";
+						+ formId + "'  and a.NAME='irel_children' ";
 				childList = documentService.getMapList(ecmSession.getToken(), sql);
 				Map<String, Object> formObj = documentService.getObjectMapById(ecmSession.getToken(), formId);
 				Date now = new Date();
 				Date grantDate = DateUtils.addDays(now, 30);
 				
-				if ("automaticAuthorization".equals(flowElementId)) {
+				//if ("automaticAuthorization".equals(flowElementId)) {
 					String userName=varMap.get("startUser").toString();
 					int permit=PermissionContext.ObjectPermission.READ;
-					if ("在线浏览".equals(varMap.get("borrowType").toString())){
+					if ("在线浏览".equals(varMap.get("SUB_TYPE").toString())){
 						permit=PermissionContext.ObjectPermission.READ;
-					}else if("下载".equals(varMap.get("borrowType").toString())) {
+					}else if("下载".equals(varMap.get("SUB_TYPE").toString())) {
 						permit=PermissionContext.ObjectPermission.DOWNLOAD;
 					}
 					for (int i = 0; i < childList.size(); i++) {
 						EcmDocument docObj = documentService.getObjectById(ecmSession.getToken(),
 								childList.get(i).get("CHILD_ID").toString());
+						logger.info("ID:"+docObj.getId());
+						logger.info("userName:"+userName);
+						logger.info("permit:"+permit);
+						logger.info("grantDate:"+grantDate.toString());
 						documentService.grantUser(ecmSession.getToken(), docObj, userName,permit, grantDate, true);
 						grantRelationPermit(ecmSession,docObj, "irel_children", userName, grantDate, permit);
 					}
-					documentService.updateStatus(ecmSession.getToken(), formId, "已完成");
-				} else if ("updateStatus".equals(flowElementId)) {
-//					for (int i = 0; i < childList.size(); i++) {
-						documentService.updateStatus(ecmSession.getToken(), formId, "待出库");
-//						documentService.updateStatus(ecmSession.getToken(), childList.get(i).get("CHILD_ID").toString(), "待出库");
-//					}
-				}
+					//documentService.updateStatus(ecmSession.getToken(), formId, "已完成");
+				//} 
+//				else if ("updateStatus".equals(flowElementId)) {
+////					for (int i = 0; i < childList.size(); i++) {
+//						documentService.updateStatus(ecmSession.getToken(), formId, "待出库");
+////						documentService.updateStatus(ecmSession.getToken(), childList.get(i).get("CHILD_ID").toString(), "待出库");
+////					}
+//				}
 
-			}
+		//	}
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO: handle exception
@@ -238,6 +271,9 @@ public class DocAuth implements ExecutionListener, JavaDelegate, TaskListener {
 				authService.logout(workflowSpecialUserName);
 			}
 		}
+		
+		
+		
 		System.out.println("DelegateExecution_execute");
 	}
 
@@ -261,55 +297,55 @@ public class DocAuth implements ExecutionListener, JavaDelegate, TaskListener {
 	/**
 	 * TaskListener 方法 for taskListener
 	 */
-	@Override
-	public void notify(DelegateTask arg0) {
-		if("create".equals(arg0.getEventName())){
-			///////////////////////任务到达发送邮件//////////////
-			String assignee=arg0.getAssignee();//ecm_user.Name
-			IEcmSession ecmSession = null;
-			String workflowSpecialUserName = env.getProperty("ecm.username");
-			
-			try {
-				ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
-				EcmUser user= userService.getObjectByName(ecmSession.getToken(), assignee);
-				String email= user.getEmail();
-				if(email!=null&&!"".equals(email)) {
-					Task tsk= taskService.createTaskQuery().taskId(arg0.getId()).singleResult();
-					serviceDocMail.sendTaskMail(email,tsk);
-				}
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}finally {
-				if (ecmSession != null) {
-					authService.logout(workflowSpecialUserName);
-				}
-			}
-			////////////////////end/////////////////
-//			arg0.getName();
-			//发邮件
-//			TODOApplication.getNeedTOChange();
-		}else {
-			if (arg0.getVariable("processInstanceID") == null) {
-				arg0.setVariable("processInstanceID", arg0.getProcessInstanceId());
-				arg0.setVariable("processName", arg0.getProcessDefinitionId().split(":")[0]);
-			}
-			IEcmSession ecmSession = null;
-			String workflowSpecialUserName = env.getProperty("ecm.username");
-			try {
-				ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
-				extracted(ecmSession, arg0);
-			} catch (Exception e) {
-				// TODO: handle exception
-			} finally {
-				if (ecmSession != null) {
-					authService.logout(workflowSpecialUserName);
-				}
-			}
-
-		}
-		System.out.println("DelegateTask_notify");
-
-	}
+//	@Override
+//	public void notify(DelegateTask arg0) {
+//		if("create".equals(arg0.getEventName())){
+//			///////////////////////任务到达发送邮件//////////////
+//			String assignee=arg0.getAssignee();//ecm_user.Name
+//			IEcmSession ecmSession = null;
+//			String workflowSpecialUserName = env.getProperty("ecm.username");
+//			
+//			try {
+//				ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
+//				EcmUser user= userService.getObjectByName(ecmSession.getToken(), assignee);
+//				String email= user.getEmail();
+//				if(email!=null&&!"".equals(email)) {
+//					Task tsk= taskService.createTaskQuery().taskId(arg0.getId()).singleResult();
+//					serviceDocMail.sendTaskMail(email,tsk);
+//				}
+//				
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}finally {
+//				if (ecmSession != null) {
+//					authService.logout(workflowSpecialUserName);
+//				}
+//			}
+//			////////////////////end/////////////////
+////			arg0.getName();
+//			//发邮件
+////			TODOApplication.getNeedTOChange();
+//		}else {
+//			if (arg0.getVariable("processInstanceID") == null) {
+//				arg0.setVariable("processInstanceID", arg0.getProcessInstanceId());
+//				arg0.setVariable("processName", arg0.getProcessDefinitionId().split(":")[0]);
+//			}
+//			IEcmSession ecmSession = null;
+//			String workflowSpecialUserName = env.getProperty("ecm.username");
+//			try {
+//				ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
+//				extracted(ecmSession, arg0);
+//			} catch (Exception e) {
+//				// TODO: handle exception
+//			} finally {
+//				if (ecmSession != null) {
+//					authService.logout(workflowSpecialUserName);
+//				}
+//			}
+//
+//		}
+//		System.out.println("DelegateTask_notify");
+//
+//	}
 }
