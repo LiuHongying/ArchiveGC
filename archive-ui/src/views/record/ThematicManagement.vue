@@ -146,7 +146,7 @@
               :isInitData="false"
               :optionWidth = "2"
               :isshowCustom="false"
-              :isEditProperty="true"
+              :isEditProperty="false"
               showOptions="查看内容"
               :isShowChangeList="false"
               @selectchange="selectDCChange"
@@ -228,7 +228,7 @@ export default {
       this.parentID=row.ID
       var condition1 =
         "SELECT CHILD_ID from ecm_relation where NAME='专题'and PARENT_ID ='" +row.ID +"'";
-      var key1 = "ID IN (" + condition1 + ")";
+      var key1 = "ID IN (" + condition1 + ") AND IS_RELEASED=1 and STATUS <> '作废'";
       this.$refs.Drawing.condition = key1;
       this.$refs.Drawing.gridViewName = "GeneralGrid";
       this.$refs.Drawing.loadGridInfo();
