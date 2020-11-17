@@ -76,11 +76,17 @@ export default {
         "access-clientPermission"
       );
   },
+  watch: {
+    typeName() {
+      this.myTypeName = this.typeName;
+    }
+  },
   props: {
-    itemId: {type:String},
-    typeName: {type:String},
-    folderId: {type:String},
-    folderPath:{type:String}
+    itemId: {type:String,default:""},
+    typeName: {type:String,default:""},
+    folderId: {type:String,default:""},
+    folderPath:{type:String,default:""},
+    
   },
   methods: {
     validateValue(itemData){

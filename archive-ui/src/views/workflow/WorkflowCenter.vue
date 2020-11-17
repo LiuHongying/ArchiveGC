@@ -18,6 +18,7 @@
                     ref="startup"
                     :is="componentName"
                     :workflowObj="workflowObj"
+                    :typeName="typeName"
                     @close="closeDialog()"
                     :showUploadFile="false"
                 ></component>
@@ -413,6 +414,11 @@
                     this.getEcmcfgActive(this.workflowObj.ID,"start",function(ecmCfgActivity){
                         _self.componentName=ecmCfgActivity.componentName;
                         _self.propertyVisible=true;
+                        _self.$nextTick(()=>{
+                            if(_self.$refs.startup){
+                            _self.$refs.startup.loadFormInfo();
+                            }
+                        });
                     });
                     // setTimeout(()=>{
                     //     if(_self.$refs.startup){
