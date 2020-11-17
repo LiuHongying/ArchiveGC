@@ -9,11 +9,18 @@
                 :close-on-click-modal="false"
                 v-dialogDrag
                 >
-                <CommonStartup 
+                <!-- <CommonStartup 
                 ref="startup"
                 :workflowObj="workflowObj" 
                 @close="closeDialog()"
-                :showUploadFile="false"></CommonStartup>
+                :showUploadFile="false"></CommonStartup> -->
+                <component
+                    ref="startup"
+                    :is="componentName"
+                    :workflowObj="workflowObj"
+                    @close="closeDialog()"
+                    :showUploadFile="false"
+                ></component>
             </el-dialog>
         </template>
         <template v-slot:main="{layout}">
@@ -99,7 +106,8 @@
                     isOnly:false,
                     butt:false,
                     workflowObj:{},
-                    workflowFileList:[]
+                    workflowFileList:[],
+                    componentName:""
                 }
             },
             mounted(){
@@ -400,15 +408,19 @@
                 {
                     let _self = this;
                     _self.workflowObj=workflow;
-                    _self.propertyVisible = true;
+                    // _self.propertyVisible = true;
                     _self.typeName=workflow.FORMNAME;
-                    setTimeout(()=>{
-                        if(_self.$refs.startup){
-                            _self.$refs.startup.typeName=workflow.FORMNAME;
-                            // _self.$refs.ShowProperty.myFolderId = _self.selectTransferRow.id;
-                            _self.$refs.startup.loadFormInfo();
-                        }
-                    },10);
+                    this.getEcmcfgActive(this.workflowObj.ID,"start",function(ecmCfgActivity){
+                        _self.componentName=ecmCfgActivity.componentName;
+                        _self.propertyVisible=true;
+                    });
+                    // setTimeout(()=>{
+                    //     if(_self.$refs.startup){
+                    //         _self.$refs.startup.typeName=workflow.FORMNAME;
+                    //         // _self.$refs.ShowProperty.myFolderId = _self.selectTransferRow.id;
+                    //         _self.$refs.startup.loadFormInfo();
+                    //     }
+                    // },10);
 
                 },
                 // 保存结果事件
