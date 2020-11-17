@@ -110,6 +110,7 @@ export default {
           dataUrl: "/dc/getDocuments",
           condition: "TYPE_NAME='设计文件'",
           isInitData:false,
+          isShowPropertyButton:true,
         },
       },
       selectedDCItems: [],//文档
@@ -163,7 +164,7 @@ export default {
     //文档模糊查询
     search() {
       let _self = this;
-      _self.$refs.Drawing.condition ="TYPE_NAME='设计文件' AND (CODING LIKE '%"+_self.inputValueNum+"%' OR TITLE LIKE '%"+_self.inputValueNum+"%') and ID IN (" + _self.condition1 + ") ";
+      _self.$refs.Drawing.condition ="TYPE_NAME='设计文件' AND (CODING LIKE '%"+_self.inputValueNum+"%' OR TITLE LIKE '%"+_self.inputValueNum+"%') and (" + _self.condition1 + ") ";
       _self.tables.Drawing.condition = _self.$refs.Drawing.condition;
       _self.$refs.Drawing.currentPage = 1;
       _self.$refs.Drawing.loadGridInfo();
