@@ -306,7 +306,7 @@
     "Pending":"待确认",
     "Rejecteded":"已驳回",
     "RefuseRejected":"拒绝驳回",
-    
+    "Manual":"手动",
     "externalICM":"外部接口统计",
     "acturComplete":"实际完成",
     "notComplete":"尚未完成",
@@ -617,6 +617,7 @@
     "oneDataOnly":"只允许选择一条数据进行排序",
     "noDowner":"没有下移的空间了",
     "PleaseSelectOneFile":"请选择一条文件数据",
+    "PleaseSelectOneContent":"请选择一条替换文件",
     "ShowDrawSpec":"只能晒本人所在部门且内部公开的图纸",
     "ShowDrawFailed":"晒图失败",
     "ShowDrawSuccess":"晒图成功",

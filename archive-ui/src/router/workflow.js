@@ -87,6 +87,16 @@ export const workflowRouter =
           name: '待归还',
           component: () => import('@/views/record/ArchivePendinggivebackMine.vue')
           
-        }
+        },
+        {
+          meta: {
+              requireAuth: true,
+              permit: 1,
+              title:'Submissiondc'
+          },
+          path: '/workflow/linkMainattachmentfile',
+          name: '关联文件',
+          component: () => import('@/views/workflow/LinkMainAttachmentFile.vue')
+      }
     ]
   }
