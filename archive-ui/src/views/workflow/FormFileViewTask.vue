@@ -2,6 +2,25 @@
   <DataLayout>
     <template v-slot:header>
       <el-dialog
+        :title="$t('application.pendNot')"
+        :visible.sync="pendNotVisible"
+        @close="pendNotVisible = false"
+        :append-to-body="true"
+        width="60%"
+        :close-on-click-modal="false"
+        v-dialogDrag
+      >
+        <el-col :span="24">
+        <el-form label-position="right" :model="pendForm" @submit.native.prevent>
+          <el-input type="textarea" :rows="6" v-model="pendForm.rejectComment" autocomplete="off"></el-input>
+        </el-form>
+        </el-col>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="saveRejectComment" :loading="butt">{{$t('application.save')}}</el-button>
+          <el-button @click="pendNotVisible = false">{{$t('application.cancel')}}</el-button>
+        </div>
+      </el-dialog>
+      <el-dialog
         :title="$t('application.AddFile')"
         :visible.sync="propertyVisible"
         @close="propertyVisible = false"
@@ -36,7 +55,7 @@
         <DataGrid
           ref="searchDoc"
           key="searchDoc"
-          dataUrl="/dc/getDocuments"
+          data-url="/dc/getDocuments"
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
@@ -56,7 +75,7 @@
         </div>
       </el-dialog>
       <el-dialog
-      :title="$t('application.VolumesFile')"
+        :title="$t('application.VolumesFile')"
         :visible.sync="volumesFileVisible"
         @close="volumesFileVisible = false"
         :append-to-body="true"
@@ -69,7 +88,7 @@
           ref="fileInArchiveList"
           key="fileInArchiveList"
           :parentId="archiveId"
-          dataUrl="/dc/getDocuByRelationParentId"
+          data-url="/dc/getDocuByRelationParentId"
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
@@ -102,32 +121,33 @@
             <el-tabs value="t01">
               <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01">
                 <el-row v-if="allowEdit||isShowReject">
-                  
-                    <el-col :span="24" style="text-align: left">
-                      <el-form :inline="true" :model="filters" @submit.native.prevent>
-                        <template v-if="allowEdit">
-                          <el-form-item>
-                            <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
-                          </el-form-item>
-                          <el-form-item>
-                            <el-button type="warning">{{ $t("application.delete") }}</el-button>
-                          </el-form-item>
-                        </template>
-                        <template v-if="isShowReject">
-                          <el-form-item>
-                            <el-button type="primary" >{{ $t("application.pendNot") }}</el-button>
-                          </el-form-item>
-                        </template>
-                      </el-form>
-                    </el-col>
-                  
+                  <el-col :span="24" style="text-align: left">
+                    <el-form :inline="true" :model="filters" @submit.native.prevent>
+                      <template v-if="allowEdit">
+                        <el-form-item>
+                          <el-button
+                            type="primary"
+                            @click="beforeAddFile"
+                          >{{ $t("application.new") }}</el-button>
+                        </el-form-item>
+                        <el-form-item>
+                          <el-button type="warning">{{ $t("application.delete") }}</el-button>
+                        </el-form-item>
+                      </template>
+                      <template v-if="isShowReject">
+                        <el-form-item>
+                          <el-button type="primary" @click="pendNot">{{ $t("application.pendNot") }}</el-button>
+                        </el-form-item>
+                      </template>
+                    </el-form>
+                  </el-col>
                 </el-row>
                 <!--列表-->
                 <DataGrid
                   ref="fileList"
                   key="fileList"
                   :parentId="parentId"
-                  dataUrl="/dc/getDocuByRelationParentId"
+                  data-url="/dc/getDocuByRelationParentId"
                   v-bind:tableHeight="tableHeight"
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
@@ -142,7 +162,12 @@
                   :isshowPage="isShowPage"
                   @selectchange="archiveSelect"
                   @dbclick="showVolumesFile"
-                ></DataGrid>
+                >
+                  <template slot="sequee" slot-scope="scope">
+                      <span :style="(scope.data.row['C_REJECT_COMMENT']!=null
+                      &&scope.data.row['C_REJECT_COMMENT']!='')?{'background':'red'}:''">{{(scope.currentPage-1) * scope.pageSize+ scope.data.$index+1}}</span>
+                  </template>
+                </DataGrid>
               </el-tab-pane>
             </el-tabs>
           </template>
@@ -179,14 +204,14 @@ export default {
     parentId: { type: String, default: "" },
     processDefinitionId: { type: String, default: "" },
     activityName: { type: String, default: "" },
-    isShowReject:{type:Boolean,default:false}
+    isShowReject: { type: Boolean, default: false }
   },
   data() {
     return {
       // 本地存储高度名称
       topStorageName: "ReceivedDCHeight",
       // 非split pan 控制区域高度
-      startHeight: 325,
+      startHeight: 255,
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
@@ -204,29 +229,95 @@ export default {
         typeName: "",
         relationName: ""
       },
+      pendForm:{
+        rejectComment:""
+      },
       selectedFiles: [],
       butt: false,
       searchFileCondition: "",
-      selectedArchives:[],
-      archiveId:"",//案卷ID
-      volumesFileVisible:false
+      selectedArchives: [],
+      archiveId: "", //案卷ID
+      volumesFileVisible: false,
+      pendNotVisible:false
     };
   },
   mounted() {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
-    showVolumesFile(row){
+    saveRejectComment(){
+
       let _self=this;
-      _self.archiveId=row.ID;
-      _self.volumesFileVisible=true;
-      _self.$nextTick(()=>{
-        _self.$refs.fileInArchiveList.loadGridData();
+      if(_self.pendForm.rejectComment==""){
+        _self.$message({
+            showClose: true,
+            message: _self.$t("message.PleaseInputData"),
+            duration: 2000,
+            type: "error"
+          });
+          return;
+      }
+      let ids=new Array();
+      _self.selectedArchives.forEach(function(e){
+        ids.push(e.ID)
       });
 
+      let m=new Map();
+      m.set("ids",ids);
+      m.set("comment",_self.pendForm.rejectComment);
+      axios.post("/dc/savePenNot",JSON.stringify(m))///dc/getSelectList
+                .then(function(response) {
+                if(response.data.code == 1){
+                    _self.$message({
+                      showClose: true,
+                      message: _self.$t("message.saveSuccess"),
+                      duration: 2000,
+                      type: "success"
+                    });
+                    _self.pendNotVisible=false;
+                }else{
+                  _self.$message({
+                      showClose: true,
+                      message: _self.$t("message.saveFailured"),
+                      duration: 2000,
+                      type: "error"
+                    });
+                }
+                })
+                .catch(function(error) {
+                console.log(error);
+                _self.$message({
+                      showClose: true,
+                      message: _self.$t("message.saveFailured"),
+                      duration: 2000,
+                      type: "error"
+                    });
+                });
+           
     },
-    archiveSelect(val){
-      this.selectedArchives=val;
+    showVolumesFile(row) {
+      let _self = this;
+      _self.archiveId = row.ID;
+      _self.volumesFileVisible = true;
+      _self.$nextTick(() => {
+        _self.$refs.fileInArchiveList.loadGridData();
+      });
+    },
+    archiveSelect(val) {
+      this.selectedArchives = val;
+    },
+    pendNot() {
+      let _self = this;
+      if (_self.selectedArchives.length == 0) {
+        _self.$message({
+          showClose: true,
+          message: _self.$t("message.PleaseSelectOneOrMoreData"),
+          duration: 2000,
+          type: "error"
+        });
+        return;
+      }
+      _self.pendNotVisible=true;
     },
     beforeAddFile() {
       let _self = this;

@@ -1,7 +1,6 @@
 <template>
-  <el-container>
-    <el-main>
-      <el-row>
+  <div>
+    <el-row>
         <ShowProperty
           v-if="allowEdit"
           ref="ShowPropertyForm"
@@ -32,8 +31,7 @@
           :isShowReject="isShowReject"
         ></FormFileViewTask>
       </el-row>
-    </el-main>
-  </el-container>
+  </div>
 </template>
 <script type="text/javascript">
 import ShowProperty from "@/components/ShowProperty";
