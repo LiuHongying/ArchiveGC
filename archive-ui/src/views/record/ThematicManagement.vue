@@ -34,7 +34,7 @@
             </template>
           <template v-slot:main>  
             <DataGrid 
-              ref="GeneralGrid"
+              ref="chooseDrawing"
               key="General"
               dataUrl="/dc/getDocuments"
               v-bind:tableHeight="360"
@@ -338,8 +338,8 @@ export default {
     searchDC(){
       let _self = this;
       let key="IS_RELEASED=1";
-      if(_self.inputValueNum!=''&&_self.inputValueNum!=undefined){
-        key+="and (CODING LIKE '%"+_self.inputValueNum+"%' OR TITLE LIKE '%"+_self.inputValueNum+"%')";
+      if(_self.DCinputValueNum!=''&&_self.DCinputValueNum!=undefined){
+        key+=" and (CODING LIKE '%"+_self.DCinputValueNum+"%' OR TITLE LIKE '%"+_self.DCinputValueNum+"%')";
       }
       _self.$refs.chooseDrawing.condition=key;
       _self.$refs.chooseDrawing.currentPage = 1;

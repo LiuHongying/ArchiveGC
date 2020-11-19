@@ -30,6 +30,7 @@
                   key="Delivery"
                   v-bind="tables.Delivery"
                   :tableHeight="layout.height-166"
+                  showOptions="查看内容"
                   @selectchange="selectDEChange"
                   @rowclick="onDataGridRowClick"
                 >
@@ -69,6 +70,7 @@
                   key="Drawing"
                   v-bind="tables.Drawing"
                   :tableHeight="layout.height-166"
+                  showOptions="查看内容"
                   @selectchange="selectDCChange"
                 >
                 <template slot="sequee" slot-scope="scope">
@@ -103,6 +105,11 @@ export default {
           dataUrl: "/dc/getDocuments",
           condition: "TYPE_NAME='移交单'",
           isInitData:false,
+          isshowCustom:false,
+          isEditProperty:false,
+          isShowChangeList:false,
+          isshowOption:true,
+          isshowSelection:true,
         },
         //设计文件
         Drawing: {
@@ -110,7 +117,11 @@ export default {
           dataUrl: "/dc/getDocuments",
           condition: "TYPE_NAME='设计文件'",
           isInitData:false,
-          isShowPropertyButton:true,
+          isshowCustom:false,
+          isEditProperty:false,
+          isShowChangeList:false,
+          isshowOption:true,
+          isshowSelection:true,
         },
       },
       selectedDCItems: [],//文档

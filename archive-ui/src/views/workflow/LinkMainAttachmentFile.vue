@@ -59,14 +59,16 @@
                             key="main"
                             dataUrl="/dc/getDocuByRelationParentId"
                             :parentId="formId"
-                            v-bind:tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
-                            v-bind:isshowOption="true" v-bind:isshowSelection ="true"
+                            :tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
+                            :isshowOption="true" 
+                            :isshowSelection ="true"
                             gridViewName="ModifyDocGrid"
                             condition=" and a.name = 'irel_children' "
                             :optionWidth = "2"
                             :isshowCustom="false"
-                            :isEditProperty="true"
-                            showOptions="查看内容"
+                            :isEditProperty="false"
+                            showOptions="查看内容,查看属性"
+                            :isShowPropertyButton="false"
                             :isShowChangeList="false"
                             @rowclick="rowClick"
                             @selectchange="selectChange"
@@ -98,9 +100,11 @@
                                     condition=" and a.NAME='irel_children'"
                                     :optionWidth = "2"
                                     :isshowCustom="false"
-                                    :isEditProperty="true"
-                                    showOptions="查看内容"
+                                    :isEditProperty="false"
+                                    :isShowMoreOption="true"
+                                    showOptions="查看内容,查看属性"
                                     :isShowChangeList="false"
+                                    :isShowPropertyButton="false"
                                     @selectchange="attachmentDocSelect"
                                 ></DataGrid>
                             </el-tab-pane>
@@ -125,15 +129,10 @@ export default {
     // CNPE 待提交文函
     data(){
         return{
-            // 本地存储高度名称
             topStorageName: 'SubmissiondcHeight',
-            // 非split pan 控制区域高度
             startHeight: 135,
-            // 顶部百分比*100
             topPercent: 65,
-            // 顶部除列表高度
             topbarHeight: 35,
-            // 底部除列表高度
             bottomHeight: 120,
             formLabelWidth: "120px",
             buttLoading:false,

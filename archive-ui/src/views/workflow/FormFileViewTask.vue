@@ -111,13 +111,14 @@
     </template>
     <template v-slot:main="{layout}">
       <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
-        <split-pane
+      <!-- <div :style="{position:'relative',height: layout.height-startHeight+'px'}"> -->
+        <!-- <split-pane
           v-on:resize="onSplitResize"
           :min-percent="20"
           :default-percent="topPercent"
           split="horizontal"
         >
-          <template slot="paneL">
+          <template slot="paneL"> -->
             <el-tabs value="t01">
               <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01">
                 <el-row v-if="allowEdit||isShowReject">
@@ -154,8 +155,10 @@
                   gridViewName="WorkflowFileGrid"
                   condition=" and a.NAME='irel_children'"
                   :optionWidth="1"
-                  :isShowMoreOption="false"
                   :isshowCustom="false"
+                  :isShowMoreOption="true"
+                  showOptions="查看内容,查看属性"
+                  :isShowPropertyButton="false"
                   :isEditProperty="allowEdit"
                   :isShowChangeList="false"
                   :isshowicon="false"
@@ -170,8 +173,8 @@
                 </DataGrid>
               </el-tab-pane>
             </el-tabs>
-          </template>
-        </split-pane>
+          <!-- </template>
+        </split-pane> -->
       </div>
     </template>
   </DataLayout>
