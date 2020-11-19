@@ -101,17 +101,26 @@
           <template slot="paneL">
             <el-tabs value="t01">
               <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01">
-                <el-row v-if="allowEdit">
-                  <el-col :span="24" style="text-align: left">
-                    <el-form :inline="true" :model="filters" @submit.native.prevent>
-                      <el-form-item>
-                        <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
-                      </el-form-item>
-                      <el-form-item>
-                        <el-button type="warning">{{ $t("application.delete") }}</el-button>
-                      </el-form-item>
-                    </el-form>
-                  </el-col>
+                <el-row v-if="allowEdit||isShowReject">
+                  
+                    <el-col :span="24" style="text-align: left">
+                      <el-form :inline="true" :model="filters" @submit.native.prevent>
+                        <template v-if="allowEdit">
+                          <el-form-item>
+                            <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
+                          </el-form-item>
+                          <el-form-item>
+                            <el-button type="warning">{{ $t("application.delete") }}</el-button>
+                          </el-form-item>
+                        </template>
+                        <template v-if="isShowReject">
+                          <el-form-item>
+                            <el-button type="primary" >{{ $t("application.pendNot") }}</el-button>
+                          </el-form-item>
+                        </template>
+                      </el-form>
+                    </el-col>
+                  
                 </el-row>
                 <!--列表-->
                 <DataGrid
@@ -169,7 +178,8 @@ export default {
     isShowPage: { type: Boolean, default: true },
     parentId: { type: String, default: "" },
     processDefinitionId: { type: String, default: "" },
-    activityName: { type: String, default: "" }
+    activityName: { type: String, default: "" },
+    isShowReject:{type:Boolean,default:false}
   },
   data() {
     return {

@@ -62,7 +62,7 @@
                     bottomHeight: 120,
                     dialogName:"",
                     propertyVisible:false,
-                    typeName:this.workflowObj.FORMNAME,
+                    typeName:"",
                     isOnly:false,
                     butt:false,
                     
@@ -74,14 +74,14 @@
                 showUploadFile:{type:Boolean,default:true},
                 workflowFileList:{type:Array,default:[]}
             },
+            
             mounted(){
                 // this.getWorkflows();
                 console.log(workflowFileList);
             },
             methods:{
                 loadFormInfo(){
-                    console.log(this.typeName)
-                    this.$refs.ShowProperty.myTypeName=this.typeName;
+                    this.$refs.ShowProperty.myTypeName=this.workflowObj.FORMNAME;
                     this.$refs.ShowProperty.loadFormInfo();
                 },
                 startUpWorkflow(workflow){
