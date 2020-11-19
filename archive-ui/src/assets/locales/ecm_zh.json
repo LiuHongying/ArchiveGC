@@ -365,7 +365,8 @@
     "WorkflowSelect":"流程选择",
     "approve":"通过",
     "reject":"驳回",
-    "classicName":"分类名称"
+    "classicName":"分类名称",
+    "VolumesFile":"卷内文件"
 },
 "skin": {
     "Blue": "天空蓝",

@@ -4,7 +4,7 @@
       <el-row>
         <ShowProperty
           v-if="allowEdit"
-          ref="ShowProperty"
+          ref="ShowPropertyForm"
           @onSaved="onSaved"
           width="100%"
           folderPath
@@ -14,7 +14,7 @@
         ></ShowProperty>
         <ShowPropertyReadOnly
           v-else
-          ref="ShowProperty"
+          ref="ShowPropertyForm"
           width="100%"
           :itemId="formId"
           :typeName="typeName"
@@ -23,12 +23,13 @@
       <el-row>
         <FormFileViewTask
           ref="workflowFile"
-          :allowEdit="false"
-          :isShowPage="false"
+          :allowEdit="allowEdit"
+          :isShowPage="true"
           v-model="workflowFileList"
           :activityName="activityName"
           :processDefinitionId="processDefinitionId"
           :parentId="formId"
+          :isShowReject="isShowReject"
         ></FormFileViewTask>
       </el-row>
     </el-main>
@@ -88,7 +89,8 @@ export default {
     allowEdit: { type: Boolean, default: false },
     showUploadFile: { type: Boolean, default: true },
     processDefinitionId: { type: String, default: "" },
-    activityName: { type: String, default: "" }
+    activityName: { type: String, default: "" },
+    isShowReject:{type:Boolean,default:false}
   },
   mounted() {
     // this.getWorkflows();
@@ -97,16 +99,16 @@ export default {
   methods: {
     
     loadFormInfo() {
-      //   this.$refs.ShowProperty.myItemId = this.formId;
-      this.$refs.ShowProperty.loadFormInfo();
+      //   this.$refs.ShowPropertyForm.myItemId = this.formId;
+      this.$refs.ShowPropertyForm.loadFormInfo();
     },
     sendData() {
-      this.$emit("click", this.$refs.ShowProperty.getFormData());
+      this.$emit("click", this.$refs.ShowPropertyForm.getFormData());
     },
     startUpWorkflow(workflow) {
       let _self = this;
       _self.butt = true;
-      if (!this.$refs.ShowProperty.validFormValue()) {
+      if (!this.$refs.ShowPropertyForm.validFormValue()) {
         _self.butt = false;
         return;
       }
@@ -118,8 +120,8 @@ export default {
       }
       m.set("childFileId", fileIds);
       var c;
-      for (c in _self.$refs.ShowProperty.dataList) {
-        let dataRows = _self.$refs.ShowProperty.dataList[c].ecmFormItems;
+      for (c in _self.$refs.ShowPropertyForm.dataList) {
+        let dataRows = _self.$refs.ShowPropertyForm.dataList[c].ecmFormItems;
         var i;
         for (i in dataRows) {
           if (dataRows[i].attrName && dataRows[i].attrName != "") {
@@ -144,16 +146,16 @@ export default {
           }
         }
       }
-      if (_self.$refs.ShowProperty.myItemId != "") {
-        m.set("ID", _self.$refs.ShowProperty.myItemId);
+      if (_self.$refs.ShowPropertyForm.myItemId != "") {
+        m.set("ID", _self.$refs.ShowPropertyForm.myItemId);
       }
-      if (_self.$refs.ShowProperty.myTypeName != "") {
-        m.set("TYPE_NAME", _self.$refs.ShowProperty.myTypeName);
-        m.set("FOLDER_ID", _self.$refs.ShowProperty.myFolderId);
+      if (_self.$refs.ShowPropertyForm.myTypeName != "") {
+        m.set("TYPE_NAME", _self.$refs.ShowPropertyForm.myTypeName);
+        m.set("FOLDER_ID", _self.$refs.ShowPropertyForm.myFolderId);
         m.set("parentDocId", _self.parentId);
         m.set("relationName", _self.relationName);
-        console.log(_self.$refs.ShowProperty.myTypeName);
-        console.log(_self.$refs.ShowProperty.myFolderId);
+        console.log(_self.$refs.ShowPropertyForm.myTypeName);
+        console.log(_self.$refs.ShowPropertyForm.myFolderId);
       }
       _self.validateData(m, function(isOk) {
         _self.isOnly = isOk;
@@ -170,12 +172,12 @@ export default {
         }
         let formdata = new FormData();
         formdata.append("metaData", JSON.stringify(m));
-        if (_self.$refs.ShowProperty.file != "") {
+        if (_self.$refs.ShowPropertyForm.file != "") {
           //console.log(_self.file);
-          formdata.append("uploadFile", _self.$refs.ShowProperty.file.raw);
+          formdata.append("uploadFile", _self.$refs.ShowPropertyForm.file.raw);
         }
         // console.log(JSON.stringify(m));
-        if (_self.$refs.ShowProperty.myItemId == "") {
+        if (_self.$refs.ShowPropertyForm.myItemId == "") {
           axios
             .post("/dc/createWorkflowFormData", formdata, {
               "Content-Type": "multipart/form-data"
@@ -254,7 +256,7 @@ export default {
     saveItem() {
       let _self = this;
       _self.saveButt = true;
-      if (!this.$refs.ShowProperty.validFormValue()) {
+      if (!this.$refs.ShowPropertyForm.validFormValue()) {
         _self.saveButt = false;
         return;
       }
@@ -265,8 +267,8 @@ export default {
       }
       m.set("childFileId", fileIds);
       var c;
-      for (c in _self.$refs.ShowProperty.dataList) {
-        let dataRows = _self.$refs.ShowProperty.dataList[c].ecmFormItems;
+      for (c in _self.$refs.ShowPropertyForm.dataList) {
+        let dataRows = _self.$refs.ShowPropertyForm.dataList[c].ecmFormItems;
         var i;
         for (i in dataRows) {
           if (dataRows[i].attrName && dataRows[i].attrName != "") {
@@ -291,16 +293,16 @@ export default {
           }
         }
       }
-      if (_self.$refs.ShowProperty.myItemId != "") {
-        m.set("ID", _self.$refs.ShowProperty.myItemId);
+      if (_self.$refs.ShowPropertyForm.myItemId != "") {
+        m.set("ID", _self.$refs.ShowPropertyForm.myItemId);
       }
-      if (_self.$refs.ShowProperty.myTypeName != "") {
-        m.set("TYPE_NAME", _self.$refs.ShowProperty.myTypeName);
-        m.set("FOLDER_ID", _self.$refs.ShowProperty.myFolderId);
+      if (_self.$refs.ShowPropertyForm.myTypeName != "") {
+        m.set("TYPE_NAME", _self.$refs.ShowPropertyForm.myTypeName);
+        m.set("FOLDER_ID", _self.$refs.ShowPropertyForm.myFolderId);
         m.set("parentDocId", _self.parentId);
         m.set("relationName", _self.relationName);
-        console.log(_self.$refs.ShowProperty.myTypeName);
-        console.log(_self.$refs.ShowProperty.myFolderId);
+        console.log(_self.$refs.ShowPropertyForm.myTypeName);
+        console.log(_self.$refs.ShowPropertyForm.myFolderId);
       }
       _self.validateData(m, function(isOk) {
         _self.isOnly = isOk;
@@ -317,12 +319,12 @@ export default {
         }
         let formdata = new FormData();
         formdata.append("metaData", JSON.stringify(m));
-        if (_self.$refs.ShowProperty.file != "") {
+        if (_self.$refs.ShowPropertyForm.file != "") {
           //console.log(_self.file);
-          formdata.append("uploadFile", _self.$refs.ShowProperty.file.raw);
+          formdata.append("uploadFile", _self.$refs.ShowPropertyForm.file.raw);
         }
         // console.log(JSON.stringify(m));
-        if (_self.$refs.ShowProperty.myItemId == "") {
+        if (_self.$refs.ShowPropertyForm.myItemId == "") {
           axios
             .post("/dc/createWorkflowFormData", formdata, {
               "Content-Type": "multipart/form-data"

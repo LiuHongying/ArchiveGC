@@ -12,10 +12,12 @@ import java.util.Set;
 
 import org.elasticsearch.common.Strings;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.DelegateHelper;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
@@ -46,6 +48,7 @@ import com.ecm.portal.service.ServiceDocMail;
 
 @Component(value = "commonExecutorListener")
 public class CommonListener implements ExecutionListener, JavaDelegate, TaskListener {
+	private Expression isSendEmail; 
 	/**
 	 * 
 	 */
@@ -141,9 +144,11 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 				ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
 				String taskUserIds = task.getAssignee();
 				/**********************发送邮件*************************************/
-				String isSendEmai= task.getVariable("isSendEmail", String.class);
-				if(isSendEmai!=null&&!"".equals(isSendEmai)) {
-					if(Boolean.parseBoolean(isSendEmai)) {
+				
+				
+				String sendMail= isSendEmail.getValue(task).toString();
+				if(sendMail!=null&&!"".equals(sendMail)) {
+					if(Boolean.parseBoolean(sendMail)) {
 						if (task.getAssignee() != null) {// 普通任务
 							EcmUser user = userService.getObjectByName(ecmSession.getToken(), assignee);
 							if(user==null) {

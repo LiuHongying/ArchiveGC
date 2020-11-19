@@ -379,7 +379,8 @@
     "AddFile":"Add files",
     "WorkflowSelect":"Workflow Select",
     "approve":"Approve",
-    "reject":"Reject"
+    "reject":"Reject",
+    "VolumesFile":"Volumes file"
 },
 "skin": {
     "Blue": "Blue",

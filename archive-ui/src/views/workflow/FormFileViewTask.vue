@@ -36,7 +36,7 @@
         <DataGrid
           ref="searchDoc"
           key="searchDoc"
-          data-url="/dc/getDocuments"
+          dataUrl="/dc/getDocuments"
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
@@ -51,8 +51,42 @@
           @selectchange="fileSelect"
         ></DataGrid>
         <div slot="footer" class="dialog-footer">
-            <el-button @click="saveFileToWorkflow" :loading="butt">{{$t('application.save')}}</el-button>
-            <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
+          <el-button @click="saveFileToWorkflow" :loading="butt">{{$t('application.save')}}</el-button>
+          <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
+        </div>
+      </el-dialog>
+      <el-dialog
+      :title="$t('application.VolumesFile')"
+        :visible.sync="volumesFileVisible"
+        @close="volumesFileVisible = false"
+        :append-to-body="true"
+        width="90%"
+        :close-on-click-modal="false"
+        v-dialogDrag
+      >
+        <!--卷内文件列表-->
+        <DataGrid
+          ref="fileInArchiveList"
+          key="fileInArchiveList"
+          :parentId="archiveId"
+          dataUrl="/dc/getDocuByRelationParentId"
+          v-bind:tableHeight="tableHeight"
+          v-bind:isshowOption="true"
+          v-bind:isshowSelection="true"
+          gridViewName="WorkflowFileGrid"
+          condition=" and a.NAME='irel_children'"
+          :optionWidth="1"
+          :isShowPropertyButton="false"
+          :isShowMoreOption="true"
+          :isshowCustom="false"
+          :isEditProperty="allowEdit"
+          :isShowChangeList="false"
+          :isshowicon="false"
+          showOptions="查看属性,查看内容"
+          :isshowPage="isShowPage"
+        ></DataGrid>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="volumesFileVisible = false">{{$t('application.cancel')}}</el-button>
         </div>
       </el-dialog>
     </template>
@@ -84,7 +118,7 @@
                   ref="fileList"
                   key="fileList"
                   :parentId="parentId"
-                  data-url="/dc/getDocuByRelationParentId"
+                  dataUrl="/dc/getDocuByRelationParentId"
                   v-bind:tableHeight="tableHeight"
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
@@ -97,7 +131,8 @@
                   :isShowChangeList="false"
                   :isshowicon="false"
                   :isshowPage="isShowPage"
-                  @selectchange="relevantDocRVSelect"
+                  @selectchange="archiveSelect"
+                  @dbclick="showVolumesFile"
                 ></DataGrid>
               </el-tab-pane>
             </el-tabs>
@@ -126,22 +161,22 @@ export default {
     DataLayout: DataLayout,
     AttachmentFile: AttachmentFile
   },
-   model: {
-    event: "change",
+  model: {
+    event: "change"
   },
   props: {
     allowEdit: { type: Boolean, default: true },
-    isShowPage:{type:Boolean,default:true},
-    parentId:{type:String,default:""},
-    processDefinitionId:{type:String,default:""},
-    activityName:{type:String,default:""}
+    isShowPage: { type: Boolean, default: true },
+    parentId: { type: String, default: "" },
+    processDefinitionId: { type: String, default: "" },
+    activityName: { type: String, default: "" }
   },
   data() {
     return {
       // 本地存储高度名称
       topStorageName: "ReceivedDCHeight",
       // 非split pan 控制区域高度
-      startHeight: 135,
+      startHeight: 325,
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
@@ -159,63 +194,82 @@ export default {
         typeName: "",
         relationName: ""
       },
-      selectedFiles:[],
-      butt:false,
-      searchFileCondition:""
+      selectedFiles: [],
+      butt: false,
+      searchFileCondition: "",
+      selectedArchives:[],
+      archiveId:"",//案卷ID
+      volumesFileVisible:false
     };
   },
   mounted() {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
-    
-    beforeAddFile() {
+    showVolumesFile(row){
       let _self=this;
-      this.getEcmcfgActive(this.processDefinitionId,this.activityName,function(ecmCfgActivity){
-        _self.searchFileCondition=ecmCfgActivity.formCondition;
-        _self.propertyVisible=true;
+      _self.archiveId=row.ID;
+      _self.volumesFileVisible=true;
+      _self.$nextTick(()=>{
+        _self.$refs.fileInArchiveList.loadGridData();
       });
-        
+
     },
-    fileSelect(val){
-        this.selectedFiles=val;
+    archiveSelect(val){
+      this.selectedArchives=val;
     },
-    saveFileToWorkflow(){
-        let _self=this;
-        if(_self.$refs.fileList.itemDataList==null){
-            _self.$refs.fileList.itemDataList=_self.selectedFiles;
-        }else{
-            _self.selectedFiles.forEach(e=>{
-                let isContain=false;
-                _self.$refs.fileList.itemDataList.find((function(value) {
-                if(value === e) {
-                    isContain=true;
-                    return;
-                    //则包含该元素
-                    }
-                }))
-                if(!isContain){
-                    _self.$refs.fileList.itemDataList.push(e);
-                }
-            });
-            // this.$refs.fileList.itemDataList=this.$refs.fileList.itemDataList.concat(this.selectedFiles);
+    beforeAddFile() {
+      let _self = this;
+      this.getEcmcfgActive(
+        this.processDefinitionId,
+        this.activityName,
+        function(ecmCfgActivity) {
+          _self.searchFileCondition = ecmCfgActivity.formCondition;
+          _self.propertyVisible = true;
         }
-        _self.$emit('change',_self.$refs.fileList.itemDataList);
-        this.butt=false;
-        this.propertyVisible=false;
+      );
+    },
+    fileSelect(val) {
+      this.selectedFiles = val;
+    },
+    saveFileToWorkflow() {
+      let _self = this;
+      if (_self.$refs.fileList.itemDataList == null) {
+        _self.$refs.fileList.itemDataList = _self.selectedFiles;
+      } else {
+        _self.selectedFiles.forEach(e => {
+          let isContain = false;
+          _self.$refs.fileList.itemDataList.find(function(value) {
+            if (value === e) {
+              isContain = true;
+              return;
+              //则包含该元素
+            }
+          });
+          if (!isContain) {
+            _self.$refs.fileList.itemDataList.push(e);
+          }
+        });
+        // this.$refs.fileList.itemDataList=this.$refs.fileList.itemDataList.concat(this.selectedFiles);
+      }
+      _self.$emit("change", _self.$refs.fileList.itemDataList);
+      this.butt = false;
+      this.propertyVisible = false;
     },
     searchItem() {
       let _self = this;
       let key = " 1=1 ";
-      if(_self.searchFileCondition!=""){
-        key+=" and ("+searchFileCondition+")";
+      if (_self.searchFileCondition != "") {
+        key += " and (" + searchFileCondition + ")";
       }
       if (_self.filters.docType != "") {
         key += " and TYPE_NAME = '" + _self.filters.docType + "'";
       }
       if (_self.filters.title != "") {
         key +=
-          " and ( TITLE like '%"+_self.filters.title+"%' or CODING like '%" +
+          " and ( TITLE like '%" +
+          _self.filters.title +
+          "%' or CODING like '%" +
           _self.filters.title +
           "%' " +
           ")";

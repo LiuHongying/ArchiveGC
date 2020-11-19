@@ -40,6 +40,7 @@
         :activityName="currentData.name"
         :formEditPermision="formEditPermision"
         :formEnableType="this.$options.name"
+        :isShowReject="isShowReject"
         @click="click"
       ></component>
       <el-divider content-position="left">流转意见</el-divider>
@@ -231,7 +232,8 @@ export default {
       formEditPermision: 0,
       rejectButton: "驳回",
       allowEdit: false,
-      sequenceFlow: []
+      sequenceFlow: [],
+      isShowReject:false,
     };
   },
   created() {
@@ -452,6 +454,11 @@ export default {
             _self.rejectButton = _self.ecmCfgActivity.rejectActivityLabel;
             _self.allowEdit = _self.ecmCfgActivity.enableEdit;
             _self.sequenceFlow=response.data.sequenceNames;
+            if(_self.sequenceFlow.indexOf('驳回')>-1){
+              _self.isShowReject=true;
+            }else{
+              _self.isShowReject=false;
+            }
             if (_self.allowEdit === true) {
               _self.formEditPermision = 1;
             } else {

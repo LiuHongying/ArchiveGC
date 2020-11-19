@@ -29,6 +29,7 @@
         :close-on-click-modal="false"
       >
         <ShowProperty
+          v-if="isEditProperty"
           ref="ShowProperty"
           @onSaved="onSaved"
           @onSaveSuccess="onPropertiesSaveSuccess"
@@ -36,6 +37,13 @@
           :typeName="typeName"
           v-bind:itemId="selectedItemId"
         ></ShowProperty>
+        <ShowPropertyReadOnly
+          v-else
+          ref="ShowProperty"
+          width="100%"
+          :itemId="selectedItemId"
+          :typeName="typeName"
+        ></ShowPropertyReadOnly>
         <RelationViewer
           v-if="showRelationViewer"
           ref="RelationViewer"
@@ -323,6 +331,7 @@
 <script type="text/javascript">
 import "@/utils/dialog";
 import ShowProperty from "@/components/ShowProperty";
+import ShowPropertyReadOnly from "@/components/ShowPropertyReadOnly"
 import EcmCustomColumns from "@/components/ecm-custom-columns";
 import RelationViewer from "@/components/RelationViewer";
 export default {
@@ -347,7 +356,7 @@ export default {
       },
       propertyVisible: false,
       currentPage: 1,
-      pageSize: 20,
+      
       showFields: [],
       selectedItemId: "",
       selectedRow: "",
@@ -393,6 +402,7 @@ export default {
     showOptions: { type: String, default: "查看内容,查看属性,加入购物车,升版" }, //功能菜单显示控制
     isShowChangeList: { type: Boolean, default: true }, //是否显示列表选择
     optionWidth: { type: Number, default: 3.5 }, //操作列宽度，放几个按钮
+    pageSize: { type: Number, default: 20 },//每页显示数量
   },
   watch: {
     showFields(val, oldVal) {
@@ -425,6 +435,7 @@ export default {
   },
   components: {
     ShowProperty: ShowProperty,
+    ShowPropertyReadOnly:ShowPropertyReadOnly,
     EcmCustomColumns: EcmCustomColumns,
     RelationViewer: RelationViewer,
   },
@@ -859,7 +870,7 @@ export default {
       let _self = this;
       _self.selectedItemId = indata.ID;
       _self.propertyVisible = true;
-      setTimeout(() => {
+      _self.$nextTick(() => {
         if (_self.$refs.ShowProperty) {
           _self.$refs.ShowProperty.myItemId = indata.ID;
           _self.typeName = indata.TYPE_NAME;
@@ -887,7 +898,7 @@ export default {
             _self.showRelationViewer = false;
           }
         }
-      }, 100);
+      });
     },
     onSaved(indata) {
       if (indata == "update") {

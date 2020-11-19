@@ -15,6 +15,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.ecm.icore.service.IEcmSession;
 
 @SpringBootApplication
 @ComponentScan({"com.ecm.core.dao","com.ecm.core.db","com.ecm.core.entity",
@@ -33,7 +34,7 @@ public class ZisEcmArchiveGCApplication extends SpringBootServletInitializer{
         return new DataSourceTransactionManager(dataSource);
     }
     
-
+	
 	
 	@Autowired
 	private Environment env;
