@@ -1,7 +1,7 @@
 <template>
-    <el-container>
-        <el-main>
-            <ShowProperty
+   <el-container>
+       <el-main>
+           <ShowProperty
                     ref="ShowProperty"
                     @onSaved="onSaved"
                     width="100%"
@@ -17,20 +17,13 @@
                     :workflowObj="workflowObj"
                 >
                 </FormFile>
-                <div class="dialog-footer" style="float:right">
-                    <slot name="footerButton">
-                        <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
-                        
-                        <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button>
-                        <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
-                    </slot>
-                    
-                </div>
-
-        </el-main>
-
-    </el-container>
-    
+       </el-main>
+       <el-footer>
+           <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
+            <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button>
+            <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
+       </el-footer>
+   </el-container>    
 </template>
 <script type="text/javascript">
     import ShowProperty from "@/components/ShowProperty";

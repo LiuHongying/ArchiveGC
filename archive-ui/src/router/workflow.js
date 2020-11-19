@@ -92,11 +92,21 @@ export const workflowRouter =
           meta: {
               requireAuth: true,
               permit: 1,
-              title:'Submissiondc'
+              title:'替换文件'
           },
           path: '/workflow/linkMainattachmentfile',
-          name: '关联文件',
+          name: '替换文件',
           component: () => import('@/views/workflow/LinkMainAttachmentFile.vue')
-      }
+      },
+      {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:'替换文件'
+        },
+        path: '/workflow/linkMainAttachmentFileByReviewer',
+        name: '审核人修改',
+        component: () => import('@/views/workflow/LinkMainAttachmentFileByReviewer.vue')
+    }
     ]
   }
