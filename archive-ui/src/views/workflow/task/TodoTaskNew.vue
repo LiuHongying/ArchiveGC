@@ -186,6 +186,8 @@ import EditTask from "@/views/workflow/task/EditTask.vue";
 import DocViewTask from "@/views/workflow/task/DocViewTask.vue";
 import borrow1 from "@/components/form/Borrow1.vue";
 import CommonView from "@/views/workflow/CommonView.vue";
+import UpdateDocContent from "@/views/workflow/LinkMainAttachmentFile.vue";
+import UpdateDocContentByReviewer from "@/views/workflow/LinkMainAttachmentFileByReviewer.vue";
 export default {
   name: "TodoTask",
   permit: 1,
@@ -195,7 +197,9 @@ export default {
     EditTask: EditTask,
     DocViewTask: DocViewTask,
     borrow1: borrow1,
-    CommonView: CommonView
+    CommonView: CommonView,
+    UpdateDocContent: UpdateDocContent,
+    UpdateDocContentByReviewer: UpdateDocContentByReviewer
   },
   data() {
     return {
