@@ -1,431 +1,183 @@
 <template>
-    <div>
-        
-        <el-row style="font-size: 14px;padding-top:5px;padding-bottom:5px;">
-            <el-col :span="2" style="padding-top:10px;">借阅人</el-col>
-            <el-col :span="5" style="float:left;text-align:left;">
+    <DataLayout>
+    <template v-slot:header>
+      <el-form :inline="true">
+        <el-form-item>
+          <el-input
+            style="width: 200px"
+            v-model="inputValueNum"
+            placeholder='请输入编码或说明'
+            @keyup.enter.native="search()"
+          ></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-date-picker
+            v-model="startDate"
+            type="date"
+            :placeholder="$t('application.startDate')"
+            value-format="yyyy-MM-dd"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item>
+          <el-date-picker
+            v-model="endDate"
+            type="date"
+            align="right"
+            :placeholder="$t('application.endDate')"
+            value-format="yyyy-MM-dd"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item>
+          <el-row>
+            <el-col :span="6" style="padding-left:10px;">借阅人</el-col>
+            <el-col :span="18" style="float:left;text-align:left;">
                 <el-input
                 v-model="orderInputkey"
-                :placeholder="$t('message.pleaseInput')+$t('application.keyword')"
-                @change="searchOrderItem"
-                prefix-icon="el-icon-search"
+                placeholder="请输入借阅人"
+                @keyup.enter.native="search()"
                 ></el-input>
             </el-col>
-            <el-col :span="3" style="padding-top:10px;">创建日期(开始)</el-col>
-            <el-col :span="3">
-                <el-date-picker v-model="startDate" 
-                type="date" placeholder="选择日期" style="display:block;" value-format="yyyy-MM-dd HH:mm:ss">
-                </el-date-picker></el-col>
-            <el-col :span="3" style="padding-top:10px;">创建日期(结束)</el-col>
-            <el-col :span="3">
-                <el-date-picker v-model="endDate" 
-                type="date" placeholder="选择日期" style="display:block;">
-                </el-date-picker></el-col>
-            <el-col :span="2" style="padding-top:4px;float:left;text-align:left;">
-                <el-button type="primary" plain
-                size="small" icon="el-icon-search" @click="loadGridData">搜索</el-button>
-                
-            </el-col>
-            
-        </el-row>
-        <el-row>
-            <el-col>
-                <DataGrid ref="orderGrid" key="main" v-bind:itemDataList="itemDataList"
-                      v-bind:columnList="gridList" @pagesizechange="pageSizeChange"
-                      @pagechange="pageChange" v-bind:itemCount="itemCount"
-                      v-bind:tableHeight="rightTableHeight" :isshowOption="true"
-                      :loading="orderLoading"
-                      @rowclick="orderclick"
-                       @selectchange="orderSelectChange"></DataGrid>
-            </el-col>
-
-        </el-row>
-        
-        <el-row>
-            <el-col>
-                <DataGrid ref="fileGrid" key="fileGrid" v-bind:itemDataList="gridListFileData"
-                      v-bind:columnList="gridListFile" @pagesizechange="filePageSizeChange"
-                      @pagechange="filePageChange" v-bind:itemCount="fileItemCount"
-                      v-bind:tableHeight="rightTableHeight" :isshowOption="true"
-                      :loading="fileLoading"
-                       @selectchange="selectChange"></DataGrid>
-            </el-col>
-            
-        </el-row>
-    </div>
+          </el-row>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="search()">{{
+            $t("application.SearchData")
+          }}</el-button>
+        </el-form-item>
+      </el-form>
+    </template>
+    <template v-slot:main="{ layout }">
+      <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
+        <split-pane v-on:resize="onSplitResize" :min-percent='20' :default-percent='topPercent' split="horizontal">
+          <template slot="paneL">
+            <DataGrid
+              ref="completeGrid"
+              key="complete"
+              dataUrl="/dc/getDocuments"
+              v-bind:tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
+              v-bind:isshowOption="true" v-bind:isshowSelection ="false"
+              gridViewName="FormGrid"
+              condition="STATUS='已完成'"
+              :optionWidth = "2"
+              :isshowCustom="false"
+              :isEditProperty="false"
+              :isShowMoreOption="false"
+              :isshowicon="false"
+              :isShowChangeList="false"
+              :isInitData="false"
+              @rowclick="onDataGridRowClick"
+            >
+            </DataGrid>
+          </template>
+          <template slot="paneR">
+            <DataGrid
+              ref="CompGrid"
+              key="Comp"
+              dataUrl="/dc/getDocuments"
+              v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
+              v-bind:isshowOption="true" v-bind:isshowSelection ="false"
+              gridViewName="FormDcGrid"
+              condition="STATUS='已完成'"
+              :optionWidth = "2"
+              :isshowCustom="false"
+              :isEditProperty="false"
+              showOptions="查看内容"
+              :isShowChangeList="false"
+              :isInitData="false"
+            >
+            </DataGrid>
+          </template>
+        </split-pane>
+      </div>
+    </template>
+  </DataLayout>
 </template>
 <script type="text/javascript">
-import DataGrid from'@/components/DataGrid';
-
+import DataGrid from "@/components/DataGrid";
+import DataLayout from "@/components/ecm-data-layout";
 export default {
-    name:'archivepending',
-    permit:1,
-    data(){
-        return{
-             
-             gridList:[],
-             innerDataList:[],
-             itemDataList:[],
-             itemDataListFull:[],
-             pageSize: 20,
-             currentPage: 1,
-             filePageSize:20,
-             fileCurrentPage: 1,
-             fileItemCount:0,
-             outFilePageSize:20,
-             outFileCurrentPage: 1,
-             outFileItemCount:0,
-             itemCount: 0,
-             inputkey: "",
-             gridListFile:[],
-             gridListFileData:[],
-             orderLoading:false,
-             fileLoading:false,
-             selectedOrderRow:[],
-             selectedOrder:[],
-             seletedFile:[],
-             orderInputkey:"",
-             gridListOutFileData:[],
-             gridListOutFile:[],
-             outFileLoading:false,
-             seletedOutFile:[],
-             selectedOutFileRow:[],
-             startDate:"",
-             endDate:"",
-             rightTableHeight: (window.innerHeight - 160)/2,
-             rightOutTableHeight:(window.innerHeight - 160)/2
-        }
-       
+  name: "TC",
+  data() {
+    return {
+      // 本地存储高度名称
+      topStorageName: 'ReceivingDC4CnpeHeight',
+      // 非split pan 控制区域高度
+      startHeight: 180,
+      // 顶部百分比*100
+      topPercent: 65,
+      // 顶部除列表高度
+      topbarHeight: 35,
+      // 底部除列表高度
+      bottomHeight:35,
+      inputValueNum:"",
+      startDate: "",
+      endDate:"",
+      orderInputkey:"",
+      typename:"'借阅单'",
+    };
+  },
+  mounted() {
+    if (!this.validataPermission()) {
+      //跳转至权限提醒页
+      let _self = this;
+      _self.$nextTick(() => {
+        _self.$router.push({ path: "/NoPermission" });
+      });
+    }
+    this.search();
+  },
+  methods: {
+    // 上下分屏事件
+    onSplitResize(topPercent){
+      // 顶部百分比*100
+      this.topPercent = topPercent
+      this.setStorageNumber(this.topStorageName, topPercent)
+      //console.log(JSON.stringify(topPercent))
     },
-    mounted(){
-        this.loadGridInfo();
-        this.loadGridData();
-        this.loadGridInfoFile();
+    //单击行
+    onDataGridRowClick: function (row) {
+      var condition1 =
+        "SELECT CHILD_ID from ecm_relation where PARENT_ID ='" +row.ID +"'";
+      var key1 = "ID IN (" + condition1 + ") AND STATUS='已完成' ";
+      this.$refs.CompGrid.condition = key1;
+      this.$refs.CompGrid.loadGridInfo();
+      this.$refs.CompGrid.loadGridData();
     },
-    components:{
-        DataGrid:DataGrid,
-        
+    //文档模糊查询
+    search() {
+      let _self = this;
+      let key="TYPE_NAME IN("+_self.typename+") AND STATUS='已完成'";
+      if(_self.inputValueNum!=''&&_self.inputValueNum!=undefined){
+        key+="and (CODING LIKE '%"+_self.inputValueNum+"%' OR C_COMMENT LIKE '%"+_self.inputValueNum+"%')";
+      }
+      if(_self.startDate!=''&&_self.startDate!=undefined){
+          key+=" and CREATION_DATE > '"+_self.startDate+"'";
+      }
+      if(_self.endDate!=''&&_self.endDate!=undefined){
+          key+=" and CREATION_DATE < '"+_self.endDate+"'";
+      }
+      if(_self.orderInputkey!=''&&_self.orderInputkey!=undefined){
+          key+=" and C_DRAFTER = '"+_self.orderInputkey+"'";
+      }
+      _self.$refs.completeGrid.condition=key;
+      _self.$refs.completeGrid.currentPage = 1;
+      _self.$refs.completeGrid.loadGridInfo();
+      _self.$refs.completeGrid.loadGridData();
     },
-    methods:{
-        filePageSizeChange(val){
-          this.filePageSize = val;
-            localStorage.setItem("docPageSize",val);
-            this.loadFileGridData();
-        },
-        orderclick(row){
-          this.loadFileGridData(row);
-        },
-        selectOutChange(val){
-          this.seletedOutFile=val;
-        },
-        outFilePageSizeChange(){
-
-        },
-        outFilePageChange(){
-          this.fileCurrentPage = val;
-          this.loadOutFileGridData();
-        },
-        pageSizeChange(val){
-            this.pageSize = val;
-            localStorage.setItem("docPageSize",val);
-            this.loadGridData();
-        },
-        //查询文档
-        searchOrderItem() {
-            this.loadGridData();
-            // this.loadPageInfo();
-        },
-        selectChange(val){
-          this.seletedFile=val;
-        },
-        orderSelectChange(val){
-          this.selectedOrder = val;
-        },
-        searchItem(){
-          this.loadFileGridData();
-        },
-        // 分页 当前页改变
-        filePageChange(val){
-          this.fileCurrentPage = val;
-          this.loadFileGridData();
-        },
-        // 分页 当前页改变
-        pageChange(val) {
-            this.currentPage = val;
-            this.loadGridData();
-            //console.log('handleCurrentChange', val);
-        },
-        outboundFile(){
-          let _self=this;
-          if(_self.seletedFile.length<1){
-            //  _self.$message("请选择待出库文件数据！");
-             _self.$message({
-                showClose: true,
-                message: "请选择待出库文件数据！",
-                duration: 2000,
-                type: "warning"
-              });
-            return;
-          }
-          let tab=_self.seletedFile;
-          let p=new Map();
-          let m = [];
-          let i;
-          for(i in tab){
-            m.push(tab[i]["ID"]);
-          }
-          p.set("ids",m);
-          p.set("pid",_self.selectedOrderRow.ID)
-          axios.post("/dc/outboundfile",SON.stringify(p))
-            .then(function(response) {
-              _self.loadGridData();
-              _self.loadFileGridData();
-              _self.loadOutFileGridData();
-              // _self.innerDataList=[];
-                // _self.showInnerFile(null);
-              // _self.$message(response.data.message);
-              _self.$message({
-                showClose: true,
-                message: response.data.message,
-                duration: 2000,
-                type: 'success'
-              });
-            })
-            .catch(function(error) {
-              // _self.$message(response.data.message);
-              _self.$message({
-                  showClose: true,
-                  message: response.data.message,
-                  duration: 5000,
-                  type: "error"
-                });
-              console.log(error);
-          });
-        },
-        outboundOrder(){
-          let _self=this;
-          if(_self.selectedOrder.length<1){
-            // _self.$message("请选择借阅单数据！");
-            _self.$message({
-              showClose: true,
-              message: "请选择借阅单数据！",
-              duration: 2000,
-              type: 'warning'
-            });
-            return;
-          }
-
-          let tab=_self.selectedOrder;
-          let m = [];
-          let i;
-          for(i in tab){
-            m.push(tab[i]["ID"]);
-          }
-          axios.post("/dc/outboundorder",JSON.stringify(m))
-            .then(function(response) {
-              _self.loadGridData();
-              _self.loadFileGridData();
-              _self.loadOutFileGridData();
-              // _self.innerDataList=[];
-                // _self.showInnerFile(null);
-              // _self.$message(response.data.message);
-              if(response.data.code==1){
-                _self.$message({
-                  showClose: true,
-                  message: response.data.message,
-                  duration: 2000,
-                  type: 'success'
-                });
-              }else{
-                _self.$message({
-                  showClose: true,
-                  message: response.data.message,
-                  duration: 5000,
-                  type: 'error'
-                });
-              }
-              
-            })
-            .catch(function(error) {
-              // _self.$message(response.data.message);
-              _self.$message({
-                  showClose: true,
-                  message: response.data.message,
-                  duration: 5000,
-                  type: 'error'
-                });
-              console.log(error);
-          });
-
-        },
-        loadOutFileGridInfo(){
-          let _self = this;
-          var m = new Map();
-          m.set("gridName", "BorrowOutFileGrid");
-          m.set("lang", _self.getLang());
-          axios.post("/dc/getGridViewInfo",JSON.stringify(m))
-            .then(function(response) {
-              _self.gridListOutFile = response.data.data;
-              
-            })
-            .catch(function(error) {
-              console.log(error);
-            });
-        },
-        // 加载未入库表格数据
-        loadOutFileGridData(row){
-          let _self = this;
-          if (row != null) {
-            _self.selectedOutFileRow = row;
-            
-          }
-          _self.outFileLoading=true;
-          var m = new Map();
-          // var key = _self.inputkey;
-          // if (key != "") {
-          //   key = " and( a.coding like '%" + key + "%' or a.C_DRAFTER like '%" + key + "%' )";
-          //   m.set("condition", key);
-          // }
-        
-          m.set("configName", "InBorrowOrderOutFile");
-          // m.set('folderId',indata.id);
-          // m.set("condition", key);
-          m.set("parentId",_self.selectedOutFileRow.ID);
-          m.set("pageSize", _self.outFilePageSize);
-          m.set("pageIndex", (_self.outFileCurrentPage - 1) * _self.outFilePageSize);
-          m.set("orderBy", "");
-          // console.log('pagesize:', _self.pageSize);
-          axios.post("/dc/getObjectsByConfigclause",JSON.stringify(m))
-            .then(function(response) {
-              _self.gridListOutFileData = response.data.data;
-              _self.outFileItemCount = response.data.pager.total;
-              //console.log(JSON.stringify(response.data.datalist));
-              _self.outFileLoading = false;
-            })
-            .catch(function(error) {
-              console.log(error);
-              _self.outFileLoading = false;
-            });
-        },
-        // 加载表格数据
-        loadFileGridData(row) {
-          let _self = this;
-          if (row != null) {
-            _self.selectedOrderRow = row;
-            
-          }
-          _self.fileLoading=true;
-          var m = new Map();
-          var key0 = _self.inputkey;
-          if (key0 && key0 != "") {
-            key0 = " and( a.coding like '%" + key0 + "%' or a.C_DRAFTER like '%" + key0 + "%' )";
-            m.set("condition", key0);
-          }
-        
-          m.set("configName", "InBorrowOrderFile");
-          // m.set('folderId',indata.id);
-          // m.set("condition", key);
-          m.set("parentId",_self.selectedOrderRow.ID);
-          m.set("pageSize", _self.filePageSize);
-          m.set("pageIndex", (_self.fileCurrentPage - 1) * _self.filePageSize);
-          m.set("orderBy", "");
-          // console.log('pagesize:', _self.pageSize);
-          axios.post("/dc/getObjectsByConfigclause",JSON.stringify(m))
-            .then(function(response) {
-              _self.gridListFileData = response.data.data;
-              _self.fileItemCount = response.data.pager.total;
-              //console.log(JSON.stringify(response.data.datalist));
-              _self.fileLoading = false;
-            })
-            .catch(function(error) {
-              console.log(error);
-              _self.fileLoading = false;
-            });
-        },
-            // 加载借阅单表格数据
-        loadGridData() {
-
-
-           let _self = this;
-          _self.gridListFileData=[];
-          _self.gridListOutFileData=[];
-          _self.orderLoading=true;
-          var key0 = _self.orderInputkey;
-          let startd=_self.startDate;
-          let endd=_self.endDate;
-          var m = new Map();
-          if (key0 && key0 != "") {
-            key0 = " and C_DRAFTER like '%" + key0 + "%' ";
-            m.set("condition", key0);
-          }
-          if(startd!=null&&startd!=""){
-              key0=key0+" and creation_date>='"+_self.dateFormat(startd)+"'";
-              m.set("condition", key0);
-          }
-          
-          if(endd!=null&&endd!=""){
-              key0=key0+" and creation_date<='"+_self.dateFormat(endd)+"'";
-              m.set("condition", key0);
-          }
-          m.set("configName", "BorrowOrderCompleted");
-          // m.set('folderId',indata.id);
-          // m.set("condition", key);
-          m.set("pageSize", _self.pageSize);
-          m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
-          m.set("orderBy", "");
-          // console.log('pagesize:', _self.pageSize);
-          axios.post("/dc/getObjectsByConfigclause",JSON.stringify(m))
-            .then(function(response) {
-              _self.itemDataList = response.data.data;
-              _self.itemDataListFull = response.data.data;
-              _self.itemCount = response.data.pager.total;
-              //console.log(JSON.stringify(response.data.datalist));
-              _self.orderLoading = false;
-            })
-            .catch(function(error) {
-              console.log(error);
-              _self.orderLoading = false;
-            });
-
-          
-        },
-        loadGridInfoFile(){
-          let _self = this;
-          var m = new Map();
-          m.set("gridName", "BorrowFileGrid");
-          m.set("lang", _self.getLang());
-          axios.post("/dc/getGridViewInfo",JSON.stringify(m))
-            .then(function(response) {
-              _self.gridListFile = response.data.data;
-              _self.rightOutTableHeight = "100%";
-            })
-            .catch(function(error) {
-              console.log(error);
-            });
-        },
-            // 加载表格样式
-        loadGridInfo() {
-          let _self = this;
-          _self.orderLoading = true;
-          var m = new Map();
-          m.set("gridName", "BorrowFormGrid");
-          m.set("lang", _self.getLang());
-          axios.post("/dc/getGridViewInfo",JSON.stringify(m))
-            .then(function(response) {
-              _self.gridList = response.data.data;
-              _self.rightTableHeight = "100%";
-              _self.orderLoading = false;
-            })
-            .catch(function(error) {
-              console.log(error);
-              _self.orderLoading = false;
-            });
-        }
-
-        }
-
+  },
+  props: {},
+  components: {
+    DataGrid: DataGrid,
+    DataLayout: DataLayout,
+  },
 };
 </script>
 <style scoped>
-
+.el-form-item {
+  margin-bottom: 0px;
+}
+.el-table td,
+.el-table th {
+  text-align: center !important;
+}
 </style>

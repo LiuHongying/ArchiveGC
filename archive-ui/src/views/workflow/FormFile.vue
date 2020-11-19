@@ -37,9 +37,9 @@
           ref="searchDoc"
           key="searchDoc"
           data-url="/dc/getDocuments"
-          v-bind:tableHeight="tableHeight"
-          v-bind:isshowOption="true"
-          v-bind:isshowSelection="true"
+          :tableHeight="tableHeight"
+          :isshowOption="true"
+          :isshowSelection="true"
           :condition="searchFileCondition"
           gridViewName="WorkflowFileGrid"
           :optionWidth="1"
@@ -57,14 +57,9 @@
       </el-dialog>
     </template>
     <template v-slot:main="{layout}">
-      <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
-        <split-pane
-          v-on:resize="onSplitResize"
-          :min-percent="20"
-          :default-percent="topPercent"
-          split="horizontal"
-        >
-          <template slot="paneL">
+      <!-- <div :style="{position:'relative',height: layout.height-startHeight+'px'}"> -->
+      <div :style="{position:'relative'}">
+
             <el-tabs value="t01">
               <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01">
                 <el-row v-if="allowEdit">
@@ -84,16 +79,18 @@
                   ref="fileList"
                   key="fileList"
                   data-url="/dc/getDocuByRelationParentId"
-                  v-bind:tableHeight="tableHeight"
-                  v-bind:isshowOption="true"
-                  v-bind:isshowSelection="true"
+                  :tableHeight="tableHeight"
+                  :isshowOption="true"
+                  :isshowSelection="true"
                   gridViewName="WorkflowFileGrid"
                   condition=" and a.NAME='irel_children'"
                   :optionWidth="1"
                   :itemDataList="files"
-                  :isShowMoreOption="false"
+                  :isShowMoreOption="true"
+                  showOptions="查看内容,查看属性"
                   :isshowCustom="false"
                   :isEditProperty="allowEdit"
+                  :isShowPropertyButton="false"
                   :isShowChangeList="false"
                   :isshowicon="false"
                   :isshowPage="isShowPage"
@@ -101,8 +98,7 @@
                 ></DataGrid>
               </el-tab-pane>
             </el-tabs>
-          </template>
-        </split-pane>
+
       </div>
     </template>
   </DataLayout>
@@ -142,8 +138,7 @@ export default {
       topStorageName: "ReceivedDCHeight",
       // 非split pan 控制区域高度
       startHeight: 135,
-      // 顶部百分比*100
-      topPercent: 65,
+      tableHeight:"400px",
       // 顶部除列表高度
       topbarHeight: 35,
       // 底部除列表高度

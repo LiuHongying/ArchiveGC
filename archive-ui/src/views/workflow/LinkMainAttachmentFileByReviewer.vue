@@ -22,7 +22,38 @@
                     <el-button type="primary" @click="uploadData()">{{$t('application.start')+$t('application.Import')}}</el-button>
                 </div>
             </el-dialog>
-            <template>
+            <el-dialog
+            title="更新主文件"
+            :visible.sync="udialogVisible"
+            v-loading="mainFileUploading"
+            :append-to-body="true"
+            >
+            <el-form label-position="right" label-width="120px">
+                <el-form-item :label="$t('message.file')" :label-width="formLabelWidth">
+                <el-upload
+                    :limit="1"
+                    :file-list="newFileList"
+                    action
+                    :on-change="handleFileChange"
+                    :auto-upload="false"
+                    :multiple="false"
+                >
+                    <el-button slot="trigger" size="small" type="primary">{{
+                    $t("application.selectFile")
+                    }}</el-button>
+                </el-upload>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="udialogVisible = false">{{
+                $t("application.cancel")
+                }}</el-button>
+                <el-button type="primary" @click="updateNewFile()">{{
+                $t("application.ok")
+                }}</el-button>
+            </div>
+            </el-dialog>
+            <el-row>
             <ShowProperty
             v-if="allowEdit"
             ref="ShowProperty"
@@ -40,15 +71,18 @@
             :itemId="formId"
             :typeName="typeName"
             ></ShowPropertyReadOnly>
-            </template>
-            <!-- <el-form :inline="true" :model="filters" @submit.native.prevent>
-            <el-form-item>
-                <el-button type="primary" @click="beforImport($refs.mainDataGrid,false,'','/系统配置/导入模板/文函')">{{$t('application.Manual')+$t('application.Import')}}</el-button>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="updateDocContent()">{{$t('application.replace')}}</el-button>
-            </el-form-item>
-            </el-form> -->
+            </el-row>
+            <el-row>
+                <el-form :inline="true" :model="filters" @submit.native.prevent>
+                <el-form-item>
+                    <el-button type="primary" @click="showUpdateFile()">{{$t('application.Manual')+$t('application.Import')}}</el-button>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="updateDocContent()">{{$t('application.replace')}}</el-button>
+                </el-form-item>
+                </el-form>
+            </el-row>
+            
         </template>
         <template v-slot:main="{layout}">
             <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
@@ -59,16 +93,14 @@
                             key="main"
                             dataUrl="/dc/getDocuByRelationParentId"
                             :parentId="formId"
-                            :tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
-                            :isshowOption="true" 
-                            :isshowSelection ="true"
+                            v-bind:tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
+                            v-bind:isshowOption="true" v-bind:isshowSelection ="true"
                             gridViewName="ModifyDocGrid"
                             condition=" and a.name = 'irel_children' "
                             :optionWidth = "2"
                             :isshowCustom="false"
-                            :isEditProperty="false"
-                            showOptions="查看内容,查看属性"
-                            :isShowPropertyButton="false"
+                            :isEditProperty="true"
+                            showOptions="查看内容"
                             :isShowChangeList="false"
                             @rowclick="rowClick"
                             @selectchange="selectChange"
@@ -77,7 +109,7 @@
                     <template slot="paneR">
                         <el-tabs  v-model="selectedTabName">
                             <el-tab-pane  :label="$t('application.Attachment')" name="t03" >
-                                <el-row>
+                                <!-- <el-row>
                                     <el-col :span="24">
                                         <el-form :inline="true" :model="filters" @submit.native.prevent>
                                             <el-form-item>
@@ -88,7 +120,7 @@
                                             </el-form-item>
                                         </el-form>
                                     </el-col>
-                                </el-row>
+                                </el-row> -->
                                 <!--列表-->
                                 <DataGrid
                                     ref="attachmentDoc"
@@ -100,11 +132,9 @@
                                     condition=" and a.NAME='irel_children'"
                                     :optionWidth = "2"
                                     :isshowCustom="false"
-                                    :isEditProperty="false"
-                                    :isShowMoreOption="true"
-                                    showOptions="查看内容,查看属性"
+                                    :isEditProperty="true"
+                                    showOptions="查看内容"
                                     :isShowChangeList="false"
-                                    :isShowPropertyButton="false"
                                     @selectchange="attachmentDocSelect"
                                 ></DataGrid>
                             </el-tab-pane>
@@ -129,10 +159,15 @@ export default {
     // CNPE 待提交文函
     data(){
         return{
+            // 本地存储高度名称
             topStorageName: 'SubmissiondcHeight',
+            // 非split pan 控制区域高度
             startHeight: 135,
+            // 顶部百分比*100
             topPercent: 65,
+            // 顶部除列表高度
             topbarHeight: 35,
+            // 底部除列表高度
             bottomHeight: 120,
             formLabelWidth: "120px",
             buttLoading:false,
@@ -150,15 +185,17 @@ export default {
                 visible:false
             },
             typeName:"文件传递单",
-            dialogName:"文件传递单",
-            propertyVisible:false,
+            mainFileUploading:false,
             selectedItems: [],
+            udialogVisible: false,
             childrenTypeSelectVisible:false,
             selectedChildrenType:'',
             selectedTransferDocItems:[],
+            newFileList: [],
             parentId:"",
             selectRow:[],
             relationName:"",
+            uploadFile: null,
             importdialogVisible:false,
             fileList: [],
             uploading:false,
@@ -183,7 +220,6 @@ export default {
             _self.$nextTick(()=>{
                 _self.$router.push({ path: '/NoPermission' })
             })
-            
         }
         setTimeout(() => {
             this.topPercent = this.getStorageNumber(this.topStorageName,60)
@@ -268,6 +304,10 @@ export default {
             });
             return formdata;
             },
+        handleFileChange(file, fileList) {
+            console.log(file)
+        this.uploadFile = file;
+        },
         //通过传递父id和附件id更新文档的主文件
         updateDocContent(){
             let _self = this;
@@ -353,11 +393,53 @@ export default {
                     _self.$refs.attachmentDoc.loadGridData();
                });
         },
+        showUpdateFile(indata) {
+            let _self = this;
+            if (this.selectedItems && this.selectedItems.length > 0) {
+            this.uploadFile = [];
+            this.udialogVisible = true;
+            }else{
+            _self.$message({
+                showClose: true,
+                message: _self.$t('message.PleaseSelectOneFile'),
+                duration: 2000,
+                type: "warning"
+                });
+                return;
+            }
+        },
         // 表格行选择
         selectChange(val) {
             this.selectedItems = val;
-        }
-
+        },
+        updateNewFile() {
+            let _self = this;
+            if (_self.selectedItems && _self.selectedItems.length > 0) {
+            _self.uploadPrimry();
+          }
+        },
+        uploadPrimry() {
+            let _self = this;
+            _self.mainFileUploading = true;
+            let formdata = new FormData();
+            formdata.append("id", _self.selectedItems[0].ID);
+            if (_self.uploadFile != "") {
+            formdata.append("uploadFile", _self.uploadFile.raw);
+            }
+            axios
+            .post("/dc/updatePrimaryContent", formdata, {
+                "Content-Type": "multipart/form-data",
+            })
+            .then(function (response) {
+                _self.udialogVisible = false;
+                _self.$message("更新成功!");
+                _self.mainFileUploading = false;
+            })
+            .catch(function (error) {
+                console.log(error);
+                _self.mainFileUploading = false;
+            });
+        },
     },
     props: {
         formId: {type: String,default: ""},

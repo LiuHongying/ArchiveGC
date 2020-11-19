@@ -25,14 +25,12 @@
             </el-dialog>
         </template>
         <template v-slot:main="{layout}">
-            <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
-                <split-pane v-on:resize="onSplitResize" :min-percent='20' :default-percent='topPercent' split="horizontal">
-                    <template slot="paneL">
+           
                         <DataGrid
                             ref="mainDataGrid"
                             key="main"
                             dataUrl="/dc/getWorkflows"
-                            v-bind:tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
+                            v-bind:tableHeight="(layout.height-startHeight)"
                             v-bind:isshowOption="true" v-bind:isshowSelection ="true"
                             gridViewName="WorkflowGrid"
                             condition="lastVersion"
@@ -57,9 +55,8 @@
                                 <!-- <el-dropdown-item icon="el-icon-chat-line-square" >{{$t('application.Reply')}}</el-dropdown-item> -->
                             </template>
                         </DataGrid>
-                    </template>
-                </split-pane>
-            </div>
+
+            
         </template>
     </DataLayout>
     
@@ -94,7 +91,7 @@
                     // 本地存储高度名称
                     topStorageName: 'ReceivedDCHeight',
                     // 非split pan 控制区域高度
-                    startHeight: 135,
+                    startHeight: 145,
                     // 顶部百分比*100
                     topPercent: 65,
                     // 顶部除列表高度

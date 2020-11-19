@@ -855,7 +855,7 @@ export default {
               });
       }
       for(let i=0;i<_self.selectTransferRow.length;i++){
-        _self.startWorkflowFun(_self.selectTransferRow[i].ID,"文档提交归档流程测试",null,"SubmissionDC测试");
+        _self.startWorkflowFun(_self.selectTransferRow[i].ID,"文档提交归档流程",null,"SubmissionDC");
       }
       
     },
@@ -1463,8 +1463,8 @@ export default {
         m.set("ID", _self.$refs.ShowProperty.myItemId);
       }
       if (_self.$refs.ShowProperty.myTypeName != "") {
-        m.set("TYPE_NAME", _self.$refs.ShowProperty.myTypeName);
-        m.set("folderPath", _self.$refs.ShowProperty.folderPath);
+        m.set("TYPE_NAME", _self.typeName);
+        m.set("folderPath", _self.folderPath);
         m.set("transferId", _self.parentId);
       }
       let formdata = new FormData();
