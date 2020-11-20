@@ -47,9 +47,10 @@ public class countDocuments implements JavaDelegate{
 			Map<String, Object> varMap = execution.getVariables();
 			String formId = varMap.get("formId").toString();
 			EcmDocument form = documentService.getObjectById(ecmSession.getToken(), formId);	//表单对象
-			String sql = "select  C_ITEM_TYPE from ecm_document where id in(select CHILD_ID from ecm_relation where parent_id = '"+formId+"')";
+			String sql = "select  TYPE_NAME,C_ITEM_TYPE from ecm_document where id in(select CHILD_ID from ecm_relation where parent_id = '"+formId+"')";
 			List<Map<String,Object>> Res = documentService.getMapList(ecmSession.getToken(), sql);
 			for(Map<String,Object> mp : Res) {
+				if(mp.get("C_ITEM_TYPE")!=null) {
 				String type = mp.get("C_ITEM_TYPE").toString();
 				if(type.equals("案卷")) {
 					AN++;
@@ -58,11 +59,13 @@ public class countDocuments implements JavaDelegate{
 					WJ++;
 				}
 			}
+				
 			if(AN>10||WJ>50) {
 				execution.setVariable("MoreThan50", "是");
 			}
 			else {
 				execution.setVariable("MoreThan50", "否");
+			}
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
