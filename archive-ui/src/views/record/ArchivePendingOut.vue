@@ -161,7 +161,7 @@ export default {
       startDate: "",
       endDate:"",
       activeName:"ArchivePendingOut",
-      typename:"'借阅单'",
+      typename:"'借阅单','复制单','设计文件修改单','科研文件借阅单','科研文件修改单'",
       parentId:"",
       condition1:"",
       condition2:"",
