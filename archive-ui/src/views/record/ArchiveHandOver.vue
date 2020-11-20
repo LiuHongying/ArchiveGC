@@ -196,7 +196,7 @@ export default {
       }
 
       var id = [];
-      var fieldStr = []
+      var fieldStr = [];
       var locationList = [];
 
       var i;
@@ -205,6 +205,10 @@ export default {
         fieldStr.push(_self.DCinputValueNum);
         locationList.push(_self.DCinputValueNum + i);
       }
+
+      console.log(id);
+      console.log(fieldStr);
+      console.log(locationList);
 
       let mp = new Map();
       mp.set("ids", id);
@@ -217,8 +221,11 @@ export default {
         }
       })
       .then(function (response) {
+        _self.$refs.mainDataGrid.loadGridData();
         let code = response.data.code;
       })
+
+      _self.propertyVisible = false
     },
 
     handOver() {},

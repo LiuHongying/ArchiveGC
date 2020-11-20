@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,6 +19,7 @@ import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
 import com.ecm.portal.controller.ControllerAbstract;
 
+@Controller
 public class RecordProcessController extends ControllerAbstract {
 	
 	@Autowired
@@ -41,7 +43,7 @@ public class RecordProcessController extends ControllerAbstract {
 	
 	@RequestMapping(value = "/record/createStorageNum", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object>  createStorageNum(@RequestBody String argStr) throws Exception {		
+	public Map<String, Object> createStorageNum(@RequestBody String argStr) throws Exception {		
 		Map<String,Object> params= JSONUtils.stringToMap(argStr);
 		String ID= params.get("ids").toString();
 		String Store= params.get("Store").toString();
@@ -56,6 +58,8 @@ public class RecordProcessController extends ControllerAbstract {
 			EcmDocument doc = documentService.getObjectById(getToken(), fileId);
 			doc.addAttribute("C_STORE_CODING", listStore.get(i));
 			doc.addAttribute("C_LOCATION", listLocation.get(i));
+			
+			documentService.updateObject(getToken(), doc, null);
 			i += 1;
 		}
 		
