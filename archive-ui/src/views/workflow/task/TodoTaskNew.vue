@@ -36,6 +36,7 @@
         :docId="form.formId"
         :taskForm="formData"
         :istask="1"
+        :formParameter="formParameter"
         :processDefinitionId="currentData.processDefinitionId"
         :activityName="currentData.name"
         :formEditPermision="formEditPermision"
@@ -187,8 +188,10 @@ import EditTask from "@/views/workflow/task/EditTask.vue";
 import DocViewTask from "@/views/workflow/task/DocViewTask.vue";
 import borrow1 from "@/components/form/Borrow1.vue";
 import CommonView from "@/views/workflow/CommonView.vue";
+import DeliverFormTask from "@/views/workflow/DeliverFormTask.vue"
 import UpdateDocContent from "@/views/workflow/LinkMainAttachmentFile.vue";
 import UpdateDocContentByReviewer from "@/views/workflow/LinkMainAttachmentFileByReviewer.vue";
+
 export default {
   name: "TodoTask",
   permit: 1,
@@ -200,7 +203,8 @@ export default {
     borrow1: borrow1,
     CommonView: CommonView,
     UpdateDocContent: UpdateDocContent,
-    UpdateDocContentByReviewer: UpdateDocContentByReviewer
+    UpdateDocContentByReviewer: UpdateDocContentByReviewer,
+    DeliverFormTask:DeliverFormTask
   },
   data() {
     return {
@@ -238,6 +242,7 @@ export default {
       allowEdit: false,
       sequenceFlow: [],
       isShowReject:false,
+      formParameter:{}
     };
   },
   created() {
@@ -454,6 +459,9 @@ export default {
           .post("/workflow/getEcmCfgActivity", JSON.stringify(m))
           .then(function(response) {
             _self.ecmCfgActivity = response.data.data;
+            if(_self.ecmCfgActivity.formParameter){
+              _self.formParameter= JSON.parse(_self.ecmCfgActivity.formParameter) 
+            }
             _self.taskName = _self.ecmCfgActivity.componentName;
             _self.rejectButton = _self.ecmCfgActivity.rejectActivityLabel;
             _self.allowEdit = _self.ecmCfgActivity.enableEdit;

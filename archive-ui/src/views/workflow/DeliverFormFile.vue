@@ -32,7 +32,7 @@
         <el-form :inline="true" :model="filters" @submit.native.prevent>
           <el-form-item>
             <el-select v-model="filters.docType">
-              <el-option :label="$t('application.all')+' '+$t('application.subDC')" value></el-option>
+              <el-option :label="$t('application.all')" value></el-option>
               <el-option
                 v-for="(name,nameIndex) in childrenTypes"
                 :key="'Type2_'+nameIndex"
@@ -65,7 +65,7 @@
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
           :gridViewName="param.searchViewName"
-          :condition="searchFileCondition+param.searchViewCondition"
+          :condition="searchFileCondition+' and '+param.searchViewCondition"
           :optionWidth="1"
           :isShowMoreOption="false"
           :isshowCustom="false"
@@ -118,8 +118,8 @@
             :isShowChangeList="false"
             :isshowicon="false"
             showOptions="查看属性,查看内容"
-            :isshowPage="isShowPage"
             @selectchange="selectInArchiveFile"
+            :isshowPage="isShowPage"
           ></DataGrid>
         </el-row>
         <div slot="footer" class="dialog-footer">
@@ -147,18 +147,16 @@
                       <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
                     </el-form-item>
                     <el-form-item>
-                      <el-button type="warning">{{ $t("application.delete") }}</el-button>
+                      <el-button
+                        type="warning"
+                        @click="deleteRelation"
+                      >{{ $t("application.delete") }}</el-button>
                     </el-form-item>
                     <el-form-item>
                       <MountFile
                         :selectedItem="selectedArchives"
                         :title="$t('application.ReplaceDoc')"
                       >{{$t('application.replace')}}</MountFile>
-                    </el-form-item>
-                  </template>
-                  <template v-if="isShowReject">
-                    <el-form-item>
-                      <el-button type="primary" @click="pendNot">{{ $t("application.pendNot") }}</el-button>
                     </el-form-item>
                   </template>
                 </el-form>
@@ -189,14 +187,7 @@
               :isshowPage="isShowPage"
               @selectchange="archiveSelect"
               @dbclick="showVolumesFile"
-            >
-              <template slot="sequee" slot-scope="scope">
-                <span
-                  :style="(scope.data.row['C_REJECT_COMMENT']!=null
-                      &&scope.data.row['C_REJECT_COMMENT']!='')?{'background':'red'}:''"
-                >{{(scope.currentPage-1) * scope.pageSize+ scope.data.$index+1}}</span>
-              </template>
-            </DataGrid>
+            ></DataGrid>
           </el-tab-pane>
         </el-tabs>
         <!-- </template>
@@ -224,7 +215,7 @@ export default {
     RejectButton: RejectButton,
     DataLayout: DataLayout,
     AttachmentFile: AttachmentFile,
-    MountFile:MountFile
+    MountFile: MountFile
   },
   model: {
     event: "change"
@@ -271,15 +262,16 @@ export default {
       archiveId: "", //案卷ID
       volumesFileVisible: false,
       pendNotVisible: false,
-      selectedInArchive: []
+      childIds: [],
+      selectedInArchive:[]
     };
   },
   mounted() {
-    this.getTypeNamesByMainList("DCTypeSubContractor");
+    this.getTypeNamesByMainList("BusinessClassic");
   },
   methods: {
-    selectInArchiveFile(val) {
-      this.selectedInArchive = val;
+    selectInArchiveFile(val){
+      this.selectedInArchive=val;
     },
     saveRejectComment() {
       let _self = this;
@@ -341,18 +333,24 @@ export default {
     archiveSelect(val) {
       this.selectedArchives = val;
     },
-    pendNot() {
+    deleteRelation() {
       let _self = this;
-      if (_self.selectedArchives.length == 0) {
+      if (this.selectedArchives && this.selectedArchives.length > 0) {
+        let ids = new Array();
+        this.selectedArchives.forEach(e => {
+          ids.push(e["RELATION_ID"]);
+        });
+        this.delRelation(ids, function() {
+          _self.$refs.fileList.loadGridData();
+        });
+      } else {
         _self.$message({
           showClose: true,
           message: _self.$t("message.PleaseSelectOneOrMoreData"),
           duration: 2000,
           type: "error"
         });
-        return;
       }
-      _self.pendNotVisible = true;
     },
     beforeAddFile() {
       let _self = this;
@@ -370,36 +368,80 @@ export default {
     },
     saveFileToWorkflow() {
       let _self = this;
-      if (_self.$refs.fileList.itemDataList == null) {
-        _self.$refs.fileList.itemDataList = _self.selectedFiles;
+      if (_self.$refs.fileList.itemDataList != null) {
+        _self.selectedFiles.forEach(e => {
+          _self.childIds.push(e.ID);
+        });
       } else {
         _self.selectedFiles.forEach(e => {
           let isContain = false;
           _self.$refs.fileList.itemDataList.find(function(value) {
-            if (value === e) {
+            if (value.ID === e.ID) {
               isContain = true;
               return;
               //则包含该元素
             }
           });
           if (!isContain) {
-            _self.$refs.fileList.itemDataList.push(e);
+            _self.childIds.push(e.ID);
           }
         });
         // this.$refs.fileList.itemDataList=this.$refs.fileList.itemDataList.concat(this.selectedFiles);
       }
-      _self.$emit("change", _self.$refs.fileList.itemDataList);
-      this.butt = false;
-      this.propertyVisible = false;
+      let m = new Map();
+      m.set("childIds", _self.childIds);
+      m.set("relationName", "irel_parent");
+      m.set("parentId", _self.parentId);
+      axios
+        .post("/dc/addRelation", JSON.stringify(m))
+        .then(function(response) {
+          if (response.data.code == 1) {
+            _self.$message({
+              showClose: true,
+              message: _self.$t("message.saveSuccess"),
+              duration: 2000,
+              type: "success"
+            });
+            _self.butt = false;
+            _self.propertyVisible = false;
+            _self.$refs.fileList.loadGridData();
+          } else {
+            _self.$message({
+              showClose: true,
+              message: _self.$t("message.saveFailured"),
+              duration: 2000,
+              type: "error"
+            });
+          }
+          _self.loading = false;
+        })
+        .catch(function(error) {
+          console.log(error);
+          _self.$message({
+            showClose: true,
+            message: _self.$t("message.saveFailured"),
+            duration: 2000,
+            type: "error"
+          });
+          _self.loading = false;
+        });
     },
     searchItem() {
       let _self = this;
       let key = " 1=1 ";
       if (_self.searchFileCondition != "") {
-        key += " and (" + searchFileCondition + ")";
+        key += " and (" + _self.searchFileCondition + ")";
       }
+
       if (_self.filters.docType != "") {
-        key += " and TYPE_NAME = '" + _self.filters.docType + "'";
+        key +=
+          " and TYPE_NAME = '" +
+          _self.filters.docType +
+          "' and STATUS='已入库' and IS_HIDDEN =0 ";
+      } else {
+        if (_self.param.searchViewCondition != "") {
+          key += " and (" + _self.param.searchViewCondition + ")";
+        }
       }
       if (_self.filters.title != "") {
         key +=
