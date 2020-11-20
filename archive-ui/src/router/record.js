@@ -136,6 +136,16 @@ export const recordRouter =  [
         meta: {
             requireAuth: true,
             permit: 1,
+            title: 'archivehandover'
+        },
+        path: '/record/archivehandover',
+        name: '移交入库',
+        component: () => import('@/views/record/ArchiveHandOver.vue'),
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
             title:'archiveoutgoing'
         },
         path: '/record/archiveoutgoing',
