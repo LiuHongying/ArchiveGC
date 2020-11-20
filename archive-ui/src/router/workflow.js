@@ -107,6 +107,16 @@ export const workflowRouter =
         path: '/workflow/linkMainAttachmentFileByReviewer',
         name: '审核人修改',
         component: () => import('@/views/workflow/LinkMainAttachmentFileByReviewer.vue')
-    }
+    },
+    {meta:{
+      requireAuth: true,
+      permit: 1,
+      title: 'StartUp'
+    },
+    path: '/workflow/BorrowStartUp',
+    name: '借阅流程启动',
+    component: () => import('@/views/workflow/BorrowStartUp.vue')
+    
+  },
     ]
   }
