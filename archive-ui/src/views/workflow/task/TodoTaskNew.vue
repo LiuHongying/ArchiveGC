@@ -1,31 +1,31 @@
 <template>
-  <div>
-    <el-dialog
-      :title="dialogTitle"
-      :visible.sync="dialogVisible"
-      v-if="dialogVisible"
-      width="95%"
-      style="width:100%"
-      custom-class="customWidth"
-    >
-      <el-form style="padding-bottom:30px">
-        <el-form-item
-          label="任务名称"
-          :label-width="formLabelWidth"
-          style="float:left"
-        >{{currentData.name}}</el-form-item>
-        <el-form-item
-          label="发起人"
-          :label-width="formLabelWidth"
-          style="float:left"
-        >{{currentData.startUser}}</el-form-item>
-        <el-form-item
-          label="到达时间"
-          :label-width="formLabelWidth"
-          style="float:left"
-        >{{dateFormat(currentData.createTime,'')}}</el-form-item>
-      </el-form>
-      <el-divider content-position="left">表单信息</el-divider>
+  <div>
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="dialogVisible"
+      v-if="dialogVisible"
+      width="95%"
+      style="width:100%"
+      custom-class="customWidth"
+    >
+      <el-form style="padding-bottom:30px">
+        <el-form-item
+          label="任务名称"
+          :label-width="formLabelWidth"
+          style="float:left"
+        >{{currentData.name}}</el-form-item>
+        <el-form-item
+          label="发起人"
+          :label-width="formLabelWidth"
+          style="float:left"
+        >{{currentData.startUser}}</el-form-item>
+        <el-form-item
+          label="到达时间"
+          :label-width="formLabelWidth"
+          style="float:left"
+        >{{dateFormat(currentData.createTime,'')}}</el-form-item>
+      </el-form>
+      <el-divider content-position="left">表单信息</el-divider>
 
       <component
         ref="propertiesComp"
@@ -124,58 +124,58 @@
         </div>
       </el-form>
 
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogVisible = false">{{$t('application.cancel')}}</el-button>
-        <el-button
-          v-if="ecmCfgActivity.enableDelegate==true"
-          @click="showOrHiddenDelegate()"
-        >{{delegateButton}}</el-button>
-        <el-button @click="claim(currentData)">认领任务</el-button>
-        <el-button @click="completetask(form)">完成任务</el-button>
-      </div>
-    </el-dialog>
-    <el-table
-      :data="dataList"
-      border
-      :height="tableHeight"
-      v-loading="loading"
-      @selection-change="selectChange"
-      style="width: 99.8%"
-    >
-      <el-table-column type="selection" width="40"></el-table-column>
-      <el-table-column type="index" width="50"></el-table-column>
-      <el-table-column prop="name" label="任务名称" min-width="15%" sortable></el-table-column>
-      <el-table-column prop="formId" label="表单Id" v-if="1==2" min-width="15%" sortable></el-table-column>
-      <el-table-column prop="startUser" label="发起人" min-width="15%" sortable></el-table-column>
-      <el-table-column
-        prop="createTime"
-        label="到达时间"
-        :formatter="dateFormatter"
-        min-width="10%"
-        sortable
-      ></el-table-column>
-      <el-table-column label="操作" width="80">
-        <template slot-scope="scope">
-          <el-button
-            :plain="true"
-            type="success"
-            size="small"
-            icon="save"
-            @click="showitem(scope.row)"
-          >查看</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="currentPage"
-      :page-sizes="[20, 50, 100, 200]"
-      :page-size="pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="itemCount"
-    ></el-pagination>
-  </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">{{$t('application.cancel')}}</el-button>
+        <el-button
+          v-if="ecmCfgActivity.enableDelegate==true"
+          @click="showOrHiddenDelegate()"
+        >{{delegateButton}}</el-button>
+        <el-button @click="claim(currentData)">认领任务</el-button>
+        <el-button @click="completetask(form)">完成任务</el-button>
+      </div>
+    </el-dialog>
+    <el-table
+      :data="dataList"
+      border
+      :height="tableHeight"
+      v-loading="loading"
+      @selection-change="selectChange"
+      style="width: 99.8%"
+    >
+      <el-table-column type="selection" width="40"></el-table-column>
+      <el-table-column type="index" width="50"></el-table-column>
+      <el-table-column prop="name" label="任务名称" min-width="15%" sortable></el-table-column>
+      <el-table-column prop="formId" label="表单Id" v-if="1==2" min-width="15%" sortable></el-table-column>
+      <el-table-column prop="startUser" label="发起人" min-width="15%" sortable></el-table-column>
+      <el-table-column
+        prop="createTime"
+        label="到达时间"
+        :formatter="dateFormatter"
+        min-width="10%"
+        sortable
+      ></el-table-column>
+      <el-table-column label="操作" width="80">
+        <template slot-scope="scope">
+          <el-button
+            :plain="true"
+            type="success"
+            size="small"
+            icon="save"
+            @click="showitem(scope.row)"
+          >查看</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-sizes="[20, 50, 100, 200]"
+      :page-size="pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="itemCount"
+    ></el-pagination>
+  </div>
 </template>
 
 <script type="text/javascript">
@@ -283,171 +283,171 @@ export default {
             }
           }
 
-          _self.loading = false;
-          _self.loadPageInfo(response.data.totalCount);
-        })
-        .catch(function(error) {
-          console.log(error);
-          _self.loading = false;
-        });
-    },
-    // 表格行选择
-    selectChange(val) {
-      this.selectedItems = val;
-      console.log(val);
-    },
-    // 分页 页数改变
-    handleSizeChange(val) {
-      this.pageSize = val;
-      localStorage.setItem("taskPageSize", val);
-      this.refreshData();
-      //console.log('handleSizeChange', val);
-    },
-    // 分页 当前页改变
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      this.refreshData();
-    },
-    // 加载页数 暂时未处理查询条件
-    loadPageInfo(val) {
-      let _self = this;
-      _self.itemCount = val;
-      _self.loading = false;
-    },
-    getFormdataMap() {
-      let _self = this;
-      return _self.taskForm;
-    },
-    completetask(indata) {
-      let _self = this;
-      if (_self.isCompleteSelected) {
-        _self.form.taskId = [];
-        _self.form.formId = [];
-        for (let i = 0; i < _self.selectedItems.length; i++) {
-          _self.form.taskId[i] = _self.selectedItems[i].id;
-        }
-      }
-      let docMap = _self.getFormdataMap();
-      _self.loading = true;
-      if (_self.formEditPermision == 1) {
-        switch (_self.currentData.processDefinitionId.split(":")[0]) {
-          case "BianJiaoShenPi":
-            _self.$refs.propertiesComp.$refs.ShowProperty.saveItem();
-            break;
-          case "process_borrow":
-            _self.$refs.propertiesComp.saveCurrentForm();
-            break;
-        }
-        // if(_self.currentData.processDefinitionId.split(":")[0]=="BianJiaoShenPi"){
-          try{
-            
-            _self.$refs.propertiesComp.sendData();
-          }catch(e){
-            _self.completetaskFinal(_self);
-            return;
-          }
-        let docMap = _self.getFormdataMap();
-        axios
-          .post("/dc/saveDocument", docMap)
-          .then(function(response) {
-            _self.completetaskFinal(_self);
-          })
-          .catch(function(error) {
-            console.log(error);
-            _self.loading = false;
-          });
-      } else {
-        _self.completetaskFinal(_self);
-      }
-    },
-    completetaskFinal(indata) {
-      let _self = indata;
-      _self.form["C_ITEM_STATUS"] = _self.form.result;
-      axios
-        .post("/workflow/completeTask", JSON.stringify(_self.form))
-        .then(function(response) {
-          _self.dialogVisible = false;
-          _self.refreshData();
-          _self.$message("完成任务成功!");
-          _self.$emit("refreshcount");
-          _self.loading = false;
-        })
-        .catch(function(error) {
-          console.log(error);
-          _self.loading = false;
-        });
-    },
-    delegateTask(indata) {
-      let _self = this;
-      _self.delegateDialogVisible = true;
-      _self.loading = true;
-      axios
-        .post("/workflow/delegateTask", JSON.stringify(indata))
-        .then(function(response) {
-          _self.loading = false;
-          _self.dialogVisible = false;
-          _self.refreshData();
-          _self.$message("委托代理成功!");
-          _self.$emit("refreshcount");
-        })
-        .catch(function(error) {
-          _self.loading = false;
-          console.log(error);
-        });
-    },
-    claim(indata) {
-      let _self = this;
-      _self.loading = true;
-      axios
-        .post("/workflow/claim", JSON.stringify(indata))
-        .then(function(response) {
-          _self.loading = false;
-          _self.$message("认领成功!");
-        })
-        .catch(function(error) {
-          _self.loading = false;
-          console.log(error);
-        });
-    },
+          _self.loading = false;
+          _self.loadPageInfo(response.data.totalCount);
+        })
+        .catch(function(error) {
+          console.log(error);
+          _self.loading = false;
+        });
+    },
+    // 表格行选择
+    selectChange(val) {
+      this.selectedItems = val;
+      console.log(val);
+    },
+    // 分页 页数改变
+    handleSizeChange(val) {
+      this.pageSize = val;
+      localStorage.setItem("taskPageSize", val);
+      this.refreshData();
+      //console.log('handleSizeChange', val);
+    },
+    // 分页 当前页改变
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.refreshData();
+    },
+    // 加载页数 暂时未处理查询条件
+    loadPageInfo(val) {
+      let _self = this;
+      _self.itemCount = val;
+      _self.loading = false;
+    },
+    getFormdataMap() {
+      let _self = this;
+      return _self.taskForm;
+    },
+    completetask(indata) {
+      let _self = this;
+      if (_self.isCompleteSelected) {
+        _self.form.taskId = [];
+        _self.form.formId = [];
+        for (let i = 0; i < _self.selectedItems.length; i++) {
+          _self.form.taskId[i] = _self.selectedItems[i].id;
+        }
+      }
+      let docMap = _self.getFormdataMap();
+      _self.loading = true;
+      if (_self.formEditPermision == 1) {
+        switch (_self.currentData.processDefinitionId.split(":")[0]) {
+          case "BianJiaoShenPi":
+            _self.$refs.propertiesComp.$refs.ShowProperty.saveItem();
+            break;
+          case "process_borrow":
+            _self.$refs.propertiesComp.saveCurrentForm();
+            break;
+        }
+        // if(_self.currentData.processDefinitionId.split(":")[0]=="BianJiaoShenPi"){
+          try{
+            
+            _self.$refs.propertiesComp.sendData();
+          }catch(e){
+            _self.completetaskFinal(_self);
+            return;
+          }
+        let docMap = _self.getFormdataMap();
+        axios
+          .post("/dc/saveDocument", docMap)
+          .then(function(response) {
+            _self.completetaskFinal(_self);
+          })
+          .catch(function(error) {
+            console.log(error);
+            _self.loading = false;
+          });
+      } else {
+        _self.completetaskFinal(_self);
+      }
+    },
+    completetaskFinal(indata) {
+      let _self = indata;
+      _self.form["C_ITEM_STATUS"] = _self.form.result;
+      axios
+        .post("/workflow/completeTask", JSON.stringify(_self.form))
+        .then(function(response) {
+          _self.dialogVisible = false;
+          _self.refreshData();
+          _self.$message("完成任务成功!");
+          _self.$emit("refreshcount");
+          _self.loading = false;
+        })
+        .catch(function(error) {
+          console.log(error);
+          _self.loading = false;
+        });
+    },
+    delegateTask(indata) {
+      let _self = this;
+      _self.delegateDialogVisible = true;
+      _self.loading = true;
+      axios
+        .post("/workflow/delegateTask", JSON.stringify(indata))
+        .then(function(response) {
+          _self.loading = false;
+          _self.dialogVisible = false;
+          _self.refreshData();
+          _self.$message("委托代理成功!");
+          _self.$emit("refreshcount");
+        })
+        .catch(function(error) {
+          _self.loading = false;
+          console.log(error);
+        });
+    },
+    claim(indata) {
+      let _self = this;
+      _self.loading = true;
+      axios
+        .post("/workflow/claim", JSON.stringify(indata))
+        .then(function(response) {
+          _self.loading = false;
+          _self.$message("认领成功!");
+        })
+        .catch(function(error) {
+          _self.loading = false;
+          console.log(error);
+        });
+    },
 
-    showOrHiddenDelegate() {
-      let _self = this;
-      if (_self.delegateDialogVisible == false) {
-        _self.delegateButton = "取消委托";
-        _self.delegateDialogVisible = true;
-      } else {
-        _self.delegateButton = "委托代理";
-        _self.delegateDialogVisible = false;
-      }
-    },
+    showOrHiddenDelegate() {
+      let _self = this;
+      if (_self.delegateDialogVisible == false) {
+        _self.delegateButton = "取消委托";
+        _self.delegateDialogVisible = true;
+      } else {
+        _self.delegateButton = "委托代理";
+        _self.delegateDialogVisible = false;
+      }
+    },
 
-    completeselected() {
-      let _self = this;
-      if (_self.selectedItems.length == 0) {
-        _self.$message("未选择任务!");
-      } else {
-        _self.dialogTitle = "批量完成任务";
-        _self.isCompleteSelected = true;
-        _self.dialogVisible = true;
-      }
-    },
-    showitem(indata) {
-      let _self = this;
-      _self.dialogTitle = "查看任务";
-      _self.delegateDialogVisible = false;
-      _self.isCompleteSelected = false;
-      _self.currentData = indata;
-      _self.form.taskId = indata.id;
-      _self.form.formId = indata.formId;
-      _self.dialogVisible = true;
-      _self.taskTableData = [];
+    completeselected() {
+      let _self = this;
+      if (_self.selectedItems.length == 0) {
+        _self.$message("未选择任务!");
+      } else {
+        _self.dialogTitle = "批量完成任务";
+        _self.isCompleteSelected = true;
+        _self.dialogVisible = true;
+      }
+    },
+    showitem(indata) {
+      let _self = this;
+      _self.dialogTitle = "查看任务";
+      _self.delegateDialogVisible = false;
+      _self.isCompleteSelected = false;
+      _self.currentData = indata;
+      _self.form.taskId = indata.id;
+      _self.form.formId = indata.formId;
+      _self.dialogVisible = true;
+      _self.taskTableData = [];
 
-      //  if ("借阅驳回" == indata.name) {
-      //     _self.rejectButton = "结束";
-      //   } else {
-      //     // _self.formEditPermision = 0;
-      //     _self.rejectButton = "驳回";
-      //   }
+      //  if ("借阅驳回" == indata.name) {
+      //     _self.rejectButton = "结束";
+      //   } else {
+      //     // _self.formEditPermision = 0;
+      //     _self.rejectButton = "驳回";
+      //   }
 
       _self.$nextTick(() => {
         //动态获取表单 显示查看或编辑页面
@@ -477,104 +477,105 @@ export default {
               _self.formEditPermision = 0;
             }
 
-            axios
-              .post("/dc/getDocumentById", indata.formId)
-              .then(function(responsedoc) {
-                let result = responsedoc.data;
-                if (result.code == 1) {
-                  _self.formData = result.data;
-                }
-              });
-            axios
-              .post("/dc/getFormRelateDocument", indata.formId)
-              .then(function(responseRdoc) {
-                let result = responseRdoc.data;
-                if (result.code == 1) {
-                  _self.tabledata = result.data;
-                }
-              });
-            var m = new Map();
-            m.set("processInstanceId", indata.processInstanceId);
-            axios
-              .post("/workflow/getWorkflowTask", JSON.stringify(m))
-              .then(function(response) {
-                _self.taskList = response.data.data;
-                //console.log(JSON.stringify(_self.taskList));
-                _self.dialogVisible = true;
-                _self.loading = false;
-              })
-              .catch(function(error) {
-                console.log(error);
-                _self.loading = false;
-              });
-          })
-          .catch(function(error) {
-            console.log(error);
-            _self.loading = false;
-          });
-      });
-    },
-    loadGridView() {
-      let _self = this;
-      var m = new Map();
-      m.set("gridName", _self.gridviewName);
-      m.set("lang", _self.currentLanguage);
-      axios
-        .post("/dc/getGridViewInfo", JSON.stringify(m))
-        .then(function(response) {
-          _self.tabledata = _self.$route.query.tabledata;
-          //_self.loadData();
-        });
-    },
-    loadData() {
-      let _self = this;
-      axios.post("/dc/getRelations", this.docId).then(function(response) {
-        let result = response.data;
+            axios
+              .post("/dc/getDocumentById", indata.formId)
+              .then(function(responsedoc) {
+                let result = responsedoc.data;
+                if (result.code == 1) {
+                  _self.formData = result.data;
+                }
+              });
+            axios
+              .post("/dc/getFormRelateDocument", indata.formId)
+              .then(function(responseRdoc) {
+                let result = responseRdoc.data;
+                if (result.code == 1) {
+                  _self.tabledata = result.data;
+                }
+              });
+            var m = new Map();
+            m.set("processInstanceId", indata.processInstanceId);
+            axios
+              .post("/workflow/getWorkflowTask", JSON.stringify(m))
+              .then(function(response) {
+                _self.taskList = response.data.data;
+                //console.log(JSON.stringify(_self.taskList));
+                _self.dialogVisible = true;
+                _self.loading = false;
+              })
+              .catch(function(error) {
+                console.log(error);
+                _self.loading = false;
+              });
+          })
+          .catch(function(error) {
+            console.log(error);
+            _self.loading = false;
+          });
+      });
+    },
+    loadGridView() {
+      let _self = this;
+      var m = new Map();
+      m.set("gridName", _self.gridviewName);
+      m.set("lang", _self.currentLanguage);
+      axios
+        .post("/dc/getGridViewInfo", JSON.stringify(m))
+        .then(function(response) {
+          _self.tabledata = _self.$route.query.tabledata;
+          //_self.loadData();
+        });
+    },
+    loadData() {
+      let _self = this;
+      axios.post("/dc/getRelations", this.docId).then(function(response) {
+        let result = response.data;
 
-        if (result.code == 1) {
-          _self.tabledata = result.data;
-        }
-      });
-    },
-    dateFormatter(row, column) {
-      let datetime = row[column.property];
-      return this.datetimeFormat(datetime);
-    },
-    search() {
-      let _self = this;
-      _self.dataList = _self.dataListFull.filter(function(item) {
-        return (
-          item.taskName.match(_self.inputkey) ||
-          item.description.match(_self.inputkey)
-        );
-      });
-    }
-  }
+        if (result.code == 1) {
+          _self.tabledata = result.data;
+        }
+      });
+    },
+    dateFormatter(row, column) {
+      let datetime = row[column.property];
+      return this.datetimeFormat(datetime);
+    },
+    search() {
+      let _self = this;
+      _self.dataList = _self.dataListFull.filter(function(item) {
+        return (
+          item.taskName.match(_self.inputkey) ||
+          item.description.match(_self.inputkey)
+        );
+      });
+    }
+  }
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
 h1,
-h2 {
-  font-weight: normal;
+h2 {
+  font-weight: normal;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+ul {
+  list-style-type: none;
+  padding: 0;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+li {
+  display: inline-block;
+  margin: 0 10px;
 }
-a {
-  color: #42b983;
+a {
+  color: #42b983;
 }
-.el-header {
-  background-color: #e8eaeb;
-  height: 28px !important;
+.el-header {
+  background-color: #e8eaeb;
+  height: 28px !important;
 }
-.el-row {
-  padding-bottom: 10px;
+.el-row {
+  padding-bottom: 10px;
 }
 </style>
+

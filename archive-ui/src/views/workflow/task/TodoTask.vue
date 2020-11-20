@@ -190,6 +190,10 @@ import EditTask from "@/views/workflow/task/EditTask.vue";
 import DocViewTask from "@/views/workflow/task/DocViewTask.vue";
 import borrow1 from "@/components/form/Borrow1.vue";
 import CommonView from "@/views/workflow/CommonView.vue"
+import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue"
+import BorrowView from "@/views/workflow/BorrowView.vue"
+import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
+import FormFileViewTask from "@/views/workflow/FormFileViewTask.vue";
 export default {
   name: "TodoTask",
   permit: 1,
@@ -199,7 +203,11 @@ export default {
     EditTask : EditTask,
     DocViewTask : DocViewTask,
     borrow1 : borrow1,
-    CommonView:CommonView
+    CommonView:CommonView,
+    BorrowViewReadOnly:BorrowViewReadOnly,
+    BorrowView:BorrowView,
+    BorrowStartUp:BorrowStartUp,
+    FormFileViewTask:FormFileViewTask
   },
  data() {
     return {

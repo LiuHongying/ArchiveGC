@@ -33,6 +33,26 @@ export const recordRouter =  [
         meta: {
             requireAuth: true,
             permit: 1,
+            title:"待作废文档"
+        },
+        path: '/record/ArchiveInvaliding',
+        name: '待作废文档',
+        component: () => import('@/views/record/ArchiveInvaliding.vue')
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:"作废库"
+        },
+        path: '/record/ArchiveInvalid',
+        name: '作废库',
+        component: () => import('@/views/record/ArchiveInvalid.vue')
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
             title:'archiveReceive'
         },
         path: '/record/archivereceive',
@@ -131,6 +151,16 @@ export const recordRouter =  [
             }
             
         ]
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title: 'archivehandover'
+        },
+        path: '/record/archivehandover',
+        name: '移交入库',
+        component: () => import('@/views/record/ArchiveHandOver.vue'),
     },
     {
         meta: {
