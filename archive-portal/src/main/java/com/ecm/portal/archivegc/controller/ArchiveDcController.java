@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,12 @@ import com.ecm.portal.controller.ControllerAbstract;
 @Controller
 public class ArchiveDcController extends ControllerAbstract{
 	private Logger log = LoggerFactory.getLogger(ArchiveDcController.class);
+import com.ecm.icore.service.IEcmSession;
+import com.ecm.portal.controller.ControllerAbstract;
+@Controller
+public class ArchiveDcController extends ControllerAbstract{
+	private int	AN;				//案卷
+	private int WJ;				//文件
 	@Autowired
 	DocumentService documentService;
 	
@@ -151,4 +158,48 @@ public class ArchiveDcController extends ControllerAbstract{
 		return mp;
 	}
 	
+	
+	@RequestMapping(value = "/dc/countDocuments", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> countDocuments(@RequestBody String metadata) throws Exception {
+		AN = 0;
+		WJ = 0;								//初始化计数器
+		String type = "未识别";
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Map<String, Object> args = JSONUtils.stringToMap(metadata);
+		Object childObj=args.get("childFileId");
+		if(childObj!=null&&!"".equals(childObj.toString())) {
+			String childFileIds=childObj.toString();
+			List<String> childIdList= JSONUtils.stringToArray(childFileIds);
+			if(childIdList.size()<10) {
+				mp.put("code", "0");			//数量处于绝对少数，无需向领导请示
+				return mp;
+			}
+			if(childIdList.size()>50) {
+				mp.put("code", "1");            //数量处于绝对多数，无需判断，必须向领导请示
+				return mp;
+			}
+			for(int i=0;childIdList!=null&&i<childIdList.size();i++) {
+				
+				String id = childIdList.get(i);
+				Map<String,Object> temp = documentService.getObjectMapById(getToken(), id);
+				if(temp.get("C_ITEM_TYPE")!=null) {
+					type = temp.get("C_ITEM_TYPE").toString();
+				}
+				if(type.equals("案卷")) {
+					AN++;
+				}
+				if(type.equals("文件")) {
+					WJ++;
+				}
+			}
+			if(AN>10||WJ>50) {
+				mp.put("code",1);
+			}
+			else {
+				mp.put("code", 0);
+			}
+		}
+		return mp;
+	}
 }
