@@ -26,13 +26,11 @@ import com.ecm.core.entity.EcmRelation;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.RelationService;
 import com.ecm.portal.controller.ControllerAbstract;
-@Controller
-public class ArchiveDcController extends ControllerAbstract{
-	private Logger log = LoggerFactory.getLogger(ArchiveDcController.class);
 import com.ecm.icore.service.IEcmSession;
 import com.ecm.portal.controller.ControllerAbstract;
 @Controller
 public class ArchiveDcController extends ControllerAbstract{
+	private Logger log = LoggerFactory.getLogger(ArchiveDcController.class);
 	private int	AN;				//案卷
 	private int WJ;				//文件
 	@Autowired
