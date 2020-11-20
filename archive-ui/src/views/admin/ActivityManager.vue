@@ -56,6 +56,9 @@
          <el-form-item label="表单条件" :label-width="formLabelWidth">
            <el-input v-model="form.formCondition" auto-complete="off"></el-input>
           </el-form-item>
+           <el-form-item label="表单参数" :label-width="formLabelWidth">
+           <el-input type="textarea" v-model="form.formParameter" auto-complete="off"></el-input>
+          </el-form-item>
         <el-row>
         </el-row>
         <el-row>

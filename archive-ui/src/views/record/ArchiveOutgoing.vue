@@ -1,62 +1,69 @@
 <template>
-      <el-container>
-        <el-aside width="200px">
-          <div v-bind:style="{height: menuHeight +'px'}">
-          <!--左侧导航-->
-          <el-menu default-active="201" class="el-menu-vertical-ecm"  :open="201">
-                <div>
-                  <el-submenu index="200">
-                    <template slot="title">
-                      <i class="el-icon-menu"></i>
-                      <span>借阅单状态</span>
-                    </template>
-                    <el-menu-item index="201" >
-                      <i class="el-icon-bottom"></i>
-                      <span slot="title"><router-link to="/record/archiveoutgoing/archivependingout">待出库</router-link></span>
-                    </el-menu-item>
-                    <el-menu-item index="202">
-                      <i class="el-icon-sort-up"></i>
-                      <span slot="title"><router-link to="/record/archiveoutgoing/archivegiveback">待归还</router-link></span>
-                    </el-menu-item>
-                    <el-menu-item index="203">
-                      <i class="el-icon-top"></i>
-                      <span slot="title"><router-link to="/record/archiveoutgoing/archivependingin">待入库</router-link></span>
-                    </el-menu-item>
-                    <el-menu-item index="204">
-                      <i class="el-icon-finished"></i>
-                      <span slot="title"><router-link to="/record/archiveoutgoing/archiveborrowcompleted">已完成</router-link></span>
-                    </el-menu-item>
-                    
-                  </el-submenu>
-                </div>
-          </el-menu>
-          </div>
-        </el-aside>
-        <el-main>
-          <transition name="fade" mode="out-in">
-            <router-view></router-view>
-          </transition>
-        </el-main>
-      </el-container>
+  <DataLayout>
+    <template v-slot:header style="height: auto"></template>
+    <template v-slot:main>
+      <el-tabs v-model="activeName" @tab-click="handleClick">
+        <el-tab-pane label="待出库" name="ArchivePendingOut">
+          <ArchivePendingOut v-if="isArchivePendingOut"></ArchivePendingOut>
+        </el-tab-pane>
+        <el-tab-pane label="待入库" name="ArchivePendingIn">
+          <ArchivePendingIn v-if="isArchivePendingIn"></ArchivePendingIn>
+        </el-tab-pane>
+        <el-tab-pane label="已完成" name="ArchiveBorrowcompleted">
+          <ArchiveBorrowcompleted v-if="isArchiveBorrowcompleted"></ArchiveBorrowcompleted>
+        </el-tab-pane>
+      </el-tabs>
+    </template>
+  </DataLayout>
 </template>
 <script type="text/javascript">
+import DataLayout from "@/components/ecm-data-layout";
+import ArchivePendingOut from "@/views/record/ArchivePendingOut.vue";
+import ArchivePendingIn from "@/views/record/ArchivePendingIn.vue"
+import ArchiveBorrowcompleted from "@/views/record/ArchiveBorrowcompleted.vue"
+
 export default {
   name: "archiveoutgoing",
-  permit: 1,
   data() {
-        return {
-            menuHeight: window.innerHeight -64
-        }
-        
-    },
-    mounted(){
-      this.$router.replace({
-        path:"/record/archiveoutgoing/archivependingout"
+    return {
+      activeName:"ArchivePendingOut",
+      isArchivePendingOut:true,
+      isArchivePendingIn:false,
+      isArchiveBorrowcompleted:false,
+    }  
+  },
+  mounted(){
+    if (!this.validataPermission()) {
+      //跳转至权限提醒页
+      let _self = this;
+      _self.$nextTick(() => {
+        _self.$router.push({ path: "/NoPermission" });
       });
-    },
-    methods: {
-
     }
+  },
+  methods: {
+    handleClick(tab) {
+      if(tab.name == "ArchivePendingOut") {
+        this.isArchivePendingOut=true;
+        this.isArchivePendingIn=false;
+        this.isArchiveBorrowcompleted=false;
+      } else if(tab.name == "ArchivePendingIn") {
+        this.isArchivePendingOut=false;
+        this.isArchivePendingIn=true;
+        this.isArchiveBorrowcompleted=false;
+      }else if(tab.name == "ArchiveBorrowcompleted") {
+        this.isArchivePendingOut=false;
+        this.isArchivePendingIn=false;
+        this.isArchiveBorrowcompleted=true;
+      }
+    }
+  },
+  components: {
+    DataLayout: DataLayout,
+    ArchivePendingOut:ArchivePendingOut,
+    ArchivePendingIn:ArchivePendingIn,
+    ArchiveBorrowcompleted:ArchiveBorrowcompleted,
+  },
 };
 </script>
 <style scoped>

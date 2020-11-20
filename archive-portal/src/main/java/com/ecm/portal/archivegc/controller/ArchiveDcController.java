@@ -6,7 +6,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,12 +22,22 @@ import com.ecm.core.ActionContext;
 import com.ecm.core.cache.manager.CacheManagerOper;
 import com.ecm.core.entity.EcmDefType;
 import com.ecm.core.entity.EcmDocument;
+import com.ecm.core.entity.EcmRelation;
 import com.ecm.core.service.DocumentService;
+import com.ecm.core.service.RelationService;
+import com.ecm.portal.controller.ControllerAbstract;
+import com.ecm.icore.service.IEcmSession;
 import com.ecm.portal.controller.ControllerAbstract;
 @Controller
 public class ArchiveDcController extends ControllerAbstract{
+	private Logger log = LoggerFactory.getLogger(ArchiveDcController.class);
+	private int	AN;				//案卷
+	private int WJ;				//文件
 	@Autowired
 	DocumentService documentService;
+	
+	@Autowired
+	private RelationService relationService;
 	
 	@RequestMapping(value = "/dc/getEcmDefTypes", method = RequestMethod.POST)
 	@ResponseBody
@@ -65,5 +78,126 @@ public class ArchiveDcController extends ControllerAbstract{
 		
 		return mp;
 		
+	}
+	/**
+	 * 保存驳回原因
+	 * @param argStr
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/dc/savePenNot", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> savePenNot(@RequestBody String argStr) throws Exception {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			
+			Map<String, Object> args= JSONUtils.stringToMap(argStr);
+			String idsStr=args.get("ids").toString();
+			String comment=args.get("comment").toString();
+			List<String> idsList=JSONUtils.stringToArray(idsStr);
+			String userName= this.getSession().getCurrentUser().getUserName();
+			for (String id : idsList) {
+				EcmDocument doc= documentService.getObjectById(getToken(), id);
+				doc.addAttribute("C_REJECT_COMMENT", comment);
+				doc.addAttribute("C_REJECTOR", userName);
+				documentService.updateObject(getToken(), doc,null);
+			}
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("msg", "保存成功");
+			return mp;
+		}catch (Exception e) {
+			// TODO: handle exception
+			log.error(e.getMessage());
+			e.printStackTrace();
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("msg", "保存失败");
+			return mp;
+		}
+	}
+	@RequestMapping(value = "/dc/Archivepending", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> ArchivePendingout(String metaData,String ID) throws Exception {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+//		Map<String, Object> args1 = JSONUtils.stringToMap(ID);
+//		String idsStr=args1.get("ID").toString();
+		List<String> list = JSONUtils.stringToArray(ID);
+		String status = args.get("status").toString();
+		String parentId=args.get("parentID").toString();
+		if(args.get("type").toString().equals("主表")) {
+			//主表
+			for (String id : list) {
+				documentService.updateStatus(getToken(), id,status);
+				//获取主表的文件所有子表
+				String sql="ID IN (select CHILD_ID from ecm_relation where PARENT_ID='"+id+"')";
+				List<Map<String, Object>> result =documentService.getObjectMap(getToken(), sql);
+				for(Map<String,Object> ids:result) {
+					documentService.updateStatus(getToken(), ids.get("ID").toString(), status);
+				}
+			}
+			mp.put("al", true);
+		}else {//子表
+			for (String id : list) {
+				documentService.updateStatus(getToken(),id, status);
+			}
+			//获取主表的文件所有子表
+			String sql="STATUS <>'"+status+"' AND ID IN (select CHILD_ID from ecm_relation where PARENT_ID='"+parentId+"')";
+			List<Map<String, Object>> result =documentService.getObjectMap(getToken(), sql);
+			boolean al = true;
+			if(result != null && result.size() > 0) {
+				al = false;
+			}
+			if(al) {
+				documentService.updateStatus(getToken(), parentId, status);
+			}
+			mp.put("al", al);
+		}
+		mp.put("code", ActionContext.SUCESS);
+		return mp;
+	}
+	
+	
+	@RequestMapping(value = "/dc/countDocuments", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> countDocuments(@RequestBody String metadata) throws Exception {
+		AN = 0;
+		WJ = 0;								//初始化计数器
+		String type = "未识别";
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Map<String, Object> args = JSONUtils.stringToMap(metadata);
+		Object childObj=args.get("childFileId");
+		if(childObj!=null&&!"".equals(childObj.toString())) {
+			String childFileIds=childObj.toString();
+			List<String> childIdList= JSONUtils.stringToArray(childFileIds);
+			if(childIdList.size()<10) {
+				mp.put("code", "0");			//数量处于绝对少数，无需向领导请示
+				return mp;
+			}
+			if(childIdList.size()>50) {
+				mp.put("code", "1");            //数量处于绝对多数，无需判断，必须向领导请示
+				return mp;
+			}
+			for(int i=0;childIdList!=null&&i<childIdList.size();i++) {
+				
+				String id = childIdList.get(i);
+				Map<String,Object> temp = documentService.getObjectMapById(getToken(), id);
+				if(temp.get("C_ITEM_TYPE")!=null) {
+					type = temp.get("C_ITEM_TYPE").toString();
+				}
+				if(type.equals("案卷")) {
+					AN++;
+				}
+				if(type.equals("文件")) {
+					WJ++;
+				}
+			}
+			if(AN>10||WJ>50) {
+				mp.put("code",1);
+			}
+			else {
+				mp.put("code", 0);
+			}
+		}
+		return mp;
 	}
 }

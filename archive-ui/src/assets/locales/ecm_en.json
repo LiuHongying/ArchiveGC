@@ -626,7 +626,9 @@
     "enterContent":"Please Enter Content",
     "PleaseSelectDC":"Please select document",
     "PleaseSelectOneData":"Please select only one data",
-    "classicName":"Classic Name"
+    "classicName":"Classic Name",
+    "PleaseSelectOneOrMoreData":"Please select one or more data！",
+    "PleaseInputData":"Please input description"
 },
 "field": {
     "indexNumber":"S/N",
