@@ -400,7 +400,7 @@ export default {
     //删除关系
     DelRelation(){
       let _self = this;
-      if(_self.selectedDCItems==''||_self.inputValueNum==undefined){
+      if(_self.selectedDCItems==''||_self.selectedDCItems==undefined){
         _self.$message({
             showClose: true,
             message:"请选择一个文档",
