@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +27,7 @@ import com.ecm.core.service.RelationService;
 import com.ecm.portal.controller.ControllerAbstract;
 @Controller
 public class ArchiveDcController extends ControllerAbstract{
+	private Logger log = LoggerFactory.getLogger(ArchiveDcController.class);
 	@Autowired
 	DocumentService documentService;
 	
@@ -71,6 +74,41 @@ public class ArchiveDcController extends ControllerAbstract{
 		return mp;
 		
 	}
+	/**
+	 * 保存驳回原因
+	 * @param argStr
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/dc/savePenNot", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> savePenNot(@RequestBody String argStr) throws Exception {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			
+			Map<String, Object> args= JSONUtils.stringToMap(argStr);
+			String idsStr=args.get("ids").toString();
+			String comment=args.get("comment").toString();
+			List<String> idsList=JSONUtils.stringToArray(idsStr);
+			String userName= this.getSession().getCurrentUser().getUserName();
+			for (String id : idsList) {
+				EcmDocument doc= documentService.getObjectById(getToken(), id);
+				doc.addAttribute("C_REJECT_COMMENT", comment);
+				doc.addAttribute("C_REJECTOR", userName);
+				documentService.updateObject(getToken(), doc,null);
+			}
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("msg", "保存成功");
+			return mp;
+		}catch (Exception e) {
+			// TODO: handle exception
+			log.error(e.getMessage());
+			e.printStackTrace();
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("msg", "保存失败");
+			return mp;
+		}
+	}
 	@RequestMapping(value = "/dc/Archivepending", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> ArchivePendingout(String metaData,String ID) throws Exception {
@@ -112,4 +150,5 @@ public class ArchiveDcController extends ControllerAbstract{
 		mp.put("code", ActionContext.SUCESS);
 		return mp;
 	}
+	
 }
