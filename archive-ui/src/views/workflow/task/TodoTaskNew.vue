@@ -186,6 +186,8 @@ import TaskTestForm1 from "@/components/form/TaskTestForm1.vue";
 import EditTask from "@/views/workflow/task/EditTask.vue";
 import DocViewTask from "@/views/workflow/task/DocViewTask.vue";
 import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue"
+import BorrowView from "@/views/workflow/BorrowView.vue"
+import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
 import borrow1 from "@/components/form/Borrow1.vue";
 import CommonView from "@/views/workflow/CommonView.vue";
 import UpdateDocContent from "@/views/workflow/LinkMainAttachmentFile.vue";
@@ -194,6 +196,8 @@ export default {
   name: "TodoTask",
   permit: 1,
   components: {
+    BorrowViewReadOnly:BorrowViewReadOnly,
+    BorrowView:BorrowView,
     UserSelectInput: UserSelectInput,
     TaskTestForm1: TaskTestForm1,
     EditTask: EditTask,
