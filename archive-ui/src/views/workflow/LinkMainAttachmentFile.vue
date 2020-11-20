@@ -4,7 +4,7 @@
             <!-- 创建附件 -->
             <el-dialog :title="$t('application.Import')" :visible.sync="importdialogVisible" width="70%" :close-on-click-modal="false" :append-to-body="true">
                 <el-form size="mini" :label-width="formLabelWidth" v-loading='uploading'>
-                    <div style="height:200px;overflow-y:scroll; overflow-x:scroll;">
+                    <div style="height:150px;overflow-y:scroll; overflow-x:scroll;">
                     <el-upload
                         :limit="100"
                         :file-list="fileList"
@@ -15,6 +15,13 @@
                     >
                         <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
                     </el-upload>
+                    </div>
+                    <div style="height:100px;">
+                    <el-input
+                    type="textarea"
+                    placeholder="请输入具体修改内容"
+                    v-model="changeDetail">
+                    </el-input>
                     </div>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
@@ -41,14 +48,6 @@
             :typeName="typeName"
             ></ShowPropertyReadOnly>
             </template>
-            <!-- <el-form :inline="true" :model="filters" @submit.native.prevent>
-            <el-form-item>
-                <el-button type="primary" @click="beforImport($refs.mainDataGrid,false,'','/系统配置/导入模板/文函')">{{$t('application.Manual')+$t('application.Import')}}</el-button>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="updateDocContent()">{{$t('application.replace')}}</el-button>
-            </el-form-item>
-            </el-form> -->
         </template>
         <template v-slot:main="{layout}">
             <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
@@ -96,11 +95,11 @@
                                     dataUrl="/dc/getDocuByRelationParentId"
                                     v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
                                     v-bind:isshowOption="true" v-bind:isshowSelection ="true"
-                                    gridViewName="AttachmentGrid"
+                                    gridViewName="ChangeAttachmentGrid"
                                     condition=" and a.NAME='irel_children'"
                                     :optionWidth = "2"
                                     :isshowCustom="false"
-                                    :isEditProperty="false"
+                                    :isEditProperty="true"
                                     :isShowMoreOption="true"
                                     showOptions="查看内容,查看属性"
                                     :isShowChangeList="false"
@@ -170,7 +169,8 @@ export default {
             isShowRelevant:true,
             selectedTabName:'t03',
             docId:"",
-            isOnly:false
+            isOnly:false,
+            changeDetail:""
         }
     },
     created(){
@@ -261,9 +261,10 @@ export default {
             data["parentDocId"] = _self.parentId;//_self.selectedInnerItems[0].ID;//_self.selectedFileId;
             data["relationName"]='irel_children';
             data["TYPE_NAME"]='附件';
+            data["C_COMMENT1"]=_self.changeDetail
+            _self.changeDetail=""
             formdata.append("metaData", JSON.stringify(data));
             _self.fileList.forEach(function(file) {
-                //console.log(file.name);
                 formdata.append("uploadFile", file.raw, file.name);
             });
             return formdata;

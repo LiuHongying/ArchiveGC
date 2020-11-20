@@ -93,14 +93,16 @@
                             key="main"
                             dataUrl="/dc/getDocuByRelationParentId"
                             :parentId="formId"
-                            v-bind:tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
-                            v-bind:isshowOption="true" v-bind:isshowSelection ="true"
+                            :tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
+                            :isshowOption="true" 
+                            :isshowSelection ="true"
                             gridViewName="ModifyDocGrid"
                             condition=" and a.name = 'irel_children' "
                             :optionWidth = "2"
                             :isshowCustom="false"
-                            :isEditProperty="true"
-                            showOptions="查看内容"
+                            :isEditProperty="false"
+                            showOptions="查看内容,查看属性"
+                            :isShowPropertyButton="false"
                             :isShowChangeList="false"
                             @rowclick="rowClick"
                             @selectchange="selectChange"
@@ -109,18 +111,6 @@
                     <template slot="paneR">
                         <el-tabs  v-model="selectedTabName">
                             <el-tab-pane  :label="$t('application.Attachment')" name="t03" >
-                                <!-- <el-row>
-                                    <el-col :span="24">
-                                        <el-form :inline="true" :model="filters" @submit.native.prevent>
-                                            <el-form-item>
-                                            <el-button type="primary" @click="beforeUploadFile('/dc/addAttachment')">{{$t('application.new')}}</el-button>
-                                            </el-form-item>
-                                            <el-form-item>
-                                            <el-button type="warning" @click="onDeleleItem(selectedAttachment,[$refs.attachmentDoc])">{{$t('application.delete')}}</el-button>
-                                            </el-form-item>
-                                        </el-form>
-                                    </el-col>
-                                </el-row> -->
                                 <!--列表-->
                                 <DataGrid
                                     ref="attachmentDoc"
@@ -128,12 +118,13 @@
                                     dataUrl="/dc/getDocuByRelationParentId"
                                     v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
                                     v-bind:isshowOption="true" v-bind:isshowSelection ="true"
-                                    gridViewName="AttachmentGrid"
+                                    gridViewName="ChangeAttachmentGrid"
                                     condition=" and a.NAME='irel_children'"
                                     :optionWidth = "2"
                                     :isshowCustom="false"
-                                    :isEditProperty="true"
-                                    showOptions="查看内容"
+                                    :isEditProperty="false"
+                                    :isShowMoreOption="true"
+                                    showOptions="查看内容,查看属性"
                                     :isShowChangeList="false"
                                     @selectchange="attachmentDocSelect"
                                 ></DataGrid>
@@ -242,54 +233,12 @@ export default {
                 // this.$refs.subAttachment.docId=row.ID;
             });
         },
-        beforImport(obj,isSub,relationName,path){
-            if(relationName=='设计文件'||relationName=='会议纪要内容项'||relationName=='材料变更清单'){
-                if(this.parentId==''){
-                    this.$message({
-                    showClose: true,
-                    message:this.$t('message.noMainFile'),
-                    duration: 2000,
-                    type: 'warning'
-                    });
-                    return;
-                }
-            }
-            this.gridObj=obj;
-            this.$nextTick(()=>{
-                if(isSub){
-                    this.$refs.BatchImport.deliveryId=this.parentId;
-                    this.$refs.BatchImport.relationName=relationName;
-                    
-                }else{
-                    this.$refs.BatchImport.deliveryId='';
-                    this.$refs.BatchImport.relationName='';
-                }
-                this.$refs.BatchImport.tmpPath=path;
-                this.$refs.BatchImport.loadTemplate();
-            })
-        },
         attachmentDocSelect(val){
             this.selectedAttachment=val;
         },
         handleChange(file, fileList) {
             this.fileList = fileList;
         },
-        beforeUploadFile(uploadpath){
-            let _self=this;
-            if(_self.parentId==undefined||_self.parentId==''){
-                _self.$message({
-                        showClose: true,
-                        message: _self.$t('message.PleaseSelectOneFile'),
-                        duration: 2000,
-                        type: "warning"
-                    });
-                return;
-            }
-            _self.uploadUrl=uploadpath;
-            _self.fileList=[];
-            _self.importdialogVisible=true;
-        },
-
         getFormData() {
             let _self = this;
             let formdata = new FormData();
@@ -345,9 +294,31 @@ export default {
                 url:'/dc/updateDcContentById'
                 })
                 .then(function(data){
-                    console.log(data)
+                    if(data.data.code=="1"){
+                        _self.$message({
+                        showClose: true,
+                        message: _self.$t('application.update')+_self.$t('message.success'),
+                        duration: 2000,
+                        type: 'success'
+                    });
+                        // _self.$message("更新成功!");
+                    }else{
+                        _self.$message({
+                        showClose: true,
+                        message: _self.$t('application.update')+_self.$t('message.success'),
+                        duration: 2000,
+                        type: 'warning'
+                    });
+                    }
+                   
                 })
                 .catch(function(error) {
+                _self.$message({
+                        showClose: true,
+                        message: _self.$t('application.update')+_self.$t('message.success'),
+                        duration: 2000,
+                        type: 'warning'
+                    });
                 _self.uploading=false;
                 console.log(error);
                 });
@@ -436,6 +407,7 @@ export default {
                 _self.mainFileUploading = false;
             })
             .catch(function (error) {
+                _self.$message("更新失败!");
                 console.log(error);
                 _self.mainFileUploading = false;
             });
