@@ -320,6 +320,7 @@ export default {
               });
               _self.propertyVisible = false;
               _self.$refs.ThematicGrid.loadGridData();
+              _self.$refs.Drawing.itemDataList=[];
             } else {
               _self.$message({
                 showClose: true,
