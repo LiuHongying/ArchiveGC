@@ -42,12 +42,13 @@
           }}</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="propertyVisible = true"
-            >添加库(位)号</el-button
-          >
+          <el-button type="primary" @click="propertyVisible = true">添加库(位)号</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handOver()">移交入库</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click.native="exportData">{{$t('application.ExportExcel')}}</el-button>
         </el-form-item>
       </el-form>
     </template>
@@ -111,6 +112,7 @@
 <script type="text/javascript">
 import DataLayout from "@/components/ecm-data-layout";
 import DataGrid from "@/components/DataGrid";
+import ExcelUtil from "@/utils/excel.js";
 export default {
   name: "ArchiveHandOver",
   data() {
@@ -278,10 +280,29 @@ export default {
       this.$refs.subtabGrid.loadGridInfo();
       this.$refs.subtabGrid.loadGridData();
     },
+
+    exportData() {
+      var fileDate = new Date();
+      let fileDateStr =
+        fileDate.getFullYear() +
+        "" +
+        fileDate.getMonth() +
+        "" +
+        fileDate.getDate();
+      let params = {
+        gridName: "ArchiveHandOverGrid",
+        lang: "zh-cn",
+        condition: this.$refs.mainDataGrid.condition,
+        filename: "File_HandOver_" + fileDateStr + ".xlsx",
+        sheetname: "Result",
+      };
+      ExcelUtil.export(params);
+    },
   },
   components: {
     DataLayout: DataLayout,
     DataGrid: DataGrid,
+    ExcelUtil: ExcelUtil,
   },
 };
 </script>
