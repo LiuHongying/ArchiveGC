@@ -11,9 +11,9 @@
         v-dialogDrag
       >
         <el-col :span="24">
-          <el-form label-position="right" :model="pendForm" @submit.native.prevent>
-            <el-input type="textarea" :rows="6" v-model="pendForm.rejectComment" autocomplete="off"></el-input>
-          </el-form>
+        <el-form label-position="right" :model="pendForm" @submit.native.prevent>
+          <el-input type="textarea" :rows="6" v-model="pendForm.rejectComment" autocomplete="off"></el-input>
+        </el-form>
         </el-col>
         <div slot="footer" class="dialog-footer">
           <el-button @click="saveRejectComment" :loading="butt">{{$t('application.save')}}</el-button>
@@ -52,20 +52,15 @@
             <el-button type="primary" v-on:click="searchItem">{{$t('application.SearchData')}}</el-button>
           </el-form-item>
         </el-form>
-        <!--searchView
-        dataUrl="/dc/getDocuments"
-        gridViewName="WorkflowFileGrid"
-        :condition="searchFileCondition"
-        -->
         <DataGrid
           ref="searchDoc"
           key="searchDoc"
-          :dataUrl="param.searchViewUrl"
+          data-url="/dc/getDocuments"
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
-          :gridViewName="param.searchViewName"
-          :condition="searchFileCondition+param.searchViewCondition"
+          gridViewName="WorkflowFileGrid"
+          :condition="searchFileCondition"
           :optionWidth="1"
           :isShowMoreOption="false"
           :isshowCustom="false"
@@ -88,40 +83,27 @@
         :close-on-click-modal="false"
         v-dialogDrag
       >
-        <!--卷内文件列表
-        gridViewName="WorkflowFileGrid"
-        condition=" and a.NAME='irel_children'"
-        dataUrl="/dc/getDocuByRelationParentId"
-        -->
-        <el-row v-if="allowEdit">
-          <MountFile
-            :selectedItem="selectedInArchive"
-            :title="$t('application.ReplaceDoc')"
-          >{{$t('application.replace')}}</MountFile>
-        </el-row>
-        <el-row>
-          <DataGrid
-            ref="fileInArchiveList"
-            key="fileInArchiveList"
-            :parentId="archiveId"
-            v-bind:tableHeight="tableHeight"
-            v-bind:isshowOption="true"
-            v-bind:isshowSelection="true"
-            :dataUrl="param.childViewUrl"
-            :gridViewName="param.childViewName"
-            :condition="param.childviewCondition"
-            :optionWidth="1"
-            :isShowPropertyButton="false"
-            :isShowMoreOption="true"
-            :isshowCustom="false"
-            :isEditProperty="allowEdit"
-            :isShowChangeList="false"
-            :isshowicon="false"
-            showOptions="查看属性,查看内容"
-            :isshowPage="isShowPage"
-            @selectchange="selectInArchiveFile"
-          ></DataGrid>
-        </el-row>
+        <!--卷内文件列表-->
+        <DataGrid
+          ref="fileInArchiveList"
+          key="fileInArchiveList"
+          :parentId="archiveId"
+          data-url="/dc/getDocuByRelationParentId"
+          v-bind:tableHeight="tableHeight"
+          v-bind:isshowOption="true"
+          v-bind:isshowSelection="true"
+          gridViewName="WorkflowFileGrid"
+          condition=" and a.NAME='irel_children'"
+          :optionWidth="1"
+          :isShowPropertyButton="false"
+          :isShowMoreOption="true"
+          :isshowCustom="false"
+          :isEditProperty="allowEdit"
+          :isShowChangeList="false"
+          :isshowicon="false"
+          showOptions="查看属性,查看内容"
+          :isshowPage="isShowPage"
+        ></DataGrid>
         <div slot="footer" class="dialog-footer">
           <el-button @click="volumesFileVisible = false">{{$t('application.cancel')}}</el-button>
         </div>
@@ -129,78 +111,70 @@
     </template>
     <template v-slot:main="{layout}">
       <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
-        <!-- <div :style="{position:'relative',height: layout.height-startHeight+'px'}"> -->
+      <!-- <div :style="{position:'relative',height: layout.height-startHeight+'px'}"> -->
         <!-- <split-pane
           v-on:resize="onSplitResize"
           :min-percent="20"
           :default-percent="topPercent"
           split="horizontal"
         >
-        <template slot="paneL">-->
-        <el-tabs value="t01">
-          <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01">
-            <el-row v-if="allowEdit||isShowReject">
-              <el-col :span="24" style="text-align: left">
-                <el-form :inline="true" :model="filters" @submit.native.prevent>
-                  <template v-if="allowEdit">
-                    <el-form-item>
-                      <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
-                    </el-form-item>
-                    <el-form-item>
-                      <el-button type="warning">{{ $t("application.delete") }}</el-button>
-                    </el-form-item>
-                    <el-form-item>
-                      <MountFile
-                        :selectedItem="selectedArchives"
-                        :title="$t('application.ReplaceDoc')"
-                      >{{$t('application.replace')}}</MountFile>
-                    </el-form-item>
+          <template slot="paneL"> -->
+            <el-tabs value="t01">
+              <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01">
+                <el-row v-if="allowEdit||isShowReject">
+                  <el-col :span="24" style="text-align: left">
+                    <el-form :inline="true" :model="filters" @submit.native.prevent>
+                      <template v-if="allowEdit">
+                        <el-form-item>
+                          <el-button
+                            type="primary"
+                            @click="beforeAddFile"
+                          >{{ $t("application.new") }}</el-button>
+                        </el-form-item>
+                        <el-form-item>
+                          <el-button type="warning">{{ $t("application.delete") }}</el-button>
+                        </el-form-item>
+                      </template>
+                      <template v-if="isShowReject">
+                        <el-form-item>
+                          <el-button type="primary" @click="pendNot">{{ $t("application.pendNot") }}</el-button>
+                        </el-form-item>
+                      </template>
+                    </el-form>
+                  </el-col>
+                </el-row>
+                <!--列表-->
+                <DataGrid
+                  ref="fileList"
+                  key="fileList"
+                  :parentId="parentId"
+                  data-url="/dc/getDocuByRelationParentId"
+                  v-bind:tableHeight="tableHeight"
+                  v-bind:isshowOption="true"
+                  v-bind:isshowSelection="true"
+                  gridViewName="BorrowSequenceGrid"
+                  condition=" and a.NAME='irel_children'"
+                  :optionWidth="1"
+                  :isshowCustom="false"
+                  :isShowMoreOption="true"
+                  showOptions="查看内容,查看属性"
+                  :isShowPropertyButton="false"
+                  :isEditProperty="allowEdit"
+                  :isShowChangeList="false"
+                  :isshowicon="false"
+                  :isshowPage="isShowPage"
+                  @selectchange="archiveSelect"
+                  @dbclick="showVolumesFile"
+                >
+                  <template slot="sequee" slot-scope="scope">
+                      <span :style="(scope.data.row['C_REJECT_COMMENT']!=null
+                      &&scope.data.row['C_REJECT_COMMENT']!='')?{'background':'red'}:''">{{(scope.currentPage-1) * scope.pageSize+ scope.data.$index+1}}</span>
                   </template>
-                  <template v-if="isShowReject">
-                    <el-form-item>
-                      <el-button type="primary" @click="pendNot">{{ $t("application.pendNot") }}</el-button>
-                    </el-form-item>
-                  </template>
-                </el-form>
-              </el-col>
-            </el-row>
-            <!--列表 dataUrl="/dc/getDocuByRelationParentId"
-                gridViewName="WorkflowFileGrid"
-                condition=" and a.NAME='irel_children'"
-            -->
-            <DataGrid
-              ref="fileList"
-              key="fileList"
-              :parentId="parentId"
-              :dataUrl="param.archiveViewUrl"
-              v-bind:tableHeight="tableHeight"
-              v-bind:isshowOption="true"
-              v-bind:isshowSelection="true"
-              :gridViewName="param.archiveViewName"
-              :condition="param.archiveViewCondition"
-              :optionWidth="1"
-              :isshowCustom="false"
-              :isShowMoreOption="true"
-              showOptions="查看内容,查看属性"
-              :isShowPropertyButton="false"
-              :isEditProperty="allowEdit"
-              :isShowChangeList="false"
-              :isshowicon="false"
-              :isshowPage="isShowPage"
-              @selectchange="archiveSelect"
-              @dbclick="showVolumesFile"
-            >
-              <template slot="sequee" slot-scope="scope">
-                <span
-                  :style="(scope.data.row['C_REJECT_COMMENT']!=null
-                      &&scope.data.row['C_REJECT_COMMENT']!='')?{'background':'red'}:''"
-                >{{(scope.currentPage-1) * scope.pageSize+ scope.data.$index+1}}</span>
-              </template>
-            </DataGrid>
-          </el-tab-pane>
-        </el-tabs>
-        <!-- </template>
-        </split-pane>-->
+                </DataGrid>
+              </el-tab-pane>
+            </el-tabs>
+          <!-- </template>
+        </split-pane> -->
       </div>
     </template>
   </DataLayout>
@@ -214,7 +188,6 @@ import ExcelUtil from "@/utils/excel.js";
 import DataSelect from "@/components/ecm-data-select";
 import DataLayout from "@/components/ecm-data-layout";
 import AttachmentFile from "@/views/dc/AttachmentFile.vue";
-import MountFile from "@/components/MountFile.vue";
 export default {
   components: {
     ShowProperty: ShowProperty,
@@ -223,8 +196,7 @@ export default {
     DataSelect: DataSelect,
     RejectButton: RejectButton,
     DataLayout: DataLayout,
-    AttachmentFile: AttachmentFile,
-    MountFile:MountFile
+    AttachmentFile: AttachmentFile
   },
   model: {
     event: "change"
@@ -235,8 +207,7 @@ export default {
     parentId: { type: String, default: "" },
     processDefinitionId: { type: String, default: "" },
     activityName: { type: String, default: "" },
-    isShowReject: { type: Boolean, default: false },
-    param: { type: Object, default: null }
+    isShowReject: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -261,8 +232,8 @@ export default {
         typeName: "",
         relationName: ""
       },
-      pendForm: {
-        rejectComment: ""
+      pendForm:{
+        rejectComment:""
       },
       selectedFiles: [],
       butt: false,
@@ -270,65 +241,62 @@ export default {
       selectedArchives: [],
       archiveId: "", //案卷ID
       volumesFileVisible: false,
-      pendNotVisible: false,
-      selectedInArchive: []
+      pendNotVisible:false
     };
   },
   mounted() {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
-    selectInArchiveFile(val) {
-      this.selectedInArchive = val;
-    },
-    saveRejectComment() {
-      let _self = this;
-      if (_self.pendForm.rejectComment == "") {
-        _self.$message({
-          showClose: true,
-          message: _self.$t("message.PleaseInputData"),
-          duration: 2000,
-          type: "error"
-        });
-        return;
-      }
-      let ids = new Array();
-      _self.selectedArchives.forEach(function(e) {
-        ids.push(e.ID);
-      });
+    saveRejectComment(){
 
-      let m = new Map();
-      m.set("ids", ids);
-      m.set("comment", _self.pendForm.rejectComment);
-      axios
-        .post("/dc/savePenNot", JSON.stringify(m)) ///dc/getSelectList
-        .then(function(response) {
-          if (response.data.code == 1) {
-            _self.$message({
-              showClose: true,
-              message: _self.$t("message.saveSuccess"),
-              duration: 2000,
-              type: "success"
-            });
-            _self.pendNotVisible = false;
-          } else {
-            _self.$message({
-              showClose: true,
-              message: _self.$t("message.saveFailured"),
-              duration: 2000,
-              type: "error"
-            });
-          }
-        })
-        .catch(function(error) {
-          console.log(error);
-          _self.$message({
+      let _self=this;
+      if(_self.pendForm.rejectComment==""){
+        _self.$message({
             showClose: true,
-            message: _self.$t("message.saveFailured"),
+            message: _self.$t("message.PleaseInputData"),
             duration: 2000,
             type: "error"
           });
-        });
+          return;
+      }
+      let ids=new Array();
+      _self.selectedArchives.forEach(function(e){
+        ids.push(e.ID)
+      });
+
+      let m=new Map();
+      m.set("ids",ids);
+      m.set("comment",_self.pendForm.rejectComment);
+      axios.post("/dc/savePenNot",JSON.stringify(m))///dc/getSelectList
+                .then(function(response) {
+                if(response.data.code == 1){
+                    _self.$message({
+                      showClose: true,
+                      message: _self.$t("message.saveSuccess"),
+                      duration: 2000,
+                      type: "success"
+                    });
+                    _self.pendNotVisible=false;
+                }else{
+                  _self.$message({
+                      showClose: true,
+                      message: _self.$t("message.saveFailured"),
+                      duration: 2000,
+                      type: "error"
+                    });
+                }
+                })
+                .catch(function(error) {
+                console.log(error);
+                _self.$message({
+                      showClose: true,
+                      message: _self.$t("message.saveFailured"),
+                      duration: 2000,
+                      type: "error"
+                    });
+                });
+           
     },
     showVolumesFile(row) {
       let _self = this;
@@ -352,7 +320,7 @@ export default {
         });
         return;
       }
-      _self.pendNotVisible = true;
+      _self.pendNotVisible=true;
     },
     beforeAddFile() {
       let _self = this;

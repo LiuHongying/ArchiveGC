@@ -973,9 +973,6 @@ export default {
             let _self=this;
             let key="";
          
-            
-            
-            
             console.log(this.filters.status)
                console.log(this.isReject)
             if(_self.filters.status!=''){

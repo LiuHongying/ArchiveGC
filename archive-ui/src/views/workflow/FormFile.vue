@@ -69,7 +69,10 @@
                         <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
                       </el-form-item>
                       <el-form-item>
-                        <el-button type="warning">{{ $t("application.delete") }}</el-button>
+                        <el-button type="warning" @click="removeFile">{{ $t("application.delete") }}</el-button>
+                      </el-form-item>
+                      <el-form-item>
+                          <MountFile :selectedItem="selectedRemoveFiles"  :title="$t('application.ReplaceDoc')">{{$t('application.replace')}}</MountFile>
                       </el-form-item>
                     </el-form>
                   </el-col>
@@ -112,6 +115,7 @@ import ExcelUtil from "@/utils/excel.js";
 import DataSelect from "@/components/ecm-data-select";
 import DataLayout from "@/components/ecm-data-layout";
 import AttachmentFile from "@/views/dc/AttachmentFile.vue";
+import MountFile from '@/components/MountFile.vue';
 export default {
   components: {
     ShowProperty: ShowProperty,
@@ -120,7 +124,8 @@ export default {
     DataSelect: DataSelect,
     RejectButton: RejectButton,
     DataLayout: DataLayout,
-    AttachmentFile: AttachmentFile
+    AttachmentFile: AttachmentFile,
+    MountFile:MountFile
   },
    model: {
      prop:"files",
@@ -156,7 +161,8 @@ export default {
       },
       selectedFiles:[],
       butt:false,
-      searchFileCondition:""
+      searchFileCondition:"",
+      selectedRemoveFiles:[]
     };
   },
   mounted() {
@@ -172,6 +178,30 @@ export default {
       });
         
     },
+    relevantDocRVSelect(val){
+      this.selectedRemoveFiles=val;
+      
+    },
+    removeFile(){
+      let _self=this;
+      for(let i=0;i<_self.selectedRemoveFiles.length;i++){
+        let e=_self.selectedRemoveFiles[i];
+        for(let n=0;n<_self.$refs.fileList.itemDataList.length;n++){
+          if(e.ID==_self.$refs.fileList.itemDataList[n].ID){
+            _self.$refs.fileList.itemDataList.splice(n, 1);
+            n--;
+          }
+        }
+        _self.selectedRemoveFiles.splice(i,1);
+        i--;
+      }
+
+      _self.selectedRemoveFiles.forEach(e=>{
+
+        
+        
+      });
+    },
     fileSelect(val){
         this.selectedFiles=val;
     },
@@ -182,13 +212,13 @@ export default {
         }else{
             _self.selectedFiles.forEach(e=>{
                 let isContain=false;
-                _self.$refs.fileList.itemDataList.find((function(value) {
-                if(value === e) {
+                _self.$refs.fileList.itemDataList.find(function(value) {
+                if(value.ID === e.ID) {
                     isContain=true;
                     return;
                     //则包含该元素
                     }
-                }))
+                })
                 if(!isContain){
                     _self.$refs.fileList.itemDataList.push(e);
                 }

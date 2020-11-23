@@ -20,7 +20,7 @@
       :visible.sync="shopingCartDialogVisible"
       @close="shopingCartDialogVisible = false"
       width="95%"
-      style="width:100%"
+      style="width: 100%"
       custom-class="customWidth"
     >
       <!-- <ShopingCart
@@ -30,16 +30,28 @@
         v-bind:shopingCartForm="shopingCartForm"
       ></ShopingCart>-->
 
-      <router-view @showOrHiden="showOrHiden" ref="ShowShopingCart"></router-view>
+      <router-view
+        @showOrHiden="showOrHiden"
+        ref="ShowShopingCart"
+      ></router-view>
       <!-- <div slot="footer" class="dialog-footer">
         <router-link  to="/borroworder"   >借阅</router-link>
         </div>       -->
-                <!-- <router-link  to="/borroworder"></router-link> -->
-     </el-dialog>
-     <el-dialog title="文件列表" :visible.sync="itemDialogVisible" width="96%"  @close="itemDialogVisible = false">  
-      <InnerItemViewer ref='innerItemViewer' v-bind:id = "currentId" v-bind:tableHeight="innerTableHeight"></InnerItemViewer>
-     </el-dialog>
-     <el-dialog
+      <!-- <router-link  to="/borroworder"></router-link> -->
+    </el-dialog>
+    <el-dialog
+      title="文件列表"
+      :visible.sync="itemDialogVisible"
+      width="96%"
+      @close="itemDialogVisible = false"
+    >
+      <InnerItemViewer
+        ref="innerItemViewer"
+        v-bind:id="currentId"
+        v-bind:tableHeight="innerTableHeight"
+      ></InnerItemViewer>
+    </el-dialog>
+    <el-dialog
       :title="$t('application.property')"
       :visible.sync="propertyVisible"
       @close="propertyVisible = false"
@@ -54,7 +66,9 @@
         v-bind:typeName="currentFolder.typeName"
       ></ShowProperty>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
+        <el-button @click="propertyVisible = false">{{
+          $t("application.cancel")
+        }}</el-button>
       </div>
     </el-dialog>
     <el-dialog
@@ -69,239 +83,273 @@
         :indeterminate="columnsInfo.isIndeterminate"
         v-model="columnsInfo.checkAll"
         @change="handleCheckAllChange"
-      >全选</el-checkbox>
+        >全选</el-checkbox
+      >
       <el-checkbox-group v-model="showFields" @change="handleCheckedColsChange">
         <el-checkbox
           v-for="item in gridList"
           :label="item.attrName"
           :key="item.attrName"
-        >{{item.label}}</el-checkbox>
+          >{{ item.label }}</el-checkbox
+        >
       </el-checkbox-group>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="columnsInfo.dialogFormVisible=false" size="medium">{{$t('application.cancel')}}</el-button>
-        <el-button type="primary" @click="confirmShow" size="medium">确定</el-button>
+        <el-button
+          @click="columnsInfo.dialogFormVisible = false"
+          size="medium"
+          >{{ $t("application.cancel") }}</el-button
+        >
+        <el-button type="primary" @click="confirmShow" size="medium"
+          >确定</el-button
+        >
       </div>
     </el-dialog>
 
-    <div :style="{position:'relative',height: asideHeight+'px'}">
-      <split-pane split="vertical" @resize="resize" min-percent='10' :default-percent='15'>
-      <template slot="paneL">
-        
-            <el-breadcrumb style="padding-top:10px;padding-bottom:10px;">
-              <el-breadcrumb-item class="title16">
-                <i class="el-icon-receiving"></i>
-                &nbsp; {{$t('route.companyDoc')}}
-              </el-breadcrumb-item>
-            </el-breadcrumb>
-         
-         <el-container :style="{height:treeHeight+'px',width:asideWidth,overflow:'auto'}">
-         
-            <el-tree
-            style="width:100%;"
-            :props="defaultProps"
-            :data="dataList"
-            node-key="id"
-            :render-content="renderContent"
-            default-expand-all
-            highlight-current
-            @node-click="handleNodeClick"
-          ></el-tree>
-     
-         </el-container>
-      </template>
-     <template slot="paneR">
-        <el-row style="padding-top:4px;">
-          <el-col :span="4" class="topbar-input">
-           
-            <el-input
-              v-model="inputkey"
-              :placeholder="$t('message.pleaseInput')+$t('application.keyword')"
-              @change="searchItem"
-              prefix-icon="el-icon-search"
-            ></el-input>
-          </el-col>
-          <el-col :span="8" class="topbar-button">
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <!-- <el-button
-                type="primary"
-                plain
-                size="medium"
-                icon="el-icon-document"
-                @click="borrowItem()"
-            >{{$t('application.borrow')}}</el-button>-->
-            <el-button
-              type="primary"
-              plain
-              size="medium"
-              icon="el-icon-upload2"
-              @click="exportExcel()"
-            >{{$t('application.export')+'Excel'}}</el-button>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <template v-if="isFileAdmin">
-              <el-button
-                type="primary"
-                plain
-                size="medium"
-                icon="el-icon-bottom"
-                @click="obtainItem()"
-              >{{$t('application.obtained')}}</el-button>
-              <el-button
-                type="primary"
-                plain
-                size="medium"
-                icon="el-icon-document-delete"
-                @click="destroyItem()"
-              >{{$t('application.destroy')}}</el-button>
-            </template>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <el-button
-              type="primary"
-              plain
-              size="medium"
-              icon="el-icon-folder-add"
-              @click="addToShopingCart()"
-            >{{$t('application.addToShopingCart')}}</el-button>
-          </el-col>
-          <el-col :span="3" class="topbar-button">
-            <BorrwoForm></BorrwoForm>
-          </el-col>
-          <el-col>
-            <template v-if="isFileAdmin">
-              <!-- `checked` 为 true显示卷宗 或 false不显示卷宗 -->
-              <el-checkbox
-                v-model="showBox"
-                :disabled="disable"
-                @change="showFileBox"
-              >{{$t('application.show')+$t('application.fileBox')}}</el-checkbox>
-            </template>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-table
-            :height="tableHeight"
-            :data="itemDataList"
-            border
-            v-loading="tableLoading"
-            @selection-change="selectChange"
-            @sort-change="sortchange"
-            style="width: 100%"
-            @header-dragend="onHeaderDragend"
-            fit
+    <div :style="{ position: 'relative', height: asideHeight + 'px' }">
+      <split-pane
+        split="vertical"
+        @resize="resize"
+        min-percent="10"
+        :default-percent="15"
+      >
+        <template slot="paneL">
+          <el-breadcrumb style="padding-top: 10px; padding-bottom: 10px">
+            <el-breadcrumb-item class="title16">
+              <i class="el-icon-receiving"></i>
+              &nbsp; {{ $t("route.companyDoc") }}
+            </el-breadcrumb-item>
+          </el-breadcrumb>
+
+          <el-container
+            :style="{
+              height: treeHeight + 'px',
+              width: asideWidth,
+              overflow: 'auto',
+            }"
           >
-            <el-table-column type="selection" @selection-change="selectChange" width="50"></el-table-column>
-            <el-table-column :label="$t('field.indexNumber')" width="70">
-              <template slot-scope="scope">
-                <span>{{(currentPage-1) * pageSize + scope.$index+1}}</span>
-              </template>
-            </el-table-column>
-            <el-table-column width="40">
-              <template slot-scope="scope">
-                <img
-                  v-if="scope.row.TYPE_NAME=='图册'"
-                  :src="'./static/img/drawing.gif'"
-                  :title="scope.row.TYPE_NAME"
-                  border="0"
-                />
-                <img
-                  v-else-if="scope.row.TYPE_NAME=='卷盒'"
-                  :src="'./static/img/box.gif'"
-                  :title="scope.row.TYPE_NAME"
-                  border="0"
-                />
-                <img
-                  v-else-if="scope.row.FORMAT_NAME==null || scope.row.FORMAT_NAME==''"
-                  :src="'./static/img/format/f_undefined_16.gif'"
-                  title="无电子文件"
-                  border="0"
-                />
-                <img
-                  v-else
-                  :src="'./static/img/format/f_'+scope.row.FORMAT_NAME+'_16.gif'"
-                  :title="scope.row.FORMAT_NAME"
-                  border="0"
-                />
-              </template>
-            </el-table-column>>
-            <div v-for="(citem,idx) in gridList" :key="idx">
-              <div v-if="citem.visibleType==1">
-                <el-table-column
-                  v-if="(citem.width+'').indexOf('%')>0"
-                  :label="citem.label"
-                  :prop="citem.attrName"
-                  :min-width="citem.width"
-                  :sortable="citem.allowOrderby"
+            <el-tree
+              style="width: 100%"
+              :props="defaultProps"
+              :data="dataList"
+              node-key="id"
+              :render-content="renderContent"
+              default-expand-all
+              highlight-current
+              @node-click="handleNodeClick"
+            ></el-tree>
+          </el-container>
+        </template>
+        <template slot="paneR">
+          <el-form :inline="true">
+            <el-form-item>
+              <el-input
+                v-model="inputkey"
+                :placeholder="
+                  $t('message.pleaseInput') + $t('application.keyword')
+                "
+                @change="searchItem"
+                prefix-icon="el-icon-search"
+              ></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                type="primary"
+                plain
+                size="medium"
+                icon="el-icon-upload2"
+                @click="exportExcel()"
+                >{{ $t("application.export") + "Excel" }}</el-button
+              >
+            </el-form-item>
+            <el-form-item>
+              <template v-if="isFileAdmin">
+                <el-button
+                  type="primary"
+                  plain
+                  size="medium"
+                  icon="el-icon-bottom"
+                  @click="obtainItem()"
+                  >{{ $t("application.obtained") }}</el-button
                 >
-                  <template slot-scope="scope">
-                    <div v-if="citem.attrName.indexOf('DATE')>0">
-                      <span>{{dateFormat(scope.row[citem.attrName])}}</span>
-                    </div>
-                    <div v-else>
-                      <span @click="rowClick(scope.row)">{{scope.row[citem.attrName]}}</span>
-                    </div>
-                  </template>
-                </el-table-column>
-                <el-table-column
-                  v-else
-                  :label="citem.label"
-                  :prop="citem.attrName"
-                  :width="citem.width"
-                  :sortable="citem.allowOrderby"
+                <el-button
+                  type="primary"
+                  plain
+                  size="medium"
+                  icon="el-icon-document-delete"
+                  @click="destroyItem()"
+                  >{{ $t("application.destroy") }}</el-button
                 >
-                  <template slot-scope="scope">
-                    <div v-if="citem.attrName.indexOf('DATE')>0">
-                      <span>{{dateFormat(scope.row[citem.attrName])}}</span>
-                    </div>
-                    <div v-else>
-                      <span @click="rowClick(scope.row)">{{scope.row[citem.attrName]}}</span>
-                    </div>
-                  </template>
-                </el-table-column>
+              </template>
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                type="primary"
+                plain
+                size="medium"
+                icon="el-icon-folder-add"
+                @click="addToShopingCart()"
+                >{{ $t("application.addToShopingCart") }}</el-button
+              >
+            </el-form-item>
+            <el-form-item>
+              <BorrwoForm></BorrwoForm>
+            </el-form-item>
+            <el-form-item>
+              <template v-if="isFileAdmin">
+                <!-- `checked` 为 true显示卷宗 或 false不显示卷宗 -->
+                <el-checkbox
+                  v-model="showBox"
+                  :disabled="disable"
+                  @change="showFileBox"
+                  >{{
+                    $t("application.show") + $t("application.fileBox")
+                  }}</el-checkbox
+                >
+              </template>
+            </el-form-item>
+          </el-form>
+          <el-row>
+            <el-table
+              :height="tableHeight"
+              :data="itemDataList"
+              border
+              v-loading="tableLoading"
+              @selection-change="selectChange"
+              @sort-change="sortchange"
+              style="width: 100%"
+              @header-dragend="onHeaderDragend"
+              fit
+            >
+              <el-table-column
+                type="selection"
+                @selection-change="selectChange"
+                width="50"
+              ></el-table-column>
+              <el-table-column :label="$t('field.indexNumber')" width="70">
+                <template slot-scope="scope">
+                  <span>{{
+                    (currentPage - 1) * pageSize + scope.$index + 1
+                  }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column width="40">
+                <template slot-scope="scope">
+                  <img
+                    v-if="scope.row.TYPE_NAME == '图册'"
+                    :src="'./static/img/drawing.gif'"
+                    :title="scope.row.TYPE_NAME"
+                    border="0"
+                  />
+                  <img
+                    v-else-if="scope.row.TYPE_NAME == '卷盒'"
+                    :src="'./static/img/box.gif'"
+                    :title="scope.row.TYPE_NAME"
+                    border="0"
+                  />
+                  <img
+                    v-else-if="
+                      scope.row.FORMAT_NAME == null ||
+                      scope.row.FORMAT_NAME == ''
+                    "
+                    :src="'./static/img/format/f_undefined_16.gif'"
+                    title="无电子文件"
+                    border="0"
+                  />
+                  <img
+                    v-else
+                    :src="
+                      './static/img/format/f_' +
+                      scope.row.FORMAT_NAME +
+                      '_16.gif'
+                    "
+                    :title="scope.row.FORMAT_NAME"
+                    border="0"
+                  />
+                </template> </el-table-column
+              >>
+              <div v-for="(citem, idx) in gridList" :key="idx">
+                <div v-if="citem.visibleType == 1">
+                  <el-table-column
+                    v-if="(citem.width + '').indexOf('%') > 0"
+                    :label="citem.label"
+                    :prop="citem.attrName"
+                    :min-width="citem.width"
+                    :sortable="citem.allowOrderby"
+                  >
+                    <template slot-scope="scope">
+                      <div v-if="citem.attrName.indexOf('DATE') > 0">
+                        <span>{{ dateFormat(scope.row[citem.attrName]) }}</span>
+                      </div>
+                      <div v-else>
+                        <span @click="rowClick(scope.row)">{{
+                          scope.row[citem.attrName]
+                        }}</span>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column
+                    v-else
+                    :label="citem.label"
+                    :prop="citem.attrName"
+                    :width="citem.width"
+                    :sortable="citem.allowOrderby"
+                  >
+                    <template slot-scope="scope">
+                      <div v-if="citem.attrName.indexOf('DATE') > 0">
+                        <span>{{ dateFormat(scope.row[citem.attrName]) }}</span>
+                      </div>
+                      <div v-else>
+                        <span @click="rowClick(scope.row)">{{
+                          scope.row[citem.attrName]
+                        }}</span>
+                      </div>
+                    </template>
+                  </el-table-column>
+                </div>
               </div>
-            </div>
-            <el-table-column align="left" width="140">
-              <template slot="header">
-                <el-button
-                  icon="el-icon-s-grid"
-                  size="small"
-                  @click="dialogFormShow"
-                  title="选择展示字段"
-                ></el-button>
-              </template>
-              <template slot-scope="scope">
-                <el-button
-                  type="primary"
-                  plain
-                  size="small"
-                  :title="$t('application.viewContent')"
-                  icon="el-icon-picture-outline"
-                  @click="showItemContent(scope.row)"
-                ></el-button>
-                <el-button
-                  type="primary"
-                  plain
-                  size="small"
-                  :title="$t('application.property')"
-                  icon="el-icon-info"
-                  @click="showItemProperty(scope.row)"
-                ></el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-          <el-pagination
-            background
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="currentPage"
-            :page-sizes="[10, 20, 50, 100, 200]"
-            :page-size="pageSize"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="itemCount"
-          ></el-pagination>
-        </el-row>
-     </template>
+              <el-table-column align="left" width="140">
+                <template slot="header">
+                  <el-button
+                    icon="el-icon-s-grid"
+                    size="small"
+                    @click="dialogFormShow"
+                    title="选择展示字段"
+                  ></el-button>
+                </template>
+                <template slot-scope="scope">
+                  <el-button
+                    type="primary"
+                    plain
+                    size="small"
+                    :title="$t('application.viewContent')"
+                    icon="el-icon-picture-outline"
+                    @click="showItemContent(scope.row)"
+                  ></el-button>
+                  <el-button
+                    type="primary"
+                    plain
+                    size="small"
+                    :title="$t('application.property')"
+                    icon="el-icon-info"
+                    @click="showItemProperty(scope.row)"
+                  ></el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-pagination
+              background
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="currentPage"
+              :page-sizes="[10, 20, 50, 100, 200]"
+              :page-size="pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="itemCount"
+            ></el-pagination>
+          </el-row>
+        </template>
       </split-pane>
     </div>
-    
   </div>
 </template>
 <script>
@@ -312,28 +360,28 @@ export default {
   components: {
     ShowProperty: ShowProperty,
     InnerItemViewer: InnerItemViewer,
-    BorrwoForm: BorrwoForm
+    BorrwoForm: BorrwoForm,
   },
   data() {
     return {
       currentuser: {
         user: {},
-        roles: []
+        roles: [],
       },
       columnsInfo: {
         checkAll: true,
         dialogFormVisible: false,
-        isIndeterminate: false
+        isIndeterminate: false,
       },
       innerTableHeight: window.innerHeight - 360,
       tableHeight: window.innerHeight - 170,
       asideHeight: window.innerHeight - 100,
       treeHeight: window.innerHeight - 120,
-      asideWidth: '100%',
+      asideWidth: "100%",
       currentLanguage: "zh-cn",
       propertyVisible: false,
       loading: false,
-      tableLoading:false,
+      tableLoading: false,
       currentFolder: [],
       isFileAdmin: false,
       showFields: [],
@@ -350,7 +398,7 @@ export default {
       selectedItemId: "",
       defaultProps: {
         children: "children",
-        label: "name"
+        label: "name",
       },
       selectedItemList: [],
       itemDialogVisible: false,
@@ -363,21 +411,21 @@ export default {
       borrowDialogVisible: false,
       shopingCartDialogVisible: false,
       defaultData: {
-        gridView: "GeneralGrid"
+        gridView: "GeneralGrid",
       },
       borrowForm: {
         taskId: 0,
         result: "在线浏览",
-        message: ""
-      }
+        message: "",
+      },
     };
   },
   created() {
     var username = sessionStorage.getItem("access-userName");
     let _self = this;
-    axios.post("/user/getGroupByUserName", username).then(function(response) {
+    axios.post("/user/getGroupByUserName", username).then(function (response) {
       var groupList = response.data.data;
-      groupList.forEach(function(val, index, arr) {
+      groupList.forEach(function (val, index, arr) {
         if (val.name == "档案管理员") {
           _self.isFileAdmin = true;
         }
@@ -395,21 +443,21 @@ export default {
     _self.loading = true;
     axios
       .post("/admin/getArchivesFolder", 0)
-      .then(function(response) {
+      .then(function (response) {
         _self.dataList = response.data.data;
         // console.log(JSON.stringify(_self.dataList));
         _self.loading = false;
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error);
         _self.loading = false;
       });
     _self.loadGridInfo(_self.defaultData);
   },
   methods: {
-     resize() {
+    resize() {
       //console.log('resize')
-      this.asideWidth = '100%';
+      this.asideWidth = "100%";
     },
     // 加载表格样式
     initGridInfo() {
@@ -420,17 +468,17 @@ export default {
       m.set("lang", _self.currentLanguage);
       axios
         .post("/dc/getGridViewInfo", JSON.stringify(m))
-        .then(function(response) {
+        .then(function (response) {
           _self.showFields = [];
           _self.gridList = response.data.data;
-          _self.gridList.forEach(element => {
+          _self.gridList.forEach((element) => {
             if (element.visibleType == 1) {
               _self.showFields.push(element.attrName);
             }
           });
           _self.loading = false;
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
           _self.loading = false;
         });
@@ -439,13 +487,13 @@ export default {
       this.currentId = row.ID;
       if (row.TYPE_NAME == "卷盒" || row.TYPE_NAME == "图册") {
         this.itemDialogVisible = true;
-        let _self=this;
-        setTimeout(()=>{
+        let _self = this;
+        setTimeout(() => {
           _self.$refs.innerItemViewer.loadGridInfo();
-        },10);
+        }, 10);
       }
     },
-    renderContent: function(h, { node, data, store }) {
+    renderContent: function (h, { node, data, store }) {
       if (data.extended) {
         return (
           <span>
@@ -468,9 +516,9 @@ export default {
       let href = this.$router.resolve({
         path: "/viewdoc",
         query: {
-          id: condition
+          id: condition,
           //token: sessionStorage.getItem('access-token')
-        }
+        },
       });
       //console.log(href);
       window.open(href.href, "_blank");
@@ -484,13 +532,13 @@ export default {
         _self.loading = true;
         axios
           .post("/admin/getFolder", indata.id)
-          .then(function(response) {
+          .then(function (response) {
             indata.children = response.data.data;
             //console.log(JSON.stringify(indata));
             indata.extended = true;
             _self.loading = false;
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.log(error);
             _self.loading = false;
           });
@@ -520,17 +568,17 @@ export default {
       m.set("lang", _self.currentLanguage);
       axios
         .post("/dc/getGridViewInfo", JSON.stringify(m))
-        .then(function(response) {
+        .then(function (response) {
           _self.showFields = [];
           _self.gridList = response.data.data;
-          _self.gridList.forEach(element => {
+          _self.gridList.forEach((element) => {
             if (element.visibleType == 1) {
               _self.showFields.push(element.attrName);
             }
           });
           _self.loading = false;
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
           _self.loading = false;
         });
@@ -538,7 +586,7 @@ export default {
     // 加载表格数据
     loadGridData(indata) {
       let _self = this;
-      _self.tableLoading = true
+      _self.tableLoading = true;
       var key = _self.inputkey;
       var m = new Map();
       m.set("gridName", indata.gridView);
@@ -549,11 +597,11 @@ export default {
       m.set("orderBy", "MODIFIED_DATE desc");
       axios
         .post("/dc/getExceptBoxDocuments", JSON.stringify(m))
-        .then(function(response) {
+        .then(function (response) {
           _self.itemDataList = response.data.data;
           _self.itemDataListFull = response.data.data;
           _self.itemCount = response.data.pager.total;
-          _self.tableHeight= window.innerHeight - 170;
+          _self.tableHeight = window.innerHeight - 170;
           //console.log(JSON.stringify(response.data.datalist));
           _self.tableLoading = false;
         });
@@ -571,7 +619,7 @@ export default {
       m.set("orderBy", "MODIFIED_DATE desc");
       axios
         .post("/dc/getContainBoxDocuments", JSON.stringify(m))
-        .then(function(response) {
+        .then(function (response) {
           _self.itemDataList = response.data.data;
           _self.itemDataListFull = response.data.data;
           _self.itemCount = response.data.pager.total;
@@ -595,7 +643,7 @@ export default {
     handleCheckAllChange(val) {
       this.showFields = [];
       if (val) {
-        this.gridList.forEach(element => {
+        this.gridList.forEach((element) => {
           this.showFields.push(element.attrName);
         });
       }
@@ -611,10 +659,10 @@ export default {
     //确认按钮显示哪些属性
     confirmShow() {
       let _self = this;
-      _self.gridList.forEach(element => {
+      _self.gridList.forEach((element) => {
         element.visibleType = 2;
       });
-      _self.showFields.forEach(element => {
+      _self.showFields.forEach((element) => {
         let item = _self.getgriditem(element);
         if (item) {
           item.visibleType = 1;
@@ -625,7 +673,7 @@ export default {
     getgriditem(attrName) {
       let _self = this;
       let ret = null;
-      _self.gridList.forEach(element => {
+      _self.gridList.forEach((element) => {
         if (element.attrName == attrName) {
           ret = element;
           return;
@@ -670,9 +718,9 @@ export default {
         m.set("orderBy", "MODIFIED_DATE desc");
         axios
           .post(url, JSON.stringify(m), {
-            responseType: "blob"
+            responseType: "blob",
           })
-          .then(res => {
+          .then((res) => {
             let fileName = res.headers["content-disposition"]
               .split(";")[1]
               .split("=")[1]
@@ -696,7 +744,7 @@ export default {
         this.$message({
           showClose: true,
           message: "请在文档目录下进行操作!",
-          duration: 2000
+          duration: 2000,
         });
       }
     },
@@ -710,7 +758,7 @@ export default {
         }
         axios
           .post("/dc/obtainDocument", JSON.stringify(obtainItemId))
-          .then(function(response) {
+          .then(function (response) {
             if (response.data.code) {
               if (_self.showBox) {
                 _self.loadAllGridData(_self.currentFolder);
@@ -721,14 +769,14 @@ export default {
                 showClose: true,
                 message: response.data.msg,
                 duration: 2000,
-                type: "success"
+                type: "success",
               });
             } else {
               _self.$message({
                 showClose: true,
                 message: response.data.msg,
                 duration: 2000,
-                type: "warning"
+                type: "warning",
               });
             }
           });
@@ -736,7 +784,7 @@ export default {
         this.$message({
           showClose: true,
           message: "请勾选待下架文件!",
-          duration: 2000
+          duration: 2000,
         });
       }
     },
@@ -750,7 +798,7 @@ export default {
         }
         axios
           .post("/dc/destroyDocuments", JSON.stringify(deletItemId))
-          .then(function(response) {
+          .then(function (response) {
             if (response.data.code) {
               if (_self.showBox) {
                 _self.loadAllGridData(_self.currentFolder);
@@ -761,14 +809,14 @@ export default {
                 showClose: true,
                 message: "销毁成功!",
                 duration: 2000,
-                type: "success"
+                type: "success",
               });
             } else {
               _self.$message({
                 showClose: true,
                 message: "销毁失败!",
                 duration: 2000,
-                type: "warning"
+                type: "warning",
               });
             }
           });
@@ -776,7 +824,7 @@ export default {
         this.$message({
           showClose: true,
           message: "请勾选待销毁文件!",
-          duration: 2000
+          duration: 2000,
         });
       }
     },
@@ -795,7 +843,7 @@ export default {
 
         axios
           .post("/dc/addToShopingCart", JSON.stringify(addItemId))
-          .then(function(response) {
+          .then(function (response) {
             if (response.data.code) {
               if (_self.showBox) {
                 _self.loadAllGridData(_self.currentFolder);
@@ -804,16 +852,16 @@ export default {
               }
               _self.$message({
                 showClose: true,
-                message:_self.$t('message.AddSuccess'),
+                message: _self.$t("message.AddSuccess"),
                 duration: 2000,
-                type: "success"
+                type: "success",
               });
             } else {
               _self.$message({
                 showClose: true,
                 message: "添加失败!",
                 duration: 2000,
-                type: "warning"
+                type: "warning",
               });
             }
           });
@@ -821,7 +869,7 @@ export default {
         this.$message({
           showClose: true,
           message: "请勾选待添加文件!",
-          duration: 2000
+          duration: 2000,
         });
       }
     },
@@ -830,9 +878,9 @@ export default {
       let _self = this;
       _self.shopingCartDialogVisible = true;
       _self.$router.push({
-        path: "/borrow"
+        path: "/borrow",
       });
-/*       if (
+      /*       if (
         _self.$refs.ShowShopingCart &&
         _self.$refs.ShowShopingCart.componentName == "shopingCart"
       ) {
@@ -922,17 +970,17 @@ export default {
 
       axios
         .post("/workflow/startWorkflow", JSON.stringify(_self.borrowForm))
-        .then(function(response) {
+        .then(function (response) {
           _self.dialogVisible = false;
           _self.refreshData();
           _self.$message("完成任务成功!");
           _self.$emit("refreshcount");
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
-    }
-  }
+    },
+  },
 };
 </script>
 <style scoped>
@@ -944,5 +992,4 @@ export default {
 } */
 </style>
 <style>
-
 </style>

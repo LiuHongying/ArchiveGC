@@ -37,4 +37,8 @@ public class EcmSessionFactory {
 		}
 		
 	}
+	
+	public static void releaseSession(AuthService authService,IEcmSession session) {
+		authService.logout(session.getCurrentUser().getLoginName());
+	}
 }

@@ -194,7 +194,7 @@ function deleteItem(url,selectedItems,dataGridObj,_this) {
     });
 }
 
-// 删除文档事件
+// 查询节点配置
 Vue.prototype.getEcmcfgActive=function(processDefinitionId,activityName,callback) {
   
   //动态获取表单 显示查看或编辑页面
@@ -211,4 +211,32 @@ Vue.prototype.getEcmcfgActive=function(processDefinitionId,activityName,callback
       }
     });
 }
-  
+//删除关系
+Vue.prototype.delRelation=function(ids,callback) {
+  let _self=this;
+  axios
+    .post("/dc/delRelation", JSON.stringify(ids))
+    .then(function(response) {
+      if(response.data.code!=1){
+        _self.$message({
+          showClose: true,
+          message: _self.$t("message.deleteFailured"),
+          duration: 2000,
+          type: "error"
+        });
+        return;
+      }else{
+        _self.$message({
+          showClose: true,
+          message: _self.$t("message.deleteSuccess"),
+          duration: 2000,
+          type: "success"
+        });
+        if(callback){
+          callback();
+        }
+      }
+      
+    });
+}
+

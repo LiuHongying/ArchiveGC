@@ -20,7 +20,7 @@
        </el-main>
        <el-footer>
            <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
-            <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button>
+            <!-- <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button> -->
             <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
        </el-footer>
    </el-container>    

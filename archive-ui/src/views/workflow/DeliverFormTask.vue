@@ -22,7 +22,7 @@
       <el-row>
         <FormFileViewTask
           ref="workflowFile"
-          :allowEdit="allowEdit"
+          :allowEdit="false"
           :isShowPage="true"
           :param="formParameter"
           v-model="workflowFileList"
@@ -31,6 +31,19 @@
           :parentId="formId"
           :isShowReject="isShowReject"
         ></FormFileViewTask>
+      </el-row>
+      <el-row>
+        <DeliverFormFile
+          ref="relevantArchives"
+          :allowEdit="true"
+          :isShowPage="true"
+          :param="deliverFormParam"
+          v-model="relevantArchiveList"
+          :activityName="activityName"
+          :processDefinitionId="processDefinitionId"
+          :parentId="formId"
+          :isShowReject="isShowReject"
+        ></DeliverFormFile>
       </el-row>
   </div>
 </template>
@@ -45,8 +58,9 @@ import DataLayout from "@/components/ecm-data-layout";
 import AttachmentFile from "@/views/dc/AttachmentFile.vue";
 import FormFileViewTask from "@/views/workflow/FormFileViewTask.vue";
 import ShowPropertyReadOnly from "@/components/ShowPropertyReadOnly.vue";
+import DeliverFormFile from "@/views/workflow/DeliverFormFile.vue"
 export default {
-  name: "CommonView",
+  name: "DeliverFormTask",
   permit: 1,
   components: {
     ShowProperty: ShowProperty,
@@ -57,7 +71,8 @@ export default {
     DataLayout: DataLayout,
     AttachmentFile: AttachmentFile,
     FormFileViewTask: FormFileViewTask,
-    ShowPropertyReadOnly: ShowPropertyReadOnly
+    ShowPropertyReadOnly: ShowPropertyReadOnly,
+    DeliverFormFile:DeliverFormFile
   },
   data() {
     return {
@@ -78,18 +93,18 @@ export default {
       butt: false,
       workflowFileList: [],
       saveButt: false,
-      
-      // param:{
-      //   searchViewUrl:"",//查询框URL
-      //   searchViewName:"",//查询框gridviewName
-      //   searchViewCondition:"",//查询框condition
-      //   childViewUrl:"",//卷内文件URL
-      //   childViewName:"",//卷内文件gridviewName
-      //   childviewCondition:"",//卷内文件condition
-      //   archiveViewUrl:"",//案卷URL
-      //   archiveViewName:"",//案卷gridviewName
-      //   archiveViewCondition:"",//案卷condition
-      // }
+      relevantArchiveList:[],
+      deliverFormParam:{
+        searchViewUrl:this.formParameter.deliverFormSearchViewUrl,//查询框URL
+        searchViewName:this.formParameter.deliverFormSearchViewName,//查询框gridviewName
+        searchViewCondition:this.formParameter.deliverFormSearchViewCondition,//查询框condition
+        childViewUrl:this.formParameter.childViewUrl,//卷内文件URL
+        childViewName:this.formParameter.childViewName,//卷内文件gridviewName
+        childviewCondition:this.formParameter.childviewCondition,//卷内文件condition
+        archiveViewUrl:this.formParameter.relevantViewUrl,//案卷URL
+        archiveViewName:this.formParameter.relevantViewName,//案卷gridviewName
+        archiveViewCondition:this.formParameter.relevantViewCondition,//案卷condition
+      }
     };
   },
   props: {
@@ -107,7 +122,21 @@ export default {
   mounted() {
     // this.getWorkflows();
   },
-
+  watch:{
+    formParameter(){
+      this.deliverFormParam={
+        searchViewUrl:this.formParameter.deliverFormSearchViewUrl,//查询框URL
+        searchViewName:this.formParameter.deliverFormSearchViewName,//查询框gridviewName
+        searchViewCondition:this.formParameter.deliverFormSearchViewCondition,//查询框condition
+        childViewUrl:this.formParameter.childViewUrl,//卷内文件URL
+        childViewName:this.formParameter.childViewName,//卷内文件gridviewName
+        childviewCondition:this.formParameter.childviewCondition,//卷内文件condition
+        archiveViewUrl:this.formParameter.relevantViewUrl,//案卷URL
+        archiveViewName:this.formParameter.relevantViewName,//案卷gridviewName
+        archiveViewCondition:this.formParameter.relevantViewCondition,//案卷condition
+      }
+    }
+  },
   methods: {
     
     loadFormInfo() {
