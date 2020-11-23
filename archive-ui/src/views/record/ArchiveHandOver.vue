@@ -19,8 +19,12 @@
             </el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="addStoreNum()">{{$t('application.ok')}}</el-button>
-            <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
+            <el-button type="primary" @click="addStoreNum()">{{
+              $t("application.ok")
+            }}</el-button>
+            <el-button @click="propertyVisible = false">{{
+              $t("application.cancel")
+            }}</el-button>
           </el-form-item>
         </el-form>
       </el-dialog>
@@ -140,7 +144,7 @@ export default {
       inputValueNum: "",
       selectedItems: [],
       propertyVisible: false,
-      DCinputValueNum:"",
+      DCinputValueNum: "",
     };
   },
   props: {},
@@ -206,29 +210,61 @@ export default {
         locationList.push(_self.DCinputValueNum + i);
       }
 
-      console.log(id);
-      console.log(fieldStr);
-      console.log(locationList);
-
       let mp = new Map();
       mp.set("ids", id);
       mp.set("Store", fieldStr);
       mp.set("Location", locationList);
 
-      axios.post("/record/createStorageNum", JSON.stringify(mp), {
-        headers: {
-            "Content-Type": "application/json;charset=UTF-8"
-        }
-      })
-      .then(function (response) {
-        _self.$refs.mainDataGrid.loadGridData();
-        let code = response.data.code;
-      })
+      axios
+        .post("/record/createStorageNum", JSON.stringify(mp), {
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+          },
+        })
+        .then(function (response) {
+          _self.$refs.mainDataGrid.loadGridData();
+          let code = response.data.code;
+        });
 
-      _self.propertyVisible = false
+      _self.propertyVisible = false;
     },
 
-    handOver() {},
+    handOver() {
+      let _self = this;
+      if (_self.selectedItems.length == 0) {
+        let msg = "请选择档案信息";
+        _self.$message({
+          showClose: true,
+          message: msg,
+          duration: 2000,
+          type: "warning",
+        });
+        return;
+      }
+
+      var id = [];
+      var fieldStr = [];
+      var locationList = [];
+
+      var i;
+      for (i in _self.selectedItems) {
+        id.push(_self.selectedItems[i]["ID"]);
+      }
+
+      let mp = new Map();
+      mp.set("ids", id);
+
+      axios
+        .post("/record/handOverRecord", JSON.stringify(mp), {
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+          },
+        })
+        .then(function (response) {
+          _self.$refs.mainDataGrid.loadGridData();
+          let code = response.data.code;
+        });
+    },
 
     onDataGridRowClick: function (row) {
       this.parentID = row.ID;

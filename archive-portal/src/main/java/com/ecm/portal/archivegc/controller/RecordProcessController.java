@@ -17,6 +17,7 @@ import com.ecm.core.dao.EcmDocumentMapper;
 import com.ecm.core.entity.EcmDocument;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
+import com.ecm.portal.archive.common.Constants;
 import com.ecm.portal.controller.ControllerAbstract;
 
 @Controller
@@ -72,9 +73,32 @@ public class RecordProcessController extends ControllerAbstract {
 	
 	@RequestMapping(value = "/record/handOverRecord", method = RequestMethod.POST)
 	@ResponseBody
-	public void handOverRecord(@RequestBody String argStr) throws Exception {
+	public Map<String, Object> handOverRecord(@RequestBody String argStr) throws Exception {
 		Map<String, Object> args = JSONUtils.stringToMap(argStr);
-		String folderRelease = folderpathService.getReleaseFolderId(getToken(), args);
+		String ID= args.get("ids").toString();
+		List<String> listID = JSONUtils.stringToArray(ID);
+		for (String fileId: listID) {
+			String sqlSecurity = "select C_SECURITY_LEVEL from ecm_document ed where ID = '" + fileId + "'";
+			List<Map<String, Object>> listSecurity = documentService.getMapList(getToken(), sqlSecurity.toString());
+			String SecurityLevel = (String) listSecurity.get(0).get("C_SECURITY_LEVEL");
+			String sqlAcl = "select NAME from ecm_acl ea where DESCRIPTION = '" + SecurityLevel + "'";
+			List<Map<String, Object>> listAcl = documentService.getMapList(getToken(), sqlAcl.toString());
+			String aclName = (String) listAcl.get(0).get("NAME");
+			
+			EcmDocument doc = documentService.getObjectById(getToken(), fileId);
+			String folderRelease = folderpathService.getReleaseFolderId(getToken(), doc.getAttributes());
+			doc.addAttribute("FOLDER_ID", folderRelease);;
+			doc.addAttribute("STATUS", Constants.INSTORAGE);;
+			doc.addAttribute("IS_RELEASED", "1");
+			doc.addAttribute("ACL_NAME", aclName);;
+			
+			documentService.updateObject(getToken(), doc, null);
+		}
+		
+		Map<String, Object> mp = new HashMap<String, Object>();
+		mp.put("code", ActionContext.SUCESS);
+		return mp;
+		
 	}
 	
 	
