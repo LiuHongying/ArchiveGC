@@ -78,7 +78,7 @@
     import DataLayout from '@/components/ecm-data-layout'
     import AttachmentFile from "@/views/dc/AttachmentFile.vue"
     import BorrowFile from "@/views/workflow/BorrowFile.vue"
-    import UserSelectInput from '@/components/controls/UserSelectInput'
+    import UserSelectInput from '@/components/controls/BorrowUserSelectInput'
     export default {
         name: "StartupWorkflow",
         permit: 1,
