@@ -398,7 +398,14 @@
           @click="importDialogVisible = true"
           >{{ $t("application.Import") }}</el-button
         >
-        <StartupComponent :selectedFiles="selectedItems"></StartupComponent>
+        <el-form :inline="true">
+          <el-form-item>
+            <StartupComponent :selectedFiles="selectedItems"></StartupComponent>
+          </el-form-item>
+          <el-form-item>
+            <ArchieveStorage :roleJudgement="true"  :selectRowData="selectedItems"></ArchieveStorage>
+          </el-form-item>
+        </el-form>  
       </el-col>
     </el-row>
     <div :style="{ position: 'relative', height: asideHeight + 'px' }">
@@ -593,7 +600,7 @@ import SystemInfo from "@/components/controls/SystemInfo";
 import FolderAcl from "@/components/controls/FolderAcl";
 import StartWorkflow from "@/views/workflow/StartWorkflow";
 import StartupComponent from "@/views/workflow/StartupComponent.vue";
-
+import ArchieveStorage from "@/components/SubmitFolder.vue";
 import "url-search-params-polyfill";
 
 export default {
@@ -609,6 +616,7 @@ export default {
     FolderAcl: FolderAcl,
     StartWorkflow: StartWorkflow,
     StartupComponent: StartupComponent,
+    ArchieveStorage: ArchieveStorage,
   },
   data() {
     return {
