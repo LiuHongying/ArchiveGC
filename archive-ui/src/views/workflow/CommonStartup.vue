@@ -62,7 +62,7 @@
                     bottomHeight: 120,
                     dialogName:"",
                     propertyVisible:false,
-                    typeName:"",
+                    
                     isOnly:false,
                     butt:false,
                     
@@ -72,12 +72,14 @@
             props:{
                 workflowObj:{type:Object,default:{}},
                 showUploadFile:{type:Boolean,default:true},
-                workflowFileList:{type:Array,default:[]}
+                workflowFileList:{type:Array,default:new Array()},
+                typeName:{type:String,default:""},
             },
             
             mounted(){
                 // this.getWorkflows();
                 console.log(workflowFileList);
+                console.log(workflowObj);
             },
             methods:{
                 loadFormInfo(){

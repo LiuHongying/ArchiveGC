@@ -1,0 +1,122 @@
+<template>
+  <div style="width:50px;">
+    <el-dialog :visible.sync="typeSelectVisible">
+      <div style="width: 80%">
+        <el-form>
+          <el-form-item
+            :label="$t('application.fileType')"
+            :rules="[{required:true,message:'必填',trigger:'blur'}]"
+          >
+            <el-select
+              name="selectName"
+              v-model="selectedClassic"
+              :placeholder="$t('application.selectFileType')"
+              style="display:block;"
+              @change="getTypeNameByClassic(selectedClassic)"
+            >
+              <template v-for="(name,nameIndex) in classicNames">
+                <el-option :label="name" :value="name" :key="nameIndex"></el-option>
+              </template>
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            :label="$t('application.fileType')"
+            :rules="[{required:true,message:'必填',trigger:'blur'}]"
+          >
+            <el-select
+              name="selectName"
+              v-model="selectedTypeName"
+              :placeholder="$t('application.selectFileType')"
+              style="display:block;"
+            >
+              <div v-for="(name,nameIndex) in typeNames" :key="'T_'+nameIndex">
+                <el-option :label="name" :value="name" :key="nameIndex"></el-option>
+              </div>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button
+            @click="typeSelectVisible=false;$emit('afterSelecteType',selectedTypeName)"
+          >{{$t('application.ok')}}</el-button>
+        </div>
+      </div>
+    </el-dialog>
+    <el-button
+      type="primary"
+      plain
+      size="small"
+      icon="el-icon-edit"
+      @click="typeSelectVisible=true"
+    >
+      <slot>{{$t('application.newDocument')}}</slot>
+    </el-button>
+  </div>
+</template>
+<script>
+export default {
+  name: "TypeSelectComment",
+  components: {},
+
+  data() {
+    return {
+      typeSelectVisible: false,
+      selectedTypeName: "",
+      typeNames: [],
+      classicNames: [],
+      selectedClassic: ""
+    };
+  },
+  props: {},
+  mounted() {
+    this.getClassicNames("ClassicNames");
+  },
+  methods: {
+    getTypeNameByClassic(keyName) {
+      let _self = this;
+      _self.selectedTypeName = "";
+      _self.typeNames = [];
+      axios
+        .post("/dc/getEcmDefTypes", keyName)
+        .then(function(response) {
+          if (response.data.code == 1) {
+            response.data.data.forEach(element => {
+              _self.typeNames.push(element.name);
+            });
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
+    getClassicNames(keyName) {
+      let _self = this;
+      let pm = new Map();
+      pm.set("configName", keyName);
+      // pm.set('parentId',"'"+p+"'");
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: JSON.stringify(pm),
+          url: "/dc/getObjectsByConfigClauseNoPage"
+        })
+        .then(function(response) {
+          var i;
+          let temp = response.data.data;
+          for (i = 0; i < temp.length; i++) {
+            _self.classicNames.push(temp[i].NAME);
+          }
+          console.log(_self.contractors);
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    }
+  }
+};
+</script>
+<style scoped>
+</style>

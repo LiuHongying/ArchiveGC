@@ -84,6 +84,7 @@
             </el-dialog>
             <!-- 创建类型选择 -->
             <el-dialog :visible.sync="childrenTypeSelectVisible" :close-on-click-modal="false">
+                <div style="width: 80%">
                 <el-form>
                     <el-form-item :label="$t('application.fileType')" :rules="[{required:true,message:'必填',trigger:'blur'}]">
                     <el-select
@@ -102,6 +103,7 @@
                     <el-button
                     @click="childrenTypeSelectVisible=false;beforeCreateDocItem(selectedChildrenType,'')"
                     >{{$t('application.ok')}}</el-button>
+                </div>
                 </div>
             </el-dialog>
 
