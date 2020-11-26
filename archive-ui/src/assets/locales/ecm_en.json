@@ -629,7 +629,9 @@
     "PleaseSelectOneData":"Please select only one data",
     "classicName":"Classic Name",
     "PleaseSelectOneOrMoreData":"Please select one or more data！",
-    "PleaseInputData":"Please input description"
+    "PleaseInputData":"Please input description",
+    "updateSuccess":"Update Success",
+    "updateFailured":"Update Failured"
 },
 "field": {
     "indexNumber":"S/N",

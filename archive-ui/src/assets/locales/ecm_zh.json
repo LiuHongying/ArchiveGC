@@ -639,7 +639,10 @@
     "PleaseSelectDC":"请选择文件",
     "PleaseSelectOneData":"请选择一条数据",
     "PleaseSelectOneOrMoreData":"请选择一条或多条数据！",
-    "PleaseInputData":"请填写描述信息"
+    "PleaseInputData":"请填写描述信息",
+    "updateSuccess":"修改成功",
+    "updateFailured":"修改失败"
+
 },
 "field": {
     "indexNumber":"序号",

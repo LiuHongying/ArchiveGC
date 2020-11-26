@@ -504,7 +504,7 @@ export default {
         
          _self.$message({
                 showClose: true,
-                message: '请选择一条图册或卷盒数据！',
+                message: '请选择一条案卷数据！',
                 duration: 2000,
                 type: "warning"
               });

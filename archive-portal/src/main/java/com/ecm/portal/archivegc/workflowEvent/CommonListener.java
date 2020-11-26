@@ -146,7 +146,7 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 				/**********************发送邮件*************************************/
 				
 				
-				String sendMail= isSendEmail.getValue(task).toString();
+				String sendMail= isSendEmail!=null?isSendEmail.getValue(task).toString():null;
 				if(sendMail!=null&&!"".equals(sendMail)) {
 					if(Boolean.parseBoolean(sendMail)) {
 						if (task.getAssignee() != null) {// 普通任务

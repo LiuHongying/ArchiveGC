@@ -103,6 +103,7 @@
       <el-table
         :key="rkey"
         id="datatable"
+        ref="datatable"
         :height="tableHeight"
         :data="itemDataList"
         border
@@ -403,6 +404,7 @@ export default {
     isShowChangeList: { type: Boolean, default: true }, //是否显示列表选择
     optionWidth: { type: Number, default: 3.5 }, //操作列宽度，放几个按钮
     pageSize: { type: Number, default: 20 },//每页显示数量
+    folderId:{type:String,default:""},//目录ID
   },
   watch: {
     showFields(val, oldVal) {
@@ -451,6 +453,12 @@ export default {
     }
   },
   methods: {
+    // clickCheck(row){
+    //   if(row){
+    //     this.$refs.datatable.clearSelection();
+    //     this.$refs.datatable.toggleRowSelection(row);
+    //   }
+    // },
     onPropertiesSaveSuccess(props) {
       this.$emit("onPropertiesSaveSuccess", props);
     },
@@ -474,6 +482,7 @@ export default {
       var m = new Map();
       m.set("gridName", this.gridviewInfo.gridviewName);
       // m.set('folderId',indata.id);
+      m.set('folderId',_self.folderId);
       m.set("condition", _self.condition);
       if (_self.parentId != "") {
         m.set("id", _self.parentId);
@@ -992,6 +1001,10 @@ export default {
     },
     rowClick(row) {
       this.selectedRow = row;
+      if(row&&this.isshowSelection){
+        this.$refs.datatable.clearSelection();
+        this.$refs.datatable.toggleRowSelection(row);
+      }
       this.$emit("rowclick", row);
     },
     dbclick(row) {

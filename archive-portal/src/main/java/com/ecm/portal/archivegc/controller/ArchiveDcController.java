@@ -1,5 +1,8 @@
 package com.ecm.portal.archivegc.controller;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +26,11 @@ import com.ecm.core.cache.manager.CacheManagerOper;
 import com.ecm.core.entity.EcmDefType;
 import com.ecm.core.entity.EcmDocument;
 import com.ecm.core.entity.EcmRelation;
+import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.service.DocumentService;
+import com.ecm.core.service.NumberService;
 import com.ecm.core.service.RelationService;
+import com.ecm.portal.archive.common.ChildrenObjAction;
 import com.ecm.portal.controller.ControllerAbstract;
 import com.ecm.icore.service.IEcmSession;
 import com.ecm.portal.controller.ControllerAbstract;
@@ -35,7 +41,8 @@ public class ArchiveDcController extends ControllerAbstract{
 	private int WJ;				//文件
 	@Autowired
 	DocumentService documentService;
-	
+	@Autowired
+	private NumberService numberService;
 	@Autowired
 	private RelationService relationService;
 	
@@ -200,4 +207,231 @@ public class ArchiveDcController extends ControllerAbstract{
 		}
 		return mp;
 	}
+	/**
+	 * 逻辑删除
+	 * @param argStr
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/dc/logicallyDel", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> logicallyDel(@RequestBody String argStr) throws Exception{
+
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			
+			Map<String, Object> args= JSONUtils.stringToMap(argStr);
+			if(args.get("ids")==null) {
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("msg", "没有选择要删除的数据！");
+				return mp;
+			}
+			String idsStr=args.get("ids").toString();
+			List<String> idList= JSONUtils.stringToArray(idsStr);
+			String whereSql= String.join("','", idList.toArray(new String[idList.size()]));
+			whereSql=" PARENT_ID in( '"+whereSql+"')";
+			
+			String sql="select ID,CHILD_ID from ecm_relation where "+whereSql;
+			List<Map<String,Object>> result= documentService.getMapList(getToken(), sql);
+			for (Map<String, Object> map : result) {
+				String childId= map.get("CHILD_ID").toString();
+				EcmDocument childDoc= documentService.getObjectById(getToken(), childId);
+				childDoc.addAttribute("IS_HIDDEN", 1);
+				documentService.updateObject(getToken(), childDoc, null);
+				relationService.deleteObjectById(getToken(), map.get("ID").toString());
+			}
+			for (String id:idList) {
+				EcmDocument pDoc= documentService.getObjectById(getToken(), id);
+				pDoc.addAttribute("IS_HIDDEN", 1);
+				documentService.updateObject(getToken(), pDoc, null);
+			}
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("msg", "删除成功");
+			return mp;
+		}catch (Exception e) {
+			// TODO: handle exception
+			log.error(e.getMessage());
+			e.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("msg", "删除失败");
+			return mp;
+		}
+	
+	}
+	@RequestMapping(value = "/dc/updateData", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> updateData(@RequestBody String argStr) throws Exception{
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			
+			List<String> paramStrs=JSONUtils.stringToArray(argStr);
+			if(paramStrs==null) {
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("msg", "没有选择要修改的数据！");
+				return mp;
+			}
+			for (String paramStr : paramStrs) {
+				Map<String, Object> args= JSONUtils.stringToMap(paramStr);
+				EcmDocument doc=new EcmDocument();
+				doc.setAttributes(args);
+				documentService.updateObject(getToken(), doc,null);
+			}
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("msg", "修改成功");
+			return mp;
+			
+		}catch (Exception e) {
+			// TODO: handle exception
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("msg", "修改失败");
+			return mp;
+		}
+		
+	}
+	/**
+	 * 提取信息
+	 * @param argStr
+	 * @return
+	 */
+	@RequestMapping(value = "/dc/fetchInformationGc", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
+	@ResponseBody
+	public Map<String,Object> fetchInformation(@RequestBody String argStr){
+
+		List<String> list = JSONUtils.stringToArray(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			for(int i=0;list!=null&&i<list.size();i++) {
+				String boxId=list.get(i);
+				EcmDocument doc = null;
+				doc = documentService.getObjectById(getToken(), boxId);
+				
+				if(doc.getCoding()==null||"".equals(doc.getCoding())) {
+					mp.put("code", ActionContext.FAILURE);
+					mp.put("message", "请先取号！");
+					return mp;
+				}else {
+
+					String sqlSumPage="select sum(C_PAGE_COUNT) as pageCount from ecm_document "
+							+ "where id in(select child_id from ecm_relation where parent_id='"+boxId+"' "
+									+ " and name='irel_children' and (DESCRIPTION!='复用' or DESCRIPTION is null))";
+					List<Map<String, Object>> pages= documentService.getMapList(getToken(),sqlSumPage);
+					if(pages!=null&&pages.size()>0&&pages.get(0)!=null) {
+						doc.addAttribute("C_PAGE_COUNT", pages.get(0).get("pageCount"));
+					}else {
+						doc.addAttribute("C_PAGE_COUNT", "0");
+					}
+					
+//					String minDocDate=ChildrenObjAction.getMinDocDate(getToken(), boxId, "C_DRAFT_DATE",documentService);
+//					if(minDocDate!=null) {
+//						doc.addAttribute("C_DRAFT_DATE", minDocDate);
+//					}
+//					String maxDocDate=ChildrenObjAction.getMaxDocDate(getToken(), boxId, "C_DRAFT_DATE",documentService);
+//					if(maxDocDate!=null) {
+//						doc.addAttribute("C_END_DATE", maxDocDate);
+//					}
+					
+					String maxRetention= ChildrenObjAction.getRetention(getToken(), boxId, documentService);
+					if(maxRetention!=null) {
+						doc.addAttribute("C_RETENTION", maxRetention);
+					}else {
+						doc.addAttribute("C_RETENTION", "10年");
+					}
+					String maxSecurity=ChildrenObjAction.getVolumeMaxSecurity(getToken(), boxId, documentService);
+					if(maxSecurity==null) {
+						doc.addAttribute("C_SECURITY_LEVEL", "内部公开");
+					}else {
+						doc.addAttribute("C_SECURITY_LEVEL", maxSecurity);
+					}
+					documentService.updateObject(getToken(), doc, null);
+				}
+				
+				//////////////////////////////////////////////
+			}
+		} catch (AccessDeniedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", e.getMessage());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", e.getMessage());
+		}
+		mp.put("code", ActionContext.SUCESS);
+		return mp;
+		
+	
+		
+	}
+	
+	/**
+	 * 取号
+	 * @param argStr
+	 * @return
+	 */
+	@RequestMapping(value = "/dc/takeNumbersArchiveGc", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
+	@ResponseBody
+	public Map<String,Object> takeNumbersArchiveGc(@RequestBody String argStr){
+		List<String> list = JSONUtils.stringToArray(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			for(int i=0;list!=null&&i<list.size();i++) {
+				String boxId=list.get(i);
+//				String boxId=argStr;
+				EcmDocument doc = null;
+				doc = documentService.getObjectById(getToken(), boxId);
+				String coding="";
+				if(doc.getCoding()!=null&&!"".equals(doc.getCoding())) {
+					coding=doc.getCoding();
+				}else {
+					while(true) {
+						coding= numberService.getNumber(getToken(), doc.getAttributes());
+						String validataSql="select coding from ecm_document where coding='"+coding+"'";
+						List<Map<String,Object>> result= documentService.getMapList(getToken(),validataSql);
+						if(result==null||result.size()==0) {
+							doc.setCoding(coding);
+							documentService.updateObject(getToken(), doc,null);
+							break;
+						}
+					}
+				}
+				String sql="select child_id from ecm_relation where parent_id='"+boxId+"' and name='irel_children'";
+				List<Map<String,Object>> childrenIds=documentService.getMapList(getToken(), sql);// ChildrenObjAction.getChildrenObjById(getToken(), boxId, documentService);
+				for(Map<String,Object> childId : childrenIds) {
+					String childidStr=(String) childId.get("child_id");
+					EcmDocument childDoc= documentService.getObjectById(getToken(), childidStr);
+					childDoc.addAttribute("C_ARCHIVE_CODING", coding);
+					try {
+						documentService.updateObject(getToken(), childDoc,null);
+					}catch(NullPointerException nu) {
+						continue;
+					}catch (Exception e) {
+						// TODO: handle exception
+						e.printStackTrace();
+						throw e;
+					}
+					
+				}
+				
+			
+			}
+		} catch (AccessDeniedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", e.getMessage());
+			return mp;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", "取号失败,详细信息："+e.getMessage());
+			return mp;
+		}
+		mp.put("code", ActionContext.SUCESS);
+		return mp;
+		
+	}
+	
 }

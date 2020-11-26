@@ -243,7 +243,42 @@ public class WorkFlowCenter extends ControllerAbstract {
 		mp.put("code", ActionContext.SUCESS);
 		return mp;
 	}
+	
+	@RequestMapping(value = "/dc/getWorkflow", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
+	@ResponseBody
+	public Map<String, Object> getWorkFlow(@RequestBody String argStr) {
+		Map<String, Object> args = JSONUtils.stringToMap(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Object processDefinitionKey = args.get("processDefinitionKey");
+		List<ProcessDefinition> lists = null;
+		if(processDefinitionKey != null&&!"".equals(processDefinitionKey)) {
+			lists = repositoryService.createProcessDefinitionQuery()
+					.processDefinitionKey(processDefinitionKey.toString())
+					.latestVersion().list();
+		}
+//    	lists.get(0).getName();
 
+		List<Map<String, Object>> workflowData = new ArrayList<Map<String, Object>>();
+
+		for (int i = 0; lists != null && i < lists.size(); i++) {
+			ProcessDefinition workflow = lists.get(i);
+
+			Map<String, Object> row = new HashMap<String, Object>();
+			row.put("ID", workflow.getId());
+			row.put("NAME", workflow.getName());
+			row.put("KEY", workflow.getKey());
+			row.put("REVISION", workflow.getVersion());
+			EcmCfgActivity ecmCfgActivityObj = CacheManagerCfgActivity.getCfgActivity(workflow.getName(), "start");
+			row.put("FORMNAME",
+					ecmCfgActivityObj == null ? workflow.getDescription() : ecmCfgActivityObj.getFormAttribute());// 流程表单名放在description中
+			workflowData.add(row);
+		}
+		
+		mp.put("data", workflowData);
+		mp.put("code", ActionContext.SUCESS);
+		return mp;
+	}
+	
 	@RequestMapping(value = "/dc/getWorkflows", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
 	@ResponseBody
 	public Map<String, Object> getWorkFlowList(@RequestBody String argStr) {
@@ -255,6 +290,10 @@ public class WorkFlowCenter extends ControllerAbstract {
 		int pageIndex = Integer.parseInt(args.get("pageIndex").toString());
 		if (condition != null && "lastVersion".equals(condition.toString())) {
 			lists = repositoryService.createProcessDefinitionQuery().latestVersion().listPage(pageIndex, pageSize);
+		}else if(condition != null) {
+			lists = repositoryService.createProcessDefinitionQuery()
+					.processDefinitionKeyLike(condition.toString())
+					.latestVersion().listPage(pageIndex, pageSize);
 		} else {
 			lists = repositoryService.createProcessDefinitionQuery().listPage(pageIndex, pageSize);
 		}

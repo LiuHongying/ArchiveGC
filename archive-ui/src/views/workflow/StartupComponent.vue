@@ -12,6 +12,7 @@
         ref="startup"
         :is="componentName"
         :workflowObj="workflowObj"
+        :typeName="workflowObj.FORMNAME"
         @close="closeDialog()"
         :showUploadFile="false"
         :workflowFileList="selectedFiles"
