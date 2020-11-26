@@ -41,7 +41,7 @@
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
-          :condition="searchFileCondition"
+          condition="IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"
           gridViewName="BorrowSequenceGrid"
           :optionWidth="1"
           :isShowMoreOption="false"
