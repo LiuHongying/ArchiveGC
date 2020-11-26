@@ -77,6 +77,9 @@ public class RecordProcessController extends ControllerAbstract {
 		Map<String, Object> args = JSONUtils.stringToMap(argStr);
 		String ID= args.get("ids").toString();
 		List<String> listID = JSONUtils.stringToArray(ID);
+		
+		int i = 0;
+		
 		for (String fileId: listID) {
 			String sqlSecurity = "select C_SECURITY_LEVEL from ecm_document ed where ID = '" + fileId + "'";
 			List<Map<String, Object>> listSecurity = documentService.getMapList(getToken(), sqlSecurity.toString());
@@ -84,9 +87,16 @@ public class RecordProcessController extends ControllerAbstract {
 			String sqlAcl = "select NAME from ecm_acl ea where DESCRIPTION = '" + SecurityLevel + "'";
 			List<Map<String, Object>> listAcl = documentService.getMapList(getToken(), sqlAcl.toString());
 			String aclName = (String) listAcl.get(0).get("NAME");
+			String sql1="select child_id from ecm_relation where parent_id='"+fileId+"' "+ " and name='irel_children'";
+			List<Map<String,Object>> childrenId= documentService.getMapList(getToken(), sql1);
+			Map<String,Object> child= childrenId.get(i);
+			String childidStr=(String) child.get("child_id");
 			
 			EcmDocument doc = documentService.getObjectById(getToken(), fileId);
-			String folderRelease = folderpathService.getReleaseFolderId(getToken(), doc.getAttributes());
+			EcmDocument docChild= documentService.getObjectById(getToken(), childidStr);
+			Map<String,Object> attr=docChild.getAttributes();
+			
+			String folderRelease = folderpathService.getReleaseFolderId(getToken(), attr);
 			doc.addAttribute("FOLDER_ID", folderRelease);;
 			doc.addAttribute("STATUS", Constants.INSTORAGE);;
 			doc.addAttribute("IS_RELEASED", "1");
