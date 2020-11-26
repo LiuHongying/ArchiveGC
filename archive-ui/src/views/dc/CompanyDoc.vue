@@ -148,16 +148,6 @@
               ></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button
-                type="primary"
-                plain
-                size="medium"
-                icon="el-icon-upload2"
-                @click="exportExcel()"
-                >{{ $t("application.export") + "Excel" }}</el-button
-              >
-            </el-form-item>
-            <el-form-item>
               <template v-if="isFileAdmin">
                 <el-button
                   type="primary"
@@ -189,6 +179,9 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" plain size="medium" icon="el-icon-right" @click="getWorkFlow">发起流程</el-button>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
             </el-form-item>
             <el-form-item>
               <template v-if="isFileAdmin">
@@ -355,6 +348,7 @@ import BorrwoForm from "@/components/form/Borrow";
 import StartupWorkflow from "@/views/workflow/BorrowStartUp.vue";
 import BorrowFile from "@/views/workflow/BorrowFile.vue";
 import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue"
+import ExcelUtil from "@/utils/excel.js";
 export default {
   components: {
     ShowProperty: ShowProperty,
@@ -362,6 +356,7 @@ export default {
     BorrwoForm: BorrwoForm,
     StartupWorkflow: StartupWorkflow,
     BorrowStartUp: BorrowStartUp,
+    ExcelUtil: ExcelUtil,
   },
   data() {
     return {
@@ -422,6 +417,8 @@ export default {
       },
 
       workflow: {},
+      gridViewTrans: "",
+      idTrans: "",
     };
   },
   created() {
@@ -449,7 +446,7 @@ export default {
       .post("/admin/getArchivesFolder", 0)
       .then(function (response) {
         _self.dataList = response.data.data;
-        // console.log(JSON.stringify(_self.dataList));
+        console.log(JSON.stringify(_self.dataList));
         _self.loading = false;
       })
       .catch(function (error) {
@@ -614,6 +611,8 @@ export default {
       _self.tableLoading = true;
       var key = _self.inputkey;
       var m = new Map();
+      _self.gridViewTrans = indata.gridView;
+      _self.idTrans = indata.id;
       m.set("gridName", indata.gridView);
       m.set("folderId", indata.id);
       m.set("condition", key);
@@ -728,51 +727,51 @@ export default {
       _self.borrowDialogVisible = true;
     },
     //导出Excel
-    exportExcel() {
-      var url = "/dc/getExportExcel";
-      var m = new Map();
-      if (this.exportAble) {
-        if (this.showBox) {
-          m.set("showBox", true);
-        } else {
-          m.set("showBox", false);
-        }
-        m.set("gridName", this.currentFolder.gridView);
-        m.set("lang", this.currentLanguage);
-        m.set("folderId", this.currentFolder.id);
-        m.set("orderBy", "MODIFIED_DATE desc");
-        axios
-          .post(url, JSON.stringify(m), {
-            responseType: "blob",
-          })
-          .then((res) => {
-            let fileName = res.headers["content-disposition"]
-              .split(";")[1]
-              .split("=")[1]
-              .replace(/\"/g, "");
-            let type = res.headers["content-type"];
-            let blob = new Blob([res.data], { type: type });
-            // IE
-            if (window.navigator.msSaveBlob) {
-              window.navigator.msSaveBlob(blob, fileName);
-            } else {
-              // console.log(3)
-              var link = document.createElement("a");
-              link.href = window.URL.createObjectURL(blob);
-              link.download = fileName;
-              link.click();
-              //释放内存
-              window.URL.revokeObjectURL(link.href);
-            }
-          });
-      } else {
-        this.$message({
-          showClose: true,
-          message: "请在文档目录下进行操作!",
-          duration: 2000,
-        });
-      }
-    },
+    // exportExcel() {
+    //   var url = "/dc/getExportExcel";
+    //   var m = new Map();
+    //   if (this.exportAble) {
+    //     if (this.showBox) {
+    //       m.set("showBox", true);
+    //     } else {
+    //       m.set("showBox", false);
+    //     }
+    //     m.set("gridName", this.currentFolder.gridView);
+    //     m.set("lang", this.currentLanguage);
+    //     m.set("folderId", this.currentFolder.id);
+    //     m.set("orderBy", "MODIFIED_DATE desc");
+    //     axios
+    //       .post(url, JSON.stringify(m), {
+    //         responseType: "blob",
+    //       })
+    //       .then((res) => {
+    //         let fileName = res.headers["content-disposition"]
+    //           .split(";")[1]
+    //           .split("=")[1]
+    //           .replace(/\"/g, "");
+    //         let type = res.headers["content-type"];
+    //         let blob = new Blob([res.data], { type: type });
+    //         // IE
+    //         if (window.navigator.msSaveBlob) {
+    //           window.navigator.msSaveBlob(blob, fileName);
+    //         } else {
+    //           // console.log(3)
+    //           var link = document.createElement("a");
+    //           link.href = window.URL.createObjectURL(blob);
+    //           link.download = fileName;
+    //           link.click();
+    //           //释放内存
+    //           window.URL.revokeObjectURL(link.href);
+    //         }
+    //       });
+    //   } else {
+    //     this.$message({
+    //       showClose: true,
+    //       message: "请在文档目录下进行操作!",
+    //       duration: 2000,
+    //     });
+    //   }
+    // },
     //下架文档
     obtainItem() {
       let _self = this;
@@ -989,6 +988,21 @@ export default {
       } else {
         _self.loadGridData(this.currentFolder);
       }
+    },
+
+    exportData() {
+      let _self = this;
+      let params = {
+        URL: "/file/exportFolderPath",
+        gridName: _self.currentFolder.gridView,
+        folderId: _self.currentFolder.id,
+        orderBy: "MODIFIED_DATE desc",
+        pageSize: _self.pageSize,
+        pageIndex: (_self.currentPage - 1) * _self.pageSize,
+        lang: "zh-cn",
+      };
+      console.log(params);
+      ExcelUtil.export4Cnpe(params);
     },
   },
 };
