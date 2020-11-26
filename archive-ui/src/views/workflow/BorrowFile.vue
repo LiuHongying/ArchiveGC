@@ -203,7 +203,7 @@ export default {
     // },
     beforeAddFile() {
       let _self=this;
-      this.getEcmcfgActive(this.workflowObj.ID,"start",function(ecmCfgActivity){
+      this.getEcmcfgActive(_self.workflowObj.ID,"start",function(ecmCfgActivity){
         _self.searchFileCondition=ecmCfgActivity.formCondition;
         _self.propertyVisible=true;
       });

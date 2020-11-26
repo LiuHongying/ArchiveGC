@@ -136,7 +136,15 @@ export const workflowRouter =
 path: '/workflow/BorrowViewReadOnly',
 name: '借阅流程只读视图',
 component: () => import('@/views/workflow/BorrowViewReadOnly.vue')
-
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'CopyStartUp'
+},
+path: '/workflow/CopyStartUp',
+name: '借阅流程只读视图',
+component: () => import('@/views/workflow/CopyStartUp.vue')
 },
 
     ]

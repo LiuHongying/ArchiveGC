@@ -194,6 +194,7 @@ import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue"
 import BorrowView from "@/views/workflow/BorrowView.vue"
 import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
 import FormFileViewTask from "@/views/workflow/FormFileViewTask.vue";
+import CopyStartUp from "@/views/workflow/CopyStartUp.vue"
 export default {
   name: "TodoTask",
   permit: 1,
@@ -207,6 +208,7 @@ export default {
     BorrowViewReadOnly:BorrowViewReadOnly,
     BorrowView:BorrowView,
     BorrowStartUp:BorrowStartUp,
+    CopyStartUp : CopyStartUp,
     FormFileViewTask:FormFileViewTask
   },
  data() {
