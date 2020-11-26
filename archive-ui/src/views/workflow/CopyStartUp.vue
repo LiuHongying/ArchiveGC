@@ -1,64 +1,68 @@
 <template>
-    <DataLayout>
-        <template v-slot:header>
-            <el-dialog
-                :title="dialogName+$t('application.property')"
-                :visible.sync="propertyVisible"
-                @close="propertyVisible = false"
-                width="90%"
-                :close-on-click-modal="false"
-                v-dialogDrag
+    <el-container>
+        <el-main>
+            <ShowProperty
+                    ref="ShowProperty"
+                    @onSaved="onSaved"
+                    width="100%"
+                    folderPath=""
+                    :showUploadFile="showUploadFile"
+                    v-bind:typeName="typeName"
                 >
-                <!-- <CommonStartup 
-                ref="startup"
-                :workflowObj="workflowObj" 
-                @close="closeDialog()"
-                :showUploadFile="false"></CommonStartup> -->
-                <component
-                    ref="startup"
-                    :is="componentName"
+                </ShowProperty>
+        <el-form :inline="true">
+        <el-form-item label="本单位/部门领导:" label-width="150px">
+        <UserSelectInput :roleName='departmentLeader' v-model="reviewer1" v-bind:inputValue="reviewer1" ></UserSelectInput>
+        </el-form-item>
+        <el-form-item label="文件形成单位/部门领导:" label-width="200px">
+        <UserSelectInput :roleName='departmentLeader' v-model="reviewer2" v-bind:inputValue="reviewer2" ></UserSelectInput>
+        </el-form-item>
+        </el-form>
+                <BorrowFile ref="workflowFile"
+                    allowEdit
+                    :isShowPage="false"
+                    v-model="workflowFileList"
                     :workflowObj="workflowObj"
-                    :typeName="typeName"
-                    @close="closeDialog()"
-                    :showUploadFile="false"
-                ></component>
-            </el-dialog>
-        </template>
-        <template v-slot:main="{layout}">
-           
-                        <DataGrid
-                            ref="mainDataGrid"
-                            key="main"
-                            dataUrl="/dc/getWorkflows"
-                            v-bind:tableHeight="(layout.height-startHeight)"
-                            v-bind:isshowOption="true" v-bind:isshowSelection ="true"
-                            gridViewName="WorkflowGrid"
-                            condition="lastVersion"
-                            @rowclick="rowClick"
-                            :isshowCustom="false"
-                            :isEditProperty="false"
-                            showOptions="查看内容"
-                            :optionWidth = "2"
-                            isInitData
-                            :isShowChangeList="false"
-                        >
-                           
-                           <template slot="optionButton" slot-scope="scope">
-                                <el-button
-                                    type="primary"
-                                    plain
-                                    size="small"
-                                    :title="$t('application.StartUpWorkflow')"
-                                    icon="el-icon-more"
-                                    @click="draftData(scope.data.row)"
-                                    ></el-button>
-                                <!-- <el-dropdown-item icon="el-icon-chat-line-square" >{{$t('application.Reply')}}</el-dropdown-item> -->
-                            </template>
-                        </DataGrid>
+                >
+                </BorrowFile>
+                <el-dialog
+                title="档案利用承诺书"
+                :visible.sync="dialogVisible"
+                :show-close="true"
+                width="50%"
+                :append-to-body="true"
+                modal-append-to-body="false" 
+                >
+                <span>
+                中国核电工程有限公司</br>
+                档案利用承诺书  </br>
 
-            
-        </template>
-    </DataLayout>
+                根据《中华人民共和国档案法》以及中国核电工程有限公司（以下简称“公司”）档案利用工作有关规定，作为公司员工，本人对档案利用作以下承诺：</br>
+                一、自觉遵守国家档案法律、法规及公司的档案利用规章制度；</br>
+                二、所借阅档案不得做任何涂改、抽取、替换或添加信息；</br>
+                三、所借阅档案应妥善保管、不得损坏、丢失，已装订成册的不得拆散；</br>
+                四、所借阅档案不得扩大知悉范围，不得拍照、复制或转借他人；</br>
+                五、所借阅档案应在规定时间内归还；</br>
+                六、本《承诺书》未尽事宜按国家有关法律法规和公司规定执行。</span>
+
+                </el-dialog>
+
+            <el-radio v-model="accept" label="接受">接受档案承诺利用书</el-radio>
+            <el-button type="success" @click="open">档案利用承诺书</el-button>
+
+                <div class="dialog-footer" style="float:right">
+                    <slot name="footerButton">
+                        <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
+                        
+                        <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button>
+                        <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
+                    </slot>
+                    
+                </div>
+
+        </el-main>
+                    
+    </el-container>
     
 </template>
 <script type="text/javascript">
@@ -70,12 +74,10 @@
     import DataSelect from '@/components/ecm-data-select'
     import DataLayout from '@/components/ecm-data-layout'
     import AttachmentFile from "@/views/dc/AttachmentFile.vue"
-    import FormFile from "@/views/workflow/FormFile.vue"
-    import CommonStartup from "@/views/workflow/CommonStartup.vue"
-    import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue"
-    import CopyStartUp from "@/views/workflow/CopyStartUp.vue"
+    import BorrowFile from "@/views/workflow/BorrowFile.vue"
+    import UserSelectInput from '@/components/controls/BorrowUserSelectInput'
     export default {
-        name: "TodoTask",
+        name: "StartupWorkflow",
         permit: 1,
         components: {
             ShowProperty:ShowProperty,
@@ -85,41 +87,68 @@
             RejectButton:RejectButton,
             DataLayout:DataLayout,
             AttachmentFile:AttachmentFile,
-            FormFile:FormFile,
-            CommonStartup:CommonStartup,
-            BorrowStartUp: BorrowStartUp,
-            CopyStartUp : CopyStartUp
+            BorrowFile:BorrowFile,
+            UserSelectInput:UserSelectInput
         },
         data() {
                 return {
-                    // 本地存储高度名称
-                    topStorageName: 'ReceivedDCHeight',
-                    // 非split pan 控制区域高度
-                    startHeight: 145,
-                    // 顶部百分比*100
-                    topPercent: 65,
-                    // 顶部除列表高度
-                    topbarHeight: 35,
-                    // 底部除列表高度
-                    bottomHeight: 120,
-                    dialogName:"",
-                    propertyVisible:false,
-                    typeName:"",
-                    isOnly:false,
-                    butt:false,
-                    workflowObj:{},
-                    workflowFileList:[],
-                    componentName:""
+      // 本地存储高度名称
+      topStorageName: "ReceivedDCHeight",
+      // 非split pan 控制区域高度
+      startHeight: 135,
+      // 顶部百分比*100
+      topPercent: 65,
+      // 顶部除列表高度
+      topbarHeight: 35,
+      // 底部除列表高度
+      bottomHeight: 120,
+      dialogName: "",
+      propertyVisible: false,
+      typeName: "复制单",
+      isOnly: false,
+      butt: false,
+      workflowFileList: [],
+      saveButt: false,
+      departmentLeader:'部门领导',
+      companyLeader:'公司领导',
+      reviewer1:'',
+      reviewer2:'',
+      reviewer3:'',
+      accept:"不接受",
+      dialogVisible:false
                 }
+            },
+            props:{
+                workflowObj:{type:Object,default:{}},
+                showUploadFile:{type:Boolean,default:true},
+                workflowFileList:{type:Array,default:[]}
             },
             mounted(){
                 // this.getWorkflows();
+                console.log(this.currentUser().department)
             },
             methods:{
-                closeDialog(){
-                    this.propertyVisible=false;
+            open(){
+                this.dialogVisible=true
+            },
+                loadFormInfo(){
+                    this.$refs.ShowProperty.myTypeName=this.typeName;
+                    this.$refs.ShowProperty.loadFormInfo();
                 },
                 startUpWorkflow(workflow){
+                  if(this.accept!="接受"){
+                      this.$message("请接受档案利用承诺书!")
+                      return
+                  }
+                  if(this.reviewer1==''){
+                      this.$message("请完成借阅单必填项！本部门领导为必填项!")
+                      return
+                    }
+                   if(this.$refs.workflowFile.sameDepartMent == false){
+                   if(this.reviewer2==''){
+                    this.$message("请完成借阅单必填项！形成部门领导为必填项!")
+                      return                }
+                   }
                    let _self = this;
                     _self.butt=true;
                     if(!this.$refs.ShowProperty.validFormValue()){
@@ -133,6 +162,9 @@
                         fileIds.push(_self.workflowFileList[n].ID);
                     }
                     m.set("childFileId",fileIds);
+
+              
+                    _self.butt = false
                     var c;
                     for(c in _self.$refs.ShowProperty.dataList)
                     {
@@ -187,6 +219,9 @@
                             _self.butt=false;
                             return;
                         }
+                        m.set("C_REVIEWER1",_self.reviewer1)
+                        m.set("C_REVIEWER2",_self.reviewer2)
+                        m.set("C_REVIEWER3",_self.reviewer3)
                         let formdata = new FormData();
                         formdata.append("metaData",JSON.stringify(m));
                         if(_self.$refs.ShowProperty.file!="")
@@ -231,7 +266,8 @@
                                         duration: 2000,
                                         type: "success",
                                     });
-
+                                    _self.closePage();
+                                   
                                     })
                                     .catch(function (error) {
                                     _self.$message({
@@ -272,7 +308,9 @@
                         }
                         
                     });
-
+                },
+                closePage(pv){
+                    this.$emit("close");
                 },
                 // 保存文档
                 saveItem()
@@ -289,6 +327,7 @@
                         fileIds.push(_self.workflowFileList[n].ID);
                     }
                     m.set("childFileId",fileIds);
+                    m.set("saveType","1");
                     var c;
                     for(c in _self.$refs.ShowProperty.dataList)
                     {
@@ -406,30 +445,7 @@
                     });
                 
                 },
-                draftData(workflow) 
-                {
-                    let _self = this;
-                    _self.workflowObj=workflow;
-                    // _self.propertyVisible = true;
-                    _self.typeName=workflow.FORMNAME;
-                    this.getEcmcfgActive(this.workflowObj.ID,"start",function(ecmCfgActivity){
-                        _self.componentName=ecmCfgActivity.componentName;
-                        _self.propertyVisible=true;
-                        _self.$nextTick(()=>{
-                            if(_self.$refs.startup){
-                            _self.$refs.startup.loadFormInfo();
-                            }
-                        });
-                    });
-                    // setTimeout(()=>{
-                    //     if(_self.$refs.startup){
-                    //         _self.$refs.startup.typeName=workflow.FORMNAME;
-                    //         // _self.$refs.ShowProperty.myFolderId = _self.selectTransferRow.id;
-                    //         _self.$refs.startup.loadFormInfo();
-                    //     }
-                    // },10);
-
-                },
+                
                 // 保存结果事件
                 onSaved(indata) {
                     let _self=this;

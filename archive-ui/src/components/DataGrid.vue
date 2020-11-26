@@ -103,6 +103,7 @@
       <el-table
         :key="rkey"
         id="datatable"
+        ref="datatable"
         :height="tableHeight"
         :data="itemDataList"
         border
@@ -452,6 +453,12 @@ export default {
     }
   },
   methods: {
+    // clickCheck(row){
+    //   if(row){
+    //     this.$refs.datatable.clearSelection();
+    //     this.$refs.datatable.toggleRowSelection(row);
+    //   }
+    // },
     onPropertiesSaveSuccess(props) {
       this.$emit("onPropertiesSaveSuccess", props);
     },
@@ -994,6 +1001,10 @@ export default {
     },
     rowClick(row) {
       this.selectedRow = row;
+      if(row&&this.isshowSelection){
+        this.$refs.datatable.clearSelection();
+        this.$refs.datatable.toggleRowSelection(row);
+      }
       this.$emit("rowclick", row);
     },
     dbclick(row) {
