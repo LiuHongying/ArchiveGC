@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +32,7 @@ import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.NumberService;
 import com.ecm.core.service.RelationService;
 import com.ecm.portal.archive.common.ChildrenObjAction;
+import com.ecm.portal.archivegc.service.ImportServiceGc;
 import com.ecm.portal.controller.ControllerAbstract;
 import com.ecm.icore.service.IEcmSession;
 import com.ecm.portal.controller.ControllerAbstract;
@@ -45,7 +47,8 @@ public class ArchiveDcController extends ControllerAbstract{
 	private NumberService numberService;
 	@Autowired
 	private RelationService relationService;
-	
+	@Autowired
+	private ImportServiceGc importService;
 	@RequestMapping(value = "/dc/getEcmDefTypes", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> getEcmDefTypes(@RequestBody String argStr) throws Exception {
@@ -364,7 +367,26 @@ public class ArchiveDcController extends ControllerAbstract{
 	
 		
 	}
-	
+	@RequestMapping(value = "/import/batchImport", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> batchImport(@RequestParam("metaData")String metaData,@RequestParam("excel") MultipartFile excel, @RequestParam("files") MultipartFile[] files) throws AccessDeniedException{
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		String msg;
+		try {
+			String relationName=args.get("relationName")==null?"":args.get("relationName").toString();
+			msg = importService.importExcel(getToken(),args.get("id").toString(),relationName,excel, files);
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("data", msg);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("data", e.getMessage());
+		}
+		
+		return mp;
+	}
 	/**
 	 * 取号
 	 * @param argStr

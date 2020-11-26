@@ -67,6 +67,31 @@
       </div>
     </el-dialog>
 
+    <el-dialog title="取批次号"
+    :visible.sync="pieceNumVisible"
+    @close="pieceNumVisible = false"
+    >
+      <el-form label-width="80px">
+        <el-col :span="12">
+          <el-form-item label="批次号">
+            <el-input v-model="pieceNum" auto-complete="off"></el-input>
+          </el-form-item>
+          
+        </el-col>
+        <el-col :span="3">
+          <div style="margin-top:6px">
+            <el-button type="primary" @click="takePiecesNumber">取批次号</el-button>
+          </div>
+          
+        </el-col>
+        
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="savePiecesNumber">{{$t('application.ok')}}</el-button>
+        <el-button @click="pieceNumVisible = false">{{$t('application.cancel')}}</el-button>
+      </div>
+    </el-dialog>
+
     <el-dialog
       :title="folderAction"
       :visible.sync="folderDialogVisible"
@@ -209,7 +234,14 @@
                 @click="arrangeComplete('已质检')"
                 title="质检完成"
               ></el-button>
-              
+              <el-button
+                type="primary"
+                plain
+                size="small"
+                icon="el-icon-help"
+                @click="pieceNumVisible=true"
+                title="生成批次号"
+              ></el-button>
               <el-button
                 type="primary"
                 plain
@@ -401,7 +433,9 @@ export default {
       parentId:"",
       folderId:"",
       archiveStatus:"",
-      extendMap:{}
+      extendMap:{},
+      pieceNum:"",//批次号
+      pieceNumVisible:false,//是否显示取批次号dialog
     };
   },
   
@@ -1200,7 +1234,7 @@ export default {
         p.push(m);
       });
       _self.updateData(p,function(){
-        _self.$$refs.leftDataGrid.itemDataList=[];
+        _self.$refs.leftDataGrid.itemDataList=[];
         _self.searchItem();
       });
     },
@@ -1323,6 +1357,79 @@ export default {
 
       
     },
+    savePiecesNumber(){
+      let _self=this;
+      if(_self.selectedItems==undefined||_self.selectedItems.length==0){
+         _self.$message({
+              showClose: true,
+              message: _self.$t('message.PleaseSelectOneOrMoreData'),
+              duration: 2000,
+              type: "error"
+            });
+            return;
+      }
+      let p=new Array();
+      _self.selectedItems.forEach(e=>{
+        let m=new Map();
+        m.set("ID",e.ID);
+        m.set("C_BATCH_CODING2",_self.pieceNum);
+        p.push(m);
+      });
+      _self.updateData(p,function(){
+        _self.$refs.leftDataGrid.itemDataList=[];
+        _self.searchItem();
+      });
+      
+    },
+    takePiecesNumber(){
+      
+      let _self=this;
+      let m=new Map();
+      m.set('TYPE_NAME','批次号');
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: JSON.stringify(m), //JSON.stringify(m),
+          url: "/dc/takeNumbersByPolicy"
+        })
+        .then(function(response) {
+          
+          let code = response.data.code;
+          if (code == 1) {
+            //  _self.$message("取号成功！");
+            _self.$message({
+              showClose: true,
+              message: "取号成功！",
+              duration: 2000,
+              type: "success"
+            });
+            _self.pieceNum=response.data.data;
+          } else {
+            // _self.$message(response.data.message);
+            _self.$message({
+              showClose: true,
+              message: response.data.message,
+              duration: 2000,
+              type: "warning"
+            });
+          }
+        })
+        .catch(function(error) {
+          _self.getNumLoading = false;
+          // _self.$message(_self.$t("message.takeNumberFaild"));
+          _self.$message({
+            showClose: true,
+            message: _self.$t("message.takeNumberFaild"),
+            duration: 5000,
+            type: "error"
+          });
+          console.log(error);
+        });
+    },
+
     takeNumbers() {
       let _self = this;
       if (_self.selectedItems.length == 0) {
