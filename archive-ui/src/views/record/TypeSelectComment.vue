@@ -1,6 +1,6 @@
 <template>
-  <div style="width:50px;">
-    <el-dialog :visible.sync="typeSelectVisible">
+  <div>
+    <el-dialog :visible.sync="typeSelectVisible" width="360px">
       <div style="width: 80%">
         <el-form>
           <el-form-item
@@ -11,11 +11,10 @@
               name="selectName"
               v-model="selectedClassic"
               :placeholder="$t('application.selectFileType')"
-              style="display:block;"
               @change="getTypeNameByClassic(selectedClassic)"
             >
               <template v-for="(name,nameIndex) in classicNames">
-                <el-option :label="name" :value="name" :key="nameIndex"></el-option>
+                <el-option :label="name" :value="name" :key="'PT_'+nameIndex"></el-option>
               </template>
             </el-select>
           </el-form-item>
@@ -27,11 +26,10 @@
               name="selectName"
               v-model="selectedTypeName"
               :placeholder="$t('application.selectFileType')"
-              style="display:block;"
             >
-              <div v-for="(name,nameIndex) in typeNames" :key="'T_'+nameIndex">
-                <el-option :label="name" :value="name" :key="nameIndex"></el-option>
-              </div>
+              <template v-for="(name,nameIndex) in typeNames" >
+                <el-option :label="name" :value="name" :key="'CT_'+nameIndex"></el-option>
+              </template>
             </el-select>
           </el-form-item>
         </el-form>
