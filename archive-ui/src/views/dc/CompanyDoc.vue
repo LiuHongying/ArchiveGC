@@ -1,20 +1,16 @@
 <template>
   <div>
-    <!-- <el-dialog
-      :title="$t('application.borrow')"
-      :visible.sync="borrowDialogVisible"
-      @close="propertyVisible = false"
-      width="80%"
-      style="width:100%"
-      custom-class="customWidth"
+    <el-dialog
+      title="文档借阅"
+      :visible.sync="borrowVisible"
+      @close="borrowVisible = false"
+      width="90%"
+      style="width: 100%"
+      :close-on-click-modal="false"
+      v-dialogDrag
     >
-      <ShowBorrowForm
-        ref="ShowBorrowForm"
-        @onSaved="onSaved"
-        width="100%"
-        v-bind:borrowForm="borrowForm"
-      ></ShowBorrowForm>
-    </el-dialog>-->
+      <div><BorrowStartUp :workflowObj="workflow" :showUploadFile="true" :workflowFileList="itemDataList"></BorrowStartUp></div>
+    </el-dialog>
     <el-dialog
       :title="$t('application.openShopingCart')"
       :visible.sync="shopingCartDialogVisible"
@@ -192,7 +188,7 @@
               >
             </el-form-item>
             <el-form-item>
-              <BorrwoForm></BorrwoForm>
+              <el-button type="primary" plain size="medium" icon="el-icon-right" @click="getWorkFlow">发起流程</el-button>
             </el-form-item>
             <el-form-item>
               <template v-if="isFileAdmin">
@@ -356,11 +352,16 @@
 import ShowProperty from "@/components/ShowProperty";
 import InnerItemViewer from "./InnerItemViewer.vue";
 import BorrwoForm from "@/components/form/Borrow";
+import StartupWorkflow from "@/views/workflow/BorrowStartUp.vue";
+import BorrowFile from "@/views/workflow/BorrowFile.vue";
+import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue"
 export default {
   components: {
     ShowProperty: ShowProperty,
     InnerItemViewer: InnerItemViewer,
     BorrwoForm: BorrwoForm,
+    StartupWorkflow: StartupWorkflow,
+    BorrowStartUp: BorrowStartUp,
   },
   data() {
     return {
@@ -380,6 +381,7 @@ export default {
       asideWidth: "100%",
       currentLanguage: "zh-cn",
       propertyVisible: false,
+      borrowVisible: false,
       loading: false,
       tableLoading: false,
       currentFolder: [],
@@ -418,6 +420,8 @@ export default {
         result: "在线浏览",
         message: "",
       },
+
+      workflow: {},
     };
   },
   created() {
@@ -455,6 +459,27 @@ export default {
     _self.loadGridInfo(_self.defaultData);
   },
   methods: {
+    getWorkFlow() {
+      let _self = this;
+
+      var m = new Map();
+      m.set("processDefinitionKey", "文档借阅流程");
+
+      axios
+        .post("/dc/getWorkflow", JSON.stringify(m))
+        .then(function (response) {
+          debugger;
+          _self.workflow = response.data.data[0];
+          console.log(_self.workflow)
+          _self.borrowVisible = true;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
+      
+    },
+
     resize() {
       //console.log('resize')
       this.asideWidth = "100%";
@@ -964,21 +989,6 @@ export default {
       } else {
         _self.loadGridData(this.currentFolder);
       }
-    },
-    startWorkflow(indata) {
-      let _self = this;
-
-      axios
-        .post("/workflow/startWorkflow", JSON.stringify(_self.borrowForm))
-        .then(function (response) {
-          _self.dialogVisible = false;
-          _self.refreshData();
-          _self.$message("完成任务成功!");
-          _self.$emit("refreshcount");
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
     },
   },
 };

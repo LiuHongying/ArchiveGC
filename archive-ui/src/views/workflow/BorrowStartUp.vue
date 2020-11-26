@@ -128,7 +128,6 @@
             },
             mounted(){
                 // this.getWorkflows();
-                console.log(this.currentUser().department)
             },
             methods:{
             open(){
@@ -167,7 +166,6 @@
                     m.set("childFileId",fileIds);
                     axios.post("/dc/countDocuments", JSON.stringify(m))
                                         .then(function (response) {
-                        console.log(response.data)
                         let code = response.data.code
                         if(code==1){
                         if(_self.reviewer3==''){
@@ -196,7 +194,6 @@
                                 }
                                 temp = temp.substring(0,temp.length-1);
                                 val = temp;
-                                console.log(val);
                             }
                             m.set(dataRows[i].attrName, val);
                             }
@@ -213,8 +210,6 @@
                         m.set('FOLDER_ID',_self.$refs.ShowProperty.myFolderId);
                         m.set("parentDocId", _self.parentId);
                         m.set("relationName",_self.relationName);
-                        console.log(_self.$refs.ShowProperty.myTypeName)
-                        console.log(_self.$refs.ShowProperty.myFolderId)
                     }
                     _self.validateData(m,function(isOk)
                     {
@@ -270,7 +265,6 @@
                                 axios
                                     .post("/workflow/startWorkflowById", JSON.stringify(m))
                                     .then(function (response) {
-                                    console.log(response);
                                     _self.$message({
                                         showClose: true,
                                         message: "流程发起成功!",
@@ -360,7 +354,6 @@
                                 }
                                 temp = temp.substring(0,temp.length-1);
                                 val = temp;
-                                console.log(val);
                             }
                             m.set(dataRows[i].attrName, val);
                             }
@@ -377,8 +370,6 @@
                         m.set('FOLDER_ID',_self.$refs.ShowProperty.myFolderId);
                         m.set("parentDocId", _self.parentId);
                         m.set("relationName",_self.relationName);
-                        console.log(_self.$refs.ShowProperty.myTypeName)
-                        console.log(_self.$refs.ShowProperty.myFolderId)
                     }
                     _self.validateData(m,function(isOk)
                     {
