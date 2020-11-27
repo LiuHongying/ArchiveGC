@@ -74,10 +74,6 @@ public class ArchiveDcController extends ControllerAbstract{
 	private RelationService relationService;
 	@Autowired
 	private ImportServiceGc importService;
-	@Autowired
-	private FolderPathService folderPathService;
-	@Autowired
-	private FolderService folderService;
 	@RequestMapping(value = "/dc/getEcmDefTypes", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> getEcmDefTypes(@RequestBody String argStr) throws Exception {
