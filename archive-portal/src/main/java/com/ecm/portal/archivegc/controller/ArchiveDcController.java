@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,7 +34,11 @@ import com.ecm.core.entity.EcmFolder;
 import com.ecm.core.entity.EcmQuery;
 import com.ecm.core.entity.EcmRelation;
 import com.ecm.core.exception.AccessDeniedException;
+import com.ecm.core.exception.EcmException;
+import com.ecm.core.exception.NoPermissionException;
 import com.ecm.core.service.DocumentService;
+import com.ecm.core.service.FolderPathService;
+import com.ecm.core.service.FolderService;
 import com.ecm.core.service.NumberService;
 import com.ecm.core.entity.LoginUser;
 import com.ecm.core.entity.Pager;
@@ -45,6 +50,7 @@ import com.ecm.core.service.NumberService;
 import com.ecm.core.service.QueryService;
 import com.ecm.core.service.RelationService;
 import com.ecm.portal.archive.common.ChildrenObjAction;
+import com.ecm.portal.archivegc.service.ImportServiceGc;
 import com.ecm.portal.controller.ControllerAbstract;
 import com.ecm.icore.service.IEcmSession;
 import com.ecm.portal.controller.ControllerAbstract;
@@ -66,7 +72,12 @@ public class ArchiveDcController extends ControllerAbstract{
 	
 	@Autowired
 	private RelationService relationService;
-	
+	@Autowired
+	private ImportServiceGc importService;
+	@Autowired
+	private FolderPathService folderPathService;
+	@Autowired
+	private FolderService folderService;
 	@RequestMapping(value = "/dc/getEcmDefTypes", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> getEcmDefTypes(@RequestBody String argStr) throws Exception {
@@ -389,7 +400,98 @@ public class ArchiveDcController extends ControllerAbstract{
 	
 		
 	}
+	@RequestMapping(value = "/import/batchImport", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> batchImport(@RequestParam("metaData")String metaData,@RequestParam("excel") MultipartFile excel, @RequestParam("files") MultipartFile[] files) throws AccessDeniedException{
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		String msg;
+		try {
+			String relationName=args.get("relationName")==null?"":args.get("relationName").toString();
+			msg = importService.importExcel(getToken(),args.get("id").toString(),relationName,excel, files);
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("data", msg);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("data", e.getMessage());
+		}
+		
+		return mp;
+	}
 	
+	
+	
+	/**
+	 * 预归档库
+	 * @param argStr
+	 * @return
+	 */
+	@RequestMapping(value = "/dc/penddingStorage", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
+	@ResponseBody
+	public Map<String,Object> penddingStorage(@RequestBody String argStr){
+		List<String> list = JSONUtils.stringToArray(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		for (String id : list) {
+//			Map<String,Object> obj= JSONUtils.stringToMap(mpstr);
+			
+			try {
+//				String id=obj.get("ID").toString();
+				EcmDocument doc= documentService.getObjectById(getToken(), id);
+				doc.setStatus("待入库");
+				
+				String folderId= folderPathService.getFolderId(getToken(), doc.getAttributes(), "3");
+				EcmFolder folder= folderService.getObjectById(getToken(), folderId);
+				doc.setFolderId(folderId);
+				doc.setAclName(folder.getAclName());
+				documentService.updateObject(getToken(), doc,null);
+			} catch (NoPermissionException | AccessDeniedException | EcmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("message", "操作失败");
+				return mp;
+			}
+		}
+		mp.put("code", ActionContext.SUCESS);
+		mp.put("message", "操作成功");
+		return mp;
+	}
+	/**
+	 * 预归档库
+	 * @param argStr
+	 * @return
+	 */
+	@RequestMapping(value = "/dc/moveToPreFiling", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
+	@ResponseBody
+	public Map<String,Object> moveToPreFiling(@RequestBody String argStr){
+		List<String> list = JSONUtils.stringToArray(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		for (String id : list) {
+//			Map<String,Object> obj= JSONUtils.stringToMap(mpstr);
+			
+			try {
+//				String id=obj.get("ID").toString();
+				EcmDocument doc= documentService.getObjectById(getToken(), id);
+				doc.setStatus("预归档");
+				
+				String folderId= folderPathService.getFolderId(getToken(), doc.getAttributes(), "4");
+				doc.setFolderId(folderId);
+				doc.setAclName("acl_pre_archive");
+				documentService.updateObject(getToken(), doc,null);
+			} catch (NoPermissionException | AccessDeniedException | EcmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("message", "操作失败");
+				return mp;
+			}
+		}
+		mp.put("code", ActionContext.SUCESS);
+		mp.put("message", "操作成功");
+		return mp;
+	}
 	/**
 	 * 取号
 	 * @param argStr
