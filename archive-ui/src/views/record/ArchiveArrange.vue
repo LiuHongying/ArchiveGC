@@ -248,8 +248,17 @@
                 :loading="releaseLoading"
                 size="small"
                 icon="el-icon-sell"
-                @click="putInStorage"
-                :title="$t('application.warehousing')"
+                @click="moveToPreFilling"
+                title="提交预归档库"
+              ></el-button>
+              <el-button
+                type="primary"
+                plain
+                :loading="releaseLoading"
+                size="small"
+                icon="el-icon-sell"
+                @click="penddingStorage"
+                title="提交入库"
               ></el-button>
             </el-col>
             </el-col>
@@ -556,6 +565,8 @@ export default {
       _self.printGridName = gridName;
       _self.printObjId = selectedRow.ID;
     },
+
+
     ///上架
     putInStorage() {
       let _self = this;
@@ -1223,6 +1234,89 @@ export default {
     searchItem() {
       this.loadGridData(this.currentFolder);
       //  this. loadPageInfo(this.currentFolder);
+    },
+    
+    penddingStorage(){
+      let _self=this;
+      if (_self.selectedItems.length == 0) {
+        //  _self.$message("请选择一条卷盒数据！");
+        _self.$message({
+          showClose: true,
+          message: "请选择一条或多条数据！",
+          duration: 2000,
+          type: "warning"
+        });
+        return;
+      }
+      let p=new Array();
+      _self.selectedItems.forEach(e=>{
+        p.push(e.ID);
+      });
+      _self
+          .axios({
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8"
+            },
+            datatype: "json",
+            method: "post",
+            data: JSON.stringify(p),
+            url: "/dc/penddingStorage"
+          })
+          .then(function(response) {
+            // _self.$message(_self.$t("message.saveSuccess"));
+            _self.$message({
+              showClose: true,
+              message: _self.$t("message.saveSuccess"),
+              duration: 2000,
+              type: "success"
+            });
+            _self.$refs.leftDataGrid.itemDataList=[];
+            _self.searchItem();
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+    },
+    moveToPreFilling(){
+      let _self=this;
+      if (_self.selectedItems.length == 0) {
+        //  _self.$message("请选择一条卷盒数据！");
+        _self.$message({
+          showClose: true,
+          message: "请选择一条或多条数据！",
+          duration: 2000,
+          type: "warning"
+        });
+        return;
+      }
+      let p=new Array();
+      _self.selectedItems.forEach(e=>{
+        p.push(e.ID);
+      });
+      _self
+          .axios({
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8"
+            },
+            datatype: "json",
+            method: "post",
+            data: JSON.stringify(p),
+            url: "/dc/moveToPreFiling"
+          })
+          .then(function(response) {
+            // _self.$message(_self.$t("message.saveSuccess"));
+            _self.$message({
+              showClose: true,
+              message: _self.$t("message.saveSuccess"),
+              duration: 2000,
+              type: "success"
+            });
+            _self.$refs.leftDataGrid.itemDataList=[];
+            _self.searchItem();
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
     },
     arrangeComplete(statusVal){
       let _self=this;

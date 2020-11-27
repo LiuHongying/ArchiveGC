@@ -26,9 +26,14 @@ import com.ecm.core.ActionContext;
 import com.ecm.core.cache.manager.CacheManagerOper;
 import com.ecm.core.entity.EcmDefType;
 import com.ecm.core.entity.EcmDocument;
+import com.ecm.core.entity.EcmFolder;
 import com.ecm.core.entity.EcmRelation;
 import com.ecm.core.exception.AccessDeniedException;
+import com.ecm.core.exception.EcmException;
+import com.ecm.core.exception.NoPermissionException;
 import com.ecm.core.service.DocumentService;
+import com.ecm.core.service.FolderPathService;
+import com.ecm.core.service.FolderService;
 import com.ecm.core.service.NumberService;
 import com.ecm.core.service.RelationService;
 import com.ecm.portal.archive.common.ChildrenObjAction;
@@ -49,6 +54,10 @@ public class ArchiveDcController extends ControllerAbstract{
 	private RelationService relationService;
 	@Autowired
 	private ImportServiceGc importService;
+	@Autowired
+	private FolderPathService folderPathService;
+	@Autowired
+	private FolderService folderService;
 	@RequestMapping(value = "/dc/getEcmDefTypes", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> getEcmDefTypes(@RequestBody String argStr) throws Exception {
@@ -385,6 +394,78 @@ public class ArchiveDcController extends ControllerAbstract{
 			mp.put("data", e.getMessage());
 		}
 		
+		return mp;
+	}
+	
+	
+	
+	/**
+	 * 预归档库
+	 * @param argStr
+	 * @return
+	 */
+	@RequestMapping(value = "/dc/penddingStorage", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
+	@ResponseBody
+	public Map<String,Object> penddingStorage(@RequestBody String argStr){
+		List<String> list = JSONUtils.stringToArray(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		for (String id : list) {
+//			Map<String,Object> obj= JSONUtils.stringToMap(mpstr);
+			
+			try {
+//				String id=obj.get("ID").toString();
+				EcmDocument doc= documentService.getObjectById(getToken(), id);
+				doc.setStatus("待入库");
+				
+				String folderId= folderPathService.getFolderId(getToken(), doc.getAttributes(), "3");
+				EcmFolder folder= folderService.getObjectById(getToken(), folderId);
+				doc.setFolderId(folderId);
+				doc.setAclName(folder.getAclName());
+				documentService.updateObject(getToken(), doc,null);
+			} catch (NoPermissionException | AccessDeniedException | EcmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("message", "操作失败");
+				return mp;
+			}
+		}
+		mp.put("code", ActionContext.SUCESS);
+		mp.put("message", "操作成功");
+		return mp;
+	}
+	/**
+	 * 预归档库
+	 * @param argStr
+	 * @return
+	 */
+	@RequestMapping(value = "/dc/moveToPreFiling", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
+	@ResponseBody
+	public Map<String,Object> moveToPreFiling(@RequestBody String argStr){
+		List<String> list = JSONUtils.stringToArray(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		for (String id : list) {
+//			Map<String,Object> obj= JSONUtils.stringToMap(mpstr);
+			
+			try {
+//				String id=obj.get("ID").toString();
+				EcmDocument doc= documentService.getObjectById(getToken(), id);
+				doc.setStatus("预归档");
+				
+				String folderId= folderPathService.getFolderId(getToken(), doc.getAttributes(), "4");
+				doc.setFolderId(folderId);
+				doc.setAclName("acl_pre_archive");
+				documentService.updateObject(getToken(), doc,null);
+			} catch (NoPermissionException | AccessDeniedException | EcmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("message", "操作失败");
+				return mp;
+			}
+		}
+		mp.put("code", ActionContext.SUCESS);
+		mp.put("message", "操作成功");
 		return mp;
 	}
 	/**

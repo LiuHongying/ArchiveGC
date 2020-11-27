@@ -439,13 +439,8 @@
           </el-container>
         </template>
         <template slot="paneR">
-          <split-pane
-            v-on:resize="onSplitResize"
-            :min-percent="20"
-            :default-percent="topPercent"
-            split="horizontal"
-          >
-            <template slot="paneL">
+          
+            <!-- <template slot="paneL"> -->
               <el-row>
                 <el-table
                   :height="tableHeight"
@@ -572,7 +567,7 @@
                   :total="itemCount"
                 ></el-pagination>
               </el-row>
-            </template>
+            <!-- </template> -->
             <template slot="paneR" v-if="tempShow">
               <el-tabs v-model="tabs.activeNum">
                 <el-tab-pane label="案卷" name="relevantFile">
@@ -586,7 +581,7 @@
                 <el-tab-pane label="文件" name="initFile"> </el-tab-pane>
               </el-tabs>
             </template>
-          </split-pane>
+          
         </template>
       </split-pane>
     </div>
