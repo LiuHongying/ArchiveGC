@@ -403,7 +403,10 @@
             <StartupComponent :selectedFiles="selectedItems"></StartupComponent>
           </el-form-item>
           <el-form-item>
-            <ArchieveStorage :roleJudgement="true"  :selectRowData="selectedItems"></ArchieveStorage>
+            <ArchieveStorage :roleJudgement="true"  :selectRowData="selectedItems" :reload-Grid = "reload"></ArchieveStorage>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
           </el-form-item>
         </el-form>  
       </el-col>
@@ -436,13 +439,8 @@
           </el-container>
         </template>
         <template slot="paneR">
-          <split-pane
-            v-on:resize="onSplitResize"
-            :min-percent="20"
-            :default-percent="topPercent"
-            split="horizontal"
-          >
-            <template slot="paneL">
+          
+            <!-- <template slot="paneL"> -->
               <el-row>
                 <el-table
                   :height="tableHeight"
@@ -569,7 +567,7 @@
                   :total="itemCount"
                 ></el-pagination>
               </el-row>
-            </template>
+            <!-- </template> -->
             <template slot="paneR" v-if="tempShow">
               <el-tabs v-model="tabs.activeNum">
                 <el-tab-pane label="案卷" name="relevantFile">
@@ -583,7 +581,7 @@
                 <el-tab-pane label="文件" name="initFile"> </el-tab-pane>
               </el-tabs>
             </template>
-          </split-pane>
+          
         </template>
       </split-pane>
     </div>
@@ -601,6 +599,7 @@ import FolderAcl from "@/components/controls/FolderAcl";
 import StartWorkflow from "@/views/workflow/StartWorkflow";
 import StartupComponent from "@/views/workflow/StartupComponent.vue";
 import ArchieveStorage from "@/components/SubmitFolder.vue";
+import ExcelUtil from "@/utils/excel.js";
 import "url-search-params-polyfill";
 
 export default {
@@ -617,13 +616,14 @@ export default {
     StartWorkflow: StartWorkflow,
     StartupComponent: StartupComponent,
     ArchieveStorage: ArchieveStorage,
+    ExcelUtil: ExcelUtil,
   },
   data() {
     return {
       RelevantFile: {
         gridViewName: "RelevantFileGrid",
         dataUrl: "/dc/getDocuments",
-        condition: "C_ITEM_TYPE='案卷' and STATUS = '归档'",
+        condition: "C_ITEM_TYPE='案卷' and STATUS = '预归档'",
       },
       activeTab: "基本信息",
       targetFolderId: "",
@@ -927,9 +927,9 @@ export default {
       }
     },
     onTabelRowClick(row) {
-      this.tempShow = true;
       this.currentId = row.ID;
       if (row.C_ITEM_TYPE == "案卷") {
+        this.tempShow = true;
         this.tabs.activeNum = "relevantFile";
         $ref.RelevantFile.condition += " ID = '"+ this.currentId +"'";
         $ref.relevantFileDataGrid.currentPage = 1;
@@ -1416,6 +1416,9 @@ export default {
           });
       }
     },
+    reload() {
+      this.loadGridData(this.currentFolder);
+    },
     //查询文档
     searchItem() {
       this.loadGridData(this.currentFolder);
@@ -1453,6 +1456,21 @@ export default {
         }
       });
       this.columnsInfo.dialogFormVisible = false;
+    },
+
+    exportData() {
+      let _self = this;
+      let params = {
+        URL: "/file/exportFolderPath",
+        gridName: _self.currentFolder.gridView,
+        folderId: _self.currentFolder.id,
+        orderBy: "MODIFIED_DATE desc",
+        pageSize: _self.pageSize,
+        pageIndex: (_self.currentPage - 1) * _self.pageSize,
+        lang: "zh-cn",
+      };
+      console.log(params);
+      ExcelUtil.export4Cnpe(params);
     },
   },
 };
