@@ -41,7 +41,7 @@
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
-          condition="IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"
+          :condition="searchFileCondition"
           gridViewName="BorrowSequenceGrid"
           :optionWidth="1"
           :isShowMoreOption="false"
@@ -203,7 +203,7 @@ export default {
     // },
     beforeAddFile() {
       let _self=this;
-      this.getEcmcfgActive(this.workflowObj.ID,"start",function(ecmCfgActivity){
+      this.getEcmcfgActive(_self.workflowObj.ID,"start",function(ecmCfgActivity){
         _self.searchFileCondition=ecmCfgActivity.formCondition;
         _self.propertyVisible=true;
       });
