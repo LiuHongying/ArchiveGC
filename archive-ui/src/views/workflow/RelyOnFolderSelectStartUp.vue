@@ -1,65 +1,29 @@
 <template>
-    <DataLayout>
-        <template v-slot:header>
-            <el-dialog
-                :title="dialogName+$t('application.property')"
-                :visible.sync="propertyVisible"
-                @close="propertyVisible = false"
-                width="90%"
-                :close-on-click-modal="false"
-                v-dialogDrag
+   <el-container>
+       <el-main>
+           <ShowProperty
+                    ref="ShowProperty"
+                    @onSaved="onSaved"
+                    width="100%"
+                    folderPath=""
+                    :showUploadFile="showUploadFile"
+                    v-bind:typeName="typeName"
                 >
-                <!-- <CommonStartup 
-                ref="startup"
-                :workflowObj="workflowObj" 
-                @close="closeDialog()"
-                :showUploadFile="false"></CommonStartup> -->
-                <component
-                    ref="startup"
-                    :is="componentName"
+                </ShowProperty>
+                <FolderFile ref="workflowFile"
+                    allowEdit
+                    :isShowPage="false"
+                    v-model="workflowFileList"
                     :workflowObj="workflowObj"
-                    :typeName="typeName"
-                    @close="closeDialog()"
-                    :showUploadFile="false"
-                ></component>
-            </el-dialog>
-        </template>
-        <template v-slot:main="{layout}">
-           
-                        <DataGrid
-                            ref="mainDataGrid"
-                            key="main"
-                            dataUrl="/dc/getWorkflows"
-                            v-bind:tableHeight="(layout.height-startHeight)"
-                            v-bind:isshowOption="true" v-bind:isshowSelection ="true"
-                            gridViewName="WorkflowGrid"
-                            condition="lastVersion"
-                            @rowclick="rowClick"
-                            :isshowCustom="false"
-                            :isEditProperty="false"
-                            showOptions="查看内容"
-                            :optionWidth = "2"
-                            isInitData
-                            :isShowChangeList="false"
-                        >
-                           
-                           <template slot="optionButton" slot-scope="scope">
-                                <el-button
-                                    type="primary"
-                                    plain
-                                    size="small"
-                                    :title="$t('application.StartUpWorkflow')"
-                                    icon="el-icon-more"
-                                    @click="draftData(scope.data.row)"
-                                    ></el-button>
-                                <!-- <el-dropdown-item icon="el-icon-chat-line-square" >{{$t('application.Reply')}}</el-dropdown-item> -->
-                            </template>
-                        </DataGrid>
-
-            
-        </template>
-    </DataLayout>
-    
+                >
+                </FolderFile>
+       </el-main>
+       <el-footer>
+           <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
+            <!-- <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button> -->
+            <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
+       </el-footer>
+   </el-container>    
 </template>
 <script type="text/javascript">
     import ShowProperty from "@/components/ShowProperty";
@@ -70,13 +34,9 @@
     import DataSelect from '@/components/ecm-data-select'
     import DataLayout from '@/components/ecm-data-layout'
     import AttachmentFile from "@/views/dc/AttachmentFile.vue"
-    import FormFile from "@/views/workflow/FormFile.vue"
-    import CommonStartup from "@/views/workflow/CommonStartup.vue"
-    import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue"
-    import CopyStartUp from "@/views/workflow/CopyStartUp.vue"
-    import RelyOnFolderSelectStartUp from "@/views/workflow/RelyOnFolderSelectStartUp.vue"
+    import FolderFile from "@/views/workflow/FolderFile.vue"
     export default {
-        name: "TodoTask",
+        name: "StartupWorkflow",
         permit: 1,
         components: {
             ShowProperty:ShowProperty,
@@ -86,18 +46,14 @@
             RejectButton:RejectButton,
             DataLayout:DataLayout,
             AttachmentFile:AttachmentFile,
-            FormFile:FormFile,
-            CommonStartup:CommonStartup,
-            BorrowStartUp: BorrowStartUp,
-            CopyStartUp : CopyStartUp,
-            RelyOnFolderSelectStartUp : RelyOnFolderSelectStartUp
+            FolderFile:FolderFile
         },
         data() {
                 return {
                     // 本地存储高度名称
                     topStorageName: 'ReceivedDCHeight',
                     // 非split pan 控制区域高度
-                    startHeight: 145,
+                    startHeight: 135,
                     // 顶部百分比*100
                     topPercent: 65,
                     // 顶部除列表高度
@@ -106,20 +62,29 @@
                     bottomHeight: 120,
                     dialogName:"",
                     propertyVisible:false,
-                    typeName:"",
+                    
                     isOnly:false,
                     butt:false,
-                    workflowObj:{},
-                    workflowFileList:[],
-                    componentName:""
+                    
+                    saveButt:false
                 }
             },
+            props:{
+                workflowObj:{type:Object,default:{}},
+                showUploadFile:{type:Boolean,default:true},
+                workflowFileList:{type:Array,default:new Array()},
+                typeName:{type:String,default:""},
+            },
+            
             mounted(){
                 // this.getWorkflows();
+                console.log(workflowFileList);
+                console.log(workflowObj);
             },
             methods:{
-                closeDialog(){
-                    this.propertyVisible=false;
+                loadFormInfo(){
+                    this.$refs.ShowProperty.myTypeName=this.workflowObj.FORMNAME;
+                    this.$refs.ShowProperty.loadFormInfo();
                 },
                 startUpWorkflow(workflow){
                    let _self = this;
@@ -135,6 +100,7 @@
                         fileIds.push(_self.workflowFileList[n].ID);
                     }
                     m.set("childFileId",fileIds);
+                    // m.set("STATUS","流程中")
                     var c;
                     for(c in _self.$refs.ShowProperty.dataList)
                     {
@@ -233,7 +199,8 @@
                                         duration: 2000,
                                         type: "success",
                                     });
-
+                                    _self.closePage();
+                                   
                                     })
                                     .catch(function (error) {
                                     _self.$message({
@@ -276,6 +243,9 @@
                     });
 
                 },
+                closePage(pv){
+                    this.$emit("close");
+                },
                 // 保存文档
                 saveItem()
                 {
@@ -291,6 +261,7 @@
                         fileIds.push(_self.workflowFileList[n].ID);
                     }
                     m.set("childFileId",fileIds);
+                    m.set("saveType","1");
                     var c;
                     for(c in _self.$refs.ShowProperty.dataList)
                     {
@@ -408,30 +379,7 @@
                     });
                 
                 },
-                draftData(workflow) 
-                {
-                    let _self = this;
-                    _self.workflowObj=workflow;
-                    // _self.propertyVisible = true;
-                    _self.typeName=workflow.FORMNAME;
-                    this.getEcmcfgActive(this.workflowObj.ID,"start",function(ecmCfgActivity){
-                        _self.componentName=ecmCfgActivity.componentName;
-                        _self.propertyVisible=true;
-                        _self.$nextTick(()=>{
-                            if(_self.$refs.startup){
-                            _self.$refs.startup.loadFormInfo();
-                            }
-                        });
-                    });
-                    // setTimeout(()=>{
-                    //     if(_self.$refs.startup){
-                    //         _self.$refs.startup.typeName=workflow.FORMNAME;
-                    //         // _self.$refs.ShowProperty.myFolderId = _self.selectTransferRow.id;
-                    //         _self.$refs.startup.loadFormInfo();
-                    //     }
-                    // },10);
-
-                },
+                
                 // 保存结果事件
                 onSaved(indata) {
                     let _self=this;

@@ -19,7 +19,7 @@
                     style="width:200px"
                     v-model="inputkey"
                     :placeholder="$t('message.pleaseInput')+$t('application.keyword')"
-                    @change="searchItem"
+                    @keyup.enter.native="searchItem"
                     prefix-icon="el-icon-search"
                     ></el-input>
                     <DataGrid
@@ -94,14 +94,20 @@ export default {
         },
         loadGridData(indata){
             let _self = this;
-            var key = _self.inputkey;
-            if(_self.fatherCondition != ""){
-                console.log(_self.fatherCondition)
-            }
-            _self.mainParam.condition=key;
-            _self.mainParam.folderId=indata.id
             _self.$nextTick(()=>{
-                _self.$refs.mainDataGrid.loadGridData();
+                let key = _self.inputkey;
+                if(key != ""){
+                    key = " coding like '%" +
+                            key +
+                            "%' or title like '%" +
+                            key +
+                            "%' ";
+                _self.mainParam.condition=key;
+                }
+                _self.mainParam.folderId=indata.id
+                _self.$nextTick(()=>{
+                    _self.$refs.mainDataGrid.loadGridData();
+                });
             });
         },
         getFolders(folderPath){
@@ -152,7 +158,22 @@ export default {
       _self.loadGridData(indata);
     },
     transferDataList(){
-
+        let _self = this;
+        this.$emit("selectchange", _self.finalDataList);
+    },
+    searchItem(){
+      let _self = this;
+      if(_self.currentFolder.length == 0){
+          _self.$message({
+                showClose: true,
+                message: '请到文件夹下进行搜索',
+                duration: 2000,
+                type: "warning"
+            });
+      }else{
+          _self.loadGridData(_self.currentFolder);
+      }
+     
     }
 },
 
