@@ -403,7 +403,7 @@
             <StartupComponent :selectedFiles="selectedItems"></StartupComponent>
           </el-form-item>
           <el-form-item>
-            <ArchieveStorage :roleJudgement="true"  :selectRowData="selectedItems"></ArchieveStorage>
+            <ArchieveStorage :roleJudgement="true"  :selectRowData="selectedItems" :reload-Grid = "reload"></ArchieveStorage>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
@@ -623,7 +623,7 @@ export default {
       RelevantFile: {
         gridViewName: "RelevantFileGrid",
         dataUrl: "/dc/getDocuments",
-        condition: "C_ITEM_TYPE='案卷' and STATUS = '归档'",
+        condition: "C_ITEM_TYPE='案卷' and STATUS = '预归档'",
       },
       activeTab: "基本信息",
       targetFolderId: "",
@@ -927,9 +927,9 @@ export default {
       }
     },
     onTabelRowClick(row) {
-      this.tempShow = true;
       this.currentId = row.ID;
       if (row.C_ITEM_TYPE == "案卷") {
+        this.tempShow = true;
         this.tabs.activeNum = "relevantFile";
         $ref.RelevantFile.condition += " ID = '"+ this.currentId +"'";
         $ref.relevantFileDataGrid.currentPage = 1;
@@ -1415,6 +1415,9 @@ export default {
             console.log(error);
           });
       }
+    },
+    reload() {
+      this.loadGridData(this.currentFolder);
     },
     //查询文档
     searchItem() {

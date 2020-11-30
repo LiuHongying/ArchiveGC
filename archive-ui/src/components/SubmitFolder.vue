@@ -12,11 +12,9 @@ export default {
   props: {
     roleJudgement: { type: Boolean, default: true },
     selectRowData: { type: Array, default: null },
-    transDataGrid: {
-      type: Object,
-      default: function () {
-        return {};
-      },
+    reloadGrid: {
+      type: Function,
+      required: true,
     },
   },
   mounted() {},
@@ -55,8 +53,7 @@ export default {
               duration: 2000,
               type: "success",
             });
-            _self.$refs.transDataGrid.loadGridInfo();
-            _self.$refs.transDataGrid.loadGridData();
+            this.$props.reloadGrid('');
           } else {
             _self.$message({
               showClose: true,
