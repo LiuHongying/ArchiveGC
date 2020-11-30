@@ -13,7 +13,7 @@
           label="流程名称"
           :label-width="formLabelWidth"
           style="float:left"
-        >{{sequenceName}}</el-form-item>
+        >{{currentData.workflowName}}</el-form-item>
         <el-form-item
           label="任务名称"
           :label-width="formLabelWidth"
@@ -450,7 +450,7 @@ export default {
       _self.form.formId = indata.formId;
       _self.dialogVisible = true;
       _self.taskTableData = [];
-      _self.sequenceName = _self.currentData.processDefinitionId.split(":")[0]
+      // _self.sequenceName = _self.currentData.processDefinitionId.split(":")[0]
       //  if ("借阅驳回" == indata.name) {
       //     _self.rejectButton = "结束";
       //   } else {
