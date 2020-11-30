@@ -91,13 +91,14 @@ export default {
   props: {
     deliveryId: { type: [String], required: true },
     relationName: { type: [String],default:'' },
-    tmpPath:{type:String,required:true}
+    tmpPath:{type:String,required:true,default:'/系统配置/导入模板'},
+    templateUrl:{type:String,default:'/import/getImportTemplates'}
   },
   methods: {
     loadTemplate(){
       let _self = this;
       _self.loading = true;
-      axios.post("/import/getImportTemplates",_self.tmpPath).then(function(response) {
+      axios.post(_self.templateUrl,_self.tmpPath).then(function(response) {
           _self.templateData = response.data.data;
           _self.loading = false;
         })

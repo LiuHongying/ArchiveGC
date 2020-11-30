@@ -8,7 +8,7 @@
       </div>
     </el-dialog>
     <el-dialog :title="$t('message.Batch')+' '+$t('application.Import')+$t('application.document')" :visible.sync="batchDialogVisible" width="80%" >
-        <BatchImport ref="BatchImport"  @onImported="onBatchImported" width="100%" v-bind:deliveryId="selectedOneTransfer.ID"></BatchImport>
+        <BatchImport ref="BatchImport" templateUrl="/import/getImportTemplatesCommon"  @onImported="onBatchImported" width="100%" v-bind:deliveryId="selectedOneTransfer.ID"></BatchImport>
         <div slot="footer" class="dialog-footer">
           <el-button @click="batchDialogVisible=false" size="medium">{{$t('application.close')}}</el-button>
          </div>
@@ -743,7 +743,7 @@ export default {
         _self.selectRow = row;
       }
       _self.selectedChildrenType = [];
-      _self.getTypeNamesByMainList(_self.selectRow.SUB_TYPE);
+      // _self.getTypeNamesByMainList(_self.selectRow.SUB_TYPE);
       // var key =row.CODING;
       // if(key!=""){
       //   key = "coding = '"+key+"' "; //此处需要修改

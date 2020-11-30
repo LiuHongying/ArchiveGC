@@ -56,7 +56,7 @@ public class Deploy2RecordStorageListener implements JavaDelegate {
 				EcmFolder folder= folderService.getObjectById(token, folderId);
 				arrchive.setFolderId(folderId);
 				arrchive.setAclName(folder.getAclName());
-				
+				arrchive.setStatus("整编");
 				documentService.updateObject(token, arrchive, null);
 				
 			}

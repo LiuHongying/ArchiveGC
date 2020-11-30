@@ -56,11 +56,11 @@ var excel = {
       let blob = new Blob([res.data], { type: type });
       // IE
       if (window.navigator.msSaveBlob) {
-        window.navigator.msSaveBlob(blob, fileName);
+        window.navigator.msSaveBlob(blob, decodeURI(fileName));
       } else {
         var link = document.createElement("a");
         link.href = window.URL.createObjectURL(blob);
-        link.download = fileName;
+        link.download = decodeURI(fileName);
         link.click();
         //释放内存
         window.URL.revokeObjectURL(link.href);
