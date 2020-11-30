@@ -63,16 +63,20 @@ public class FileExportController extends ControllerAbstract{
 			String folderPath = ecmFolder.getFolderPath();
 			
 			String fileName[]=folderPath.split("/");
-			int maxSplit=3;
-			fileName=folderPath.split("/",maxSplit);
 			Date date = new Date();
 	        //设置要获取到什么样的时间
 	        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HH_mm_ss");
 	        //获取String类型的时间
 	        String createdate = sdf.format(date);
 			
-			String filename = fileName[1] + "-" + fileName[2] + createdate + ".xlsx";
-			String sheetname = fileName[2];
+	        String filename = new String();
+	        String sheetname = new String();
+	        
+	        for (int i = 1; i < fileName.length; i++) {
+	        	filename += fileName[i] + "-";
+	        }
+	        filename += createdate + ".xlsx";
+			sheetname = fileName[fileName.length-1];
 			
 			EcmGridView gv = CacheManagerOper.getEcmGridViews().get(gridName);
 			List<EcmGridViewItem> list = gv.getGridViewItems(lang);
@@ -88,7 +92,7 @@ public class FileExportController extends ControllerAbstract{
 			}
 			datalist.add(titleCNName);
 			
-			StringBuffer condition = new StringBuffer("(" + gv.getCondition() + " and IS_CHILD=0 AND STATUS<>'作废' ) ");
+			StringBuffer condition = new StringBuffer("(" + gv.getCondition() + ") ");
 			condition.append(" and FOLDER_ID in (SELECT id from ecm_folder where folder_path like '%" + ecmFolder.getFolderPath() + "%')");
 			
 			List<Map<String, Object>> infList = documentService.getObjectsByConditon(getToken(), gridName, folderId, pager, condition.toString(), args.get("orderBy").toString());
