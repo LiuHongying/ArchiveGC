@@ -9,11 +9,6 @@
       custom-class="customWidth"
     >
       <el-form style="padding-bottom:30px">
-          <el-form-item
-          label="流程名称"
-          :label-width="formLabelWidth"
-          style="float:left"
-        >{{sequenceName}}</el-form-item>
         <el-form-item
           label="任务名称"
           :label-width="formLabelWidth"
@@ -216,7 +211,6 @@ export default {
   },
   data() {
     return {
-      sequenceName:'',
       currentData: [],
       taskName: "",
       taskTableData: [],
@@ -450,7 +444,7 @@ export default {
       _self.form.formId = indata.formId;
       _self.dialogVisible = true;
       _self.taskTableData = [];
-      _self.sequenceName = _self.currentData.processDefinitionId.split(":")[0]
+
       //  if ("借阅驳回" == indata.name) {
       //     _self.rejectButton = "结束";
       //   } else {
