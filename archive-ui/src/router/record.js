@@ -53,6 +53,26 @@ export const recordRouter =  [
         meta: {
             requireAuth: true,
             permit: 1,
+            title:"档案鉴定"
+        },
+        path: '/record/ArchivalAppraisal',
+        name: '档案鉴定',
+        component: () => import('@/views/record/ArchivalAppraisal.vue')
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:"档案销毁"
+        },
+        path: '/record/ArchivalDestruction',
+        name: '档案销毁',
+        component: () => import('@/views/record/ArchivalDestruction.vue')
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
             title:'archiveReceive'
         },
         path: '/record/archivereceive',

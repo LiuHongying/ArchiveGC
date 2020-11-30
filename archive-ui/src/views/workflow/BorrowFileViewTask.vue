@@ -110,9 +110,17 @@
       </el-dialog>
     </template>
     <template v-slot:main="{layout}">
-      <div :style="{position:'relative'}">
-            <el-tabs value="t01" >
-              <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01" >
+      <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
+      <!-- <div :style="{position:'relative',height: layout.height-startHeight+'px'}"> -->
+        <!-- <split-pane
+          v-on:resize="onSplitResize"
+          :min-percent="20"
+          :default-percent="topPercent"
+          split="horizontal"
+        >
+          <template slot="paneL"> -->
+            <el-tabs value="t01">
+              <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01">
                 <el-row v-if="allowEdit||isShowReject">
                   <el-col :span="24" style="text-align: left">
                     <el-form :inline="true" :model="filters" @submit.native.prevent>
@@ -141,7 +149,7 @@
                   key="fileList"
                   :parentId="parentId"
                   data-url="/dc/getDocuByRelationParentId"
-                  v-bind:tableHeight="200"
+                  v-bind:tableHeight="tableHeight"
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
                   gridViewName="BorrowSequenceGrid"
@@ -233,8 +241,7 @@ export default {
       selectedArchives: [],
       archiveId: "", //案卷ID
       volumesFileVisible: false,
-      pendNotVisible:false,
-      tableHeight:427
+      pendNotVisible:false
     };
   },
   mounted() {

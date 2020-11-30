@@ -48,9 +48,7 @@
           <el-button type="primary" @click="handOver()">移交入库</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click.native="exportData">{{
-            $t("application.ExportExcel")
-          }}</el-button>
+          <el-button type="primary" @click.native="exportData">{{$t('application.ExportExcel')}}</el-button>
         </el-form-item>
       </el-form>
     </template>
@@ -296,7 +294,7 @@ export default {
         lang: "zh-cn",
         condition: this.$refs.mainDataGrid.condition,
         filename: "File_HandOver_" + fileDateStr + ".xlsx",
-        sheetname: "移交入库",
+        sheetname: "Result",
       };
       ExcelUtil.export(params);
     },
