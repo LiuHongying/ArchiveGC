@@ -118,6 +118,16 @@ export const workflowRouter =
     component: () => import('@/views/workflow/BorrowStartUp.vue')
     
   },
+    {meta:{
+      requireAuth: true,
+      permit: 1,
+      title: 'StartUp'
+    },
+    path: '/workflow/RelyOnFolderSelectStartUp',
+    name: '科研预归档借阅流程启动',
+    component: () => import('@/views/workflow/RelyOnFolderSelectStartUp.vue')
+    
+  },
   {meta:{
     requireAuth: true,
     permit: 1,
