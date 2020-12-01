@@ -75,6 +75,7 @@
     import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue"
     import CopyStartUp from "@/views/workflow/CopyStartUp.vue"
     import RelyOnFolderSelectStartUp from "@/views/workflow/RelyOnFolderSelectStartUp.vue"
+    import DesignChangeFileStartup from "@/views/workflow/DesignChangeFileStartup.vue"
     export default {
         name: "TodoTask",
         permit: 1,
@@ -90,7 +91,8 @@
             CommonStartup:CommonStartup,
             BorrowStartUp: BorrowStartUp,
             CopyStartUp : CopyStartUp,
-            RelyOnFolderSelectStartUp : RelyOnFolderSelectStartUp
+            RelyOnFolderSelectStartUp : RelyOnFolderSelectStartUp,
+            DesignChangeFileStartup :DesignChangeFileStartup
         },
         data() {
                 return {
