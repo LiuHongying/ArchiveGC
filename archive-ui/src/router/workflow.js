@@ -131,6 +131,16 @@ export const workflowRouter =
   {meta:{
     requireAuth: true,
     permit: 1,
+    title: 'StartUp'
+  },
+  path: '/workflow/DesignChangeFileStartup',
+  name: '设计文件流程启动',
+  component: () => import('@/views/workflow/DesignChangeFileStartup.vue')
+  
+},
+  {meta:{
+    requireAuth: true,
+    permit: 1,
     title: 'BorrowView'
   },
   path: '/workflow/BorrowView',

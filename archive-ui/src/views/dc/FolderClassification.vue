@@ -400,12 +400,6 @@
         >
         <el-form :inline="true">
           <el-form-item>
-            <StartupComponent :selectedFiles="selectedItems"></StartupComponent>
-          </el-form-item>
-          <el-form-item>
-            <ArchieveStorage :roleJudgement="true"  :selectRowData="selectedItems" :reload-Grid = "reload"></ArchieveStorage>
-          </el-form-item>
-          <el-form-item>
             <el-button type="primary" @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
           </el-form-item>
         </el-form>  
@@ -938,7 +932,6 @@ export default {
       }
     },
     renderContent: function (h, { node, data, store }) {
-      //console.log(data);
       if (data.extended) {
         return (
           <span>

@@ -11,7 +11,7 @@
         v-dialogDrag
       >
         <el-form :inline="true" :model="filters" @submit.native.prevent>
-          <el-form-item>
+          <!-- <el-form-item>
             <el-select v-model="filters.docType">
               <el-option :label="$t('application.all')+' '+$t('application.subDC')" value></el-option>
               <el-option
@@ -21,7 +21,7 @@
                 :value="name"
               ></el-option>
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item>
             <el-input
               v-model="filters.title"
@@ -41,7 +41,7 @@
           :isshowOption="true"
           :isshowSelection="true"
           :condition="searchFileCondition"
-          gridViewName="WorkflowFileGrid"
+          gridViewName="ModifyDocGrid"
           :optionWidth="1"
           :isShowMoreOption="false"
           :isshowCustom="false"
@@ -71,9 +71,6 @@
                       <el-form-item>
                         <el-button type="warning" @click="removeFile">{{ $t("application.remove") }}</el-button>
                       </el-form-item>
-                      <el-form-item>
-                          <MountFile :selectedItem="selectedRemoveFiles"  :title="$t('application.ReplaceDoc')">{{$t('application.replace')}}</MountFile>
-                      </el-form-item>
                     </el-form>
                   </el-col>
                 </el-row>
@@ -85,7 +82,7 @@
                   :tableHeight="tableHeight"
                   :isshowOption="true"
                   :isshowSelection="true"
-                  gridViewName="WorkflowFileGrid"
+                  gridViewName="ModifyDocGrid"
                   condition=" and a.NAME='irel_children'"
                   :optionWidth="1"
                   :itemDataList="files"
@@ -166,7 +163,6 @@ export default {
     };
   },
   mounted() {
-   
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
@@ -180,7 +176,6 @@ export default {
     },
     relevantDocRVSelect(val){
       this.selectedRemoveFiles=val;
-      
     },
     removeFile(){
       let _self=this;

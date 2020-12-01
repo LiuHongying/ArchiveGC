@@ -10,13 +10,13 @@
                     v-bind:typeName="typeName"
                 >
                 </ShowProperty>
-                <FolderFile ref="workflowFile"
+                <DesignFile ref="workflowFile"
                     allowEdit
                     :isShowPage="false"
                     v-model="workflowFileList"
                     :workflowObj="workflowObj"
                 >
-                </FolderFile>
+                </DesignFile>
        </el-main>
        <el-footer>
            <el-button type="primary" @click="closePage()">{{$t('application.cancel')}}</el-button>
@@ -27,25 +27,14 @@
 <script type="text/javascript">
     import ShowProperty from "@/components/ShowProperty";
     import DataGrid from "@/components/DataGrid";
-    import AddCondition from '@/views/record/AddCondition';
-    import RejectButton from "@/components/RejectButton";
-    import ExcelUtil from '@/utils/excel.js'
-    import DataSelect from '@/components/ecm-data-select'
-    import DataLayout from '@/components/ecm-data-layout'
-    import AttachmentFile from "@/views/dc/AttachmentFile.vue"
-    import FolderFile from "@/views/workflow/FolderFile.vue"
+    import DesignFile from "@/views/workflow/DesignFile.vue";
     export default {
         name: "StartupWorkflow",
         permit: 1,
         components: {
             ShowProperty:ShowProperty,
             DataGrid:DataGrid,
-            AddCondition:AddCondition,
-            DataSelect:DataSelect,
-            RejectButton:RejectButton,
-            DataLayout:DataLayout,
-            AttachmentFile:AttachmentFile,
-            FolderFile:FolderFile
+            DesignFile:DesignFile
         },
         data() {
                 return {
