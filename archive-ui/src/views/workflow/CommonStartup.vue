@@ -19,9 +19,8 @@
                 </FormFile>
        </el-main>
        <el-footer>
+           <el-button type="primary" @click="closePage()">{{$t('application.cancel')}}</el-button>
            <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
-            <!-- <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button> -->
-            <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
        </el-footer>
    </el-container>    
 </template>
@@ -412,5 +411,8 @@
     }
 </script>
 <style scoped>
-
+.el-footer {
+    text-align: right;
+    padding: 10px;
+  }
 </style>

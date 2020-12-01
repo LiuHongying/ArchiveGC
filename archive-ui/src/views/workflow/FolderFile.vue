@@ -34,7 +34,7 @@
                         <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
                       </el-form-item>
                       <el-form-item>
-                        <el-button type="warning" @click="removeFile">{{ $t("application.delete") }}</el-button>
+                        <el-button type="warning" @click="removeFile">{{ $t("application.remove") }}</el-button>
                       </el-form-item>
                     </el-form>
                   </el-col>
@@ -54,7 +54,7 @@
                   :isShowMoreOption="true"
                   showOptions="查看内容,查看属性"
                   :isshowCustom="false"
-                  :isEditProperty="allowEdit"
+                  :isEditProperty="false"
                   :isShowPropertyButton="false"
                   :isShowChangeList="false"
                   :isshowicon="false"
