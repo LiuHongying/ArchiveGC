@@ -199,6 +199,8 @@ import UpdateDocContent from "@/views/workflow/LinkMainAttachmentFile.vue";
 import UpdateDocContentByReviewer from "@/views/workflow/LinkMainAttachmentFileByReviewer.vue";
 import BorrowView from "@/views/workflow/BorrowView.vue"
 import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
+import CancelView from "@/views/workflow/CancelView.vue"
+import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue"
 export default {
   name: "TodoTask",
   permit: 1,
@@ -214,7 +216,9 @@ export default {
     DeliverFormTask:DeliverFormTask,
     BorrowViewReadOnly:BorrowViewReadOnly,
     BorrowView:BorrowView,
-    CommonViewRelyDocType:CommonViewRelyDocType
+    CommonViewRelyDocType:CommonViewRelyDocType,
+    CancelView:CancelView,
+    CancelViewReadOnly : CancelViewReadOnly
   },
   data() {
     return {
