@@ -173,9 +173,35 @@ component: () => import('@/views/workflow/BorrowViewReadOnly.vue')
   title: 'CopyStartUp'
 },
 path: '/workflow/CopyStartUp',
-name: '借阅流程只读视图',
+name: '复制流程启动',
 component: () => import('@/views/workflow/CopyStartUp.vue')
 },
-
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'CancelStartUp'
+},
+path: '/workflow/CancelStartUp',
+name: '作废通知单作废流程启动',
+component: () => import('@/views/workflow/CancelStartUp.vue')
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'CancelView'
+},
+path: '/workflow/CancelView',
+name: '作废通知单作废流程视图',
+component: () => import('@/views/workflow/CancelView.vue')
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'CancelViewReadOnly'
+},
+path: '/workflow/CancelViewReadOnly',
+name: '作废通知单作废流程只读视图',
+component: () => import('@/views/workflow/CancelViewReadOnly.vue')
+},
     ]
   }

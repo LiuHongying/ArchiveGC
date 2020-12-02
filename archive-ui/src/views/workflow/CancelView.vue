@@ -49,7 +49,8 @@ export default {
     RejectButton: RejectButton,
     DataLayout: DataLayout,
     AttachmentFile: AttachmentFile,
-    ShowPropertyReadOnly: ShowPropertyReadOnly
+    ShowPropertyReadOnly: ShowPropertyReadOnly,
+    BorrowFileViewTask : BorrowFileViewTask
   },
   data() {
     return {
@@ -77,7 +78,7 @@ export default {
       type: String,
       default: ""
     },
-    allowEdit: { type: Boolean, default: false },
+    allowEdit: { type: Boolean, default: true },
     showUploadFile: { type: Boolean, default: true },
     processDefinitionId: { type: String, default: "" },
     activityName: { type: String, default: "" },

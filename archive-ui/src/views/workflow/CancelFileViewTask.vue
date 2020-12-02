@@ -132,7 +132,7 @@
                           >{{ $t("application.new") }}</el-button>
                         </el-form-item>
                         <el-form-item>
-                          <el-button type="warning">{{ $t("application.delete") }}</el-button>
+                          <el-button type="warning" @click="removeRelation">{{ $t("application.delete") }}</el-button>
                         </el-form-item>
                       </template>
                       <template v-if="isShowReject">
@@ -195,9 +195,8 @@
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
                   gridViewName="WorkflowFileGrid"
-                  condition=" and a.NAME='irel_children'"
+                  condition=" and a.NAME='irel_children' and b.TYPE_NAME = '附件'"
                   :optionWidth="1"
-                  :itemDataList="files"
                   :isShowMoreOption="false"
                   :isshowCustom="false"
                   :isEditProperty="allowEdit"
@@ -277,15 +276,38 @@ export default {
       selectedArchives: [],
       archiveId: "", //案卷ID
       volumesFileVisible: false,
-      pendNotVisible:false
+      pendNotVisible:false,
+      selectedAttachment:[],
     };
   },
   mounted() {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
-    saveRejectComment(){
+    attachSelect(val){
+      this.selectedAttachment = val
+      console.log(this.selectedAttachment)
+    },
+    removeRelation(){
+      let ids = []
+      let _self = this
+      console.log("12123")
+      ids.push(_self.parentId)
+      this.selectedArchives.forEach(function(item){
+                ids.push(item.ID)
+            })
+      axios.post("/exchange/doc/deleteRelations",ids).then(function(response){
+        console.log(response)
+        let code = response.data.code
+        if(code==0){
+          _self.$message("删除成功")
+        }
+                  _self.$refs.fileList.loadGridData()
+      })
+    },
 
+
+    saveRejectComment(){
       let _self=this;
       if(_self.pendForm.rejectComment==""){
         _self.$message({

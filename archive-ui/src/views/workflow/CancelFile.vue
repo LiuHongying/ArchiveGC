@@ -103,7 +103,7 @@
                   </el-col>
                 </el-row>
                 <!--列表-->
-                                <DataGrid
+                  <DataGrid
                   ref="fileList"
                   key="fileList"
                   data-url="/dc/getDocuByRelationParentId"
@@ -131,7 +131,7 @@
                       <el-button type="primary" @click="beforeUploadFile('/dc/addAttachment4Copy')">添加附件</el-button>
                       </el-form-item>
                       <el-form-item>
-                        <el-button type="warning" @click="removeFile">{{ $t("application.delete") }}</el-button>
+                        <el-button type="warning" @click="deleteAttach">{{ $t("application.delete") }}</el-button>
                       </el-form-item>
                     </el-form>
                   </el-col>
@@ -145,17 +145,16 @@
                   v-bind:tableHeight="tableHeight"
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
-                  gridViewName="WorkflowFileGrid"
-                  condition=" and a.NAME='irel_children'"
+                  gridViewName="BorrowSequenceGrid"
+                  condition=" and a.NAME='irel_children' and b.TYPE_NAME='附件'"
                   :optionWidth="1"
-                  :itemDataList="files"
                   :isShowMoreOption="false"
                   :isshowCustom="false"
                   :isEditProperty="allowEdit"
                   :isShowChangeList="false"
                   :isshowicon="false"
                   :isshowPage="isShowPage"
-                  @selectchange="relevantDocRVSelect"
+                  @selectchange="attachSelect"
                 ></DataGrid>
               </el-tab-pane>
             </el-tabs>
@@ -240,10 +239,13 @@ export default {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
+    initTable(){
+    this.$refs.attach.loadGridData();  
+    this.$refs.fileList.loadGridData();
+    },
             beforeUploadFile(uploadpath){
             let _self=this;
             _self.parentId = _self.GUID          
-            console.log(_self.parentId)
             if(_self.parentId==undefined||_self.parentId==''){
                 _self.$message({
                         showClose: true,
@@ -333,6 +335,26 @@ export default {
       _self.selectedRemoveFiles.forEach(e=>{
       });
     },
+    deleteAttach(){
+      let ids = []
+      let _self = this
+      ids.push(_self.parentId)
+      this.selectedAttachment.forEach(function(item){
+                ids.push(item.ID)
+            })
+      axios.post("/exchange/doc/deleteRelations",ids).then(function(response){
+        let code = response.data.code
+        if(code==0){
+          _self.$message("删除成功")
+          _self.$refs.attach.loadGridData()
+        }
+      })
+    },
+    attachSelect(val){
+      this.selectedAttachment = val
+    },
+
+
     checkCreateUnit(){
       let crUnit = null
       this.createUnit = null
