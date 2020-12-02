@@ -131,6 +131,16 @@ export const workflowRouter =
   {meta:{
     requireAuth: true,
     permit: 1,
+    title: 'CommonViewRelyDocType'
+  },
+  path: '/workflow/CommonViewRelyDocType',
+  name: '基于文件类型显示任务组件',
+  component: () => import('@/views/workflow/CommonViewRelyDocType.vue')
+  
+},
+  {meta:{
+    requireAuth: true,
+    permit: 1,
     title: 'StartUp'
   },
   path: '/workflow/DesignChangeFileStartup',
