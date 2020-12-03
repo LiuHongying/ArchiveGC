@@ -10,7 +10,15 @@
         v-bind:currentFolderId="this.currentFolder.id"
       ></PrintVolumes>
     </el-dialog>
-
+    <el-dialog :visible.sync="PreparationTablePrintVisible" width="80%"
+    @close="PreparationTablePrintVisible=false">
+      <PreparationTablePrint
+        ref="PreparationTablePrint"
+        v-bind:archiveId="this.archiveId"
+        v-bind:currentFolderId="this.currentFolder.id"
+      ></PreparationTablePrint>
+    </el-dialog>
+    
     <el-dialog
       width="80%"
       :title="dialogName+$t('application.property')"
@@ -226,13 +234,29 @@
                 title="整编完成"
               ></el-button>
              
-                <el-button
+              <el-button
                 type="primary"
                 plain
                 size="small"
                 icon="el-icon-printer"
                 @click="arrangeComplete('已质检')"
                 title="质检完成"
+              ></el-button>
+              <el-button
+                type="primary"
+                plain
+                size="small"
+                icon="el-icon-printer"
+                @click="beforePrint(selectRow,'ArrangeInnerGridPrint','卷内目录')"
+                title="打印卷内目录"
+              ></el-button>
+              <el-button
+                type="primary"
+                plain
+                size="small"
+                icon="el-icon-printer"
+                @click="beforePrintPreparationTable(selectRow,'备考表')"
+                title="打印备考表"
               ></el-button>
               <el-button
                 type="primary"
@@ -338,8 +362,10 @@ import TypeSelectComment from "@/views/record/TypeSelectComment.vue";
 import "url-search-params-polyfill";
 
 import PrintPage from "@/views/record/PrintPage";
-import PrintVolumes from "@/views/record/PrintVolumes";
+// import PrintVolumes from "@/views/record/PrintVolumes";
+import PrintVolumes from "@/views/record/PrintVolumes4Archive";
 import PrintRidge from "@/views/record/PrintRidge";
+import PreparationTablePrint from "@/views/record/PreparationTablePrint.vue"
 export default {
   name: "FolderClassification",
   components: {
@@ -349,7 +375,8 @@ export default {
     DataGrid: DataGrid,
     PrintPage: PrintPage,
     PrintVolumes: PrintVolumes,
-    PrintRidge: PrintRidge
+    PrintRidge: PrintRidge,
+    PreparationTablePrint:PreparationTablePrint
     //Prints:Prints
   },
   data() {
@@ -445,6 +472,7 @@ export default {
       extendMap:{},
       pieceNum:"",//批次号
       pieceNumVisible:false,//是否显示取批次号dialog
+      PreparationTablePrintVisible:false,
     };
   },
   
@@ -458,7 +486,7 @@ export default {
     _self.loading = true;
     let m=new Map();
     m.set("folderConfig","ArchiveCollatedID");
-    m.set("condition"," and IS_HIDDEN=0 ");
+    m.set("condition"," and((C_ITEM_TYPE='文件' or C_ITEM_TYPE='案卷') and IS_HIDDEN=0 and IS_CHILD=0) ");
     _self
       .axios({
         headers: {
@@ -566,6 +594,53 @@ export default {
       _self.printObjId = selectedRow.ID;
     },
 
+    beforePrintPreparationTable(selectedRow,vtitle){
+      
+      let _self=this;
+      if(selectedRow.ID==undefined){
+        // _self.$message('请选择一条数据进行打印');
+        _self.$message({
+                showClose: true,
+                message: '请选择一条数据进行打印!',
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      _self.PreparationTablePrintVisible = true;
+
+      setTimeout(()=>{
+        _self.$refs.PreparationTablePrint.getArchiveObj(selectedRow.ID,
+        vtitle); 
+      },10);
+
+    },
+
+    beforePrint(selectedRow,gridName,vtitle){
+      debugger
+      let _self=this;
+      if(selectedRow.ID==undefined){
+        // _self.$message('请选择一条数据进行打印');
+        _self.$message({
+                showClose: true,
+                message: '请选择一条数据进行打印!',
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      _self.printVolumesVisible = true;
+
+      setTimeout(()=>{
+        _self.$refs.printVolumes.dialogQrcodeVisible = false
+        _self.$refs.printVolumes.getArchiveObj(selectedRow.ID,
+        gridName,
+        vtitle); 
+      },10);
+
+      _self.printGridName=gridName;
+      _self.printObjId=selectedRow.ID;
+    },
 
     ///上架
     putInStorage() {
@@ -946,14 +1021,17 @@ export default {
       // 没有加载，逐级加载
       if (indata.extended == false) {
         _self.loading = true;
+        let mp=new Map();
+        mp.set("folderId",indata.id);
+        mp.set("condition"," and(IS_HIDDEN=0 and IS_CHILD=0)");
         _self
           .axios({
             headers: {
               "Content-Type": "application/json;charset=UTF-8"
             },
             method: "post",
-            data: indata.id,
-            url: "/folder/getArchiveFolderByConfige" //"/admin/getFolder"
+            data: JSON.stringify(mp),
+            url: "/folder/getArchiveFolderByConfigeArchiveGc" //"/admin/getFolder"
           })
           .then(function(response) {
             indata.children = response.data.data;
