@@ -458,7 +458,7 @@ export default {
     _self.loading = true;
     let m=new Map();
     m.set("folderConfig","ArchiveCollatedID");
-    m.set("condition"," and IS_HIDDEN=0 ");
+    m.set("condition"," and IS_HIDDEN=0 and IS_CHILD=0 ");
     _self
       .axios({
         headers: {
