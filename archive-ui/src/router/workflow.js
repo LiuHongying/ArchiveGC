@@ -131,6 +131,26 @@ export const workflowRouter =
   {meta:{
     requireAuth: true,
     permit: 1,
+    title: 'CommonViewRelyDocType'
+  },
+  path: '/workflow/CommonViewRelyDocType',
+  name: '基于文件类型显示任务组件',
+  component: () => import('@/views/workflow/CommonViewRelyDocType.vue')
+  
+},
+  {meta:{
+    requireAuth: true,
+    permit: 1,
+    title: 'StartUp'
+  },
+  path: '/workflow/DesignChangeFileStartup',
+  name: '设计文件流程启动',
+  component: () => import('@/views/workflow/DesignChangeFileStartup.vue')
+  
+},
+  {meta:{
+    requireAuth: true,
+    permit: 1,
     title: 'BorrowView'
   },
   path: '/workflow/BorrowView',
@@ -153,9 +173,35 @@ component: () => import('@/views/workflow/BorrowViewReadOnly.vue')
   title: 'CopyStartUp'
 },
 path: '/workflow/CopyStartUp',
-name: '借阅流程只读视图',
+name: '复制流程启动',
 component: () => import('@/views/workflow/CopyStartUp.vue')
 },
-
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'CancelStartUp'
+},
+path: '/workflow/CancelStartUp',
+name: '作废通知单作废流程启动',
+component: () => import('@/views/workflow/CancelStartUp.vue')
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'CancelView'
+},
+path: '/workflow/CancelView',
+name: '作废通知单作废流程视图',
+component: () => import('@/views/workflow/CancelView.vue')
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'CancelViewReadOnly'
+},
+path: '/workflow/CancelViewReadOnly',
+name: '作废通知单作废流程只读视图',
+component: () => import('@/views/workflow/CancelViewReadOnly.vue')
+},
     ]
   }

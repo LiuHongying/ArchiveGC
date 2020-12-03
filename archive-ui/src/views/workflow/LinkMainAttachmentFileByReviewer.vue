@@ -159,7 +159,7 @@ export default {
             // 顶部除列表高度
             topbarHeight: 35,
             // 底部除列表高度
-            bottomHeight: 120,
+            bottomHeight: 80,
             formLabelWidth: "120px",
             buttLoading:false,
             filters: {

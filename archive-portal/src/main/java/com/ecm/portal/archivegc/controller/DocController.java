@@ -34,6 +34,7 @@ import com.ecm.core.cache.manager.CacheManagerOper;
 import com.ecm.core.db.SqlUtils;
 import com.ecm.core.entity.EcmContent;
 import com.ecm.core.entity.EcmDocument;
+import com.ecm.core.entity.EcmFolder;
 import com.ecm.core.entity.EcmGridView;
 import com.ecm.core.entity.EcmGridViewItem;
 import com.ecm.core.entity.EcmRelation;
@@ -68,7 +69,8 @@ public class DocController  extends ControllerAbstract  {
 	
 	@Autowired
 	private GridViewService gridViewService;
-	
+	@Autowired
+	private FolderService folderService;
 	@Autowired
 	private GridViewItemService gridViewItemService;
 	private final String queryBase = "SELECT ID,APP_NAME, CREATION_DATE, EXPORT_DATE, IMPORT_DATE, STATUS, ERROR_MESSAGE FROM exc_syn_detail";
@@ -302,6 +304,117 @@ public class DocController  extends ControllerAbstract  {
 		mp.put("id", id);
 		return mp;
 	}
+	@RequestMapping(value = "deleteRelations", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> remove(@RequestBody List<String> ids) {
+		Map<String, Object> mp = new HashMap();
+		String formId = ids.get(0);
+		for(int i = 1;i < ids.size();i++) {
+		try {
+			String id = ids.get(i);
+			String relationSqlStr = "select id from ecm_relation where parent_id='"+formId+"' and child_id='"+id+"'";
+			List<Map<String, Object>> list = relationService.getMapList(getToken(), relationSqlStr);
+			relationService.deleteObjectById(getToken(),id);
+			Map<String,Object> temprs = list.get(0);
+			relationService.deleteObjectById(getToken(),temprs.get("id").toString());			//仅删除当前文件挂载关系
+			EcmDocument eu = documentService.getObjectById(getToken(), id);
+			if(eu.getTypeName().equals("附件")) {
+				documentService.deleteObjectById(getToken(), id);	
+			}
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			mp.put("code", ActionContext.SUCESS);
+		}
+		}
+		mp.put("code", ActionContext.SUCESS);
+		return mp;
+	}
+	
+	
+	@RequestMapping(value = "addAttachment4Copy", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> add4Attachment(String metaData, MultipartFile[] uploadFile) {
+		
+		
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			EcmDocument form = new EcmDocument();
+			Map<String,Object> temp = new HashMap<String,Object>();
+			
+			String parentId = args.get("parentDocId").toString();
+			if("".equals(parentId)) {
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("message","没有主文件ID");
+				return mp;
+			}
+			temp = documentService.getObjectMapById(getToken(), parentId);
+			form.setId(parentId);
+			if(temp==null) {
+			form.setTypeName("临时表单");
+			documentService.newObject(getToken(), form.getAttributes());		//要是表单没有的话就先创建一个空白表单
+			
+			}
+			if (uploadFile != null&&uploadFile.length>0) {
+				for (MultipartFile multipartFile : uploadFile) {
+					
+					EcmDocument doc = new EcmDocument();
+					doc.setAttributes(args);
+					String fileName=multipartFile.getOriginalFilename();
+					fileName=fileName.substring(0,fileName.lastIndexOf(".")<0
+							?fileName.length():fileName.lastIndexOf("."));
+					doc.setName(fileName);
+					
+					Object fid= args.get("folderId");
+					String folderId="";
+					if(fid==null) {
+						folderId= folderPathService.getFolderId(getToken(), doc.getAttributes(), "3");
+					}else {
+						folderId=fid.toString();
+					}
+					EcmFolder folder= folderService.getObjectById(getToken(), folderId);
+					doc.setFolderId(folderId);
+					doc.setAclName(folder.getAclName());
+					
+					EcmContent en = new EcmContent();
+					en.setName(multipartFile.getOriginalFilename());
+					en.setContentSize(multipartFile.getSize());
+					en.setInputStream(multipartFile.getInputStream());
+//					documentService.addRendition(getToken(), parentId, en);
+					
+					String relationName="irel_children";
+					relationName=args.get("relationName")!=null
+							&&!"".equals(args.get("relationName").toString())
+							?args.get("relationName").toString():"irel_children";
+					String id = documentService.newObject(getToken(),doc,en);//创建文件和内容
+					//----------------创建关系--------------
+					EcmRelation relation=new EcmRelation();
+					relation.setParentId(parentId);
+					
+					relation.setChildId(id);
+					relation.setName(relationName);
+					try {
+						relationService.newObject(getToken(), relation);
+					} catch (EcmException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						mp.put("code", ActionContext.FAILURE);
+						mp.put("message",e.getMessage());
+						return mp;
+					}
+					//----------------end创建关系-------------------
+				}
+				
+				mp.put("code", ActionContext.SUCESS);
+			}
+		} catch (Exception ex) {
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", ex.getMessage());
+		}
+		return mp;
+	}
+	
 	
 	private void createRefDocs(String token,String fromId, String toId) throws Exception {
 		EcmDocument fromDoc = documentService.getObjectById(token, fromId);
@@ -343,6 +456,7 @@ public class DocController  extends ControllerAbstract  {
 		}
 		
 	}
+	
 	
 	private void newRelation(String token, String parentId, String relationName, String childId, int orderIndex,
 			String description) throws EcmException {
