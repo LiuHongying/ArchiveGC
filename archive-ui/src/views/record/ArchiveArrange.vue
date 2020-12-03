@@ -595,7 +595,7 @@ export default {
     },
 
     beforePrintPreparationTable(selectedRow,vtitle){
-      debugger
+      
       let _self=this;
       if(selectedRow.ID==undefined){
         // _self.$message('请选择一条数据进行打印');
