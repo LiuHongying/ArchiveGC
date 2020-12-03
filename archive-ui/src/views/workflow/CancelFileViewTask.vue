@@ -60,7 +60,7 @@
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
           gridViewName="WorkflowFileGrid"
-          :condition="searchFileCondition"
+          condition="TYPE_NAME='设计文件'"
           :optionWidth="1"
           :isShowMoreOption="false"
           :isshowCustom="false"
@@ -153,7 +153,7 @@
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
                   gridViewName="BorrowSequenceGrid"
-                  condition=" and a.NAME='irel_children'"
+                  condition=" and a.NAME='irel_children' and b.type_name!='附件'"
                   :optionWidth="1"
                   :isshowCustom="false"
                   :isShowMoreOption="true"
@@ -180,7 +180,7 @@
                       <el-button type="primary" @click="beforeUploadFile('/dc/addAttachment4Copy')">添加附件</el-button>
                       </el-form-item>
                       <el-form-item>
-                        <el-button type="warning" @click="removeFile">{{ $t("application.delete") }}</el-button>
+                        <el-button type="warning" @click="removeAttachs">{{ $t("application.delete") }}</el-button>
                       </el-form-item>
                     </el-form>
                   </el-col>
@@ -203,7 +203,7 @@
                   :isShowChangeList="false"
                   :isshowicon="false"
                   :isshowPage="isShowPage"
-                  @selectchange="relevantDocRVSelect"
+                  @selectchange="attachSelect"
                 ></DataGrid>
               </el-tab-pane>
             </el-tabs>
@@ -284,16 +284,45 @@ export default {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
+    checkCondition(){
+     let cond = this.$refs.searchDoc.condition
+     let ids =  this.$refs.fileList.itemDataList
+     let list = ""
+     list +="'"
+     ids.forEach(function(item){
+          list += item.ID
+          list +=","
+            })
+      list.slice(0,list.length-1)
+      list +="'"
+      cond +="and id not in"+list 
+      console.log(cond)
+      this.$refs.searchDoc.condition = cond
+    },
     attachSelect(val){
       this.selectedAttachment = val
-      console.log(this.selectedAttachment)
     },
     removeRelation(){
       let ids = []
       let _self = this
-      console.log("12123")
       ids.push(_self.parentId)
       this.selectedArchives.forEach(function(item){
+                ids.push(item.ID)
+            })
+      axios.post("/exchange/doc/deleteRelations",ids).then(function(response){
+        console.log(response)
+        let code = response.data.code
+        if(code==0){
+          _self.$message("删除成功")
+        }
+        _self.$refs.fileList.loadGridData()
+      })
+    },
+    removeAttachs(){
+      let ids = []
+      let _self = this
+      ids.push(_self.parentId)
+      this.selectedFiles.forEach(function(item){
                 ids.push(item.ID)
             })
       axios.post("/exchange/doc/deleteRelations",ids).then(function(response){
@@ -305,7 +334,6 @@ export default {
                   _self.$refs.fileList.loadGridData()
       })
     },
-
 
     saveRejectComment(){
       let _self=this;
@@ -322,7 +350,6 @@ export default {
       _self.selectedArchives.forEach(function(e){
         ids.push(e.ID)
       });
-
       let m=new Map();
       m.set("ids",ids);
       m.set("comment",_self.pendForm.rejectComment);
@@ -381,8 +408,9 @@ export default {
       _self.pendNotVisible=true;
     },
     beforeAddFile() {
-      let _self = this;
-      this.getEcmcfgActive(
+        //this.checkCondition()
+        let _self = this;
+        this.getEcmcfgActive(
         this.processDefinitionId,
         this.activityName,
         function(ecmCfgActivity) {
@@ -393,9 +421,12 @@ export default {
     },
     fileSelect(val) {
       this.selectedFiles = val;
+      console.log(this.selectedFiles)
     },
     saveFileToWorkflow() {
       let _self = this;
+      let ids = []
+      
       if (_self.$refs.fileList.itemDataList == null) {
         _self.$refs.fileList.itemDataList = _self.selectedFiles;
       } else {
@@ -412,8 +443,20 @@ export default {
             _self.$refs.fileList.itemDataList.push(e);
           }
         });
-        // this.$refs.fileList.itemDataList=this.$refs.fileList.itemDataList.concat(this.selectedFiles);
+        
       }
+      ids.push(_self.parentId)
+      this.selectedFiles.forEach(function(item){
+                ids.push(item.ID)
+            })
+      axios.post("/exchange/doc/AddRelations",ids).then(function(response){
+        console.log(response)
+        let code = response.data.code
+        if(code==0){
+          _self.$message("添加成功")
+        }
+      _self.$refs.fileList.loadGridData()
+      })
       _self.$emit("change", _self.$refs.fileList.itemDataList);
       this.butt = false;
       this.propertyVisible = false;
@@ -421,9 +464,7 @@ export default {
     searchItem() {
       let _self = this;
       let key = " 1=1 ";
-      if (_self.searchFileCondition != "") {
-        key += " and (" + searchFileCondition + ")";
-      }
+ 
       if (_self.filters.docType != "") {
         key += " and TYPE_NAME = '" + _self.filters.docType + "'";
       }

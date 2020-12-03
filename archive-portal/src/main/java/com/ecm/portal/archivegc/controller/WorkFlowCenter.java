@@ -163,6 +163,96 @@ public class WorkFlowCenter extends ControllerAbstract {
 
 	}
 
+	@RequestMapping(value = "/dc/createWorkflowFormData4Copy", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> createWorkflowFormData4Copy(String metaData, MultipartFile uploadFile) throws Exception {
+
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		Object saveType = args.get("saveType");
+		Object childObj = args.get("childFileId");
+		args.keySet().remove("childFileId");
+		args.keySet().remove("saveType");
+		EcmContent en = null;
+		EcmDocument doc = new EcmDocument();
+		doc.setAttributes(args);
+
+		if (uploadFile != null) {
+			en = new EcmContent();
+			en.setName(uploadFile.getOriginalFilename());
+			en.setContentSize(uploadFile.getSize());
+			en.setFormatName(FileUtils.getExtention(uploadFile.getOriginalFilename()));
+			en.setInputStream(uploadFile.getInputStream());
+		}
+		Object fid = args.get("folderId");
+
+		String folderId = "";
+		if (fid == null) {
+			folderId = folderPathService.getFolderId(getToken(), doc.getAttributes(),
+					(saveType != null && !"".equals(saveType.toString())) ? saveType.toString() : "3");
+		} else {
+			folderId = fid.toString();
+		}
+		doc.setStatus("新建");
+		EcmFolder folder = folderService.getObjectById(getToken(), folderId);
+		doc.setFolderId(folderId);
+		doc.setAclName(folder.getAclName());
+
+		String id = doc.getId();
+
+		if (childObj != null && !"".equals(childObj.toString())) {
+
+			String relationName = "irel_children";
+			relationName = (args.get("relationName") != null && !"".equals(args.get("relationName").toString()))
+					? args.get("relationName").toString()
+					: "irel_children";
+			String childFileIds = childObj.toString();
+			if(id!=null) {
+				documentService.updateObject(getToken(), doc.getAttributes());
+			}
+			if(id==null)
+			id = documentService.newObject(getToken(), doc, en);
+			if (id != null && !"".equals(id)) {
+
+				List<String> childIdList = JSONUtils.stringToArray(childFileIds);
+				for (int i = 0; childIdList != null && i < childIdList.size(); i++) {
+					String childId = childIdList.get(i);
+					EcmRelation relation = new EcmRelation();
+					relation.setParentId(id);
+
+					relation.setChildId(childId);
+					relation.setName(relationName);
+					try {
+						relationService.newObject(getToken(), relation);
+					} catch (EcmException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						mp.put("code", ActionContext.FAILURE);
+						mp.put("MES", "");
+						mp.put("message", e.getMessage());
+						return mp;
+					}
+				}
+
+			} else {
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("MES", "对象已存在");
+				return mp;
+			}
+
+		} else {
+			id = documentService.newObject(getToken(), doc, en);
+		}
+
+		mp.put("code", ActionContext.SUCESS);
+		mp.put("MES", "");
+		mp.put("id", id);
+		return mp;
+
+	}
+	
+	
+	
 	/**
 	 * 添加关系
 	 * 

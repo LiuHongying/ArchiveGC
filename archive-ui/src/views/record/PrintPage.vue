@@ -159,7 +159,7 @@ export default {
           },
           method: "post",
           data: JSON.stringify(m),//_self.myItemId+_self.myTypeName,
-          url: "/zisecm/dc/getArchiveObj"
+          url: "/dc/getArchiveObj"
         })
         .then(function(response) {
 
