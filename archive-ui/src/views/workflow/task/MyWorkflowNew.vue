@@ -1,28 +1,37 @@
 <template>
   <div>
     <el-dialog title="查看" :visible.sync="dialogVisible" v-if="dialogVisible" width="95%">
-      <!-- <el-steps :active="activeIndex" align-center finish-status="process" process-status="success">
-        <el-step
-          v-for="item in activityList"
-          :title="item.name"
-          :key="item.id"
-          :description="item.description"
-        ></el-step>
-      </el-steps> -->
-      <el-divider content-position="left">表单信息</el-divider>
-      <component
-        :is="taskName"
-        :typeName="taskName"
-        :formId="currentFormId"
-        :docId="currentFormId"
-        :istask="1"
-        :formParameter="formParameter"
-        :allowEdit="false"
-        :processDefinitionId="currentData.processDefinitionId"
-        :activityName="currentData.name"
-        :formEditPermision=0
-        :formEnableType="this.$options.name"
-      ></component>
+      <ShowPropertyReadOnly
+        ref="ShowProperty"
+        width="100%"
+        :itemId="currentFormId"
+        :typeName="typeName"
+        ></ShowPropertyReadOnly>
+      <br>
+      <el-tabs  v-model="selectedTabName">
+        <el-tab-pane  :label="$t('application.Attachment')" name="t03" >
+            <!--列表-->
+            <DataGrid
+                ref="mainDataGrid"
+                key="main"
+                dataUrl="/dc/getDocuByRelationParentId"
+                :parentId="currentFormId"
+                :tableHeight="500"
+                :isshowOption="true" 
+                :isshowSelection ="true"
+                gridViewName="ModifyDocGrid"
+                condition=" and a.name = 'irel_children' "
+                :optionWidth = "2"
+                :isshowCustom="false"
+                :isEditProperty="false"
+                showOptions="查看内容,查看属性"
+                :isShowPropertyButton="false"
+                :isShowChangeList="false"
+                @rowclick="rowClick"
+                @selectchange="selectChange"
+            ></DataGrid>
+        </el-tab-pane>
+    </el-tabs>
       <el-divider content-position="left">流转意见</el-divider>
       <el-table :data="taskList" border v-loading="loading" style="width: 100%">
         <el-table-column label="序号" width="65">
@@ -163,8 +172,6 @@
         :formatter="dateFormatter"
         min-width="20%"
       ></el-table-column>
-      <!-- <el-table-column prop="currentAssignee" label="当前执行人"  min-width="20%">
-      </el-table-column>-->
       <el-table-column label="操作" width="210px" v-if="currentUserName=='all'">
         <template slot-scope="scope">
           <el-button
@@ -207,11 +214,9 @@
 </template>
 
 <script type="text/javascript">
-// $.ajaxSetup({
-//   contentType: "application/json"
-// });
-
 import UserSelectInput from "@/components/controls/UserSelectInput";
+import ShowPropertyReadOnly from "@/components/ShowPropertyReadOnly.vue";
+import DataGrid from "@/components/DataGrid";
 import TaskTestForm1 from "@/components/form/TaskTestForm1.vue";
 import EditTask from "@/views/workflow/task/EditTask.vue";
 import DocViewTask from "@/views/workflow/task/DocViewTask.vue";
@@ -242,7 +247,9 @@ export default {
     BorrowView:BorrowView,
     CommonViewRelyDocType:CommonViewRelyDocType,
     CancelView:CancelView,
-    CancelViewReadOnly : CancelViewReadOnly
+    CancelViewReadOnly : CancelViewReadOnly,
+    ShowPropertyReadOnly: ShowPropertyReadOnly,
+    DataGrid:DataGrid
   },
   data() {
     return {
@@ -251,7 +258,6 @@ export default {
       taskName:'',
       currentFormId:'',
       dataList: [],
-      dataListFull: [],
       taskList: [],
       inputkey: "",
       activeIndex: 0,
@@ -277,8 +283,10 @@ export default {
         endTimeBefore: "",
         isFinished: "全部",
       },
+      typeName:"文件传递单",
       formParameter:{},
-      formData:{}
+      formData:{},
+      selectedTabName:'t03'
     };
   },
   created() {
@@ -301,6 +309,7 @@ export default {
       _self.loading = true;
       _self.refreshData("1");
     },
+    rowClick(){},
     dateFormatter(row, column) {
       let datetime = row[column.property];
       return this.datetimeFormat(datetime);
@@ -356,19 +365,12 @@ export default {
       m.set("condition", _self.inputkey);
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
-      // if(obj=="1"){
-      // _self.workflowForm.startTimeAfter=_self.workflowForm.startTimeAfter==""?"":_self.dateFormat(_self.workflowForm.startTimeAfter);
-      // _self.workflowForm.startTimeBefore==_self.workflowForm.startTimeBefore==""?"":_self.dateFormat(_self.workflowForm.startTimeBefore);
-      // _self.workflowForm.endTimeAfter==_self.workflowForm.endTimeAfter==""?"":_self.dateFormat(_self.workflowForm.endTimeAfter);
-      // _self.workflowForm.endTimeBefore==_self.workflowForm.endTimeBefore==""?"":_self.dateFormat(_self.workflowForm.endTimeBefore);
       m.set("workflowForm", _self.workflowForm);
-      // }
       m.set("userId", _self.currentUserName);
       axios
         .post("/workflow/myWorkflow", JSON.stringify(m))
         .then(function (response) {
           _self.dataList = response.data.data;
-          _self.dataListFull = response.data.data;
           _self.loading = false;
           _self.loadPageInfo(response.data.totalCount);
         })
@@ -447,26 +449,26 @@ export default {
       n.set("processDefinitionId", indata.processDefinitionId);
       n.set("activityName", indata.name);
       n.set("taskId",indata.id);
-      axios
-        .post("/workflow/getEcmCfgActivity", JSON.stringify(n))
-        .then(function(response){
-          _self.ecmCfgActivity = response.data.data;
-          if(_self.ecmCfgActivity.formParameter){
-              _self.formParameter= JSON.parse(_self.ecmCfgActivity.formParameter) 
-            }
-          _self.taskName = _self.ecmCfgActivity.componentName;
-          axios
-              .post("/dc/getDocumentById", indata.formId)
-              .then(function(responsedoc) {
-                let result = responsedoc.data;
-                if (result.code == 1) {
-                  _self.formData = result.data;
-                }
-              });
-        }).catch(function(error) {
-          console.log(error);
-          _self.loading = false;
-        });
+    //   axios
+    //     .post("/workflow/getEcmCfgActivity", JSON.stringify(n))
+    //     .then(function(response){
+    //       _self.ecmCfgActivity = response.data.data;
+    //       if(_self.ecmCfgActivity.formParameter){
+    //           _self.formParameter= JSON.parse(_self.ecmCfgActivity.formParameter) 
+    //         }
+    //       _self.taskName = _self.ecmCfgActivity.componentName;
+    //       axios
+    //           .post("/dc/getDocumentById", indata.formId)
+    //           .then(function(responsedoc) {
+    //             let result = responsedoc.data;
+    //             if (result.code == 1) {
+    //               _self.formData = result.data;
+    //             }
+    //           });
+    //     }).catch(function(error) {
+    //       console.log(error);
+    //       _self.loading = false;
+    //     });
 
       m.set("processInstanceId", indata.processInstanceId);
       _self.currentProcessId = indata.processInstanceId;
