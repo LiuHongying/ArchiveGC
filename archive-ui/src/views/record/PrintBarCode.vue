@@ -74,7 +74,6 @@ export default {
   },
   methods: {
       getArchiveObjs(){
-        debugger
         return this.archiveObjects;
       },
       refreshBarCode(objs,pixel){
