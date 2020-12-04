@@ -50,6 +50,16 @@
         <PrintRidge ref="printRidge"></PrintRidge>
       </div>
     </el-dialog>
+    <el-dialog
+      title="打印条码"
+      width="43%"
+      :visible="printBarCodeVisible"
+      @close="printBarCodeVisible=false"
+    >
+      <div style="height:900px;">
+        <PrintBarCode ref="printBarCode" :archiveObjects="selectedItems" :isBarCode="true"></PrintBarCode>
+      </div>
+    </el-dialog>
 
     <el-dialog :title="$t('application.Import')" :visible.sync="importdialogVisible" width="70%">
       <el-form size="mini" :label-width="formLabelWidth">
@@ -216,13 +226,21 @@
                 icon="el-icon-upload2"
                 @click="beforeMount(selectedItems);uploadUrl='/dc/mountFile'"
               ></el-button>
-              <el-button
+              <!-- <el-button
                 type="primary"
                 plain
                 size="small"
                 icon="el-icon-printer"
                 @click="beforePrintRidge(selectRow,'printRidgeGrid','打印背脊')"
                 title="打印"
+              ></el-button> -->
+              <el-button
+                type="primary"
+                plain
+                size="small"
+                icon="el-icon-printer"
+                @click="beforePrintBarCode(selectedItems,'打印条码')"
+                title="打印条码"
               ></el-button>
               
                 <el-button
@@ -366,6 +384,7 @@ import PrintPage from "@/views/record/PrintPage";
 import PrintVolumes from "@/views/record/PrintVolumes4Archive";
 import PrintRidge from "@/views/record/PrintRidge";
 import PreparationTablePrint from "@/views/record/PreparationTablePrint.vue"
+import PrintBarCode from "@/views/record/PrintBarCode.vue"
 export default {
   name: "FolderClassification",
   components: {
@@ -376,7 +395,8 @@ export default {
     PrintPage: PrintPage,
     PrintVolumes: PrintVolumes,
     PrintRidge: PrintRidge,
-    PreparationTablePrint:PreparationTablePrint
+    PreparationTablePrint:PreparationTablePrint,
+    PrintBarCode:PrintBarCode
     //Prints:Prints
   },
   data() {
@@ -473,6 +493,7 @@ export default {
       pieceNum:"",//批次号
       pieceNumVisible:false,//是否显示取批次号dialog
       PreparationTablePrintVisible:false,
+      printBarCodeVisible:false,
     };
   },
   
@@ -568,6 +589,27 @@ export default {
           console.log(error);
         });
       
+
+    },
+    ///打印条码
+    beforePrintBarCode(selectedRows,vtitle) {
+      let _self = this;
+      if (selectedRows == undefined||selectedRows.length==0) {
+        // _self.$message('请选择一条数据进行打印');
+        _self.$message({
+          showClose: true,
+          message: "请选择一条数据进行打印",
+          duration: 2000,
+          type: "warning"
+        });
+        return;
+      }
+      _self.printBarCodeVisible = true;
+
+      setTimeout(() => {
+        // _self.$refs.printBarCode.archiveObjects=selectedRows;
+        _self.$refs.printBarCode.refreshBarCode(selectedRows, 1);
+      }, 10);
 
     },
     ///打印背脊
