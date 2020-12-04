@@ -330,7 +330,32 @@ public class DocController  extends ControllerAbstract  {
 		mp.put("code", ActionContext.SUCESS);
 		return mp;
 	}
-	
+	@RequestMapping(value = "AddRelations", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> adds(@RequestBody List<String> ids) {
+		Map<String, Object> mp = new HashMap();
+		String formId = ids.get(0);
+		for(int i = 1;i < ids.size();i++) {
+		try {
+			String id = ids.get(i);
+			String relationSqlStr = "select id from ecm_relation where parent_id='"+formId+"' and child_id='"+id+"'";
+			List<Map<String, Object>> list = relationService.getMapList(getToken(), relationSqlStr);   //先找当前子文件ID是否和表单有关联关系
+			if(list!=null) {		//当前结果MAP为空，说明需要创建关系
+				EcmRelation relation = new EcmRelation();
+				relation.setParentId(formId);
+				relation.setChildId(id);
+				relation.setName("irel_children");
+				relationService.newObject(getToken(), relation);
+			}		
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			mp.put("code", 1);
+		}
+		}
+		mp.put("code", 0);
+		return mp;
+	}
 	
 	@RequestMapping(value = "addAttachment4Copy", method = RequestMethod.POST)
 	@ResponseBody

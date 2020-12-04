@@ -110,7 +110,7 @@
                       <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
                     </el-form-item>
                     <el-form-item>
-                      <el-button type="warning" @click="removeFile">{{ $t("application.remove") }}</el-button>
+                          <el-button type="warning" @click="removeRelation">{{ $t("application.delete") }}</el-button>a
                     </el-form-item>
                   </template>
                 </el-form>
@@ -227,6 +227,23 @@ export default {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
+      removeRelation(){
+      let ids = []
+      let _self = this
+      ids.push(_self.parentId)
+      this.selectedArchives.forEach(function(item){
+                ids.push(item.ID)
+            })
+      axios.post("/exchange/doc/deleteRelations",ids).then(function(response){
+        console.log(response)
+        let code = response.data.code
+        if(code==0){
+          _self.$message("删除成功")
+        }
+                  _self.$refs.fileList.loadGridData()
+      })
+    },
+
     selectInArchiveFile(val) {
       this.selectedInArchive = val;
     },
