@@ -77,6 +77,7 @@
     import RelyOnFolderSelectStartUp from "@/views/workflow/RelyOnFolderSelectStartUp.vue"
     import CancelStartUp from "@/views/workflow/CancelStartUp.vue"
     import DesignChangeFileStartup from "@/views/workflow/DesignChangeFileStartup.vue"
+    import DesignCancelStartUp from "@/views/workflow/DesignCancelStartUp.vue"
     export default {
         name: "TodoTask",
         permit: 1,
@@ -94,7 +95,8 @@
             CopyStartUp : CopyStartUp,
             RelyOnFolderSelectStartUp : RelyOnFolderSelectStartUp,
             CancelStartUp : CancelStartUp,
-            DesignChangeFileStartup :DesignChangeFileStartup
+            DesignChangeFileStartup :DesignChangeFileStartup,
+            DesignCancelStartUp:DesignCancelStartUp
         },
         data() {
                 return {
