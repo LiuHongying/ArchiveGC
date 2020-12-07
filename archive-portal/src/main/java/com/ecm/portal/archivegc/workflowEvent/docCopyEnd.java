@@ -39,7 +39,6 @@ public class docCopyEnd implements JavaDelegate {
 			String formId = varMap.get("formId").toString();
 			
 			EcmDocument ecmObject = documentService.getObjectById(ecmSession.getToken(), formId);
-			String type = varMap.get("SUB_TYPE").toString();
 			ecmObject.setStatus("已完成");
 			documentService.updateObject(ecmSession.getToken(), ecmObject,null);
 	}

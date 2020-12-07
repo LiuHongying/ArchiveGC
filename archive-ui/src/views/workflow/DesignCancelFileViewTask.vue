@@ -59,7 +59,7 @@
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
-          gridViewName="WorkflowFileGrid"
+          gridViewName="DesignCancelGrid"
           :condition="searchFileCondition"
           :optionWidth="1"
           :isShowMoreOption="false"
@@ -144,7 +144,7 @@
                   v-bind:tableHeight="200"
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
-                  gridViewName="BorrowSequenceGrid"
+                  gridViewName="DesignCancelGrid"
                   condition=" and a.NAME='irel_children'"
                   :optionWidth="1"
                   :isshowCustom="false"
@@ -241,8 +241,7 @@ export default {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
-    
-            checkCondition(){    
+        checkCondition(){    
      let _self = this
      let cond = this.searchFileCondition
      let ids =  _self.$refs.fileList.itemDataList
@@ -260,8 +259,8 @@ export default {
      this.searchFileCondition = cond}
     },
 
-    saveRejectComment(){
 
+    saveRejectComment(){
       let _self=this;
       if(_self.pendForm.rejectComment==""){
         _self.$message({

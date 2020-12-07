@@ -59,8 +59,8 @@
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
-          gridViewName="WorkflowFileGrid"
-          condition="TYPE_NAME='设计文件'"
+          gridViewName="DesignCancelGrid"
+          :condition="searchFileCondition"
           :optionWidth="1"
           :isShowMoreOption="false"
           :isshowCustom="false"
@@ -152,7 +152,7 @@
                   v-bind:tableHeight="tableHeight"
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
-                  gridViewName="BorrowSequenceGrid"
+                  gridViewName="DesignCancelGrid"
                   condition=" and a.NAME='irel_children' and b.type_name!='附件'"
                   :optionWidth="1"
                   :isshowCustom="false"
@@ -194,7 +194,7 @@
                   v-bind:tableHeight="tableHeight"
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
-                  gridViewName="WorkflowFileGrid"
+                  gridViewName="DesignCancelGrid"
                   condition=" and a.NAME='irel_children' and b.TYPE_NAME = '附件'"
                   :optionWidth="1"
                   :isShowMoreOption="false"
@@ -278,26 +278,29 @@ export default {
       volumesFileVisible: false,
       pendNotVisible:false,
       selectedAttachment:[],
+      searchCondition:"TYPE_NAME='设计文件'"
     };
   },
   mounted() {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
-    checkCondition(){
-     let cond = this.$refs.searchDoc.condition
-     let ids =  this.$refs.fileList.itemDataList
+            checkCondition(){    
+     let _self = this
+     let cond = this.searchFileCondition
+     let ids =  _self.$refs.fileList.itemDataList
+     if(ids.length!=0){
      let list = ""
-     list +="'"
+     list +="("
      ids.forEach(function(item){
-          list += item.ID
-          list +=","
+          list += "'"+item.ID
+          list +="',"
             })
-      list.slice(0,list.length-1)
+      list=list.slice(0,list.length-2)
       list +="'"
-      cond +="and id not in"+list 
+      cond +="and id not in"+list+")"
       console.log(cond)
-      this.$refs.searchDoc.condition = cond
+     this.searchFileCondition = cond}
     },
     attachSelect(val){
       this.selectedAttachment = val
@@ -408,7 +411,6 @@ export default {
       _self.pendNotVisible=true;
     },
     beforeAddFile() {
-        //this.checkCondition()
         let _self = this;
         this.getEcmcfgActive(
         this.processDefinitionId,
@@ -416,6 +418,7 @@ export default {
         function(ecmCfgActivity) {
           _self.searchFileCondition = ecmCfgActivity.formCondition;
           _self.propertyVisible = true;
+          _self.checkCondition()
         }
       );
     },
@@ -464,7 +467,9 @@ export default {
     searchItem() {
       let _self = this;
       let key = " 1=1 ";
- 
+      if (_self.searchFileCondition != "") {
+        key += " and (" + searchFileCondition + ")";
+      }
       if (_self.filters.docType != "") {
         key += " and TYPE_NAME = '" + _self.filters.docType + "'";
       }

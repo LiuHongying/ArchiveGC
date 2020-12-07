@@ -723,4 +723,18 @@ public class ArchiveDcController extends ControllerAbstract{
 		mp.put("code", ActionContext.SUCESS);
 		return mp;
 	}
+	@RequestMapping(value = "/dc/recyclebin/resetDC", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> resetDC(@RequestBody String argStr) throws Exception {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		List<String> list = JSONUtils.stringToArray(argStr);
+		EcmDocument temp = new EcmDocument();
+		for (String id : list) {
+			temp = documentService.getObjectById(getToken(), id);
+			temp.addAttribute("IS_HIDDEN", 0);
+			documentService.updateObject(getToken(), temp, null);
+		}
+		mp.put("code", ActionContext.SUCESS);
+		return mp;
+	}
 }

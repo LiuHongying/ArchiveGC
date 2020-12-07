@@ -233,6 +233,8 @@ import BorrowView from "@/views/workflow/BorrowView.vue"
 import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
 import CancelView from "@/views/workflow/CancelView.vue"
 import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue"
+import DesignCancelViewReadOnly from "@/views/workflow/DesignCancelViewReadOnly.vue"
+import DesignCancelView from "@/views/workflow/DesignCancelView.vue"
 export default {
   name: "TodoTask",
   permit: 1,
@@ -250,7 +252,9 @@ export default {
     BorrowView:BorrowView,
     CommonViewRelyDocType:CommonViewRelyDocType,
     CancelView:CancelView,
-    CancelViewReadOnly : CancelViewReadOnly
+    CancelViewReadOnly : CancelViewReadOnly,
+    DesignCancelView:DesignCancelView,
+    DesignCancelViewReadOnly:DesignCancelViewReadOnly
   },
   data() {
     return {
