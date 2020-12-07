@@ -15,6 +15,7 @@
         :activityName="currentData.name"
         :formEditPermision=0
         :formEnableType="this.$options.name"
+        :allowChangeDoc="false"
       ></component>
       <el-divider content-position="left">流转意见</el-divider>
       <el-table :data="taskList" border v-loading="loading" style="width: 100%">
@@ -63,6 +64,41 @@
         <el-button @click="showprocessDiagram()">显示流程图</el-button>
       </div>
     </el-dialog>
+    <el-row>
+      <el-form ref="workflowForm" :model="workflowForm">
+        <el-row class="topbar-button">
+          <el-form-item label="流程名称" :label-width="formLabelWidth" style="float:left">
+              <el-select v-model="workflowForm.workflowName" @change="changeJobNames()">
+                <div v-for="item in workflowNames" :key="item.id" >
+                  <el-option :label="item.name" :value="item.id"></el-option>
+                </div>
+              </el-select>
+          </el-form-item>
+          <el-form-item label="任务名称" :label-width="formLabelWidth" style="float:left">
+              <el-select v-model="workflowForm.jobName">
+                <div v-for="item in jobNames" :key="item.id" >
+                  <el-option :label="item.activityName" :value="item.activityName"></el-option>
+                </div>
+              </el-select>
+          </el-form-item>
+          <el-form-item label="到达时间" :label-width="formLabelWidth" style="float:left">
+              <el-date-picker
+                v-model="workflowForm.startTimeAfter"
+                auto-complete="off"
+                value-format="yyyy-MM-dd HH:mm:ss"
+              ></el-date-picker>
+              <el-date-picker
+                v-model="workflowForm.startTimeBefore"
+                auto-complete="off"
+                value-format="yyyy-MM-dd HH:mm:ss"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item style="float:left;padding-left:3px">
+              <el-button type="primary" :plain="true" size="small" @click="search()">查询</el-button>
+            </el-form-item>
+        </el-row>
+      </el-form>
+    </el-row>
     <el-table
       :data="dataList"
       border
@@ -154,6 +190,8 @@ export default {
   },
   data() {
     return {
+      workflowNames:[],
+      jobNames:[],
       currentData: [],
       ecmCfgActivity: [],
       taskName: "",
@@ -176,7 +214,13 @@ export default {
       currentFormId: "",
       taskForm: {},
       formData: {},
-      formParameter:{}
+      formParameter:{},
+      workflowForm: {
+        workflowName: "",
+        jobName:"",
+        startTimeAfter:"",
+        startTimeBefore:""
+      }
     };
   },
   created() {
@@ -185,6 +229,7 @@ export default {
     if (psize) {
       _self.pageSize = parseInt(psize);
     }
+    _self.loadWorkflowInfo();
     _self.refreshData();
   },
   methods: {
@@ -285,12 +330,7 @@ export default {
     },
     search() {
       let _self = this;
-      _self.dataList = _self.dataListFull.filter(function (item) {
-        return (
-          item.taskName.match(_self.inputkey) ||
-          item.result.match(_self.inputkey)
-        );
-      });
+      _self.refreshData();
     },
     showprocessDiagram() {
       let _self = this;
@@ -310,6 +350,31 @@ export default {
         }
       }
     },
+    loadWorkflowInfo(){
+      let _self = this
+      axios.get("/cfgworkflow/processes").then(function(response) {
+        _self.workflowNames = response.data.data
+      });
+    },
+    changeJobNames(){
+      let _self = this;
+      _self.workflowForm.jobName = ""
+      var jobNamesArr = new Array();
+      axios
+        .get("/cfgworkflow/cfgActivities/"+_self.workflowForm.workflowName)
+        .then(function(response) {
+        jobNamesArr = response.data.data
+        jobNamesArr.forEach(function(value,index){
+          if(value.activityName == "start"){
+            jobNamesArr.splice(index, 1)
+          }
+        })
+        _self.jobNames = jobNamesArr
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    }
   },
 };
 </script>

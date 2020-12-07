@@ -76,7 +76,7 @@
                     <template slot="paneR">
                         <el-tabs  v-model="selectedTabName">
                             <el-tab-pane  :label="$t('application.Attachment')" name="t03" >
-                                <el-row>
+                                <el-row v-if="allowChangeDoc">
                                     <el-col :span="24">
                                         <el-form :inline="true" :model="filters" @submit.native.prevent>
                                             <el-form-item>
@@ -365,7 +365,8 @@ export default {
         allowEdit: { type: Boolean, default: false },
         showUploadFile: { type: Boolean, default: true },
         processDefinitionId: { type: String, default: "" },
-        activityName: { type: String, default: "" }
+        activityName: { type: String, default: "" },
+        allowChangeDoc: { type: Boolean, default: true }
     },
     components: {
         ShowProperty:ShowProperty,
