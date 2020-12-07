@@ -1,37 +1,25 @@
 <template>
   <div>
     <el-dialog title="查看" :visible.sync="dialogVisible" v-if="dialogVisible" width="95%">
-      <ShowPropertyReadOnly
-        ref="ShowProperty"
-        width="100%"
-        :itemId="currentFormId"
-        :typeName="typeName"
-        ></ShowPropertyReadOnly>
-      <br>
-      <el-tabs  v-model="selectedTabName">
-        <el-tab-pane  :label="$t('application.Attachment')" name="t03" >
-            <!--列表-->
-            <DataGrid
-                ref="mainDataGrid"
-                key="main"
-                dataUrl="/dc/getDocuByRelationParentId"
-                :parentId="currentFormId"
-                :tableHeight="500"
-                :isshowOption="true" 
-                :isshowSelection ="true"
-                gridViewName="ModifyDocGrid"
-                condition=" and a.name = 'irel_children' "
-                :optionWidth = "2"
-                :isshowCustom="false"
-                :isEditProperty="false"
-                showOptions="查看内容,查看属性"
-                :isShowPropertyButton="false"
-                :isShowChangeList="false"
-                @rowclick="rowClick"
-                @selectchange="selectChange"
-            ></DataGrid>
-        </el-tab-pane>
-    </el-tabs>
+      <el-divider content-position="left">表单信息</el-divider>
+      <component
+        ref="propertiesComp"
+        :is="taskName"
+        v-model="taskForm"
+        :formId="currentFormId"
+        :docId="currentFormId"
+        :allowEdit="false"
+        :taskForm="formData"
+        :istask="1"
+        :formParameter="formParameter"
+        :processDefinitionId="currentData.processDefinitionId"
+        :activityName="currentData.name"
+        formEditPermision="0"
+        :formEnableType="this.$options.name"
+        :isShowReject="false"
+        :showUploadFile="false"
+        @click="click"
+      ></component>
       <el-divider content-position="left">流转意见</el-divider>
       <el-table :data="taskList" border v-loading="loading" style="width: 100%">
         <el-table-column label="序号" width="65">
@@ -215,7 +203,6 @@
 
 <script type="text/javascript">
 import UserSelectInput from "@/components/controls/UserSelectInput";
-import ShowPropertyReadOnly from "@/components/ShowPropertyReadOnly.vue";
 import DataGrid from "@/components/DataGrid";
 import TaskTestForm1 from "@/components/form/TaskTestForm1.vue";
 import EditTask from "@/views/workflow/task/EditTask.vue";
@@ -226,10 +213,8 @@ import CommonViewRelyDocType from "@/views/workflow/CommonViewRelyDocType.vue";
 import DeliverFormTask from "@/views/workflow/DeliverFormTask.vue"
 import UpdateDocContent from "@/views/workflow/LinkMainAttachmentFile.vue";
 import UpdateDocContentByReviewer from "@/views/workflow/LinkMainAttachmentFileByReviewer.vue";
-import BorrowView from "@/views/workflow/BorrowView.vue"
-import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
-import CancelView from "@/views/workflow/CancelView.vue"
-import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue"
+import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue";
+import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue";
 export default {
   name: "MyWorkflow",
   permit: 1,
@@ -243,13 +228,10 @@ export default {
     UpdateDocContent: UpdateDocContent,
     UpdateDocContentByReviewer: UpdateDocContentByReviewer,
     DeliverFormTask:DeliverFormTask,
-    BorrowViewReadOnly:BorrowViewReadOnly,
-    BorrowView:BorrowView,
     CommonViewRelyDocType:CommonViewRelyDocType,
-    CancelView:CancelView,
-    CancelViewReadOnly : CancelViewReadOnly,
-    ShowPropertyReadOnly: ShowPropertyReadOnly,
-    DataGrid:DataGrid
+    DataGrid:DataGrid,
+    BorrowViewReadOnly:BorrowViewReadOnly,
+    CancelViewReadOnly:CancelViewReadOnly
   },
   data() {
     return {
@@ -286,7 +268,17 @@ export default {
       typeName:"文件传递单",
       formParameter:{},
       formData:{},
-      selectedTabName:'t03'
+      selectedTabName:'t03',
+      taskForm:{},
+      viewMap:{
+          "设计文件修改流程":"修改确认",
+          "科研预归档借阅流程":"整编岗确认",
+          "科研文件修改流程":"整编岗确认",
+          "文档借阅流程":"借阅抽调",
+          "作废通知单作废流程":"审核",
+          "文档提交归档流程":"文档提交检查",
+          "文档复制流程":"本部门领导审批",
+          "图纸文件审批流程":"校对"}
     };
   },
   created() {
@@ -304,6 +296,9 @@ export default {
     _self.refreshData();
   },
   methods: {
+    click(value){
+        this.taskForm = value.get("meteData")
+    },
     search() {
       let _self = this;
       _self.loading = true;
@@ -314,19 +309,6 @@ export default {
       let datetime = row[column.property];
       return this.datetimeFormat(datetime);
     },
-    // refreshProcess(wfId) {
-    //   let _self = this;
-    //   _self.loading = true;
-    //   // axios.post('/workflow/getWfActivities',wfId)
-    //   // .then(function(response) {
-    //   //   _self.activityList = response.data.data;
-    //   //   _self.loading = false;
-    //   // })
-    //   // .catch(function(error) {
-    //   //   console.log(error);
-    //   //   _self.loading = false;
-    //   // });
-    // },
     //格式化时间
     dateFtt(fmt, date) {
       var o = {
@@ -447,28 +429,27 @@ export default {
       var m = new Map();
       var n = new Map();
       n.set("processDefinitionId", indata.processDefinitionId);
-      n.set("activityName", indata.name);
-      n.set("taskId",indata.id);
-    //   axios
-    //     .post("/workflow/getEcmCfgActivity", JSON.stringify(n))
-    //     .then(function(response){
-    //       _self.ecmCfgActivity = response.data.data;
-    //       if(_self.ecmCfgActivity.formParameter){
-    //           _self.formParameter= JSON.parse(_self.ecmCfgActivity.formParameter) 
-    //         }
-    //       _self.taskName = _self.ecmCfgActivity.componentName;
-    //       axios
-    //           .post("/dc/getDocumentById", indata.formId)
-    //           .then(function(responsedoc) {
-    //             let result = responsedoc.data;
-    //             if (result.code == 1) {
-    //               _self.formData = result.data;
-    //             }
-    //           });
-    //     }).catch(function(error) {
-    //       console.log(error);
-    //       _self.loading = false;
-    //     });
+      n.set("activityName", _self.viewMap[indata.name]);
+      axios
+        .post("/workflow/getEcmCfgActivity", JSON.stringify(n))
+        .then(function(response){
+          _self.ecmCfgActivity = response.data.data;
+          if(_self.ecmCfgActivity.formParameter){
+              _self.formParameter= JSON.parse(_self.ecmCfgActivity.formParameter) 
+            }
+          _self.taskName = _self.ecmCfgActivity.componentName;
+          axios
+              .post("/dc/getDocumentById", indata.formId)
+              .then(function(responsedoc) {
+                let result = responsedoc.data;
+                if (result.code == 1) {
+                  _self.formData = result.data;
+                }
+              });
+        }).catch(function(error) {
+          console.log(error);
+          _self.loading = false;
+        });
 
       m.set("processInstanceId", indata.processInstanceId);
       _self.currentProcessId = indata.processInstanceId;
