@@ -10,18 +10,23 @@
         <!-- <el-col style="padding:3px;text-align:left">
           <el-form-item>{{typeName}}</el-form-item></el-col> -->
         <el-collapse v-model="activeNames">
-          <el-collapse-item v-for="(citem,cindex) in dataList" :title="citem.label" :name="citem.label"  :id="citem.label" :key="cindex"> 
-          <template v-for="(item,itemIndex) in citem.ecmFormItems">
+          <el-collapse-item v-for="(citem,cindex) in dataList"   :id="citem.label" :key="cindex"> 
+         <template slot="title" >
+          <div class="el-divider el-divider--horizontal"><div class="el-divider__text is-left">{{citem.label}}</div></div>
+        </template>
+         <template v-for="(item,itemIndex) in citem.ecmFormItems">
             <el-col v-show="itemId || (!itemId && !item.readOnly)" :span="showCellValue(item)" v-bind:key="itemIndex" style="text-align:left;">
               <el-form-item :hidden="item.isHide" :label="item.label">
               {{item.defaultValue}}
               </el-form-item>
             </el-col>
           </template>
-          </el-collapse-item>
-        </el-collapse>
+          <el-col>
+             <el-form-item style="float:left"  :label="$t('application.type')" >{{myTypeName}}</el-form-item>
+          </el-col>
+         </el-collapse-item>
+      </el-collapse>
     </el-row>
-      <el-form-item style="float:left"  :label="$t('application.type')" >{{myTypeName}}</el-form-item>
       
     </el-form>
   </div>
