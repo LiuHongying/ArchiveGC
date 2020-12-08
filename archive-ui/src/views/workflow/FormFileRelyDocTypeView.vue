@@ -110,7 +110,7 @@
                       <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
                     </el-form-item>
                     <el-form-item>
-                          <el-button type="warning" @click="removeRelation">{{ $t("application.delete") }}</el-button>a
+                          <el-button type="warning" @click="removeRelation">{{ $t("application.delete") }}</el-button>
                     </el-form-item>
                   </template>
                 </el-form>
@@ -225,7 +225,7 @@ export default {
       let ids = []
       let _self = this
       ids.push(_self.parentId)
-      this.selectedArchives.forEach(function(item){
+      this.selectedRemoveFiles.forEach(function(item){
                 ids.push(item.ID)
             })
       axios.post("/exchange/doc/deleteRelations",ids).then(function(response){
@@ -282,13 +282,15 @@ export default {
     },
     saveFileToWorkflow() {
       let _self = this;
+      let ids = []
+      
       if (_self.$refs.fileList.itemDataList == null) {
         _self.$refs.fileList.itemDataList = _self.selectedFiles;
       } else {
         _self.selectedFiles.forEach(e => {
           let isContain = false;
           _self.$refs.fileList.itemDataList.find(function(value) {
-            if (value.ID === e.ID) {
+            if (value === e) {
               isContain = true;
               return;
               //则包含该元素
@@ -298,9 +300,20 @@ export default {
             _self.$refs.fileList.itemDataList.push(e);
           }
         });
-        // this.$refs.fileList.itemDataList=this.$refs.fileList.itemDataList.concat(this.selectedFiles);
+        
       }
-      _self.files=_self.$refs.fileList.itemDataList;
+      ids.push(_self.parentId)
+      this.selectedFiles.forEach(function(item){
+                ids.push(item.ID)
+            })
+      axios.post("/exchange/doc/AddRelations",ids).then(function(response){
+        console.log(response)
+        let code = response.data.code
+        if(code==0){
+          _self.$message("添加成功")
+        }
+      _self.$refs.fileList.loadGridData()
+      })
       _self.$emit("change", _self.$refs.fileList.itemDataList);
       this.butt = false;
       this.propertyVisible = false;
