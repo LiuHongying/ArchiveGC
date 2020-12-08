@@ -85,6 +85,13 @@
             </el-form-item>
           </el-col>
           <el-col>
+            <el-form-item label="流程名称" :label-width="formLabelWidth" style="float:left">
+              <el-select v-model="workflowForm.workflowName">
+                <div v-for="item in workflowNames" :key="item.id" >
+                  <el-option :label="item.name" :value="item.id"></el-option>
+                </div>
+              </el-select>
+            </el-form-item>
             <el-form-item label="状态" :label-width="formLabelWidth" style="float:left">
               <el-select style="width:12em" v-model="workflowForm.isFinished">
                 <el-option label="全部" value="全部"></el-option>
@@ -210,11 +217,12 @@ import DocViewTask from "@/views/workflow/task/DocViewTask.vue";
 import borrow1 from "@/components/form/Borrow1.vue";
 import CommonView from "@/views/workflow/CommonView.vue";
 import CommonViewRelyDocType from "@/views/workflow/CommonViewRelyDocType.vue";
-import DeliverFormTask from "@/views/workflow/DeliverFormTask.vue"
+import DeliverFormTask from "@/views/workflow/DeliverFormTask.vue";
 import UpdateDocContent from "@/views/workflow/LinkMainAttachmentFile.vue";
 import UpdateDocContentByReviewer from "@/views/workflow/LinkMainAttachmentFileByReviewer.vue";
 import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue";
 import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue";
+import CommonViewRelyFolder from "@/views/workflow/CommonViewRelyFolder.vue";
 export default {
   name: "MyWorkflow",
   permit: 1,
@@ -231,10 +239,12 @@ export default {
     CommonViewRelyDocType:CommonViewRelyDocType,
     DataGrid:DataGrid,
     BorrowViewReadOnly:BorrowViewReadOnly,
-    CancelViewReadOnly:CancelViewReadOnly
+    CancelViewReadOnly:CancelViewReadOnly,
+    CommonViewRelyFolder:CommonViewRelyFolder
   },
   data() {
     return {
+      workflowNames:[],
       currentData: [],
       ecmCfgActivity: [],
       taskName:'',
@@ -264,6 +274,7 @@ export default {
         startTimeBefore: "",
         endTimeBefore: "",
         isFinished: "全部",
+        workflowName:""
       },
       typeName:"文件传递单",
       formParameter:{},
@@ -293,6 +304,7 @@ export default {
       _self.currentUserName = "all";
       _self.tableHeight = window.innerHeight - 205;
     }
+    _self.loadWorkflowInfo();
     _self.refreshData();
   },
   methods: {
@@ -361,7 +373,12 @@ export default {
           _self.loading = false;
         });
     },
-
+    loadWorkflowInfo(){
+      let _self = this
+      axios.get("/cfgworkflow/processes").then(function(response) {
+        _self.workflowNames = response.data.data
+      });
+    },
     terminateWorkflow(indata) {
       let _self = this;
       _self

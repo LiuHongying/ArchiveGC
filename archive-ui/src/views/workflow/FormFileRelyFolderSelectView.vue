@@ -10,46 +10,12 @@
         :close-on-click-modal="false"
         v-dialogDrag
       >
-        <el-form :inline="true" :model="filters" @submit.native.prevent>
-          <el-form-item>
-            <el-select v-model="filters.docType">
-              <el-option :label="$t('application.all')+' '+$t('application.subDC')" value></el-option>
-              <el-option
-                v-for="(name,nameIndex) in childrenTypes"
-                :key="'Type2_'+nameIndex"
-                :label="name"
-                :value="name"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-input
-              v-model="filters.title"
-              :placeholder="$t('application.Coding')+$t('application.or')+$t('application.Title')"
-              @keyup.enter.native="searchItem"
-            ></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" v-on:click="searchItem">{{$t('application.SearchData')}}</el-button>
-          </el-form-item>
-        </el-form>
-        <DataGrid
-          ref="searchDoc"
-          key="searchDoc"
-          :dataUrl="param.searchViewUrl"
-          v-bind:tableHeight="tableHeight"
-          v-bind:isshowOption="true"
-          v-bind:isshowSelection="true"
-          :gridViewName="param.searchViewName"
-          :condition="searchFileCondition+param.searchViewCondition"
-          :optionWidth="1"
-          :isShowMoreOption="false"
-          :isshowCustom="false"
-          :isEditProperty="false"
-          :isShowChangeList="false"
-          :isshowicon="false"
-          @selectchange="fileSelect"
-        ></DataGrid>
+        <FolderSelect
+        ref="folderSelectDoc"
+        folderPath="/预归档库"
+        gridViewName="ResearchBorrowGrid"
+        @selectchange="fileSelect"
+        ></FolderSelect>
         <div slot="footer" class="dialog-footer">
           <el-button @click="saveFileToWorkflow" :loading="butt">{{$t('application.save')}}</el-button>
           <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
@@ -110,7 +76,7 @@
                       <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
                     </el-form-item>
                     <el-form-item>
-                          <el-button type="warning" @click="removeRelation">{{ $t("application.delete") }}</el-button>a
+                          <el-button type="warning" @click="removeRelation">{{ $t("application.delete") }}</el-button>
                     </el-form-item>
                   </template>
                 </el-form>
@@ -155,6 +121,7 @@ import DataSelect from "@/components/ecm-data-select";
 import DataLayout from "@/components/ecm-data-layout";
 import AttachmentFile from "@/views/dc/AttachmentFile.vue";
 import MountFile from "@/components/MountFile.vue";
+import FolderSelect from "@/components/FolderSelect.vue";
 export default {
   components: {
     ShowProperty: ShowProperty,
@@ -164,7 +131,8 @@ export default {
     RejectButton: RejectButton,
     DataLayout: DataLayout,
     AttachmentFile: AttachmentFile,
-    MountFile:MountFile
+    MountFile: MountFile,
+    FolderSelect: FolderSelect
   },
   model: {
     prop:"files",
@@ -225,16 +193,15 @@ export default {
       let ids = []
       let _self = this
       ids.push(_self.parentId)
-      this.selectedArchives.forEach(function(item){
+      this.selectedRemoveFiles.forEach(function(item){
                 ids.push(item.ID)
             })
       axios.post("/exchange/doc/deleteRelations",ids).then(function(response){
-        console.log(response)
         let code = response.data.code
         if(code==0){
           _self.$message("删除成功")
         }
-                  _self.$refs.fileList.loadGridData()
+        _self.$refs.fileList.loadGridData()
       })
     },
 
@@ -278,17 +245,21 @@ export default {
       );
     },
     fileSelect(val) {
+        console.log(val)
       this.selectedFiles = val;
     },
     saveFileToWorkflow() {
       let _self = this;
+      _self.$refs.folderSelectDoc.transferDataList();
+      let ids = []
+      
       if (_self.$refs.fileList.itemDataList == null) {
         _self.$refs.fileList.itemDataList = _self.selectedFiles;
       } else {
         _self.selectedFiles.forEach(e => {
           let isContain = false;
           _self.$refs.fileList.itemDataList.find(function(value) {
-            if (value.ID === e.ID) {
+            if (value === e) {
               isContain = true;
               return;
               //则包含该元素
@@ -298,9 +269,20 @@ export default {
             _self.$refs.fileList.itemDataList.push(e);
           }
         });
-        // this.$refs.fileList.itemDataList=this.$refs.fileList.itemDataList.concat(this.selectedFiles);
+        
       }
-      _self.files=_self.$refs.fileList.itemDataList;
+      ids.push(_self.parentId)
+      this.selectedFiles.forEach(function(item){
+                ids.push(item.ID)
+            })
+      axios.post("/exchange/doc/AddRelations",ids).then(function(response){
+        console.log(response)
+        let code = response.data.code
+        if(code==0){
+          _self.$message("添加成功")
+        }
+      _self.$refs.fileList.loadGridData()
+      })
       _self.$emit("change", _self.$refs.fileList.itemDataList);
       this.butt = false;
       this.propertyVisible = false;
@@ -342,6 +324,7 @@ export default {
     },
     removeFile(){
       let _self=this;
+      console.log(_self.selectedRemoveFiles)
       for(let i=0;i<_self.selectedRemoveFiles.length;i++){
         let e=_self.selectedRemoveFiles[i];
         for(let n=0;n<_self.$refs.fileList.itemDataList.length;n++){

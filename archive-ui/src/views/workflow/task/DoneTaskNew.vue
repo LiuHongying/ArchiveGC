@@ -81,7 +81,7 @@
                 </div>
               </el-select>
           </el-form-item>
-          <el-form-item label="到达时间" :label-width="formLabelWidth" style="float:left">
+          <el-form-item label="开始时间" :label-width="formLabelWidth" style="float:left">
               <el-date-picker
                 v-model="workflowForm.startTimeAfter"
                 auto-complete="off"
@@ -169,6 +169,7 @@ import BorrowView from "@/views/workflow/BorrowView.vue"
 import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
 import CancelView from "@/views/workflow/CancelView.vue"
 import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue"
+import CommonViewRelyFolder from "@/views/workflow/CommonViewRelyFolder.vue";
 export default {
   name: "DoneTask",
   permit: 1,
@@ -186,7 +187,8 @@ export default {
     BorrowView:BorrowView,
     CommonViewRelyDocType:CommonViewRelyDocType,
     CancelView:CancelView,
-    CancelViewReadOnly : CancelViewReadOnly
+    CancelViewReadOnly : CancelViewReadOnly,
+    CommonViewRelyFolder : CommonViewRelyFolder
   },
   data() {
     return {
@@ -241,7 +243,7 @@ export default {
       let _self = this;
       _self.loading = true;
       var m = new Map();
-      m.set("condition", _self.inputkey);
+      m.set("workflowForm", _self.workflowForm);
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
       m.set("userId", sessionStorage.getItem("access-userName"));
