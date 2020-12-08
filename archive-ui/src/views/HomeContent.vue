@@ -184,7 +184,7 @@ export default {
     return {
       jumpPath: {
         search: "",
-        todolist: "/workflow/todotask",
+        todolist: "/workflow/todoTaskNew",
         notification: "/dc/folderviewer",
         userCenter: "/user/userinfo"
       },
