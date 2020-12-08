@@ -30,7 +30,7 @@
           style="float:left"
         >{{dateFormat(currentData.createTime,'')}}</el-form-item>
       </el-form>
-      <el-divider content-position="left">表单信息</el-divider>
+      <!-- <el-divider content-position="left">表单信息</el-divider> -->
 
       <component
         ref="propertiesComp"

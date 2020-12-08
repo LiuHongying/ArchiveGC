@@ -9,8 +9,8 @@
       <el-row>
         <!-- <el-col style="padding:3px;text-align:left">
           <el-form-item>{{typeName}}</el-form-item></el-col> -->
-        <el-collapse v-model="activeNames">
-          <el-collapse-item v-for="(citem,cindex) in dataList"   :id="citem.label" :key="cindex"> 
+        <el-collapse v-model="activeNames" >
+          <el-collapse-item v-for="(citem,cindex) in dataList"  :name="citem.label" :id="citem.label" :key="cindex"> 
          <template slot="title" >
           <div class="el-divider el-divider--horizontal"><div class="el-divider__text is-left">{{citem.label}}</div></div>
         </template>
