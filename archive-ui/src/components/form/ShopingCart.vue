@@ -81,7 +81,7 @@
 <script type="text/javascript">
 import ShowBorrowForm from "@/components/form/Borrow";
 export default {
-  name: "ShowProperty",
+  name: "Favorite",
   components: {
     ShowBorrowForm: ShowBorrowForm,
   },
