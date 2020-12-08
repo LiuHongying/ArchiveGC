@@ -58,7 +58,6 @@
               </el-form-item>
               <el-form-item>
                 <ArchieveStorage
-                  :roleJudgement="true"
                   :selectRowData="selectedItems"
                   :reload-Grid="reload"
                 ></ArchieveStorage>
@@ -208,7 +207,7 @@ export default {
         console.log(error);
         _self.loading = false;
       });
-    
+
     setTimeout(() => {
       _self.topPercent = _self.getStorageNumber(_self.topStorageName, 60);
     }, 300);
