@@ -16,7 +16,7 @@
             <el-row>
               <el-form :inline="true">
                 <el-form-item>
-                    <el-button type="primary">提交整编</el-button>
+                    <el-button type="primary" @click="submitArrange()">提交整编</el-button>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="warning" @click="beforeRejectDE()">驳回</el-button>
@@ -87,6 +87,7 @@
   </DataLayout>
 </template>
 <script type="text/javascript">
+import ShowProperty from "@/components/ShowProperty";
 import DataGrid from "@/components/DataGrid";
 import DataLayout from "@/components/ecm-data-layout";
 import RejectButton from "@/components/RejectButton";
@@ -147,10 +148,10 @@ export default {
     this.init()
   },
   methods: {
-    async init(){
+    init(){
       let _self = this;
       _self.condition = "SELECT ID from ecm_folder where FOLDER_PATH='/移交库/TC'"
-      _self.$refs.DeliveryDataGrid.condition ="TYPE_NAME='移交单' AND FOLDER_ID IN("+_self.condition+")"
+      _self.$refs.DeliveryDataGrid.condition ="TYPE_NAME='移交单' AND FOLDER_ID IN("+_self.condition+") AND STATUS <>'整编'"
       _self.tables.Delivery.condition = _self.$refs.DeliveryDataGrid.condition;
       _self.$refs.DeliveryDataGrid.currentPage = 1;
       _self.$refs.DeliveryDataGrid.loadGridInfo();
@@ -198,7 +199,6 @@ export default {
       
       var i;
       for (i in tab) {
-          m.push(tab[i]["ID"]);
           if(tab[i]["STATUS"]=="已驳回"){
              _self.$message({
             showClose: true,
@@ -208,7 +208,7 @@ export default {
           });
             return
           }
-          if(tab[i]["STATUS"]=="已接收"){
+          else if(tab[i]["STATUS"]=="已接收"){
              _self.$message({
             showClose: true,
             message:"文件"+tab[i]["CODING"]+"已接收",
@@ -216,6 +216,9 @@ export default {
             type: 'warning' 
           });
             return
+          }
+          else{
+              m.push(tab[i]["ID"]);
           }
       }
       let mp=new Map();
@@ -352,12 +355,70 @@ export default {
         console.log(error);
       });
     },
+    //提交整编
+    submitArrange(){
+      let _self=this
+      if(_self.selectedDEItems.length==0){
+        _self.$message({
+                showClose: true,
+                message:  "请选择一个移交单",
+                duration: 2000,
+                type: 'warning' 
+            });
+            return
+      }
+      var m = [];
+      let tab = _self.selectedDEItems;
+      var i;
+      for (i in tab) {
+        m.push(tab[i]["ID"]);
+      }
+      let mp=new Map();
+      mp.set("ids",m);
+      axios.post("/TC/Arrangedc",JSON.stringify(mp),{
+          headers: {
+              "Content-Type": "application/json;charset=UTF-8"
+          }
+      })
+      .then(function(response){
+        if(response.data.code==1){
+          _self.init()
+          _self.$message({
+              showClose: true,
+              message: "整编成功",
+              duration: 2000,
+              type: 'success'
+          });
+          _self.$refs.Drawing.itemDataList=[];
+        }else{
+              
+          _self.$message({
+              showClose: true,
+              message: response.data.message,//_self.$t("message.operationFaild"),
+              duration: 5000,
+              type: 'error'
+          });
+        }
+          
+      })
+      .catch(function(error) {
+        _self.$message({
+          showClose: true,
+          message: _self.$t("message.operationFaild"),
+          duration: 5000,
+          type: 'error'
+        });
+        console.log(error);
+      });
+      
+    },
   },
   props: {},
   components: {
     DataGrid: DataGrid,
     DataLayout: DataLayout,
     RejectButton:RejectButton,
+    ShowProperty: ShowProperty,
   },
 };
 </script>
