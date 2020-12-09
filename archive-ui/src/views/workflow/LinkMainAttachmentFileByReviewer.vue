@@ -72,7 +72,7 @@
             :typeName="typeName"
             ></ShowPropertyReadOnly>
             </el-row>
-            <el-row>
+            <el-row v-if="allowChangeDoc">
                 <el-form :inline="true" :model="filters" @submit.native.prevent>
                 <el-form-item>
                     <el-button type="primary" @click="showUpdateFile()">{{$t('application.Manual')+$t('application.Import')}}</el-button>
@@ -418,7 +418,8 @@ export default {
         allowEdit: { type: Boolean, default: false },
         showUploadFile: { type: Boolean, default: true },
         processDefinitionId: { type: String, default: "" },
-        activityName: { type: String, default: "" }
+        activityName: { type: String, default: "" },
+        allowChangeDoc: { type: Boolean, default: true }
     },
     components: {
         ShowProperty:ShowProperty,

@@ -64,6 +64,18 @@
 	              <router-link to="/user/changepassword">{{$t('route.changePassword')}}</router-link>
 	            </span>
 	          </el-menu-item>
+            <el-menu-item index="/ShopingCart">
+              <i class="iconfont zisecm-group menu-white"></i>
+              <span slot="title">
+                <router-link to="/ShopingCart">我的收藏</router-link>
+              </span>
+            </el-menu-item>
+            <el-menu-item index="/Subscription">
+              <i class="iconfont zisecm-group menu-white"></i>
+              <span slot="title">
+                <router-link to="/Subscription">我的订阅</router-link>
+              </span>
+            </el-menu-item>
 	        </el-submenu>
       </template>
     <AdminMenu v-if="clientPermission>4" :isNest="isNest"></AdminMenu>

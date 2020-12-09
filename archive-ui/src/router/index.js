@@ -50,7 +50,7 @@ const router = new Router({
         ...workflowCenter,
         reportRouter,
         userRouter,
-        favoriteRouter,
+        ...favoriteRouter,
         // docexchange,
         ...testRouter,
         ...adminRouter,

@@ -138,6 +138,16 @@ export const workflowRouter =
   component: () => import('@/views/workflow/CommonViewRelyDocType.vue')
   
 },
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'CommonViewRelyFolder'
+},
+path: '/workflow/CommonViewRelyFolder',
+name: '基于文件夹路径显示文件列表组件',
+component: () => import('@/views/workflow/CommonViewRelyFolder.vue')
+
+},
   {meta:{
     requireAuth: true,
     permit: 1,

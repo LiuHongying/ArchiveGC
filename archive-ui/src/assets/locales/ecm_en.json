@@ -420,6 +420,7 @@
     "recycleBin":"RecycleBin",
     "companyDoc":"CompanyDoc",
     "favorite":"Favorite",
+    "subscription": "Subscription",
     "archivehandover":"Archive Handover",
     "userRoleInfo":"MyRoles",
     "archiveTool":"ArchiveTool",

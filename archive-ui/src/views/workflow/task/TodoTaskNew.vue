@@ -94,8 +94,6 @@
                   <template v-for="(itm,key) in sequenceFlow">
                     <el-radio-button :label="itm" :key="'seqence'+key">{{itm}}</el-radio-button>
                   </template>
-                  <!-- <el-radio-button label="驳回">{{$t(rejectButton)}}</el-radio-button> -->
-                  <!-- <el-radio-button :label="$t(rejectButton)">{{$t(rejectButton)}}</el-radio-button> -->
                 </el-radio-group>
               </el-form-item>
             </el-col>
@@ -128,7 +126,6 @@
           <el-row></el-row>
         </div>
       </el-form>
-
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogVisible = false">{{$t('application.cancel')}}</el-button>
         <el-button
@@ -139,6 +136,41 @@
         <el-button @click="completetask(form)">完成任务</el-button>
       </div>
     </el-dialog>
+    <el-row>
+      <el-form ref="workflowForm" :model="workflowForm">
+        <el-row class="topbar-button">
+          <el-form-item label="流程名称" :label-width="formLabelWidth" style="float:left">
+              <el-select v-model="workflowForm.workflowName" @change="changeJobNames()">
+                <div v-for="item in workflowNames" :key="item.id" >
+                  <el-option :label="item.name" :value="item.id"></el-option>
+                </div>
+              </el-select>
+          </el-form-item>
+          <el-form-item label="任务名称" :label-width="formLabelWidth" style="float:left">
+              <el-select v-model="workflowForm.jobName">
+                <div v-for="item in jobNames" :key="item.id" >
+                  <el-option :label="item.activityName" :value="item.activityName"></el-option>
+                </div>
+              </el-select>
+          </el-form-item>
+          <el-form-item label="到达时间" :label-width="formLabelWidth" style="float:left">
+              <el-date-picker
+                v-model="workflowForm.startTimeAfter"
+                auto-complete="off"
+                value-format="yyyy-MM-dd HH:mm:ss"
+              ></el-date-picker>
+              <el-date-picker
+                v-model="workflowForm.startTimeBefore"
+                auto-complete="off"
+                value-format="yyyy-MM-dd HH:mm:ss"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item style="float:left;padding-left:3px">
+              <el-button type="primary" :plain="true" size="small" @click="search()">查询</el-button>
+            </el-form-item>
+        </el-row>
+      </el-form>
+    </el-row>
     <el-table
       :data="dataList"
       border
@@ -194,6 +226,7 @@ import DocViewTask from "@/views/workflow/task/DocViewTask.vue";
 import borrow1 from "@/components/form/Borrow1.vue";
 import CommonView from "@/views/workflow/CommonView.vue";
 import CommonViewRelyDocType from "@/views/workflow/CommonViewRelyDocType.vue";
+import CommonViewRelyFolder from "@/views/workflow/CommonViewRelyFolder.vue";
 import DeliverFormTask from "@/views/workflow/DeliverFormTask.vue"
 import UpdateDocContent from "@/views/workflow/LinkMainAttachmentFile.vue";
 import UpdateDocContentByReviewer from "@/views/workflow/LinkMainAttachmentFileByReviewer.vue";
@@ -201,8 +234,6 @@ import BorrowView from "@/views/workflow/BorrowView.vue"
 import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
 import CancelView from "@/views/workflow/CancelView.vue"
 import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue"
-import DesignCancelViewReadOnly from "@/views/workflow/DesignCancelViewReadOnly.vue"
-import DesignCancelView from "@/views/workflow/DesignCancelView.vue"
 export default {
   name: "TodoTask",
   permit: 1,
@@ -219,13 +250,14 @@ export default {
     BorrowViewReadOnly:BorrowViewReadOnly,
     BorrowView:BorrowView,
     CommonViewRelyDocType:CommonViewRelyDocType,
+    CommonViewRelyFolder: CommonViewRelyFolder,
     CancelView:CancelView,
-    CancelViewReadOnly : CancelViewReadOnly,
-    DesignCancelView:DesignCancelView,
-    DesignCancelViewReadOnly:DesignCancelViewReadOnly
+    CancelViewReadOnly : CancelViewReadOnly
   },
   data() {
     return {
+      workflowNames:[],
+      jobNames:[],
       sequenceName:'',
       currentData: [],
       taskName: "",
@@ -261,7 +293,13 @@ export default {
       allowEdit: false,
       sequenceFlow: [],
       isShowReject:false,
-      formParameter:{}
+      formParameter:{},
+      workflowForm: {
+        workflowName: "",
+        jobName:"",
+        startTimeAfter:"",
+        startTimeBefore:""
+      }
     };
   },
   created() {
@@ -270,6 +308,7 @@ export default {
     if (psize) {
       _self.pageSize = parseInt(psize);
     }
+    _self.loadWorkflowInfo();
     _self.refreshData();
   },
   methods: {
@@ -281,7 +320,7 @@ export default {
       _self.selectedItems = [];
       _self.loading = true;
       var m = new Map();
-      m.set("condition", _self.inputkey);
+      m.set("workflowForm", _self.workflowForm);
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
       m.set("userId", sessionStorage.getItem("access-userName"));
@@ -561,12 +600,32 @@ export default {
     },
     search() {
       let _self = this;
-      _self.dataList = _self.dataListFull.filter(function(item) {
-        return (
-          item.taskName.match(_self.inputkey) ||
-          item.description.match(_self.inputkey)
-        );
+      _self.refreshData();
+    },
+    loadWorkflowInfo(){
+      let _self = this
+      axios.get("/cfgworkflow/processes").then(function(response) {
+        _self.workflowNames = response.data.data
       });
+    },
+    changeJobNames(){
+      let _self = this;
+      _self.workflowForm.jobName = ""
+      var jobNamesArr = new Array();
+      axios
+        .get("/cfgworkflow/cfgActivities/"+_self.workflowForm.workflowName)
+        .then(function(response) {
+        jobNamesArr = response.data.data
+        jobNamesArr.forEach(function(value,index){
+          if(value.activityName == "start"){
+            jobNamesArr.splice(index, 1)
+          }
+        })
+        _self.jobNames = jobNamesArr
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
     }
   }
 };
