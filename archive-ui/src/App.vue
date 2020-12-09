@@ -58,7 +58,7 @@ export default {
   border-radius: 4px !important;
   padding-left: 10px;
   vertical-align: middle  !important;
-  line-height: 0  !important;
+  /* line-height: 0  !important; */
 }
 .el-dialog__body {
   padding: 5px 20px !important;
@@ -95,8 +95,9 @@ export default {
 .el-collapse-item__header {
     height: 40px !important;
     line-height: 40px !important;
-    background-color: #ebeef5 !important;
-    border-bottom: 1px solid #ccc !important;
+    /* background-color: #ebeef5 !important; */
+    /* border-bottom: 1px solid #ccc !important; */
+    border-bottom: 0 solid #ccc !important;
     font-size: 14px !important;
     font-weight: 600 !important;
 }

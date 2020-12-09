@@ -30,7 +30,7 @@
           style="float:left"
         >{{dateFormat(currentData.createTime,'')}}</el-form-item>
       </el-form>
-      <el-divider content-position="left">表单信息</el-divider>
+      <!-- <el-divider content-position="left">表单信息</el-divider> -->
 
       <component
         ref="propertiesComp"
@@ -226,6 +226,7 @@ import DocViewTask from "@/views/workflow/task/DocViewTask.vue";
 import borrow1 from "@/components/form/Borrow1.vue";
 import CommonView from "@/views/workflow/CommonView.vue";
 import CommonViewRelyDocType from "@/views/workflow/CommonViewRelyDocType.vue";
+import CommonViewRelyFolder from "@/views/workflow/CommonViewRelyFolder.vue";
 import DeliverFormTask from "@/views/workflow/DeliverFormTask.vue"
 import UpdateDocContent from "@/views/workflow/LinkMainAttachmentFile.vue";
 import UpdateDocContentByReviewer from "@/views/workflow/LinkMainAttachmentFileByReviewer.vue";
@@ -233,8 +234,6 @@ import BorrowView from "@/views/workflow/BorrowView.vue"
 import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
 import CancelView from "@/views/workflow/CancelView.vue"
 import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue"
-import DesignCancelViewReadOnly from "@/views/workflow/DesignCancelViewReadOnly.vue"
-import DesignCancelView from "@/views/workflow/DesignCancelView.vue"
 export default {
   name: "TodoTask",
   permit: 1,
@@ -251,19 +250,14 @@ export default {
     BorrowViewReadOnly:BorrowViewReadOnly,
     BorrowView:BorrowView,
     CommonViewRelyDocType:CommonViewRelyDocType,
+    CommonViewRelyFolder: CommonViewRelyFolder,
     CancelView:CancelView,
-    CancelViewReadOnly : CancelViewReadOnly,
-    DesignCancelView:DesignCancelView,
-    DesignCancelViewReadOnly:DesignCancelViewReadOnly
+    CancelViewReadOnly : CancelViewReadOnly
   },
   data() {
     return {
-      workflowNames:[
-        "设计文件修改流程","科研预归档借阅流程","科研文件修改流程"
-      ],
-      jobNames:[
-        "修改确认","修改文件","替换文件"
-      ],
+      workflowNames:[],
+      jobNames:[],
       sequenceName:'',
       currentData: [],
       taskName: "",

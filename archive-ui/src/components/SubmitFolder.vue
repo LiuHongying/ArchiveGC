@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button type="primary" v-if="roleJudgement" @click="submitWhouse()">提交入库</el-button>
+    <el-button type="primary" @click="submitWhouse()">提交入库</el-button>
   </div>
 </template>
 <script type="text/javascript">
@@ -10,8 +10,7 @@ export default {
     return {};
   },
   props: {
-    roleJudgement: { type: Boolean, default: true },
-    selectRowData: { type: Array, default: null },
+    selectRowData: { type: Array, default: [] },
     reloadGrid: {
       type: Function,
       required: true,

@@ -465,7 +465,6 @@ export default {
       axios
         .post("/dc/getWorkflow", JSON.stringify(m))
         .then(function (response) {
-          debugger;
           _self.workflow = response.data.data[0];
           console.log(_self.workflow)
           _self.borrowVisible = true;
