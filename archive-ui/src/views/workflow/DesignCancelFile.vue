@@ -83,6 +83,7 @@
                   :isShowChangeList="false"
                   :isshowicon="false"
                   :isshowPage="isShowPage"
+                  :isInitData="false"
                   @selectchange="relevantDocRVSelect"
                 ></DataGrid>
               </el-tab-pane>
@@ -153,11 +154,12 @@ export default {
   },
   mounted() {
     this.getTypeNamesByMainList("DCTypeSubContractor");
+    this.searchItem()
   },
   methods: {
     beforeAddFile() {
       let _self=this;
-      this.getEcmcfgActive(this.workflowObj.ID,"start",function(ecmCfgActivity){
+      this.getEcmcfgActive(_self.workflowObj.ID,"start",function(ecmCfgActivity){
         _self.searchFileCondition=ecmCfgActivity.formCondition;
         _self.propertyVisible=true;
       });
