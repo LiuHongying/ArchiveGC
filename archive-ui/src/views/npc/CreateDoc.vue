@@ -3,9 +3,9 @@
     <template v-slot:header></template>
     <template v-slot:main>
       <el-row>
-        <el-col :span="3" style="height:30px;line-height:30px;text-align:center;">模板名称：</el-col>
-        <el-col :span="6" style="height:30px;line-height:30px;text-align:center;">模板名称：</el-col>
-        <el-col :span="6">
+        <el-col :span="3" class="el-form-item__label">模板</el-col>
+        <el-col :span="3" class="el-form-item__content">模板1</el-col>
+        <el-col :span="6" class="el-form-item__content">
           <el-button type="primary">预览</el-button>
           <el-button type="primary">下载</el-button>
         </el-col>
