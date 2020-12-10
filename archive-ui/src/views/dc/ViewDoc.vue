@@ -326,7 +326,7 @@ export default {
       m.set("actionName","ecm_download")
       m.set("appName","portal")
       axios
-        .post("/audit/addAudit", JSON.stringify(m))
+        .post("/archive/addAudit", JSON.stringify(m))
         .then(function(response){
           
         })
