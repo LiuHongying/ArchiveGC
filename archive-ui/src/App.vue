@@ -141,4 +141,18 @@ export default {
   vertical-align: middle  !important;
   line-height: 0  !important;
 }
+
+.gutter{
+  display:block;
+}
+
+.el-button-ecm{
+    height: 30px !important;
+  padding: 2px 3px !important;
+  border-radius: 4px !important;
+  vertical-align: middle  !important;
+  line-height: 0  !important;
+  float:left;
+
+}
 </style>

@@ -13,7 +13,8 @@
         <EcmCustomColumns
           ref="ecmCustomColumns"
           :gridViewName="gridViewName"
-          @onClose="onCloseCustom" @onCancel="editColumn=false"
+          @onClose="onCloseCustom"
+          @onCancel="editColumn = false"
         >
         </EcmCustomColumns>
       </el-dialog>
@@ -28,19 +29,41 @@
         style="text-align: center"
         :close-on-click-modal="false"
       >
-        <ViewDraftDoc ref="createDoc"
-        :selectedItemId="selectedItemId"
-        @onStartUpworkflow="startworkflow"
+        <ViewDraftDoc
+          ref="createDoc"
+          :selectedItemId="selectedItemId"
+          @onStartUpworkflow="startworkflow"
         >
-
         </ViewDraftDoc>
-        <div slot="footer" class="dialog-footer">
-        <el-button @click="saveOrStartup(true)" :loading="butt">启动流程</el-button>
-        <el-button @click="saveOrStartup(false)" :loading="butt">暂存</el-button>
-        <el-button @click="propertyVisible = false;butt=false;">{{
-          $t("application.cancel")
-        }}</el-button>
-      </div>
+
+          <el-card shadow="hover">
+            <el-collapse value="操作">
+              <el-collapse-item
+                title="操作"
+                name="操作"
+                id="action"
+                key="cindex"
+              >
+                <el-row>
+                  <el-col :span="24">
+                    <el-button type="primary" @click="saveOrStartup(true)" :loading="butt"
+                      >启动流程</el-button
+                    >
+                    <el-button type="primary" @click="saveOrStartup(false)" :loading="butt"
+                      >暂存</el-button
+                    >
+                    <el-button
+                      @click="
+                        propertyVisible = false;
+                        butt = false;
+                      "
+                      >{{ $t("application.cancel") }}</el-button
+                    >
+                  </el-col>
+                </el-row>
+              </el-collapse-item>
+            </el-collapse>
+          </el-card>
       </el-dialog>
       <!-- 选字段对话框 -->
       <el-dialog
@@ -106,9 +129,14 @@
         ></el-table-column>
         <el-table-column :label="$t('field.indexNumber')" key="#1" width="70">
           <template slot-scope="scope">
-            <slot name="sequee" :data="scope" :currentPage="currentPage" :pageSize="pageSize">
+            <slot
+              name="sequee"
+              :data="scope"
+              :currentPage="currentPage"
+              :pageSize="pageSize"
+            >
               <span>{{ (currentPage - 1) * pageSize + scope.$index + 1 }}</span>
-            </slot> 
+            </slot>
             <!-- <slot name="sequee" :data="{scope,'currentPage':currentPage,'pageSize':pageSize}">
                 <span>{{(currentPage-1) * pageSize + scope.$index+1}}</span>
               </slot> -->
@@ -313,10 +341,10 @@
 <script type="text/javascript">
 import "@/utils/dialog";
 import ShowProperty from "@/components/ShowProperty";
-import ShowPropertyReadOnly from "@/components/ShowPropertyReadOnly"
+import ShowPropertyReadOnly from "@/components/ShowPropertyReadOnly";
 import EcmCustomColumns from "@/components/ecm-custom-columns";
 import RelationViewer from "@/components/RelationViewer";
-import ViewDraftDoc from "@/views/npc/ViewDraftDoc.vue"
+import ViewDraftDoc from "@/views/npc/ViewDraftDoc.vue";
 export default {
   name: "dataGrid",
   data() {
@@ -335,11 +363,11 @@ export default {
         checkedCities: [],
         temCol: [],
         dialogFormVisible: false,
-        isIndeterminate: false,
+        isIndeterminate: false
       },
       propertyVisible: false,
       currentPage: 1,
-      
+
       showFields: [],
       selectedItemId: "",
       selectedRow: "",
@@ -355,11 +383,11 @@ export default {
       propertiesData: [],
       gridviewInfo: {
         gridviewName: "",
-        isCustom: false,
+        isCustom: false
       },
       showRelationViewer: false,
       timer: null,
-      butt:false,
+      butt: false
     };
   },
   props: {
@@ -386,18 +414,18 @@ export default {
     showOptions: { type: String, default: "查看内容,查看属性,加入购物车,升版" }, //功能菜单显示控制
     isShowChangeList: { type: Boolean, default: true }, //是否显示列表选择
     optionWidth: { type: Number, default: 3.5 }, //操作列宽度，放几个按钮
-    pageSize: { type: Number, default: 20 },//每页显示数量
-    folderId:{type:String,default:""},//目录ID
+    pageSize: { type: Number, default: 20 }, //每页显示数量
+    folderId: { type: String, default: "" } //目录ID
   },
   watch: {
     showFields(val, oldVal) {
       //普通的watch监听
       //console.log("a: "+val, oldVal);
       let _self = this;
-      _self.columnList.forEach((element) => {
+      _self.columnList.forEach(element => {
         element.visibleType = 2;
       });
-      val.forEach((element) => {
+      val.forEach(element => {
         let item = _self.getgriditem(element);
         if (item) {
           //console.log(element);
@@ -413,17 +441,17 @@ export default {
       this.$emit("input", val);
     },
 
-    "$store.state.app.language": function (nv, ov) {
+    "$store.state.app.language": function(nv, ov) {
       this.currentLanguage = nv;
       this.loadGridInfo();
-    },
+    }
   },
   components: {
     ShowProperty: ShowProperty,
-    ShowPropertyReadOnly:ShowPropertyReadOnly,
+    ShowPropertyReadOnly: ShowPropertyReadOnly,
     EcmCustomColumns: EcmCustomColumns,
     RelationViewer: RelationViewer,
-    ViewDraftDoc:ViewDraftDoc
+    ViewDraftDoc: ViewDraftDoc
   },
   mounted() {
     // this.ready();
@@ -443,31 +471,32 @@ export default {
     //     this.$refs.datatable.toggleRowSelection(row);
     //   }
     // },
-    saveOrStartup(isStartup){
-      this.butt=true;
+    saveOrStartup(isStartup) {
+      this.butt = true;
       this.$refs.createDoc.saveData(isStartup);
-      this.butt=false;
+      this.butt = false;
     },
     startworkflow(m) {
       let _self = this;
-      let form={};
-      _self.butt=true;
+      let form = {};
+      _self.butt = true;
       _self.loading = true;
-      let d=new Map(m);
-      form['formId']=d.get('ID');
-      form['processInstanceKey']='图纸文件审批流程';
-      axios.post('/workflow/startWorkflow',JSON.stringify(form))
-      .then(function(response) {
-        _self.$message("发起流程成功!");
-        _self.loading = false;
-        _self.butt=false;
-        _self.propertyVisible=false;
-      })
-      .catch(function(error) {
-        console.log(error);
-        _self.loading = false;
-        _self.butt=false;
-      });
+      let d = new Map(m);
+      form["formId"] = d.get("ID");
+      form["processInstanceKey"] = "图纸文件审批流程";
+      axios
+        .post("/workflow/startWorkflow", JSON.stringify(form))
+        .then(function(response) {
+          _self.$message("发起流程成功!");
+          _self.loading = false;
+          _self.butt = false;
+          _self.propertyVisible = false;
+        })
+        .catch(function(error) {
+          console.log(error);
+          _self.loading = false;
+          _self.butt = false;
+        });
     },
     onPropertiesSaveSuccess(props) {
       this.$emit("onPropertiesSaveSuccess", props);
@@ -492,7 +521,7 @@ export default {
       var m = new Map();
       m.set("gridName", this.gridviewInfo.gridviewName);
       // m.set('folderId',indata.id);
-      m.set('folderId',_self.folderId);
+      m.set("folderId", _self.folderId);
       m.set("condition", _self.condition);
       if (_self.parentId != "") {
         m.set("id", _self.parentId);
@@ -502,15 +531,16 @@ export default {
       m.set("orderBy", "");
       axios
         .post(this.dataUrl, JSON.stringify(m))
-        .then(function (response) {
+        .then(function(response) {
           _self.itemDataList = response.data.data;
           _self.itemCount = response.data.pager ? response.data.pager.total : 0;
           _self.loading = false;
           setTimeout(() => {
-            _self.tableHeight =  _self.tableHeight + (Math.floor(Math.random()*10)>4?1:-1);
+            _self.tableHeight =
+              _self.tableHeight + (Math.floor(Math.random() * 10) > 4 ? 1 : -1);
           }, 100);
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log(error);
           _self.loading = false;
         });
@@ -536,25 +566,25 @@ export default {
       _self
         .axios({
           headers: {
-            "Content-Type": "application/json;charset=UTF-8",
+            "Content-Type": "application/json;charset=UTF-8"
           },
           method: "post",
           data: JSON.stringify(m),
-          url: "/admin/deleteCustomGridView",
+          url: "/admin/deleteCustomGridView"
         })
-        .then(function (response) {
+        .then(function(response) {
           if (response.data.code == 1) {
             _self.$message({
               showClose: true,
               message: _self.$t("message.deleteSuccess"),
               duration: 2000,
-              type: "success",
+              type: "success"
             });
             _self.selectedName = "";
             _self.loadCustomName();
           }
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log(error);
         });
     },
@@ -567,7 +597,7 @@ export default {
       let url = "/dc/getOneEcmCustomGridViewInfo";
       axios
         .post(url, JSON.stringify(m))
-        .then(function (response) {
+        .then(function(response) {
           if (response.data.code == 1) {
             _self.gridviewInfo.gridviewName = item.name;
             _self.gridviewInfo.isCustom = true;
@@ -575,7 +605,7 @@ export default {
             _self.loadGridData();
           }
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log(error);
         });
     },
@@ -586,7 +616,7 @@ export default {
           showClose: true,
           message: _self.$t("message.nameIsNull"),
           duration: 2000,
-          type: "Error",
+          type: "Error"
         });
         return;
       }
@@ -597,25 +627,25 @@ export default {
       _self
         .axios({
           headers: {
-            "Content-Type": "application/json;charset=UTF-8",
+            "Content-Type": "application/json;charset=UTF-8"
           },
           method: "post",
           data: JSON.stringify(m),
-          url: "/admin/createOrUpdateGridView",
+          url: "/admin/createOrUpdateGridView"
         })
-        .then(function (response) {
+        .then(function(response) {
           if (response.data.code == 1) {
             _self.$message({
               showClose: true,
               message: _self.$t("message.saveSuccess"),
               duration: 2000,
-              type: "Success",
+              type: "Success"
             });
           }
           _self.inputColumn = false;
           _self.loadCustomName();
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log(error);
         });
     },
@@ -623,11 +653,11 @@ export default {
       let _self = this;
       let url = "/admin/getAllGridViewsOfCurrentUser";
       let params = {
-        gridName: this.gridViewName,
+        gridName: this.gridViewName
       };
       axios
         .post(url, JSON.stringify(params))
-        .then(function (response) {
+        .then(function(response) {
           if (response.data.code == 1) {
             _self.customNames = response.data.data;
             _self.customList = response.data.data;
@@ -636,7 +666,7 @@ export default {
             _self.gridviewInfo.isCustom = false;
           }
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log(error);
         });
     },
@@ -650,7 +680,7 @@ export default {
           showClose: true,
           message: _self.$t("message.nameIsNull"),
           duration: 2000,
-          type: "Error",
+          type: "Error"
         });
         return;
       }
@@ -670,26 +700,26 @@ export default {
       _self
         .axios({
           headers: {
-            "Content-Type": "application/json;charset=UTF-8",
+            "Content-Type": "application/json;charset=UTF-8"
           },
           method: "post",
           data: JSON.stringify(m),
-          url: "/admin/createOrUpdateGridView",
+          url: "/admin/createOrUpdateGridView"
         })
-        .then(function (response) {
+        .then(function(response) {
           if (response.data.code == 1) {
             _self.$message({
               showClose: true,
               message: _self.$t("message.saveSuccess"),
               duration: 2000,
-              type: "Success",
+              type: "Success"
             });
           }
           // _self.loadGridInfo();
           // _self.loadCustomName();
           _self.editColumn = false;
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log(error);
         });
     },
@@ -703,16 +733,16 @@ export default {
       _self
         .axios({
           headers: {
-            "Content-Type": "application/json;charset=UTF-8",
+            "Content-Type": "application/json;charset=UTF-8"
           },
           method: "post",
           data: JSON.stringify(m),
-          url: "/dc/getEcmCustomGridViewInfo",
+          url: "/dc/getEcmCustomGridViewInfo"
         })
-        .then(function (response) {
+        .then(function(response) {
           _self.columnList = response.data.customGridInfo;
           _self.sysColumnInfo = response.data.sysGridInfo;
-          _self.columnList.forEach((element) => {
+          _self.columnList.forEach(element => {
             if (element.visibleType == 1) {
               _self.showFields.push(element.attrName);
             }
@@ -720,7 +750,7 @@ export default {
           // _self.tableHeight = "100%";
           _self.loading = false;
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log(error);
           _self.loading = false;
         });
@@ -751,7 +781,7 @@ export default {
             showClose: true,
             message: _self.$t("message.noUpper"),
             duration: 2000,
-            type: "warning",
+            type: "warning"
           });
 
           return;
@@ -768,7 +798,7 @@ export default {
           showClose: true,
           message: _self.$t("message.oneDataOnly"),
           duration: 2000,
-          type: "error",
+          type: "error"
         });
       }
     },
@@ -787,7 +817,7 @@ export default {
             showClose: true,
             message: _self.$t("message.noDowner"),
             duration: 2000,
-            type: "warning",
+            type: "warning"
           });
 
           return;
@@ -804,7 +834,7 @@ export default {
           showClose: true,
           message: _self.$t("message.oneDataOnly"),
           duration: 2000,
-          type: "error",
+          type: "error"
         });
       }
     },
@@ -826,7 +856,7 @@ export default {
       for (let i = 0; i < _self.sysColumnInfo.length; i++) {
         data.push({
           key: _self.sysColumnInfo[i].attrName,
-          label: _self.sysColumnInfo[i].label,
+          label: _self.sysColumnInfo[i].label
         });
       }
       return data;
@@ -849,9 +879,9 @@ export default {
       let href = this.$router.resolve({
         path: "/viewdoc",
         query: {
-          id: condition,
+          id: condition
           //token: sessionStorage.getItem('access-token')
-        },
+        }
       });
       //console.log(href);
       window.open(href.href, "_blank");
@@ -863,7 +893,7 @@ export default {
       // console.log('pagesize:', _self.pageSize);
       axios
         .post("/dc/upgradeDocument", item.ID)
-        .then(function (response) {
+        .then(function(response) {
           if (response.data.code == "1") {
             _self.$emit("upgradeFun", response.data.id);
           } else {
@@ -871,11 +901,11 @@ export default {
               showClose: true,
               message: response.data.message,
               duration: 2000,
-              type: "warning",
+              type: "warning"
             });
           }
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log(error);
           _self.loading = false;
         });
@@ -883,7 +913,6 @@ export default {
     // 保存文档
     saveItem(isStartWorkflow) {
       // this.$refs.ShowProperty.saveItem();
-
     },
     //查看属性
     showItemProperty(indata) {
@@ -901,7 +930,6 @@ export default {
           }
           _self.$refs.createDoc.$refs.ShowProperty.loadFormInfo();
           _self.getPropertiesData();
-          
         }
       });
     },
@@ -919,7 +947,7 @@ export default {
       let _self = this;
       _self.showFields = [];
 
-      _self.columnList.forEach((element) => {
+      _self.columnList.forEach(element => {
         if (element.visibleType == 1) {
           _self.showFields.push(element.attrName);
         }
@@ -928,7 +956,7 @@ export default {
     getgriditem(attrName) {
       let _self = this;
       let ret = null;
-      _self.columnList.forEach((element) => {
+      _self.columnList.forEach(element => {
         if (element.attrName == attrName) {
           ret = element;
           return;
@@ -940,7 +968,7 @@ export default {
     handleCheckAllChange(val) {
       this.showFields = [];
       if (val) {
-        this.columnList.forEach((element) => {
+        this.columnList.forEach(element => {
           this.showFields.push(element.attrName);
         });
       }
@@ -960,10 +988,10 @@ export default {
     },
     confirmShow() {
       let _self = this;
-      _self.columnList.forEach((element) => {
+      _self.columnList.forEach(element => {
         element.visibleType = 2;
       });
-      _self.showFields.forEach((element) => {
+      _self.showFields.forEach(element => {
         let item = _self.getgriditem(element);
         if (item) {
           item.visibleType = 1;
@@ -997,7 +1025,7 @@ export default {
     },
     rowClick(row) {
       this.selectedRow = row;
-      if(row&&this.isshowSelection){
+      if (row && this.isshowSelection) {
         this.$refs.datatable.clearSelection();
         this.$refs.datatable.toggleRowSelection(row);
       }
@@ -1016,8 +1044,8 @@ export default {
     //row 行对象，column 列对象,cell 单元格,event 事件对象
     cellMouseLeave(row, column, cell, event) {
       this.$emit("cellMouseLeave", row, column, cell, event);
-    },
-  },
+    }
+  }
 };
 </script>
 <style>
@@ -1082,5 +1110,4 @@ export default {
   cursor: pointer;
   color: #409eff;
 }
-
 </style>
