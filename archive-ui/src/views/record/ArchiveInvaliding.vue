@@ -1,6 +1,17 @@
 <template>
     <DataLayout>
     <template v-slot:header>
+      <el-dialog
+      title="设计文件作废"
+      :visible.sync="flowVisible"
+      @close="flowVisible = false"
+      width="90%"
+      style="width: 100%"
+      :close-on-click-modal="false"
+      v-dialogDrag
+    >
+      <div><DesignCancelStartUp :workflowObj="workflow" :showUploadFile="true" :workflowFileList="selectedDCItems" :typeName="typename" @close="flowVisible = false"></DesignCancelStartUp></div>
+    </el-dialog>
       <el-form :inline="true">
         <el-form-item>
           <el-input
@@ -33,7 +44,7 @@
           }}</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">发起流程</el-button>
+          <el-button type="primary" @click="getWorkFlow">发起流程</el-button>
         </el-form-item>
       </el-form>
     </template>
@@ -43,7 +54,7 @@
         key="Invaliding"
         dataUrl="/dc/getDocuments"
         v-bind:tableHeight="layout.height-166"
-        v-bind:isshowOption="true" v-bind:isshowSelection ="false"
+        v-bind:isshowOption="true" v-bind:isshowSelection ="true"
         gridViewName="InvalidingGrid"
         condition="STATUS='已完成'"
         :optionWidth = "2"
@@ -53,7 +64,7 @@
         :isshowicon="false"
         :isShowChangeList="false"
         :isInitData="false"
-        @rowclick="onDataGridRowClick"
+        @selectchange="selectDCChange"
       >
       </DataGrid>
     </template>
@@ -62,6 +73,8 @@
 <script type="text/javascript">
 import DataGrid from "@/components/DataGrid";
 import DataLayout from "@/components/ecm-data-layout";
+import DesignCancelStartUp from "@/views/workflow/DesignCancelStartUp.vue"
+
 export default {
   name: "TC",
   data() {
@@ -69,6 +82,10 @@ export default {
       inputValueNum:"",
       startDate: "",
       endDate:"",
+      flowVisible:false,
+      workflow:{},
+      typename:'设计文件作废单',
+      selectedDCItems:[],
     };
   },
   mounted() {
@@ -82,6 +99,37 @@ export default {
     this.search();
   },
   methods: {
+    selectDCChange(val) {
+      this.selectedDCItems = val;
+    },
+    getWorkFlow() {
+      let _self = this;
+      if(_self.selectedDCItems==''||_self.selectedDCItems==undefined){
+        _self.$message({
+            showClose: true,
+            message:"请选择一个设计文件",
+            duration: 2000,
+            type: "warning",
+          });
+        return
+      }
+
+      var m = new Map();
+      m.set("processDefinitionKey", "设计文件作废流程");
+
+      axios
+        .post("/dc/getWorkflow", JSON.stringify(m))
+        .then(function (response) {
+          _self.workflow = response.data.data[0];
+          console.log(_self.workflow)
+          _self.flowVisible = true;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
+      
+    },
     //文档模糊查询
     search() {
       let _self = this;
@@ -105,6 +153,7 @@ export default {
   components: {
     DataGrid: DataGrid,
     DataLayout: DataLayout,
+    DesignCancelStartUp:DesignCancelStartUp,
   },
 };
 </script>
