@@ -25,12 +25,25 @@ export default {
       this.format = this.$route.query.format;
     }
     this.loadUrl();
+    this.writeAudit(this.id)
+
   },
   methods: {
     loadUrl() {
       let _self = this;
       let getfileUrl =  _self.axios.defaults.baseURL+"/dc/getContent?id="+_self.id+"&token="+sessionStorage.getItem('access-token')+"&format=pdf";
       _self.pdfUrl = "./static/pdfviewer/web/viewer.html?file="+encodeURIComponent(getfileUrl)+"&.pdf"
+    },
+    writeAudit(docId){
+      var m = new Map();
+      m.set("docId",docId)
+      m.set("actionName","ecm_read")
+      m.set("appName","portal")
+      axios
+        .post("/audit/addAudit", JSON.stringify(m))
+        .then(function(response){
+          
+        })
     }
   }
 };

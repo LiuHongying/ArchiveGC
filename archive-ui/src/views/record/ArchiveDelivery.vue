@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <DataLayout>
     <el-dialog title="添加复用文件" :visible.sync="reuseVisible" width="80%">
       <AddReuse ref="addReuseModel"></AddReuse>
       <div slot="footer" class="dialog-footer">
@@ -220,104 +220,123 @@
         >{{$t('application.delete')}}</el-button>
       </el-col>
     </el-row>
-    <el-row>
-      <el-col :span="6">
-        <DataGrid
-          ref="transferDataGrid"
-          key="transfer"
-          v-bind:isshowPage="false"
-          v-bind:itemDataList="transferDataList"
-          v-bind:columnList="transferColumnList"
-          @pagesizechange="handleSizeChange"
-          @pagechange="handleCurrentChange"
-          gridViewName="DeliveryGrid"
-          v-bind:itemCount="transferCount"
-          v-bind:tableHeight="leftTableHeight"
-          @rowclick="beforeLoadGridData"
-          @selectchange="transferselectChange"
-        ></DataGrid>
-      </el-col>
-
-      <el-col :span="18">   
-        <DataGrid
-          ref="mainDataGrid"
-          key="main"
-          v-bind:itemDataList="itemDataList"
-          v-bind:columnList="gridList"
-          :sysColumnInfo="sysColumnInfo"
-          gridViewName="ArchiveGrid"
-          isshowCustom="true"
-          @pagesizechange="pageSizeChange"
-          @pagechange="pageChange"
-          v-bind:itemCount="itemCount"
-          v-bind:tableHeight="rightTableHeight"
-          v-bind:isshowOption="true" v-bind:isshowSelection ="false"
-          v-bind:propertyComponent="this.$refs.ShowProperty"
-          @rowclick="beforeShowInnerFile"
-          @selectchange="selectChange"
-          @refreshdatagrid="refreshMain"
-        ></DataGrid>
-        <el-row>
-          <span style="float:left;text-align:left;">文件列表</span>
-          <!-- <el-button type="primary" plain size="small" title="自动组卷"  @click="autoPaper()">自动组卷</el-button> -->
-          <el-button
-            type="primary"
-            plain
-            size="small"
-            @click="beforeCreateFile(selectRow)"
-          >{{$t('application.createDocument')}}</el-button>
-          <el-button
-            type="primary"
-            plain
-            size="small"
-            :title="$t('application.addReuseFile')"
-            @click="beforeAddreuse()"
-          >{{$t('application.addReuseFile')}}</el-button>
-          
-          <el-button type="primary" plain size="small" title="删除" @click="onDeleleFileItem()">{{$t('application.delete')}}</el-button>
-          <el-button
-            type="primary"
-            plain
-            size="small"
-            title="挂载文件"
-            @click="beforeUploadFile('/dc/mountFile')"
-          >挂载文件</el-button>
-          <el-button
-            type="primary"
-            plain
-            size="small"
-            :title="$t('application.viewRedition')"
-            @click="beforeUploadFile('/dc/addRendition')"
-          >格式副本</el-button>
-          <el-button type="primary" plain size="small" title="上移" @click="onMoveUp()">上移</el-button>
-          <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
-        </el-row>
-
-        <DataGrid
-          ref="leftDataGrid"
-          key="left"
-          v-bind:itemDataList="innerDataList"
-          v-bind:columnList="innerGridList"
-          v-bind:itemCount="innerCount"
-          v-bind:loading="uploadFileLoding"
-          gridViewName="DrawingGrid"
-          v-bind:tableHeight="rightTableHeight"
-          v-bind:isshowOption="true" v-bind:isshowSelection ="false"
-          @pagesizechange="innerPageSizeChange"
-          @rowclick="selectOneFile"
-          @pagechange="innerPageChange"
-          @selectchange="selectInnerChange"
-          @refreshdatagrid="refreshLeft"
-        ></DataGrid>
-      </el-col>
-    </el-row>
-  </div>
+    <template v-slot:main="{layout}">
+      <div :style="{position:'relative',height: layout.height-startHeight+45+'px'}">
+        <split-pane split="vertical" @resize="onHorizontalSplitResize" :min-percent='1' :default-percent='leftPercent'>
+          <template slot="paneL">
+            <el-row>
+              <el-col :span="24">
+                <DataGrid
+                  ref="transferDataGrid"
+                  key="transfer"
+                  v-bind:isshowPage="false"
+                  v-bind:itemDataList="transferDataList"
+                  v-bind:columnList="transferColumnList"
+                  @pagesizechange="handleSizeChange"
+                  @pagechange="handleCurrentChange"
+                  gridViewName="DeliveryGrid"
+                  v-bind:itemCount="transferCount"
+                  v-bind:tableHeight="layout.height-136"
+                  @rowclick="beforeLoadGridData"
+                  @selectchange="transferselectChange"
+                ></DataGrid>
+              </el-col>
+            </el-row>
+          </template>
+          <template slot="paneR">
+                <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
+                  <split-pane v-on:resize="onSplitResize" :min-percent='20' :default-percent='topPercent' split="horizontal">
+                    <template slot="paneL">
+                      <DataGrid
+                        ref="mainDataGrid"
+                        key="main"
+                        v-bind:itemDataList="itemDataList"
+                        v-bind:columnList="gridList"
+                        :sysColumnInfo="sysColumnInfo"
+                        gridViewName="ArchiveGrid"
+                        isshowCustom="true"
+                        @pagesizechange="pageSizeChange"
+                        @pagechange="pageChange"
+                        v-bind:itemCount="itemCount"
+                        v-bind:tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
+                        v-bind:isshowOption="true" v-bind:isshowSelection ="false"
+                        v-bind:propertyComponent="$refs.ShowProperty"
+                        @rowclick="beforeShowInnerFile"
+                        @selectchange="selectChange"
+                        @refreshdatagrid="refreshMain"
+                      ></DataGrid>
+                    </template>
+                    <template slot="paneR">
+                      <el-row>
+                        <span style="float:left;text-align:left;">文件列表</span>
+                        <!-- <el-button type="primary" plain size="small" title="自动组卷"  @click="autoPaper()">自动组卷</el-button> -->
+                        <el-button
+                          type="primary"
+                          plain
+                          size="small"
+                          @click="beforeCreateFile(selectRow)"
+                        >{{$t('application.createDocument')}}</el-button>
+                        <el-button
+                          type="primary"
+                          plain
+                          size="small"
+                          :title="$t('application.addReuseFile')"
+                          @click="beforeAddreuse()"
+                        >{{$t('application.addReuseFile')}}</el-button>
+                        
+                        <el-button type="primary" plain size="small" title="删除" @click="onDeleleFileItem()">{{$t('application.delete')}}</el-button>
+                        <el-button
+                          type="primary"
+                          plain
+                          size="small"
+                          title="挂载文件"
+                          @click="beforeUploadFile('/dc/mountFile')"
+                        >挂载文件</el-button>
+                        <el-button
+                          type="primary"
+                          plain
+                          size="small"
+                          :title="$t('application.viewRedition')"
+                          @click="beforeUploadFile('/dc/addRendition')"
+                        >格式副本</el-button>
+                        <el-button type="primary" plain size="small" title="上移" @click="onMoveUp()">上移</el-button>
+                        <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
+                      </el-row>
+                      <el-row>
+                        <el-col :span="24">
+                          <DataGrid
+                            ref="leftDataGrid"
+                            key="left"
+                            v-bind:itemDataList="innerDataList"
+                            v-bind:columnList="innerGridList"
+                            v-bind:itemCount="innerCount"
+                            v-bind:loading="uploadFileLoding"
+                            gridViewName="DrawingGrid"
+                            v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
+                            v-bind:isshowOption="true" v-bind:isshowSelection ="false"
+                            @pagesizechange="innerPageSizeChange"
+                            @rowclick="selectOneFile"
+                            @pagechange="innerPageChange"
+                            @selectchange="selectInnerChange"
+                            @refreshdatagrid="refreshLeft"
+                          ></DataGrid>
+                        </el-col>
+                      </el-row>
+                    </template>
+                  </split-pane>
+                </div>
+          </template>
+        </split-pane>
+      </div>
+    </template>
+  </DataLayout>
 </template>
 
 <script type="text/javascript">
 import ShowProperty from "@/components/ShowProperty";
 import DataGrid from "@/components/DataGrid";
 import DataGridleft from "@/components/DataGrid";
+import DataLayout from "@/components/ecm-data-layout";
 //import Prints from '@/components/record/Print'
 
 import "url-search-params-polyfill";
@@ -332,6 +351,20 @@ export default {
   name: "ArchiveDelivery",
   data() {
     return {
+      leftStorageName: 'ProjectViewerWidth',
+      leftPercent: 20,
+
+      // 本地存储高度名称
+      topStorageName: 'ProjectViewerHeight',
+      // 非split pan 控制区域高度
+      startHeight: 175,
+      // 顶部百分比*100
+      topPercent: 65,
+      // 顶部除列表高度
+      topbarHeight: 35,
+      // 底部除列表高度
+      bottomHeight: 35,
+      asideWidth: '100%',
       currentLanguage: "zh-cn",
       printsVisible: false,
       printVolumesVisible: false,
@@ -449,15 +482,31 @@ export default {
     }
   },
   mounted() {
-    let _self=this;
     this.getClassicNames("ClassicNames");
     // this.getTypeNames("innerTransferDocType");
     this.loadTransferGridInfo();
     this.loadTransferGridData();
     this.loadGridInfo();
     this.loadInnerGridInfo();
+        setTimeout(() => {
+            this.topPercent = this.getStorageNumber(this.topStorageName,60)
+            this.leftPercent = this.getStorageNumber(this.leftStorageName,20)
+        }, 300);
   },
   methods: {
+    // 水平分屏事件
+    onHorizontalSplitResize(leftPercent){
+      // 左边百分比*100
+      this.leftPercent = leftPercent
+      this.setStorageNumber(this.leftStorageName, leftPercent)
+    },
+    // 上下分屏事件
+    onSplitResize(topPercent){
+      // 顶部百分比*100
+      this.topPercent = topPercent
+      this.setStorageNumber(this.topStorageName, topPercent)
+      //console.log(JSON.stringify(topPercent))
+    },
     refreshMain(){
       this.loadGridData();
     },
@@ -2195,6 +2244,7 @@ export default {
     }
   },
   components: {
+    DataLayout: DataLayout,
     ShowProperty: ShowProperty,
     PrintPage: PrintPage,
     PrintVolumes: PrintVolumes,
