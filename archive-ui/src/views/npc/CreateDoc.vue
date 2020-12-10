@@ -131,6 +131,7 @@
                   >发起流程</el-button
                 >
                 <el-button type="primary" :loading="butt" @click="saveOrStartup(false)">暂 存</el-button>
+                <!-- <el-button type="primary" :loading="butt" @click="beforRemoveAttach()">刷新</el-button> -->
               </el-col>
             </el-row>
           </el-collapse-item>
@@ -145,6 +146,7 @@ import ShowProperty from "@/components/ShowProperty";
 import UserSelectInput from "@/components/controls/UserSelectInput";
 export default {
   name: "CreateDoc",
+  inject:['reload'],
   data() {
     return {
       file: [],
@@ -186,7 +188,10 @@ export default {
       //console.log(href);
       window.open(href.href, "_blank");
     },
-    beforRemoveAttach(file, fileList) {},
+    beforRemoveAttach() {
+        debugger
+       this.reload();
+    },
     saveOrStartup(isStartup) {
       let _self = this;
       _self.butt=true;
@@ -268,6 +273,7 @@ export default {
             });
         _self.loading = false;
         _self.butt=false;
+        _self.reload();
       })
       .catch(function(error) {
         console.log(error);

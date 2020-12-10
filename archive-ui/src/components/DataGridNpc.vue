@@ -461,6 +461,7 @@ export default {
         _self.$message("发起流程成功!");
         _self.loading = false;
         _self.butt=false;
+        _self.propertyVisible=false;
       })
       .catch(function(error) {
         console.log(error);

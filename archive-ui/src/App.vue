@@ -1,7 +1,7 @@
 <template>
   <div id="app" v-title :data-title="$t('application.name')">
     <transition name="moveToTop">
-      <router-view></router-view>
+      <router-view v-if="isRouterAlive"></router-view>
     </transition>
   </div>
 </template>
@@ -10,6 +10,22 @@
 import "vue-transition.css";
 export default {
   name: "app",
+  provide(){
+		return {
+			reload: this.reload
+		}
+	},
+	data(){
+		return {
+			isRouterAlive:true
+		}
+	},
+	methods:{
+		reload(){
+			this.isRouterAlive=false
+			this.$nextTick(()=>this.isRouterAlive=true)
+		}
+	},
 };
 </script>
 
