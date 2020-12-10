@@ -1,33 +1,51 @@
 <template>
 <div>
-    <el-form label-position="right" label-width="100px">
-      <!--
-      <div>
-        <el-button :plain="true" type="primary" size="small" icon="edit" @click="loaddata()">刷新数据</el-button>
-      </div>
-      -->
-      <el-row>
-        <!-- <el-col style="padding:3px;text-align:left">
-          <el-form-item>{{typeName}}</el-form-item></el-col> -->
-        <el-collapse v-model="activeNames" >
-          <el-collapse-item v-for="(citem,cindex) in dataList"  :name="citem.label" :id="citem.label" :key="cindex"> 
-         <template slot="title" >
-          <div class="el-divider el-divider--horizontal"><div class="el-divider__text is-left">{{citem.label}}</div></div>
-        </template>
-         <template v-for="(item,itemIndex) in citem.ecmFormItems">
-            <el-col v-show="itemId || (!itemId && !item.readOnly)" :span="showCellValue(item)" v-bind:key="itemIndex" style="text-align:left;">
-              <el-form-item :hidden="item.isHide" :label="item.label">
-              {{item.defaultValue}}
+  <el-form label-position="right" label-width="100px">
+    <el-row>
+      <el-collapse v-model="activeNames">
+        <el-collapse-item v-for="(citem,cindex) in dataList" :title="citem.label" :name="citem.label"  :id="citem.label" :key="cindex"> 
+          <template v-for="(item,itemIndex) in citem.ecmFormItems">
+            <el-col :span="showCellValue(item)" :xs="24" :sm="12" :md="showCellValue(item)" :lg="showCellValue(item)" :xl="showCellValue(item)" v-bind:key="itemIndex" style="text-align:left;">
+              <el-form-item :hidden="item.isHide" :label="item.label" :rules="[{required:validateValue(item),message:$t('application.requiredInput'),trigger:'blur'}]" :label-width="formLabelWidth">
+                    <el-input v-if="item.controlType=='TextBox' && !item.isRepeat" type="text" :name="item.attrName" v-model="item.defaultValue" :disabled="item.readOnly"></el-input>
+                    <MultiInput v-if="item.controlType=='TextBox' && item.isRepeat" v-model="item.defaultValue"></MultiInput>
+                    <el-input v-if="item.controlType=='TextArea'" type="textarea" :name="item.attrName" v-model="item.defaultValue" :disabled="item.readOnly"></el-input>
+                    <el-input v-else-if="item.controlType=='Integer'" :min="0" type="number" :name="item.attrName" v-model="item.defaultValue" :disabled="item.readOnly"></el-input>
+                    <el-checkbox v-else-if="item.controlType=='Boolean'"  :name="item.attrName" v-model="item.defaultValue" :disabled="item.readOnly"></el-checkbox>
+                    <template v-else-if="item.controlType=='Date'">
+                      <span v-if="item.readOnly" >{{datetimeFormat(item.defaultValue)}}</span>
+                      <el-date-picker v-else :name="item.attrName" v-model="item.defaultValue" type="date" :placeholder="$t('application.selectDate')" style="display:block;" format="yyyy-MM-dd" value-format="yyyy-MM-dd HH:mm:ss" :readonly="item.readOnly"></el-date-picker>
+                    </template>
+                    <el-select  :name="item.attrName"
+                    v-else-if="item.controlType=='Select' || item.controlType=='ValueSelect' || item.controlType=='Department' || item.controlType=='SQLSelect'" 
+                    v-model="item.defaultValue" :placeholder="$t('application.pleaseSelect')+item.label" :disabled="item.readOnly" :multiple="item.isRepeat" style="display:block;"
+                    @change="((val)=>{onSelectChange(val, item)})" >
+                          <div v-for="(name,nameIndex) in item.validValues" :key="nameIndex+'N'">
+                            <el-option :label="name" :value="name" :key="nameIndex"></el-option>
+                          </div>
+                      </el-select>
+                    <UserSelectInput v-else-if="item.controlType=='UserSelect'" v-model="item.defaultValue" v-bind:inputValue="item.defaultValue" v-bind:roleName="item.queryName" v-bind:isRepeat="item.isRepeat"></UserSelectInput>
               </el-form-item>
             </el-col>
           </template>
-          <el-col>
-             <el-form-item style="float:left"  :label="$t('application.type')" >{{myTypeName}}</el-form-item>
-          </el-col>
-         </el-collapse-item>
-      </el-collapse>
+          </el-collapse-item>
+        </el-collapse>
     </el-row>
+    <el-row>
       
+      <div v-if="(itemId  == undefined || itemId == '0' || itemId == '') && showUploadFile " style="float:left;margin-left:120px;">
+        <el-upload
+        :limit="1"
+        :file-list="fileList" 
+        action=""
+        :on-change="handleChange"
+        :auto-upload="false"
+        :multiple="false">
+        <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
+        </el-upload>
+        
+      </div>
+    </el-row>
     </el-form>
   </div>
 </template>
@@ -35,16 +53,18 @@
 <script type="text/javascript">
 import UserSelectInput from '@/components/controls/UserSelectInput'
 import AddCondition from '@/views/record/AddCondition'
+import MultiInput from '@/components/ecm-multi-input'
 
 export default {
-  name: "ShowPropertyReadOnly",
+  name: "ShowProperty",
   components: {
-    UserSelectInput:UserSelectInput,
-    AddCondition:AddCondition
+    UserSelectInput : UserSelectInput,
+    AddCondition : AddCondition,
+    MultiInput : MultiInput
   },
   data() {
     return {
-      tableHeight: window.innerHeight - 98,
+      formLabelWidth: "150px",
       currentLanguage: "zh-cn",
       permit:5,
       activeNames:'',
@@ -69,36 +89,66 @@ export default {
       myItemId: this.itemId,
       myTypeName: this.typeName,
       myFolderId: this.folderId,
-      formName:"",
+      
       parentDocId:'',
-      clientPermission: 1
+      clientPermission: 1,
+      mainObject:[],
+      mainSubRelation:[]
     };
-  },
-  mounted() {
-    this.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
-    this.loadFormInfo();
-    this.clientPermission = sessionStorage.getItem(
-        "access-clientPermission"
-      );
   },
   watch: {
     typeName() {
       this.myTypeName = this.typeName;
     }
   },
+  mounted() {
+    this.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
+    if( this.mainObject == null || this.mainObject.length ==0){
+      this.loadFormInfo();
+    }
+    this.clientPermission = sessionStorage.getItem(
+        "access-clientPermission"
+      );
+  },
   props: {
     itemId: {type:String,default:""},
     typeName: {type:String,default:""},
+    formName:{type:String,default:""},
     folderId: {type:String,default:""},
     folderPath:{type:String,default:""},
-    
+    showUploadFile: {type:Boolean, default:true}
   },
   methods: {
+    setMainObject(obj){
+      this.mainObject=obj;
+    },
+    setMainSubRelation(obj){
+      this.mainSubRelation=obj;
+    },
+    validateValueByPolicy(policy){
+        if(policy != null && policy != ""){
+          var p = policy.split(";");
+          if(p[0] != ""){
+            var p1 = p[0].split(":");
+            if(this.getValueByAttr(p1[0]) == p1[1]){
+              return true;
+            }
+          }else{
+            return true;
+          }
+        }
+        return false;
+    },
     validateValue(itemData){
       if(itemData.required){
         if(itemData.validatePolicy != null && itemData.validatePolicy != ""){
-          var p = itemData.validatePolicy.split(":");
-          if(this.getValueByAttr(p[0]) == p[1]){
+          var p = itemData.validatePolicy.split(";");
+          if(p[0] != ""){
+            var p1 = p[0].split(":");
+            if(this.getValueByAttr(p1[0]) == p1[1]){
+              return true;
+            }
+          }else{
             return true;
           }
         }else{
@@ -166,10 +216,14 @@ export default {
     {
       let _self = this;
       _self.loading = true;
-      if(_self.myItemId != '')
+      if(!_self.myItemId&&!_self.myTypeName){
+        return;
+      }
+      if(_self.myItemId&&_self.myItemId != '')
       {
         _self.myTypeName = "";
       }
+      
       var m = new Map();
       m.set('itemInfo',_self.myItemId+_self.myTypeName);//ID 或类型
       m.set('formName',_self.formName);
@@ -211,6 +265,37 @@ export default {
           {
             msg += "["+dataRows[i].label+"] ";
             ret = false;
+          }else if(dataRows[i].validatePolicy != null && dataRows[i].validatePolicy != ""){
+            if((_self.myItemId == null || _self.myItemId =="") && dataRows[i].validatePolicy.indexOf(";")>-1){
+              let p = dataRows[i].validatePolicy.split(";")[1];
+              if(_self.validateValueByPolicy(dataRows[i].validatePolicy.split(";")[0])){
+                let fun = p.split(":");
+                if(p.indexOf("now")>-1){
+                  let dt = new Date();
+                  if(p.indexOf(">=") > -1){
+                    if(_self.validateInputDate(dt, dataRows[i].defaultValue,fun[2])<0){
+                      msg += "["+dataRows[i].label+"] 必需大于等于当前日期+" + fun[2]+"天";
+                      ret = false;
+                    }
+                  }else if(p.indexOf("<=") > -1){
+                    if(_self.validateInputDate(dt,dataRows[i].defaultValue,fun[2])>0){
+                      msg += "["+dataRows[i].label+"] 必需小于等于当前日期+" + fun[2] + "天";
+                      ret = false;
+                    }
+                  }else if(p.indexOf(">") > -1){
+                    if(_self.validateInputDate(dt,dataRows[i].defaultValue,fun[2])>=0){
+                      msg += "["+dataRows[i].label+"] 必需大于当前日期+" + fun[2]+"天";
+                      ret = false;
+                    }
+                  }else if(p.indexOf("<") > -1){
+                    if(_self.validateInputDate(dt,dataRows[i].defaultValue,fun[2])>=0){
+                      msg += "["+dataRows[i].label+"] 必需小于当前日期+" + fun[2]+"天";
+                      ret = false;
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -220,6 +305,14 @@ export default {
       }
       return ret;
     },
+    // 日期比较，输入日期-当前日期 -天数
+    validateInputDate(fromDate, dateTime, addDay){
+      let now = fromDate;
+      now=now.setDate(now.getDate()+parseInt(addDay));
+      var today = new Date(now).Format("yyyyMMdd");
+      var dt = new Date(dateTime).Format("yyyyMMdd");
+      return parseInt(dt) - parseInt(today);
+	  },
     getFormData(){
       let _self = this;
       var m = new Map();
@@ -370,16 +463,45 @@ export default {
       let _self = this;
       if(_self.myItemId =='')
       {
+        var c;
+            for(c in indata){
+              let frmItems = indata[c].ecmFormItems;
+              //console.log(JSON.stringify(frmItems));
+              var i;
+              for (i in frmItems) {
+                let val =frmItems[i].defaultValue;
+                
+                if(_self.mainSubRelation&&_self.mainSubRelation.size>0
+                &&_self.mainObject&&(val==null||val==undefined||val=='')){
+                   val=_self.mainObject[_self.mainSubRelation.get(frmItems[i].attrName)];
+                   frmItems[i].defaultValue = val;
+                }
+                if(frmItems[i].isRepeat){
+                  if(frmItems[i].controlType=='TextBox' || frmItems[i].controlType=='Select' || frmItems[i].controlType=='SQLSelect' || frmItems[i].controlType=='ValueSelect'){
+                    if(frmItems[i].defaultValue==null){
+                      frmItems[i].defaultValue =[]
+                    }else{
+                      frmItems[i].defaultValue =  frmItems[i].defaultValue.split(";");
+                    }
+                  }
+                }
+                
+                // if("TYPE_NAME"==frmItems[i].attrName){
+                //   _self.typeName=frmItems[i].attrName；
+                // }
+                //console.log(JSON.stringify(frmItems[i].attrName)+":"+frmItems[i].defaultValue);
+              }
+            }
+          
         _self.dataList = indata;
+        _self.mainObject = null;  
+          _self.mainSubRelation = null;
       }
       else
       {
         axios.post("/dc/getDocument",_self.myItemId)
           .then(function(response) {
             let tab = response.data.data;
-            if(_self.typeName!=response.data.data.TYPE_NAME){
-              _self.myTypeName=response.data.data.TYPE_NAME;
-            }
             _self.permit =  response.data.permit;
             
             var c;
@@ -392,6 +514,7 @@ export default {
                 if(val && frmItems[i].isRepeat){
                   val = val.split(";");
                 }
+                
                 frmItems[i].defaultValue = val;
                 // if("TYPE_NAME"==frmItems[i].attrName){
                 //   _self.typeName=frmItems[i].attrName；

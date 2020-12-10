@@ -1,7 +1,7 @@
 <template>
   <el-container v-title :data-title="$t('application.name')">
     <div>
-       <el-dialog
+       <el-dialog v-dialogDrag 
       :title="$t('application.borrow')"
       :visible.sync="borrowDialogVisible"
       @close="borrowDialogVisible = false"
@@ -47,7 +47,7 @@
              <!-- <CADViewer v-else-if="viewerType==6" v-bind:id="doc.id" format="ocf"></CADViewer> -->
              <CADViewerHtml5 v-else-if="viewerType==6" v-bind:id="doc.id" format="ocf"></CADViewerHtml5>
              <JTViewer v-else-if="viewerType==7" v-bind:id="doc.id" format="obj" :fileName="doc.C_IMPORT_NAME"></JTViewer>
-             <ThreeDsViewer v-else-if="viewerType==8" v-bind:id="doc.id" ></ThreeDsViewer>
+             <!-- <ThreeDsViewer v-else-if="viewerType==8" v-bind:id="doc.id" ></ThreeDsViewer> -->
              <div v-else-if="doc.contentSize==0" style="padding-top:40px;">
                 {{$t('application.noE-File')}}
             </div>
@@ -90,7 +90,7 @@
       </el-row>
     </el-main>
 
-    <el-dialog :title="dialog.title" :visible.sync="dialog.visible" width="90%" :before-close="handleClose">      
+    <el-dialog v-dialogDrag  :title="dialog.title" :visible.sync="dialog.visible" width="90%" :before-close="handleClose">      
       <template v-if="dialog.title==$t('application.dcproper')">
         <ShowProperty ref="ShowProperty" :itemId="doc.id" :typeName="doc.typeName" :folderId="doc.folderId"></ShowProperty>
       </template>
@@ -152,7 +152,7 @@ import ChangeDocViewer from "./ChangeDocViewer.vue"
 import CADViewer from "./CADViewer.vue"
 import CADViewerHtml5 from "./CADViewerHtml5.vue"
 import JTViewer from "./JTViewer2.vue"
-import ThreeDsViewer from "./ThreeDsViewer.vue"
+// import ThreeDsViewer from "./ThreeDsViewer.vue"
 import Borrow from "@/components/form/Borrow.vue"
 import InTransferDoc from "@/views/dc/InTransferDoc.vue"
 import RelevantDoc from "@/views/dc/RelevantDoc.vue"
@@ -179,7 +179,7 @@ export default {
     CADViewerHtml5:CADViewerHtml5,
     JTViewer:JTViewer,
     Borrow:Borrow,
-    ThreeDsViewer: ThreeDsViewer,
+    // ThreeDsViewer: ThreeDsViewer,
     InTransferDoc:InTransferDoc,
     RelevantDoc:RelevantDoc,
     AttachmentFile:AttachmentFile,

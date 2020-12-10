@@ -3,18 +3,6 @@
     <el-form  :model="taskForm" style="width:100%" >
       <el-row style="width:100%">
         <div >
-           <el-col style="padding-top:3px;">
-            <div v-for="(approver,index)  in approvalUserList" :key="'approver_'+index">
-            <el-form-item :label="approver.activityName"  :label-width="formLabelWidth" style="float:left">
-              <UserSelectInput
-                v-model="taskForm[approver.formAttribute]"
-                v-bind:inputValue="taskForm[approver.formAttribute]"
-                v-bind:roleName="approver.roleName"
-                :buttonType = "formEnableType != 'TodoTask'"
-              ></UserSelectInput>
-            </el-form-item>
-          </div>
-          </el-col>
           <el-col>
             <!-- <el-form-item label="备注" :label-width="formLabelWidth" style="text-align:left">
               <el-input
@@ -33,11 +21,25 @@
             ></ShowPropertyReadOnly>
           </el-col>   
           <el-col>
-             <el-form-item label="文件" :label-width="formLabelWidth" style="text-align:left">
+          <el-divider content-position="left">文件信息</el-divider>
+            <el-form-item label="文件" :label-width="formLabelWidth" style="text-align:left">
                 <el-button @click="viewdoc(docId)">查看文件</el-button>
                 <el-button v-if="formEnableType == 'TodoTask'" @click="importdialogVisible=true">上传文件</el-button>
             </el-form-item>
           </el-col>   
+           <el-col style="padding-top:3px;">
+          <el-divider content-position="left">选择流程审批人员</el-divider>
+           <div v-for="(approver,index)  in approvalUserList" :key="'approver_'+index">
+            <el-form-item :label="approver.activityName"  :label-width="formLabelWidth" style="float:left">
+              <UserSelectInput
+                v-model="taskForm[approver.formAttribute]"
+                v-bind:inputValue="taskForm[approver.formAttribute]"
+                v-bind:roleName="approver.roleName"
+                :buttonType = "formEnableType != 'TodoTask'"
+              ></UserSelectInput>
+            </el-form-item>
+          </div>
+          </el-col>
 
         </div>
       </el-row>
