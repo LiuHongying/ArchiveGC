@@ -380,7 +380,9 @@
     "WorkflowSelect":"Workflow Select",
     "approve":"Approve",
     "reject":"Reject",
-    "VolumesFile":"Volumes file"
+    "VolumesFile":"Volumes file",
+    "archivesCategory":"Archives Category",
+    "archivesType":"Archives Type"
 },
 "skin": {
     "Blue": "Blue",

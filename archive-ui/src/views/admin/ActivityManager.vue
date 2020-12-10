@@ -53,6 +53,9 @@
           </el-form-item>
         </el-col>
         </el-row>
+        <el-form-item label="执行人规则" :label-width="formLabelWidth">
+           <el-input v-model="form.performerPolicy" auto-complete="off"></el-input>
+          </el-form-item>
          <el-form-item label="表单条件" :label-width="formLabelWidth">
            <el-input v-model="form.formCondition" auto-complete="off"></el-input>
           </el-form-item>
@@ -272,7 +275,8 @@ export default {
         enableDelegate:true,
         enableRepeat:false,
         enableEdit:true,
-        formCondition: ""
+        formCondition: "",
+        performerPolicy:""
       },
       formLabelWidth: "120px"
     };
