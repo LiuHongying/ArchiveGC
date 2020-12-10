@@ -36,7 +36,6 @@
         </el-row>
       </el-card>
       <el-card>
-        <el-row>
           <el-collapse value="上传文件" accordion>
             <el-collapse-item
               title="上传文件"
