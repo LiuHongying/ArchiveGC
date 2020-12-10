@@ -88,8 +88,8 @@
                 <!-- <label>{{'approver_'+index}}</label> -->
                 <el-form-item :label="approver.activityName"  :label-width="formLabelWidth" style="float:left">
                 <UserSelectInput
-                    v-model="taskForm[approver.formAttribute]"
-                    v-bind:inputValue="taskForm[approver.formAttribute]"
+                    v-model="taskForm[approver.performerPolicy]"
+                    v-bind:inputValue="taskForm[approver.performerPolicy]"
                     v-bind:roleName="approver.roleName"
                     
                 ></UserSelectInput>
@@ -164,11 +164,13 @@ export default {
           let jsonStr= formData.get('metaData');
           let m= JSON.parse(jsonStr);
           for(let key in _self.taskForm){
-              m.set(key,_self.taskForm[key]);
+              let p=new Array();
+              p.push(key);
+              p.push(_self.taskForm[key]);
+              m.push(p);
           }
         let formdataNew = new FormData();
         formdataNew.append("metaData",JSON.stringify(m));
-        debugger
         if(_self.file!="")
         {
             //console.log(_self.file);
@@ -183,7 +185,6 @@ export default {
             }
             
         }
-        debugger
         axios.post("/dc/newDocumentMoreFile",formdataNew,{
             'Content-Type': 'multipart/form-data'
           })
@@ -193,6 +194,12 @@ export default {
           if(code==1){
             _self.$emit('onSaved','new');
             _self.$emit("onSaveSuccess",m);
+             _self.$message({
+              showClose: true,
+              message: "保存成功",
+              duration: 2000,
+              type: "Success",
+            });
           }
           else{
              _self.$message(_self.$t('message.newFailured'));

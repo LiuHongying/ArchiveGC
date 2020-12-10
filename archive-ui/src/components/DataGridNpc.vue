@@ -30,9 +30,17 @@
       >
         <ViewDraftDoc ref="createDoc"
         :selectedItemId="selectedItemId"
+        @onStartUpworkflow="startworkflow"
         >
 
         </ViewDraftDoc>
+        <div slot="footer" class="dialog-footer">
+        <el-button @click="saveOrStartup(true)" :loading="butt">启动流程</el-button>
+        <el-button @click="saveOrStartup(false)" :loading="butt">暂存</el-button>
+        <el-button @click="propertyVisible = false;butt=false;">{{
+          $t("application.cancel")
+        }}</el-button>
+      </div>
       </el-dialog>
       <!-- 选字段对话框 -->
       <el-dialog
@@ -351,6 +359,7 @@ export default {
       },
       showRelationViewer: false,
       timer: null,
+      butt:false,
     };
   },
   props: {
@@ -434,6 +443,31 @@ export default {
     //     this.$refs.datatable.toggleRowSelection(row);
     //   }
     // },
+    saveOrStartup(isStartup){
+      this.butt=true;
+      this.$refs.createDoc.saveData(isStartup);
+      this.butt=false;
+    },
+    startworkflow(m) {
+      let _self = this;
+      let form={};
+      _self.butt=true;
+      _self.loading = true;
+      let d=new Map(m);
+      form['formId']=d.get('ID');
+      form['processInstanceKey']='图纸文件审批流程';
+      axios.post('/workflow/startWorkflow',JSON.stringify(form))
+      .then(function(response) {
+        _self.$message("发起流程成功!");
+        _self.loading = false;
+        _self.butt=false;
+      })
+      .catch(function(error) {
+        console.log(error);
+        _self.loading = false;
+        _self.butt=false;
+      });
+    },
     onPropertiesSaveSuccess(props) {
       this.$emit("onPropertiesSaveSuccess", props);
     },
@@ -846,8 +880,9 @@ export default {
         });
     },
     // 保存文档
-    saveItem() {
-      this.$refs.ShowProperty.saveItem();
+    saveItem(isStartWorkflow) {
+      // this.$refs.ShowProperty.saveItem();
+
     },
     //查看属性
     showItemProperty(indata) {
