@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <DataLayout>
     <el-dialog :visible.sync="printsVisible">
       <PrintPage ref="printPage" v-bind:archiveId="this.archiveId"></PrintPage>
     </el-dialog>
@@ -137,253 +137,267 @@
         <el-button @click="folderDialogVisible = false">{{$t('application.cancel')}}</el-button>
       </div>
     </el-dialog>
-    <div :style="{position:'relative',height: asideHeight+'px'}">
-      <split-pane split="vertical" @resize="resize" min-percent="10" :default-percent="15">
-        <template slot="paneL">
-          <el-container :style="{height:asideHeight+'px',width:asideWidt,overflow:'auto'}">
-            <el-tree
-              style="width:100%"
-              :props="defaultProps"
-              :data="dataList"
-              node-key="id"
-              :render-content="renderContent"
-              :default-expand-all="isExpand"
-              highlight-current
-              @node-click="handleNodeClick"
-            ></el-tree>
-          </el-container>
-        </template>
-        <template slot="paneR">
-          <el-row>
-            <el-col :span="3" class="topbar-input">
-              <el-input
-                v-model="inputkey"
-                :placeholder="$t('message.pleaseInput')+$t('application.keyword')"
-                @change="searchItem"
-                prefix-icon="el-icon-search"
-              ></el-input>
-            </el-col>
-            <el-col :span="3" class="topbar-input">
-              <el-select v-model="archiveStatus" placeholder="请选择状态" @change="searchItem">
-                <el-option label="全部" value=""></el-option>
-                <el-option label="整编" value="整编"></el-option>
-                <el-option label="已整编" value="已整编"></el-option>
-                <el-option label="已质检" value="已质检"></el-option>
-              </el-select>
-            </el-col>
-            <el-col :span="4" style="padding-top:8px;">
-              <el-radio style="margin-right:5px;" v-model="radio" label="案卷" @change="changeRadio">案卷</el-radio>
-              <el-radio style="margin-left:5px;" v-model="radio" label="文件" @change="changeRadio">文件</el-radio>
-            </el-col>
-            <el-col :span="14" class="topbar-button">
-              <el-col :span="4">
-                <TypeSelectComment @afterSelecteType="newArchiveItem"></TypeSelectComment>
-              </el-col>
-              
-              <!-- <el-button
-                type="primary"
-                plain
-                size="small"
-                icon="el-icon-edit"
-                @click="newArchiveItem('卷盒')"
-              >{{$t('application.newArchive')}}</el-button> -->
-              <!-- <el-button
-                type="primary"
-                plain
-                size="small"
-                icon="el-icon-edit"
-                @click="newArchiveItem('文件')"
-              >{{$t('application.newVolume')}}</el-button> -->
-              <el-col :span="17">
-              <el-button
-                type="primary"
-                plain
-                size="small"
-                icon="el-icon-delete"
-                @click="logicallyDel(selectedItems,function(){
-                  let _self=this;
-                  _self.$refs.leftDataGrid.itemDataList=[];
-                  _self.loadGridData(_self.currentFolder);
-                })"
-                :title="$t('application.delete')+$t('application.document')"
-               ><!--{{$t('application.delete')+$t('application.document')}}--></el-button> 
-              
-              <el-button
-                type="primary"
-                plain
-                :loading="getNumLoading"
-                size="small"
-                icon="el-icon-s-order"
-                @click="takeNumbers"
-                :title="$t('application.takeNumbers')"
-              ></el-button>
-              
-              <el-button
-                type="primary"
-                plain
-                :loading="getInfoLoading"
-                size="small"
-                icon="el-icon-notebook-2"
-                @click="fetchInformation"
-                :title="$t('application.fetchInformation')"
-              ></el-button>
-              <el-button
-                type="primary"
-                plain
-                size="small"
-                title="挂载文件"
-                icon="el-icon-upload2"
-                @click="beforeMount(selectedItems);uploadUrl='/dc/mountFile'"
-              ></el-button>
-              <!-- <el-button
-                type="primary"
-                plain
-                size="small"
-                icon="el-icon-printer"
-                @click="beforePrintRidge(selectRow,'printRidgeGrid','打印背脊')"
-                title="打印"
-              ></el-button> -->
-              <el-button
-                type="primary"
-                plain
-                size="small"
-                icon="el-icon-printer"
-                @click="beforePrintBarCode(selectedItems,'打印条码')"
-                title="打印条码"
-              ></el-button>
-              <el-button
-                type="primary"
-                plain
-                size="small"
-                icon="el-icon-printer"
-                @click="beforePrintArchiveCode(selectedItems,'打印档号')"
-                title="打印档号"
-              ></el-button>
-                <el-button
-                type="primary"
-                plain
-                size="small"
-                icon="el-icon-printer"
-                @click="arrangeComplete('已整编')"
-                title="整编完成"
-              ></el-button>
-             
-              <el-button
-                type="primary"
-                plain
-                size="small"
-                icon="el-icon-printer"
-                @click="arrangeComplete('已质检')"
-                title="质检完成"
-              ></el-button>
-              <el-button
-                type="primary"
-                plain
-                size="small"
-                icon="el-icon-printer"
-                @click="beforePrint(selectRow,'ArrangeInnerGridPrint','卷内目录')"
-                title="打印卷内目录"
-              ></el-button>
-              <el-button
-                type="primary"
-                plain
-                size="small"
-                icon="el-icon-printer"
-                @click="beforePrintPreparationTable(selectRow,'备考表')"
-                title="打印备考表"
-              ></el-button>
-              <el-button
-                type="primary"
-                plain
-                size="small"
-                icon="el-icon-help"
-                @click="pieceNumVisible=true"
-                title="生成批次号"
-              ></el-button>
-              <el-button
-                type="primary"
-                plain
-                :loading="releaseLoading"
-                size="small"
-                icon="el-icon-sell"
-                @click="moveToPreFilling"
-                title="提交预归档库"
-              ></el-button>
-              <el-button
-                type="primary"
-                plain
-                :loading="releaseLoading"
-                size="small"
-                icon="el-icon-sell"
-                @click="penddingStorage"
-                title="提交入库"
-              ></el-button>
-            </el-col>
-            </el-col>
-          </el-row>
-          <el-row>
-            <DataGrid
-              ref="mainDataGrid"
-              key="main"
-              dataUrl="/dc/getInnerFolderDocuments"
-              :isInitData="false"
-              v-bind:tableHeight="rightTableHeight"
-              :isshowOption="true"
-              :isshowSelection="true"
-              :condition="mainParam.condition"
-              :folderId="mainParam.folderId"
-              gridViewName="ArrangeGrid"
-              @rowclick="beforeShowInnerFile"
-              @selectchange="selectChange"
-            ></DataGrid>
-            <div>
-              <span style="float:left;text-align:left;">卷内文件列表</span>
-              <!-- <el-button type="primary" plain size="small" title="自动组卷"  @click="autoPaper()">自动组卷</el-button> -->
-              <!-- <el-button type="primary" plain size="small"  @click="childrenTypeSelectVisible=true">{{$t('application.createDocument')}}</el-button>
-                      <el-button type="primary" plain size="small" :title="$t('application.addReuseFile')"  @click="reuseVisible=true">{{$t('application.addReuseFile')}}</el-button>
+    <template v-slot:main="{layout}">
+      <div :style="{position:'relative',height: layout.height-startHeight+45+'px'}">
+        <split-pane split="vertical" @resize="onHorizontalSplitResize" :min-percent='1' :default-percent='leftPercent'>
+          <template slot="paneL">
+            <el-container :style="{height:asideHeight+'px',width:asideWidth,overflow:'auto'}">
+              <el-tree
+                style="width:100%"
+                :props="defaultProps"
+                :data="dataList"
+                node-key="id"
+                :render-content="renderContent"
+                :default-expand-all="isExpand"
+                highlight-current
+                @node-click="handleNodeClick"
+              ></el-tree>
+            </el-container>
+          </template>
+          <template slot="paneR">
+            <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
+              <split-pane v-on:resize="onSplitResize" :min-percent='20' :default-percent='topPercent' split="horizontal">
+                <template slot="paneL">
+                  <el-row>
+                    <el-col :span="3" class="topbar-input">
+                      <el-input
+                        v-model="inputkey"
+                        :placeholder="$t('message.pleaseInput')+$t('application.keyword')"
+                        @change="searchItem"
+                        prefix-icon="el-icon-search"
+                      ></el-input>
+                    </el-col>
+                    <el-col :span="3" class="topbar-input">
+                      <el-select v-model="archiveStatus" placeholder="请选择状态" @change="searchItem">
+                        <el-option label="全部" value=""></el-option>
+                        <el-option label="整编" value="整编"></el-option>
+                        <el-option label="已整编" value="已整编"></el-option>
+                        <el-option label="已质检" value="已质检"></el-option>
+                      </el-select>
+                    </el-col>
+                    <el-col :span="4" style="padding-top:8px;">
+                      <el-radio style="margin-right:5px;" v-model="radio" label="案卷" @change="changeRadio">案卷</el-radio>
+                      <el-radio style="margin-left:5px;" v-model="radio" label="文件" @change="changeRadio">文件</el-radio>
+                    </el-col>
+                    <el-col :span="14" class="topbar-button">
+                      <el-col :span="4">
+                        <TypeSelectComment @afterSelecteType="newArchiveItem"></TypeSelectComment>
+                      </el-col>
                       
-                      <el-button type="primary" plain size="small" title="删除"  @click="onDeleleFileItem()">{{$t('application.delete')}}</el-button>
-                      <el-button type="primary" plain size="small" title="挂载文件"  @click="importdialogVisible=true;uploadUrl='/dc/mountFile'">挂载文件</el-button>
-              <el-button type="primary" plain size="small" :title="$t('application.viewRedition')"  @click="importdialogVisible=true;uploadUrl='/dc/addRendition'">格式副本</el-button>-->
-              <el-button type="primary" plain size="small" @click="beforeCreateFile(selectRow)">著录</el-button>
-              <el-button
-                type="primary"
-                plain
-                size="small"
-                title="挂载文件"
-                @click="beforeMount(selectedInnerItems);uploadUrl='/dc/mountFile'"
-              >挂载文件</el-button>
-              <el-button
-                type="primary"
-                plain
-                size="small"
-                :title="$t('application.viewRedition')"
-                @click="beforeMount(selectedInnerItems);uploadUrl='/dc/addRendition'"
-              >格式副本</el-button>
+                      <!-- <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-edit"
+                        @click="newArchiveItem('卷盒')"
+                      >{{$t('application.newArchive')}}</el-button> -->
+                      <!-- <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-edit"
+                        @click="newArchiveItem('文件')"
+                      >{{$t('application.newVolume')}}</el-button> -->
+                      <el-col :span="17">
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-delete"
+                        @click="logicallyDel(selectedItems,function(){
+                          let _self=this;
+                          _self.$refs.leftDataGrid.itemDataList=[];
+                          _self.loadGridData(_self.currentFolder);
+                        })"
+                        :title="$t('application.delete')+$t('application.document')"
+                      ><!--{{$t('application.delete')+$t('application.document')}}--></el-button> 
+                      
+                      <el-button
+                        type="primary"
+                        plain
+                        :loading="getNumLoading"
+                        size="small"
+                        icon="el-icon-s-order"
+                        @click="takeNumbers"
+                        :title="$t('application.takeNumbers')"
+                      ></el-button>
+                      
+                      <el-button
+                        type="primary"
+                        plain
+                        :loading="getInfoLoading"
+                        size="small"
+                        icon="el-icon-notebook-2"
+                        @click="fetchInformation"
+                        :title="$t('application.fetchInformation')"
+                      ></el-button>
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        title="挂载文件"
+                        icon="el-icon-upload2"
+                        @click="beforeMount(selectedItems);uploadUrl='/dc/mountFile'"
+                      ></el-button>
+                      <!-- <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-printer"
+                        @click="beforePrintRidge(selectRow,'printRidgeGrid','打印背脊')"
+                        title="打印"
+                      ></el-button> -->
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-printer"
+                        @click="beforePrintBarCode(selectedItems,'打印条码')"
+                        title="打印条码"
+                      ></el-button>
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-printer"
+                        @click="beforePrintArchiveCode(selectedItems,'打印档号')"
+                        title="打印档号"
+                      ></el-button>
+                        <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-printer"
+                        @click="arrangeComplete('已整编')"
+                        title="整编完成"
+                      ></el-button>
+                    
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-printer"
+                        @click="arrangeComplete('已质检')"
+                        title="质检完成"
+                      ></el-button>
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-printer"
+                        @click="beforePrint(selectRow,'ArrangeInnerGridPrint','卷内目录')"
+                        title="打印卷内目录"
+                      ></el-button>
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-printer"
+                        @click="beforePrintPreparationTable(selectRow,'备考表')"
+                        title="打印备考表"
+                      ></el-button>
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-help"
+                        @click="pieceNumVisible=true"
+                        title="生成批次号"
+                      ></el-button>
+                      <el-button
+                        type="primary"
+                        plain
+                        :loading="releaseLoading"
+                        size="small"
+                        icon="el-icon-sell"
+                        @click="moveToPreFilling"
+                        title="提交预归档库"
+                      ></el-button>
+                      <el-button
+                        type="primary"
+                        plain
+                        :loading="releaseLoading"
+                        size="small"
+                        icon="el-icon-sell"
+                        @click="penddingStorage"
+                        title="提交入库"
+                      ></el-button>
+                    </el-col>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <DataGrid
+                        ref="mainDataGrid"
+                        key="main"
+                        dataUrl="/dc/getInnerFolderDocuments"
+                        :isInitData="false"
+                        v-bind:tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
+                        :isshowOption="true"
+                        :isshowSelection="true"
+                        :condition="mainParam.condition"
+                        :folderId="mainParam.folderId"
+                        gridViewName="ArrangeGrid"
+                        @rowclick="beforeShowInnerFile"
+                        @selectchange="selectChange"
+                      ></DataGrid>
+                    </el-col>
+                  </el-row>
+                </template>
+                <template slot="paneR">
+                  <el-row>
+                    <span style="float:left;text-align:left;">卷内文件列表</span>
+                    <!-- <el-button type="primary" plain size="small" title="自动组卷"  @click="autoPaper()">自动组卷</el-button> -->
+                    <!-- <el-button type="primary" plain size="small"  @click="childrenTypeSelectVisible=true">{{$t('application.createDocument')}}</el-button>
+                            <el-button type="primary" plain size="small" :title="$t('application.addReuseFile')"  @click="reuseVisible=true">{{$t('application.addReuseFile')}}</el-button>
+                            
+                            <el-button type="primary" plain size="small" title="删除"  @click="onDeleleFileItem()">{{$t('application.delete')}}</el-button>
+                            <el-button type="primary" plain size="small" title="挂载文件"  @click="importdialogVisible=true;uploadUrl='/dc/mountFile'">挂载文件</el-button>
+                    <el-button type="primary" plain size="small" :title="$t('application.viewRedition')"  @click="importdialogVisible=true;uploadUrl='/dc/addRendition'">格式副本</el-button>-->
+                    <el-button type="primary" plain size="small" @click="beforeCreateFile(selectRow)">著录</el-button>
+                    <el-button
+                      type="primary"
+                      plain
+                      size="small"
+                      title="挂载文件"
+                      @click="beforeMount(selectedInnerItems);uploadUrl='/dc/mountFile'"
+                    >挂载文件</el-button>
+                    <el-button
+                      type="primary"
+                      plain
+                      size="small"
+                      :title="$t('application.viewRedition')"
+                      @click="beforeMount(selectedInnerItems);uploadUrl='/dc/addRendition'"
+                    >格式副本</el-button>
 
-              <el-button type="primary" plain size="small" title="上移" @click="onMoveUp()">上移</el-button>
-              <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
-              <DataGrid
-                ref="leftDataGrid"
-                key="left"
-                @rowclick="selectOneFile"
-                dataUrl="/dc/getDocuByRelationParentId"
-                gridViewName='ArrangeInnerGrid'
-                condition="and a.NAME='irel_children' and b.IS_HIDDEN=0"
-                :parentId="parentId"
-                v-bind:tableHeight="rightTableHeight"
-                :isshowOption="true"
-                :isshowSelection="true"
-                @selectchange="selectInnerChange"
-              ></DataGrid>
+                    <el-button type="primary" plain size="small" title="上移" @click="onMoveUp()">上移</el-button>
+                    <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <DataGrid
+                        ref="leftDataGrid"
+                        key="left"
+                        @rowclick="selectOneFile"
+                        dataUrl="/dc/getDocuByRelationParentId"
+                        gridViewName='ArrangeInnerGrid'
+                        condition="and a.NAME='irel_children' and b.IS_HIDDEN=0"
+                        :parentId="parentId"
+                        v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
+                        :isshowOption="true"
+                        :isshowSelection="true"
+                        @selectchange="selectInnerChange"
+                      ></DataGrid>
+                    </el-col>
+                  </el-row>
+                </template>
+              </split-pane>
             </div>
-            
-            
-          </el-row>
-        </template>
-      </split-pane>
-    </div>
-  </div>
+          </template>
+        </split-pane>
+      </div>
+    </template>
+  </DataLayout>
 </template>
 
 <script type="text/javascript">
@@ -392,6 +406,7 @@ import DataGrid from "@/components/DataGrid";
 import DataGridleft from "@/components/DataGrid";
 import TypeSelectComment from "@/views/record/TypeSelectComment.vue";
 //import Prints from '@/components/record/Print'
+import DataLayout from '@/components/ecm-data-layout'
 
 import "url-search-params-polyfill";
 
@@ -414,11 +429,26 @@ export default {
     PrintRidge: PrintRidge,
     PreparationTablePrint:PreparationTablePrint,
     PrintBarCode:PrintBarCode,
-    PrintArchiveCode:PrintArchiveCode
+    PrintArchiveCode:PrintArchiveCode,
     //Prints:Prints
+    DataLayout:DataLayout,
+
   },
   data() {
     return {
+      leftStorageName: 'ProjectViewerWidth',
+      leftPercent: 20,
+
+      // 本地存储高度名称
+      topStorageName: 'ProjectViewerHeight',
+      // 非split pan 控制区域高度
+      startHeight: 135,
+      // 顶部百分比*100
+      topPercent: 65,
+      // 顶部除列表高度
+      topbarHeight: 35,
+      // 底部除列表高度
+      bottomHeight: 35,
       isExpand: false,
       rightTableHeight: (window.innerHeight - 232) / 2,
       asideHeight: window.innerHeight - 85,
@@ -548,15 +578,26 @@ export default {
         console.log(error);
         _self.loading = false;
       });
+      setTimeout(() => {
+        this.topPercent = this.getStorageNumber(this.topStorageName,60)
+        this.leftPercent = this.getStorageNumber(this.leftStorageName,20)
+      }, 300);
   },
   methods: {
-    
-    
-    resize() {
-      //console.log('resize')
-      this.asideWidth = "100%";
+    // 水平分屏事件
+    onHorizontalSplitResize(leftPercent){
+      // 左边百分比*100
+      this.leftPercent = leftPercent
+      this.setStorageNumber(this.leftStorageName, leftPercent)
+        
     },
-   
+    // 上下分屏事件
+    onSplitResize(topPercent){
+      // 顶部百分比*100
+      this.topPercent = topPercent
+      this.setStorageNumber(this.topStorageName, topPercent)
+      //console.log(JSON.stringify(topPercent))
+    },
     //著录文件
     beforeCreateFile(row){
       let _self=this;

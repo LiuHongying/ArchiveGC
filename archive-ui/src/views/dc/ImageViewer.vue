@@ -33,10 +33,22 @@ export default {
     }
     console.log(this.axios.defaults.baseURL);
     this.imageArray[0] =  this.axios.defaults.baseURL+"/dc/getContent?id="+this.id+"&token="+sessionStorage.getItem('access-token');
+    this.writeAudit(this.id);
   },
   methods: {
     inited (viewer) {
       this.imageViewer = viewer;
+    },
+    writeAudit(docId){
+      var m = new Map();
+      m.set("docId",docId)
+      m.set("actionName","ecm_read")
+      m.set("appName","portal")
+      axios
+        .post("/audit/addAudit", JSON.stringify(m))
+        .then(function(response){
+          
+        })
     }
   }
 };
