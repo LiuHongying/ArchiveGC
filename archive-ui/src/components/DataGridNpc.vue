@@ -547,7 +547,7 @@ export default {
               showClose: true,
               message: _self.$t("message.deleteSuccess"),
               duration: 2000,
-              type: "Success",
+              type: "success",
             });
             _self.selectedName = "";
             _self.loadCustomName();

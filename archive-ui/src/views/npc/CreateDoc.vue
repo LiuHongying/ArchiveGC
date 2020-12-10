@@ -127,10 +127,10 @@
           <el-collapse-item title="操作" name="操作" id="action" key="cindex">
             <el-row>
               <el-col :span="24">
-                <el-button type="primary" @click="getData()"
+                <el-button type="primary" :loading="butt" @click="saveOrStartup(true)"
                   >发起流程</el-button
                 >
-                <el-button>暂 存</el-button>
+                <el-button type="primary" :loading="butt" @click="saveOrStartup(false)">暂 存</el-button>
               </el-col>
             </el-row>
           </el-collapse-item>
@@ -153,7 +153,8 @@ export default {
       fileAttachList: [],
       approvalUserList: [],
       taskForm: {},
-      formLabelWidth: "120px"
+      formLabelWidth: "120px",
+      butt:false,
     };
   },
   props: {
@@ -161,13 +162,7 @@ export default {
   },
   mounted() {
     this.getApprovalUserList();
-    this.fileAttachList = [
-      {
-        name: "food.jpg",
-        id: "cb82ba8119914da9a6f219ba4c0b0be4",
-        url: "https://xxx.cdn.com/xxx.jpg"
-      }
-    ];
+    
   },
   components: {
     DataLayout: DataLayout,
@@ -192,8 +187,10 @@ export default {
       window.open(href.href, "_blank");
     },
     beforRemoveAttach(file, fileList) {},
-    getData() {
+    saveOrStartup(isStartup) {
       let _self = this;
+      _self.butt=true;
+      _self.loading = true;
       let formData = _self.$refs.ShowProperty.getFormData();
       let jsonStr = formData.get("metaData");
       let m = JSON.parse(jsonStr);
@@ -222,24 +219,61 @@ export default {
         })
         .then(function(response) {
           let code = response.data.code;
+          let docId=response.data.id;
           //console.log(JSON.stringify(response));
           if (code == 1) {
+              let param=new Map(m);
+              param.set("ID",docId);
             _self.$emit("onSaved", "new");
-            _self.$emit("onSaveSuccess", m);
+            _self.$emit("onSaveSuccess", param);
             _self.$message({
               showClose: true,
               message: "保存成功",
               duration: 2000,
-              type: "Success"
+              type: "success"
             });
+            _self.butt=false;
+            _self.loading = false;
+            if(isStartup){
+                _self.startworkflow(param);
+            }
           } else {
             _self.$message(_self.$t("message.newFailured"));
+            _self.butt=false;
+            _self.loading = false;
           }
         })
         .catch(function(error) {
           _self.$message(_self.$t("message.newFailured"));
           console.log(error);
+          _self.butt=false;
+            _self.loading = false;
         });
+    },
+    startworkflow(m) {
+      let _self = this;
+      let form={};
+      _self.butt=true;
+      _self.loading = true;
+      let d=new Map(m);
+      form['formId']=d.get('ID');
+      form['processInstanceKey']='图纸文件审批流程';
+      axios.post('/workflow/startWorkflow',JSON.stringify(form))
+      .then(function(response) {
+        _self.$message({
+              showClose: true,
+              message: "流程发起成功",
+              duration: 2000,
+              type: "success"
+            });
+        _self.loading = false;
+        _self.butt=false;
+      })
+      .catch(function(error) {
+        console.log(error);
+        _self.loading = false;
+        _self.butt=false;
+      });
     },
     handleChange(file, fileList) {
       this.file = file;
