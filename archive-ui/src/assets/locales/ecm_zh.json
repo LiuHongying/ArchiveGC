@@ -366,7 +366,9 @@
     "approve":"通过",
     "reject":"驳回",
     "classicName":"分类名称",
-    "VolumesFile":"卷内文件"
+    "VolumesFile":"卷内文件",
+    "archivesCategory":"档案类目",
+    "archivesType":"档案类型"
 },
 "skin": {
     "Blue": "天空蓝",

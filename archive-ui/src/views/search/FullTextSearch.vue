@@ -11,6 +11,32 @@
         <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
       </div>
     </el-dialog>
+    <el-dialog 
+      :title="$t('application.scendSearch')"
+      :visible.sync="secondSearchVisible"
+      @close="secondSearchVisible = false"
+      width="60%"
+      >
+    <el-divider class="headerDivider"></el-divider>
+    <div v-for="(term,idx) in terms" :key="idx+'_T'">
+      <el-row style="margin-top:20px;margin-bottom:20px">
+        <span class="ecmtitle" style="float:left;margin-right:30px;margin-left:20px">{{$t('application.'+term.fieldName)}}:</span>
+          <el-checkbox-group  v-model="checkedTerms[term.index]">
+            <template v-for="(gg,gidx) in term.groups" >
+            <el-checkbox
+              :label="gg.name"
+              :key="term.fieldName+''+gg.name"
+            >{{gg.name}}<el-badge :value="gg.value" class="item"></el-badge></el-checkbox>
+            </template>
+        </el-checkbox-group>
+      </el-row>
+      <el-divider class="contentDivider"></el-divider>
+    </div>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="secondSearchVisible = false" style="margin-right:20px">{{$t('application.cancel')}}</el-button>
+      <el-button @click="handleScendSearch()" type="primary">{{$t('application.scendSearch')}}</el-button>
+      </div>
+    </el-dialog>
     <div class="searchInput" >
       <!-- <el-autocomplete
         class="inline-input"
@@ -24,11 +50,12 @@
         style="width:60%"
       ></el-autocomplete> -->
       <el-input prefix-icon="el-icon-search" v-model="inputkey" :placeholder="$t('application.placeholderSearch')" @keyup.enter.native="enterDown"
-        style="width:60%;padding-top:10px;"></el-input>
+        style="width:40%;padding-top:10px;margin-left:20%"></el-input>
       <el-checkbox :label="$t('application.propertyOnly')" v-model="propertyOnly"></el-checkbox>
+      <el-button type="primary" plain @click="beforeSecondSearch()">{{$t('application.scendSearch')}}</el-button>
     </div>
-    <div>
-      <div class="docType">
+    <el-row>
+      <el-col :span="14" style="text-align:left;margin-left:20%">
         <span>{{$t('application.docTypeName')}}:</span>
         <el-checkbox
           :indeterminate="isIndeterminate"
@@ -36,22 +63,24 @@
           @change="handleCheckAllChange"
         >{{$t('application.selectAll')}}</el-checkbox>
         <el-checkbox-group v-model="checkedCards">
+          <el-col :xs="8" :sm="6" :md="6" :lg="4" :xl="3" v-for="card in cards" :key="card.id">
           <el-checkbox
-            v-for="card in cards"
             :label="card.name"
-            :key="card.id"
             checked
             @change="handleCheckedTypeChange"
           >{{card.name}}</el-checkbox>
+          </el-col>
         </el-checkbox-group>
-      </div>
-    </div>
+      
+      </el-col>
+    </el-row>
+    </el-row>
     <div v-if="searched">
-      <div>
+      <div style="margin-left:20%">
         <span>{{$t('application.searchResult')}} {{itemCount}}, &nbsp; {{$t('application.takeTime')}} {{searchTime}}{{$t('application.scend')}}</span>
       </div>
       <el-container>
-        <el-col :span="3">
+        <!-- <el-col :span="3">
         <el-aside class="fixed" id="searchBar" width="160px">
           <el-row>
             <el-button
@@ -84,8 +113,8 @@
             </div>
           </div>
         </el-aside>
-        </el-col>
-        <el-col :span="21">
+        </el-col> -->
+        <el-col :span="24" >
         <el-main>
           <!-- <el-pagination
           background
@@ -230,15 +259,18 @@
 
 <script type="text/javascript">
 import ShowProperty from "@/components/ShowProperty";
+import ShowPropertyReadOnly from "@/components/ShowPropertyReadOnly"
 export default {
   name: "FullTextSearch",
   components: {
-    ShowProperty: ShowProperty
+    ShowProperty: ShowProperty,
+    ShowPropertyReadOnly: ShowPropertyReadOnly
   },
   permit: 1,
   data() {
     return {
       imageFormat: "jpg,jpeg,bmp,gif,png",
+      checkList: [],
       currentData: [],
       dataList: [],
       dataListFull: [],
@@ -254,6 +286,7 @@ export default {
       checkedTerms: [],
       checkAll: true,
       isScend: false,
+      isSearched:false,
       searched: false,
       isIndeterminate: false,
       imageViewVisible: false,
@@ -265,6 +298,7 @@ export default {
       itemCount: 0,
       selectedItemId: "",
       propertyVisible: false,
+      secondSearchVisible: false,
       selectedItems: [],
       currentPage: 1,
       loading: false,
@@ -377,6 +411,7 @@ export default {
       //console.log(item);
       this.currentPage = 1;
       this.search(true);
+      this.secondSearchVisible = false;
     },
     createFilter(queryString) {
       return keyword => {
@@ -458,6 +493,7 @@ export default {
       _self.loadData = true;
       _self.isScend = isScend;
       _self.loading = true;
+      _self.isSearched = true;
       //console.log(JSON.stringify(_self.checkedCards));
       var m = new Map();
       m.set("keyword", _self.inputkey);
@@ -546,6 +582,15 @@ export default {
       }else{
         document.querySelector('#searchBar').style.top = '100px';
       }
+    },
+    beforeSecondSearch(){
+      let _self = this;
+      if(_self.isSearched){
+        _self.secondSearchVisible = true;
+      }else{
+        _self.$message("还未搜索，不能进行二次搜索!");
+      }
+      
     }
   }
 };
@@ -571,6 +616,7 @@ a {
 .searchInput {
   display: inline;
   padding-top:10px;
+  text-align: center;
 }
 .docType {
   display: inline;
@@ -587,5 +633,19 @@ a {
 <style>
 .el-button+.el-button {
     margin-left: 1px;
+}
+.el-divider.headerDivider{
+     margin: 8px 0;
+     background: 0 0;
+     border-top: 2px solid #9fa0a1;
+ } 
+ .el-divider.contentDivider{
+     margin: 8px 0;
+     background: 0 0;
+     border-top: 1px dashed #9fa0a1;
+ } 
+ .ecmtitle{
+  font-size: 16px;
+  font-weight: bold;
 }
 </style>
