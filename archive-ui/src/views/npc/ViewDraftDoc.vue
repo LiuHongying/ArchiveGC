@@ -26,14 +26,25 @@
 
     </template>
     <template v-slot:main="{ layout }">
-      <el-row>
-        <el-col :span="3" style="height:30px;line-height:30px;text-align:center;">模板名称：</el-col>
-        <el-col :span="6" style="height:30px;line-height:30px;text-align:center;">模板名称：</el-col>
-        <el-col :span="6">
-          <el-button type="primary">预览</el-button>
-          <el-button type="primary">下载</el-button>
-        </el-col>
-      </el-row>
+      <el-card shadow="hover">
+        <el-collapse value="模板" accordion>
+          <el-collapse-item
+            title="模板"
+            name="模板"
+            id="selectTemplate"
+            key="cindex"
+          >
+            <el-row>
+              <el-col :span="3" class="el-form-item__content">模板1</el-col>
+              <el-col :span="6" class="el-form-item__content">
+                <el-button type="primary">预览</el-button>
+                <el-button type="primary">下载</el-button>
+              </el-col>
+            </el-row>
+          </el-collapse-item>
+        </el-collapse>
+      </el-card>
+      <el-card shadow="hover">
       <el-row>
         <el-col :span="24">
           <ShowProperty
@@ -47,8 +58,10 @@
           ></ShowProperty>
         </el-col>
       </el-row>
+      </el-card>
+      <el-card shadow="hover">
       <el-row>
-        <el-collapse v-model="uploadFileModel">
+        <el-collapse value="文件列表">
           <el-collapse-item
             title="文件列表"
             name="文件列表"
@@ -106,8 +119,17 @@
           </el-collapse-item> -->
           
         </el-collapse>
-        <el-row>
-            <el-divider content-position="left">选择流程审批人员</el-divider>
+      </el-row>
+      </el-card>
+       <el-card shadow="hover">
+        <el-collapse value="选择流程审批人员">
+          <el-collapse-item
+            title="选择流程审批人员"
+            name="选择流程审批人员"
+            id="selectApprover"
+            key="cindex"
+          >
+       <el-row>
             <el-form>
             <div v-for="(approver,index)  in approvalUserList" :key="'approver_'+index">
                 <!-- <label>{{'approver_'+index}}</label> -->
@@ -123,6 +145,9 @@
             </div>
             </el-form>
         </el-row>
+          </el-collapse-item>
+        </el-collapse>
+       </el-card>
         <el-row>
             
             <!-- <el-col :span="24">
@@ -130,7 +155,6 @@
                 <el-button style="position:absolute;right:50px;margin:10px;" >暂  存</el-button>
             </el-col> -->
         </el-row>
-      </el-row>
     </template>
   </DataLayout>
 </template>

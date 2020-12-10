@@ -86,6 +86,11 @@ export default {
   position: relative;
   margin: 0 0 2px !important;
 }
+.el-card {
+    border: 1px solid #EBEEF5!important;
+    margin: 20px 3px 0 3px;
+    
+}
 .el-card__header {
   padding: 8px 5px !important;
   border-bottom: 1px solid #ebeef5;
