@@ -25,6 +25,7 @@ export default {
       this.format = this.$route.query.format;
     }
     this.loadUrl();
+    this.writeAudit(this.id);
   },
   methods: {
     loadUrl() {
@@ -49,6 +50,17 @@ export default {
           console.log(error);
           _self.loading = false;
         });
+    },
+    writeAudit(docId){
+      var m = new Map();
+      m.set("docId",docId)
+      m.set("actionName","ecm_read")
+      m.set("appName","portal")
+      axios
+        .post("/audit/addAudit", JSON.stringify(m))
+        .then(function(response){
+          
+        })
     }
   }
 };

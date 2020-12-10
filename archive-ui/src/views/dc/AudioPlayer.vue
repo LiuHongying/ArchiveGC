@@ -72,6 +72,7 @@ export default {
       this.id +
       "&token=" +
       sessionStorage.getItem("access-token");
+      this.writeAudit(this.id);
   },
   mounted() {
     this.$nextTick(() => {
@@ -124,6 +125,17 @@ export default {
         (s < 10 ? "0" : "") +
         parseInt(it % 60)
       );
+    },
+    writeAudit(docId){
+      var m = new Map();
+      m.set("docId",docId)
+      m.set("actionName","ecm_read")
+      m.set("appName","portal")
+      axios
+        .post("/audit/addAudit", JSON.stringify(m))
+        .then(function(response){
+          
+        })
     }
   }
 };

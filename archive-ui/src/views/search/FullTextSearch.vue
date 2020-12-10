@@ -55,13 +55,14 @@
       <el-button type="primary" plain @click="beforeSecondSearch()">{{$t('application.scendSearch')}}</el-button>
     </div>
     <el-row>
-      <el-col :span="14" style="text-align:left;margin-left:20%">
+      <el-col :span="13" style="text-align:left;margin-left:20%">
         <span>{{$t('application.docTypeName')}}:</span>
         <el-checkbox
           :indeterminate="isIndeterminate"
           v-model="checkAll"
           @change="handleCheckAllChange"
         >{{$t('application.selectAll')}}</el-checkbox>
+  
         <el-checkbox-group v-model="checkedCards">
           <el-col :xs="8" :sm="6" :md="6" :lg="4" :xl="3" v-for="card in cards" :key="card.id">
           <el-checkbox
@@ -71,9 +72,8 @@
           >{{card.name}}</el-checkbox>
           </el-col>
         </el-checkbox-group>
-      
       </el-col>
-    </el-row>
+
     </el-row>
     <div v-if="searched">
       <div style="margin-left:20%">
