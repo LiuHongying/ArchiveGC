@@ -91,7 +91,12 @@ export default {
   border-bottom: 1px solid #ebeef5;
   box-sizing: border-box;
 }
-
+.el-card__body {
+    padding: 1px 12px 1px 12px !important;
+}
+.el-collapse {
+     border-top: 0 solid #ebeef5 !important; 
+}
 .el-collapse-item__header {
     height: 40px !important;
     line-height: 40px !important;
@@ -103,6 +108,10 @@ export default {
 }
 .el-collapse-item__arrow{
       line-height: normal !important;
+}
+
+.el-collapse-item__wrap {
+     border-bottom: 0px solid #EBEEF5!important;
 }
 .el-button {
   height: 30px !important;
