@@ -317,8 +317,20 @@ export default {
     },
     download(){
       let url = this.axios.defaults.baseURL+"/dc/getContent?id="+this.doc.id+"&token="+sessionStorage.getItem('access-token')+"&action=download";
+      this.recordAudit(this.doc.id);
       window.open(url, '_blank');
-    },    
+    },
+    recordAudit(docId){
+      var m = new Map();
+      m.set("docId",docId)
+      m.set("actionName","ecm_download")
+      m.set("appName","portal")
+      axios
+        .post("/audit/addAudit", JSON.stringify(m))
+        .then(function(response){
+          
+        })
+    },  
     menuClick(type){
       console.log(this.$t('application.dcproper'))
       this.dialog.title=type;

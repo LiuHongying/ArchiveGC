@@ -26,6 +26,7 @@ export default {
       this.format = this.$route.query.format;
     }
     this.loadUrl();
+    this.writeAudit(this.id);
   },
   methods: {
     loadUrl() {
@@ -33,6 +34,17 @@ export default {
     //   let getfileUrl =  _self.axios.defaults.baseURL+"/dc/getContent?id="+_self.id+"&token="+sessionStorage.getItem('access-token')+"&format=pdf";
 	 _self.url = "./static/jtviewer/jtViewer.html?fileName="+ _self.fileName
 	//   _self.url = "./static/pdfviewer/web/viewer.html?file="+encodeURIComponent(getfileUrl)+"&.pdf"
+    },
+    writeAudit(docId){
+      var m = new Map();
+      m.set("docId",docId)
+      m.set("actionName","ecm_read")
+      m.set("appName","portal")
+      axios
+        .post("/audit/addAudit", JSON.stringify(m))
+        .then(function(response){
+          
+        })
     }
   },
   
