@@ -2,7 +2,7 @@
   <DataLayout>
     <template v-slot:header></template>
     <template v-slot:main>
-      <el-card>
+      <el-card shadow="hover">
         <el-collapse value="模板" accordion>
           <el-collapse-item
             title="模板"
@@ -20,7 +20,7 @@
           </el-collapse-item>
         </el-collapse>
       </el-card>
-      <el-card>
+      <el-card shadow="hover">
         <el-row>
           <el-col :span="24">
             <ShowProperty
@@ -35,7 +35,7 @@
           </el-col>
         </el-row>
       </el-card>
-      <el-card>
+      <el-card shadow="hover">
         <el-collapse value="上传文件" accordion>
           <el-collapse-item
             title="上传文件"
@@ -89,7 +89,7 @@
           </el-collapse-item> -->
         </el-collapse>
       </el-card>
-      <el-card>
+      <el-card shadow="hover">
         <el-collapse value="选择流程审批人员">
           <el-collapse-item
             title="选择流程审批人员"
@@ -122,7 +122,7 @@
           </el-collapse-item>
         </el-collapse>
       </el-card>
-      <el-card>
+      <el-card shadow="hover">
         <el-collapse value="操作">
           <el-collapse-item title="操作" name="操作" id="action" key="cindex">
             <el-row>
