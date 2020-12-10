@@ -1,7 +1,7 @@
 <template>
   <DataLayout>
     <template v-slot:header></template>
-    <template v-slot:main="{ layout }">
+    <template v-slot:main>
       <el-row>
         <el-col :span="3" style="height:30px;line-height:30px;text-align:center;">模板名称：</el-col>
         <el-col :span="6" style="height:30px;line-height:30px;text-align:center;">模板名称：</el-col>

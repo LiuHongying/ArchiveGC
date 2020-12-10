@@ -101,6 +101,9 @@ export default {
     font-size: 14px !important;
     font-weight: 600 !important;
 }
+.el-collapse-item__arrow{
+      line-height: normal !important;
+}
 .el-button {
   height: 30px !important;
   padding: 2px 12px !important;
