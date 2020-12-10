@@ -6,7 +6,7 @@
       @close="propertyVisible = false"
       width="90%"
     >
-      <ShowPropertyReadOnly ref="ShowProperty" width="100%" v-bind:itemId="selectedItemId"></ShowPropertyReadOnly>
+      <ShowProperty ref="ShowProperty" width="100%" v-bind:itemId="selectedItemId"></ShowProperty>
       <div slot="footer" class="dialog-footer">
         <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
       </div>
@@ -54,8 +54,8 @@
       <el-checkbox :label="$t('application.propertyOnly')" v-model="propertyOnly"></el-checkbox>
       <el-button type="primary" plain @click="beforeSecondSearch()">{{$t('application.scendSearch')}}</el-button>
     </div>
-    <div>
-      <div class="docType">
+    <el-row>
+      <el-col :span="14" style="text-align:left;margin-left:20%">
         <span>{{$t('application.docTypeName')}}:</span>
         <el-checkbox
           :indeterminate="isIndeterminate"
@@ -63,18 +63,20 @@
           @change="handleCheckAllChange"
         >{{$t('application.selectAll')}}</el-checkbox>
         <el-checkbox-group v-model="checkedCards">
+          <el-col :xs="8" :sm="6" :md="6" :lg="4" :xl="3" v-for="card in cards" :key="card.id">
           <el-checkbox
-            v-for="card in cards"
             :label="card.name"
-            :key="card.id"
             checked
             @change="handleCheckedTypeChange"
           >{{card.name}}</el-checkbox>
+          </el-col>
         </el-checkbox-group>
-      </div>
-    </div>
+      
+      </el-col>
+    </el-row>
+    </el-row>
     <div v-if="searched">
-      <div>
+      <div style="margin-left:20%">
         <span>{{$t('application.searchResult')}} {{itemCount}}, &nbsp; {{$t('application.takeTime')}} {{searchTime}}{{$t('application.scend')}}</span>
       </div>
       <el-container>
@@ -112,7 +114,7 @@
           </div>
         </el-aside>
         </el-col> -->
-        <el-col :span="24">
+        <el-col :span="24" >
         <el-main>
           <!-- <el-pagination
           background
