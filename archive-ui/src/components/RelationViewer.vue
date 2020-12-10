@@ -270,8 +270,7 @@
                 <MountFile
                   :selectedItem="selectedItems"
                   @refresh="refreshtransferDocRVData"
-                  >{{ $t("application.ReplaceDoc") }}</MountFile
-                >
+                  >{{ $t("application.ReplaceDoc") }}</MountFile>
               </el-form-item>
               <el-form-item>
                 <el-button

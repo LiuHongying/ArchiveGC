@@ -26,50 +26,40 @@
       <el-row>
         <el-collapse v-model="uploadFileModel">
           <el-collapse-item
-            title="上传文件"
-            name="上传文件"
+            title="文件列表"
+            name="文件列表"
             id="uploadFile"
             key="cindex"
           >
-          <el-row style="margin:10px">
-            <el-col :span="3">上传主件：</el-col>
-            <el-col :span="20">
-              <el-upload
-                :limit="1"
-                :file-list="fileList"
-                action
-                :on-change="handleChange"
-                :auto-upload="false"
-                :multiple="false"
-              >
-                <el-button
-                  slot="trigger"
-                  size="small"
-                  type="primary"
-                >{{$t('application.selectFile')}}</el-button>
-              </el-upload>
-            </el-col>
+          <el-row>
+            <el-button @click="showItemContent(selectedItemId)">查看</el-button>
+            <MountFile
+                  :selectedItem="[{'ID':selectedItemId}]"
+                  >{{ $t("application.ReplaceDoc") }}</MountFile>
           </el-row>
-          <el-row style="margin:10px">
-              <el-col :span="3">上传附件：</el-col>
-                <el-col :span="20">
-                    <el-upload
-                        :limit="0"
-                        :file-list="fileAttachList"
-                        action
-                        :on-change="handleChangeAttach"
-                        :auto-upload="false"
-                        :multiple="true"
-                        :on-preview="showItemContent"
-                        :before-remove="beforRemoveAttach"
-                    >
-                        <el-button
-                        slot="trigger"
-                        size="small"
-                        type="primary"
-                        >{{$t('application.selectFile')}}</el-button>
-                    </el-upload>
-                </el-col>
+          <el-row>
+            <el-button>添加附件</el-button>
+            <el-button>删除附件</el-button>
+          </el-row>
+          <el-row>
+            <!--列表-->
+              <DataGrid
+                  ref="attachmentDoc"
+                  key="attachmentDocKey"
+                  dataUrl="/dc/getDocuByRelationParentId"
+                  v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
+                  v-bind:isshowOption="true" v-bind:isshowSelection ="true"
+                  gridViewName="AttachmentGrid"
+                  condition=" and a.NAME='附件'"
+                  :optionWidth = "2"
+                  :isshowCustom="false"
+                  :isEditProperty="true"
+                  showOptions="查看内容"
+                  :isShowChangeList="false"
+                  :parentId="selectedItemId"
+                  :isInitData="true"
+                  @selectchange="attachmentDocSelect"
+              ></DataGrid>
           </el-row>
           </el-collapse-item>
           <!-- <el-collapse-item
@@ -113,6 +103,8 @@
 import DataLayout from "@/components/ecm-data-layout";
 import ShowProperty from "@/components/ShowProperty";
 import UserSelectInput from "@/components/controls/UserSelectInput";
+import DataGrid from "@/components/DataGrid";
+import MountFile from "@/components/MountFile.vue";
 export default {
   name: "CreateDoc",
   data() {
@@ -131,20 +123,22 @@ export default {
   },
   mounted() {
       this.getApprovalUserList();
-      this.fileAttachList=[{name: 'food.jpg',id:'cb82ba8119914da9a6f219ba4c0b0be4', url: 'https://xxx.cdn.com/xxx.jpg'}];
+      
   },
   components: {
     DataLayout: DataLayout,
     ShowProperty: ShowProperty,
-    UserSelectInput:UserSelectInput
+    UserSelectInput:UserSelectInput,
+    DataGrid:DataGrid,
+    MountFile: MountFile,
   },
   methods: {
       // 查看内容
-    showItemContent(indata) {
-        if(!indata.id){
+    showItemContent(id) {
+        if(!id){
             return;
         }
-      let condition = indata.id;
+      let condition = id;
       let href = this.$router.resolve({
         path: "/viewdoc",
         query: {
