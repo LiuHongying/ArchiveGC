@@ -53,7 +53,7 @@
                     
                     isOnly:false,
                     butt:false,
-                    
+                    typename:"设计文件作废审批单",
                     saveButt:false
                 }
             },
@@ -61,7 +61,6 @@
                 workflowObj:{type:Object,default:{}},
                 showUploadFile:{type:Boolean,default:true},
                 workflowFileList:{type:Array,default:new Array()},
-                typeName:{type:String,default:""},
             },
             
             mounted(){
@@ -98,7 +97,7 @@
                             if(dataRows[i].attrName !='FOLDER_ID'&&dataRows[i].attrName !='ID')
                             {
                             var val = dataRows[i].defaultValue;
-                            if(val && dataRows[i].isRepeat){
+                            if(val && dataRows[i].isRepeat && val instanceof Array){
                                 var temp = "";
                             // console.log(val);
                                 for(let j=0,len=val.length;j<len;j++){

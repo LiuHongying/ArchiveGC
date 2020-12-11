@@ -302,8 +302,6 @@
                             _self.butt=false;
                             return;
                         }
-                        m.set("ID",_self.$refs.workflowFile.GUID)
-                        console.log(m)
                         let formdata = new FormData();
                         formdata.append("metaData",JSON.stringify(m));
                         if(_self.$refs.ShowProperty.file!="")

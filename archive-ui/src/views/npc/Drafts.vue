@@ -93,7 +93,7 @@ export default {
       },
       selectedFiles: [],
       butt: false,
-      searchFileCondition: ""
+      searchFileCondition: " status='新建' and type_name!='附件' and CREATOR='@currentuser' "
     };
   },
   mounted() {
@@ -104,7 +104,7 @@ export default {
       let _self = this;
       
       // let key = " status='新建' and C_ITEM_TYPE='表单' and CREATOR='@currentuser' ";
-      let key = " status='新建' and CREATOR='@currentuser' ";
+      let key = " status='新建' and type_name!='附件' and CREATOR='@currentuser' ";
       if (_self.filters.title != "") {
         key +=" and TITLE like '%" +
           _self.filters.title +

@@ -117,6 +117,7 @@
         highlight-current-row
         @cell-mouse-enter="cellMouseEnter"
         @cell-mouse-leave="cellMouseLeave"
+        width="100%"
       >
         <el-table-column
           v-if="isshowSelection"

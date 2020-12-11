@@ -143,7 +143,6 @@ export default {
       }
       if (_self.$refs.ShowPropertyForm.myTypeName != "") {
         m.set("TYPE_NAME", _self.$refs.ShowPropertyForm.myTypeName);
-        m.set("FOLDER_ID", _self.$refs.ShowPropertyForm.myFolderId);
         m.set("parentDocId", _self.parentId);
         m.set("relationName", _self.relationName);
         console.log(_self.$refs.ShowPropertyForm.myTypeName);
@@ -290,7 +289,6 @@ export default {
       }
       if (_self.$refs.ShowPropertyForm.myTypeName != "") {
         m.set("TYPE_NAME", _self.$refs.ShowPropertyForm.myTypeName);
-        m.set("FOLDER_ID", _self.$refs.ShowPropertyForm.myFolderId);
         m.set("parentDocId", _self.parentId);
         m.set("relationName", _self.relationName);
         console.log(_self.$refs.ShowPropertyForm.myTypeName);
