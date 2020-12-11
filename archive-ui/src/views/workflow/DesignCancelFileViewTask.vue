@@ -126,6 +126,9 @@
                         <el-form-item>
                           <el-button type="warning" @click="removeRelation">{{ $t("application.delete") }}</el-button>
                         </el-form-item>
+                        <el-form-item>
+                          <el-button type="warning" @click="checkExcel">检查EXCEL</el-button>
+                        </el-form-item>
                       </template>
                       <template v-if="isShowReject">
                         <el-form-item>
@@ -241,6 +244,22 @@ export default {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
+    checkExcel(){
+      let ids = []
+      let _self = this
+      ids.push(_self.parentId)
+     ids.forEach(function(item){
+     ids.push(item.ID)
+     })
+     axios.post("/exchange/doc/checkExcel",ids).then(function(response){
+        console.log(response)
+        let code = response.data.code
+        if(code==0){
+          _self.$message("删除成功")
+        }
+                  _self.$refs.fileList.loadGridData()
+      })
+    },
         checkCondition(){    
      let _self = this
      let cond = this.searchFileCondition

@@ -128,7 +128,7 @@
                   <el-col :span="24" style="text-align: left">
                     <el-form :inline="true" :model="filters" @submit.native.prevent>
                       <el-form-item>
-                      <el-button type="primary" @click="beforeUploadFile('/dc/addAttachment4Copy')">添加附件</el-button>
+                      <el-button type="primary" @click="beforeUploadFile('/exchange/doc/addAttachment4Copy')">添加附件</el-button>
                       </el-form-item>
                       <el-form-item>
                         <el-button type="warning" @click="deleteAttach">{{ $t("application.delete") }}</el-button>
