@@ -92,10 +92,14 @@
                     >
                   </div>
                   <div class="el-button-ecm">
+                    <UploadOneFile :docId="selectedItemId" url="/dc/addRendition">格式副本</UploadOneFile>
+                  </div>
+                  <div class="el-button-ecm">
                     <MountFile :selectedItem="[{ ID: selectedItemId }]">{{
                       $t("application.ReplaceDoc")
                     }}</MountFile>
                   </div>
+
                   <div class="el-button-ecm">
                     <el-button
                       type="primary"
@@ -198,6 +202,7 @@ import ShowProperty from "@/components/ShowProperty";
 import UserSelectInput from "@/components/controls/UserSelectInput";
 import DataGrid from "@/components/DataGrid";
 import MountFile from "@/components/MountFile.vue";
+import UploadOneFile from "@/components/UploadOneFile.vue";
 export default {
   name: "CreateDoc",
   data() {
@@ -227,7 +232,8 @@ export default {
     ShowProperty: ShowProperty,
     UserSelectInput: UserSelectInput,
     DataGrid: DataGrid,
-    MountFile: MountFile
+    MountFile: MountFile,
+    UploadOneFile:UploadOneFile
   },
   methods: {
     loadPerson(){
