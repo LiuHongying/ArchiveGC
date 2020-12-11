@@ -161,10 +161,10 @@ export default {
   width:90% !important;
 }
 
-.el-message{
+/* .el-message{
   background-color: #67c23acc !important;
 }
 .el-message .el-icon-info {
     color: #fff!important;
-}
+} */
 </style>
