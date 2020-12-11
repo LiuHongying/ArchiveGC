@@ -921,6 +921,7 @@ export default {
       _self.propertyVisible = true;
       _self.$nextTick(() => {
         if (_self.$refs.createDoc.$refs.ShowProperty) {
+          _self.$refs.createDoc.loadPerson();
           _self.$refs.createDoc.$refs.ShowProperty.myItemId = indata.ID;
           _self.typeName = indata.TYPE_NAME;
           if (_self.typeName == "相关文件") {

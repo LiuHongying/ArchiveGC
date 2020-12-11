@@ -172,7 +172,7 @@
                   >
                     <UserSelectInput
                       v-model="taskForm[approver.performerPolicy]"
-                      v-bind:inputValue="taskForm[approver.performerPolicy]"
+                      v-bind:inputValue="vdata[approver.performerPolicy]"
                       v-bind:roleName="approver.roleName"
                     ></UserSelectInput>
                     <!-- :buttonType = "formEnableType != 'TodoTask'" -->
@@ -211,14 +211,16 @@ export default {
       formLabelWidth: "120px",
       importSubVisible: false,
       uploadUrl: "",
-      selectedAttachment: []
+      selectedAttachment: [],
+      vdata:{}
     };
   },
   props: {
     selectedItemId: { type: String, default: "" }
   },
   mounted() {
-    this.getApprovalUserList();
+    
+    
   },
   components: {
     DataLayout: DataLayout,
@@ -228,6 +230,13 @@ export default {
     MountFile: MountFile
   },
   methods: {
+    loadPerson(){
+      let _self=this;
+      _self.getObjectById(this.selectedItemId,function(data){
+        _self.vdata=data;
+      });
+      _self.getApprovalUserList();
+    },
     attachmentDocSelect(val) {
       this.selectedAttachment = val;
     },

@@ -35,7 +35,7 @@
       <component style="width:100%"
         ref="propertiesComp"
         :is="taskName"
-        v-model="taskForm"
+        v-model="formData"
         :formId="form.formId"
         :allowEdit="allowEdit"
         :docId="form.formId"
@@ -319,7 +319,7 @@ export default {
   },
   methods: {
     click(value) {
-      this.taskForm = value.get("metaData");
+      this.formData = value.get("metaData");
     },
     refreshData() {
       let _self = this;
@@ -380,7 +380,7 @@ export default {
     },
     getFormdataMap() {
       let _self = this;
-      return _self.taskForm;
+      return _self.formData;
     },
     completetask(indata) {
       let _self = this;

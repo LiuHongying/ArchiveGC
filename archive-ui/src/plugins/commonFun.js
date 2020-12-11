@@ -72,3 +72,16 @@ Vue.prototype.updateData=function(param,callback){
       
     });
 }
+//获取对象byId
+Vue.prototype.getObjectById=function(id,callback){
+    axios
+          .post("/dc/getDocumentById", id)
+          .then(function(responsedoc) {
+            let result = responsedoc.data;
+            if (result.code == 1) {
+              if(callback){
+                callback(result.data);
+              }
+            }
+          });
+}

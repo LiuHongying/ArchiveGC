@@ -146,7 +146,7 @@
                 <el-form-item :label="approver.activityName"  :label-width="formLabelWidth" style="float:left">
                 <UserSelectInput
                     v-model="taskForm[approver.performerPolicy]"
-                    v-bind:inputValue="taskForm[approver.performerPolicy]"
+                    v-bind:inputValue="vdata[approver.performerPolicy]"
                     v-bind:roleName="approver.roleName"
                     
                 ></UserSelectInput>
@@ -191,8 +191,18 @@ export default {
       selectedAttachment:[],
     };
   },
+  model: {
+    prop: "vdata",
+    event: "change"
+  },
   props:{
       formId: {type:String,default:""},
+      vdata:{
+        type: Object  ,
+        default: function () {
+            return {}
+        }
+      },
       allowEdit: { type: Boolean, default: false },
       processDefinitionId: {
         type: String,
@@ -204,6 +214,8 @@ export default {
       },
   },
   mounted() {
+    debugger
+      console.log(this.vdata);
       this.getApprovalUserList();
       
   },
@@ -313,6 +325,8 @@ export default {
               p.push(_self.taskForm[key]);
               m.push(p);
           }
+          
+          _self.$emit("change",new Map(m));
           // m.push(['ID',_self.selectedItemId]);
         axios.post("/dc/saveDocument",JSON.stringify(m))
         .then(function(response) {

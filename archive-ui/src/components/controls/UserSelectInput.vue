@@ -79,7 +79,7 @@
       </div>
     </el-dialog>
     <el-col :span="16">
-      <el-input type="text" :placeholder="$t('application.selectUser')" readonly="readonly" v-model="inputValue"></el-input>
+      <el-input type="text" :placeholder="$t('application.selectUser')" readonly="readonly" v-model="inputData"></el-input>
       <input value="value1" type="hidden" />
     </el-col>
     <el-col :span="4">
@@ -98,15 +98,22 @@ export default {
       tranList2: [],
       tranList: [],
       rightNameList: "",
-      rightListId: []
+      rightListId: [],
+      inputData:"",
     };
   },
   model: {
     prop: "value1",
     event: "change"
   },
+  watch:{
+    inputValue(val){
+      this.inputData=val;
+    }
+  },
   mounted() {},
   props: {
+    value1:{type: String,default: ""},
     //输入框默认显示值
     inputValue: {
       type: String,
@@ -186,9 +193,14 @@ export default {
         0,
         _self.rightNameList.length - 1
       );
-      _self.$emit("change", _self.rightNameList);
-      _self.rightNameList = "";
-      _self.visible = false;
+      _self.$nextTick(()=>{
+        
+        _self.inputData=_self.rightNameList;
+        _self.$emit("change", _self.rightNameList);
+        _self.rightNameList = "";
+        _self.visible = false;
+      });
+      
     },
     handleSelectionChange(selection) {
       this.tranList = [];
