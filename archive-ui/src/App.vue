@@ -1,7 +1,7 @@
 <template>
   <div id="app" v-title :data-title="$t('application.name')">
     <transition name="moveToTop">
-      <router-view></router-view>
+      <router-view v-if="isRouterAlive"></router-view>
     </transition>
   </div>
 </template>
@@ -10,6 +10,22 @@
 import "vue-transition.css";
 export default {
   name: "app",
+  provide(){
+		return {
+			reload: this.reload
+		}
+	},
+	data(){
+		return {
+			isRouterAlive:true
+		}
+	},
+	methods:{
+		reload(){
+			this.isRouterAlive=false
+			this.$nextTick(()=>this.isRouterAlive=true)
+		}
+	},
 };
 </script>
 
@@ -68,6 +84,7 @@ export default {
 }
 .el-dialog__footer {
   padding: 10px 10px !important;
+  text-align: center!important;
 }
 .el-tree-node:focus > .el-tree-node__content {
   background-color: #92c6fd;
@@ -86,12 +103,22 @@ export default {
   position: relative;
   margin: 0 0 2px !important;
 }
+.el-card {
+    border: 1px solid #EBEEF5!important;
+    margin: 20px 3px 0 3px;
+    
+}
 .el-card__header {
   padding: 8px 5px !important;
   border-bottom: 1px solid #ebeef5;
   box-sizing: border-box;
 }
-
+.el-card__body {
+    padding: 1px 12px 1px 12px !important;
+}
+.el-collapse {
+     border-top: 0 solid #ebeef5 !important; 
+}
 .el-collapse-item__header {
     height: 40px !important;
     line-height: 40px !important;
@@ -104,11 +131,29 @@ export default {
 .el-collapse-item__arrow{
       line-height: normal !important;
 }
+
+.el-collapse-item__wrap {
+     border-bottom: 0px solid #EBEEF5!important;
+}
 .el-button {
   height: 30px !important;
   padding: 2px 12px !important;
   border-radius: 4px !important;
   vertical-align: middle  !important;
   line-height: 0  !important;
+}
+
+.gutter{
+  display:block;
+}
+
+.el-button-ecm{
+    height: 30px !important;
+  padding: 2px 3px !important;
+  border-radius: 4px !important;
+  vertical-align: middle  !important;
+  line-height: 0  !important;
+  float:left;
+
 }
 </style>
