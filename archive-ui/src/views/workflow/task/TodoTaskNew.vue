@@ -32,7 +32,7 @@
       </el-form>
       <!-- <el-divider content-position="left">表单信息</el-divider> -->
 
-      <component
+      <component style="width:100%"
         ref="propertiesComp"
         :is="taskName"
         v-model="taskForm"
@@ -236,6 +236,7 @@ import CancelView from "@/views/workflow/CancelView.vue"
 import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue"
 import DesignCancelViewReadOnly from "@/views/workflow/DesignCancelViewReadOnly.vue"
 import DesignCancelView from "@/views/workflow/DesignCancelView.vue"
+import ViewDocNpc from "@/views/npc/ViewDocNpc.vue"
 export default {
   name: "TodoTask",
   permit: 1,
@@ -256,7 +257,8 @@ export default {
     CancelView:CancelView,
     CancelViewReadOnly : CancelViewReadOnly,
     DesignCancelView:DesignCancelView,
-    DesignCancelViewReadOnly:DesignCancelViewReadOnly
+    DesignCancelViewReadOnly:DesignCancelViewReadOnly,
+    ViewDocNpc:ViewDocNpc
   },
   data() {
     return {
