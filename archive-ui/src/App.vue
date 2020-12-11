@@ -156,4 +156,8 @@ export default {
   float:left;
 
 }
+
+.el-select-dropdown__item{
+  width:90% !important;
+}
 </style>
