@@ -276,13 +276,13 @@
                           size="small"
                           @click="beforeCreateFile(selectRow)"
                         >{{$t('application.createDocument')}}</el-button>
-                        <el-button
+                        <!-- <el-button
                           type="primary"
                           plain
                           size="small"
                           :title="$t('application.addReuseFile')"
                           @click="beforeAddreuse()"
-                        >{{$t('application.addReuseFile')}}</el-button>
+                        >{{$t('application.addReuseFile')}}</el-button> -->
                         
                         <el-button type="primary" plain size="small" title="删除" @click="onDeleleFileItem()">{{$t('application.delete')}}</el-button>
                         <el-button
@@ -292,13 +292,13 @@
                           title="挂载文件"
                           @click="beforeUploadFile('/dc/mountFile')"
                         >挂载文件</el-button>
-                        <el-button
+                        <!-- <el-button
                           type="primary"
                           plain
                           size="small"
                           :title="$t('application.viewRedition')"
                           @click="beforeUploadFile('/dc/addRendition')"
-                        >格式副本</el-button>
+                        >格式副本</el-button> -->
                         <el-button type="primary" plain size="small" title="上移" @click="onMoveUp()">上移</el-button>
                         <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
                       </el-row>

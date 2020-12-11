@@ -107,7 +107,6 @@
         :height="tableHeight"
         :data="itemDataList"
         border
-        fit
         @selection-change="selectChange"
         @sort-change="sortchange"
         @row-click="rowClick"

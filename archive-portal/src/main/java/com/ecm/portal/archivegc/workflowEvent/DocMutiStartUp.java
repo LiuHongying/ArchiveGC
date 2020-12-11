@@ -142,6 +142,7 @@ public class DocMutiStartUp implements ExecutionListener, JavaDelegate, TaskList
 			String workflowSpecialUserName = env.getProperty("ecm.username");
 			try {
 				ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
+				loadProcessBusinessLogicToVariable(ecmSession, task);
 				String taskUserIds = task.getAssignee();
 				/**********************发送邮件*************************************/
 				
@@ -223,6 +224,7 @@ public class DocMutiStartUp implements ExecutionListener, JavaDelegate, TaskList
 			if (task.getVariable("processInstanceID") == null) {
 				task.setVariable("processInstanceID", task.getProcessInstanceId());
 				task.setVariable("processName", task.getProcessDefinitionId().split(":")[0]);
+				
 			}
 			IEcmSession ecmSession = null;
 			String workflowSpecialUserName = env.getProperty("ecm.username");
