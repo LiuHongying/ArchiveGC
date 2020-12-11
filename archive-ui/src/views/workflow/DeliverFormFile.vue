@@ -138,7 +138,7 @@
         >
         <template slot="paneL">-->
         <el-tabs value="t01">
-          <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01">
+          <el-tab-pane :label="$t('application.replaceFile')" name="t01">
             <el-row v-if="allowEdit||isShowReject">
               <el-col :span="24" style="text-align: left">
                 <el-form :inline="true" :model="filters" @submit.native.prevent>

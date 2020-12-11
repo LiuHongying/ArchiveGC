@@ -2,7 +2,7 @@
   <DataLayout>
     <template v-slot:header></template>
     <template v-slot:main>
-      <el-card shadow="hover">
+      <!-- <el-card shadow="hover">
         <el-collapse value="模板" accordion>
           <el-collapse-item
             title="模板"
@@ -19,7 +19,7 @@
             </el-row>
           </el-collapse-item>
         </el-collapse>
-      </el-card>
+      </el-card> -->
       <el-card shadow="hover">
         <el-row>
           <el-col :span="24">

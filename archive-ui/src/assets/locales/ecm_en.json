@@ -382,7 +382,8 @@
     "reject":"Reject",
     "VolumesFile":"Volumes file",
     "archivesCategory":"Archives Category",
-    "archivesType":"Archives Type"
+    "archivesType":"Archives Type",
+    "replaceFile":"Replace files"
 },
 "skin": {
     "Blue": "Blue",

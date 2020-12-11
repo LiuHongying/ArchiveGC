@@ -368,7 +368,8 @@
     "classicName":"分类名称",
     "VolumesFile":"卷内文件",
     "archivesCategory":"档案类目",
-    "archivesType":"档案类型"
+    "archivesType":"档案类型",
+    "replaceFile":"替换件"
 },
 "skin": {
     "Blue": "天空蓝",
@@ -544,7 +545,8 @@
     "desfolderid":"目标文件夹ID",
     "importJson":"Json包导入",
     "filelist":"文件列表",
-    "workflowCenter":"流程中心"
+    "workflowCenter":"流程中心",
+    "CreateDoc":"文件创建"
 },
 "message": {
     "conditionS":"条件选择",
