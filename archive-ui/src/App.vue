@@ -160,4 +160,11 @@ export default {
 .el-select-dropdown__item{
   width:90% !important;
 }
+
+.el-message{
+  background-color: #67c23acc !important;
+}
+.el-message .el-icon-info {
+    color: #fff!important;
+}
 </style>
