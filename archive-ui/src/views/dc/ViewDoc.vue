@@ -22,7 +22,14 @@
       <el-col :span="4" style="float:right; text-align:right;">
         <template v-if="docObj!=null">
           <!-- <el-button size="mini" icon="el-icon-shopping-cart-2" @click="borrowItem(docObj)">借阅</el-button> -->
-          <el-button v-if="doc.permit>=4" size="mini" icon="el-icon-download" @click="download()">{{$t('application.download')}}</el-button>
+          <template v-if="judgeDownload.showRelyPermit == true">
+            <el-button v-if="doc.permit>=4" size="mini" icon="el-icon-download" @click="download()">{{$t('application.download')}}</el-button>
+          </template>
+          <template v-else>
+            <template v-if="judgeDownload.downloadPermit">
+              <el-button v-if="showDownloadButton" size="mini" icon="el-icon-download" @click="download()">{{$t('application.download')}}</el-button>
+            </template>
+          </template>
         </template>
       </el-col>
     </el-header>
@@ -216,7 +223,12 @@ export default {
         visible:false
       },
       borrowDialogVisible:false,
-      revertType:""
+      revertType:"",
+      judgeDownload:{
+        showRelyPermit:false,
+        downloadPermit:false
+      },
+      showDownloadButton:true
     }
   },
   created(){
@@ -233,6 +245,7 @@ export default {
   mounted(){
     var _self = this;
     this.docId = this.$route.query.id;
+    _self.judgeShowDownload(this.docId);
     var user = sessionStorage.getItem("access-user");
     this.user = JSON.parse(user);
     this.token = sessionStorage.getItem("access-token");
@@ -316,9 +329,23 @@ export default {
             });
     },
     download(){
+      if(this.judgeDownload.showRelyPermit==false && this.judgeDownload.downloadPermit==true){
+        this.showDownloadButton = false;
+      }
       let url = this.axios.defaults.baseURL+"/dc/getContent?id="+this.doc.id+"&token="+sessionStorage.getItem('access-token')+"&action=download";
       this.recordAudit(this.doc.id);
       window.open(url, '_blank');
+    },
+    judgeShowDownload(docId){
+      let _self = this;
+      var m = new Map()
+      m.set("docId",docId)
+      axios
+        .post("/archive/judgeDownloadByAudit", JSON.stringify(m))
+        .then(function(response){
+          _self.judgeDownload.showRelyPermit = response.data.showRelyPermit
+          _self.judgeDownload.downloadPermit = response.data.downloadPermit
+        })
     },
     recordAudit(docId){
       var m = new Map();
