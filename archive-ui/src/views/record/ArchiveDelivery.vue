@@ -234,6 +234,7 @@
                   v-bind:columnList="transferColumnList"
                   @pagesizechange="handleSizeChange"
                   @pagechange="handleCurrentChange"
+                  :isInitData="false"
                   gridViewName="DeliveryGrid"
                   v-bind:itemCount="transferCount"
                   v-bind:tableHeight="layout.height-136"
