@@ -144,12 +144,12 @@
             <div v-for="(approver,index)  in approvalUserList" :key="'approver_'+index">
                 <!-- <label>{{'approver_'+index}}</label> -->
                 <el-form-item :label="approver.activityName"  :label-width="formLabelWidth" style="float:left">
-                <UserSelectInput
+                <UserSelectInput v-if="isTodoTask"
                     v-model="taskForm[approver.performerPolicy]"
                     v-bind:inputValue="vdata[approver.performerPolicy]"
                     v-bind:roleName="approver.roleName"
-                    
                 ></UserSelectInput>
+                <div style="width:80px;" v-else>{{vdata[approver.performerPolicy]}}</div>
                 <!-- :buttonType = "formEnableType != 'TodoTask'" -->
                 </el-form-item>
             </div>
@@ -204,6 +204,7 @@ export default {
         }
       },
       allowEdit: { type: Boolean, default: false },
+      isTodoTask:{type:Boolean,default:true},
       processDefinitionId: {
         type: String,
         default: ""
