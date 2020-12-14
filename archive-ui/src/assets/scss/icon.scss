@@ -1,0 +1,48 @@
+.ecm-icon{
+    content: none;   
+    margin: 10px;
+    width: auto;
+    height: 60px;
+    border:0px solid  #CFC4CC;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+
+.ecm-icon-desc{
+    font-size: 10px;
+    text-align: center;
+}
+
+.ecm-icon-cp{
+    @extend .ecm-icon;
+    background: url("icons/icon-cp.png") no-repeat center center;
+}
+.ecm-icon-borrow{
+    @extend .ecm-icon;
+    background: url("icons/icon-borrow.png") no-repeat center center;
+}
+.ecm-icon-cancelnotice{
+    @extend .ecm-icon;
+    background: url("icons/icon-cancelnotice.png") no-repeat center center;
+}
+.ecm-icon-designdoc{
+    @extend .ecm-icon;
+    background: url("icons/icon-designdoc.png") no-repeat center center;
+}
+.ecm-icon-docviolatehandle{
+    @extend .ecm-icon;
+    background: url("icons/icon-docviolatehandle.png") no-repeat center center;
+}
+.ecm-icon-prearchive{
+    @extend .ecm-icon;
+    background: url("icons/icon-prearchive.png") no-repeat center center;
+}
+.ecm-icon-prearchive{
+    @extend .ecm-icon;
+    background: url("icons/icon-prearchive.png") no-repeat center center;
+}
+.ecm-icon-scdoc{
+    @extend .ecm-icon;
+    background: url("icons/icon-scdoc.png") no-repeat center center;
+}
