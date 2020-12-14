@@ -118,47 +118,47 @@ public class Receiving4TC extends ControllerAbstract {
 			String idsStr=args.get("ids").toString();
 			List<String> list = JSONUtils.stringToArray(idsStr);
 			for(String id : list) {
-				EcmDocument doc = documentService.getObjectById(getToken(), id);
-				String coding=doc.getCoding();
-				String condition = "CODING='"+coding+"' and C_ITEM_TYPE='案卷'";
-				List<EcmDocument> res = documentService.getObjects(getToken(), condition);
-				if(res != null && res.size() > 0) {
-					//获取当前移交单下文件的属性
-					String sql = "select CHILD_ID from ecm_relation where PARENT_ID='"+id+"'";
-					List<Map<String, Object>> lis = relationService.getMapList(getToken(), sql);
-					String childId = lis.get(0).toString();
-					EcmDocument result = documentService.getObjectById(getToken(), childId);
-					//库位号
-					String LOCATION = result.getAttributeValue("C_LOCATION").toString()==null?""
-							:result.getAttributeValue("C_LOCATION").toString();
-					//库号
-					String StoreCoding = result.getAttributeValue("C_STORE_CODING").toString()==null?""
-							:result.getAttributeValue("C_STORE_CODING").toString();
-					//档案号
-					String ArchiveCoding = result.getAttributeValue("C_ARCHIVE_CODING").toString()==null?""
-							:result.getAttributeValue("C_ARCHIVE_CODING").toString();
-					//获取查询到的案卷的文件属性
-					String sql1 = "select CHILD_ID from ecm_relation where PARENT_ID='"+res.get(0).toString()+"'";
-					List<Map<String, Object>> lis2 = relationService.getMapList(getToken(), sql1);
-					String childId2 = lis2.get(0).toString();
-					String condition2= "ID='"+childId2+"'";
-					List<Map<String,Object>> result2 = documentService.getObjectMap(getToken(), condition2);
-					for(Map<String, Object> re2:result2) {
-						String folderId=folderPathService.getFolderId(getToken(), re2, "2");
-						re2.put("C_LOCATION", LOCATION);
-						re2.put("C_STORE_CODING", StoreCoding);
-						re2.put("C_ARCHIVE_CODING", ArchiveCoding);
-						re2.put("FOLDER_ID", folderId);
+				//查询移交单下的文件的id
+				String sql = "select CHILD_ID from ecm_relation where PARENT_ID='"+id+"'";
+				List<Map<String, Object>> lis = relationService.getMapList(getToken(), sql);
+				for(Map<String,Object> a:lis) {
+					//查询移交单下文件的属性信息
+					Map<String, Object> doc = documentService.getObjectMapById(getToken(), a.get("CHILD_ID").toString());
+					String coding=doc.get("CODING").toString();
+					//查询是否存在相同coding的文件
+					String condition = "CODING='"+coding+"' and C_ITEM_TYPE='文件' and id !='"+a.get("CHILD_ID")+"'";
+					List<EcmDocument> res = documentService.getObjects(getToken(), condition);
+					if(res != null && res.size() > 0) {
+						//获取文件的案卷id
+						String sql1 = "select PARENT_ID from ecm_relation where CHILD_ID='"+res.get(0).getId()+"'";
+						List<Map<String, Object>> lis2 = relationService.getMapList(getToken(), sql1);
+						//通过id获取属性信息
+						String parentId2 = lis2.get(0).get("PARENT_ID").toString();
+						EcmDocument result2 = documentService.getObjectById(getToken(), parentId2);
+						//库位号
+						String LOCATION = result2.getAttributeValue("C_LOCATION").toString()==null?""
+								:result2.getAttributeValue("C_LOCATION").toString();
+						//库号
+						String StoreCoding = result2.getAttributeValue("C_STORE_CODING").toString()==null?""
+								:result2.getAttributeValue("C_STORE_CODING").toString();
+						//档案号
+						String ArchiveCoding = result2.getAttributeValue("C_ARCHIVE_CODING").toString()==null?""
+								:result2.getAttributeValue("C_ARCHIVE_CODING").toString();
+						
+						String folderId=folderPathService.getFolderId(getToken(), doc, "2");
+						doc.put("C_LOCATION", LOCATION);
+						doc.put("C_STORE_CODING", StoreCoding);
+						doc.put("C_ARCHIVE_CODING", ArchiveCoding);
+						doc.put("FOLDER_ID", folderId);
 						EcmFolder folder = folderService.getObjectById(getToken(), folderId);
-						re2.put("ACL_NAME", folder.getAclName());
-						re2.put("STATUS", "整编");
-						documentService.updateObject(getToken(), re2);
+						doc.put("ACL_NAME", folder.getAclName());
+						doc.put("STATUS", "整编");
+						documentService.updateObject(getToken(), doc);
+					}else {
+						mp.put("code", ActionContext.FAILURE);
+						mp.put("message", "文件"+coding+"没有对应案卷");
+						return mp;
 					}
-					
-				}else {
-					mp.put("code", ActionContext.FAILURE);
-					mp.put("message", "文件"+coding+"没有对应案卷");
-					return mp;
 				}
 				documentService.updateStatus(getToken(), id, "整编", "");
 			}
