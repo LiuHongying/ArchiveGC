@@ -491,6 +491,7 @@ export default {
           _self.loading = false;
           _self.butt = false;
           _self.propertyVisible = false;
+          this.loadGridData();
         })
         .catch(function(error) {
           console.log(error);

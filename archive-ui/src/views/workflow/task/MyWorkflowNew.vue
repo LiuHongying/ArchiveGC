@@ -5,12 +5,14 @@
       <component
         ref="propertiesComp"
         :is="taskName"
-        v-model="taskForm"
+        v-model="formData"
         :formId="currentFormId"
         :docId="currentFormId"
         :allowEdit="false"
         :taskForm="formData"
         :istask="1"
+        :isTodoTask="false"
+        :needAllUser="true"
         :formParameter="formParameter"
         :processDefinitionId="currentData.processDefinitionId"
         :activityName="currentData.name"
@@ -223,6 +225,7 @@ import UpdateDocContentByReviewer from "@/views/workflow/LinkMainAttachmentFileB
 import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue";
 import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue";
 import CommonViewRelyFolder from "@/views/workflow/CommonViewRelyFolder.vue";
+import ViewDocNpc from "@/views/npc/ViewDocNpc.vue";
 export default {
   name: "MyWorkflow",
   permit: 1,
@@ -240,7 +243,8 @@ export default {
     DataGrid:DataGrid,
     BorrowViewReadOnly:BorrowViewReadOnly,
     CancelViewReadOnly:CancelViewReadOnly,
-    CommonViewRelyFolder:CommonViewRelyFolder
+    CommonViewRelyFolder:CommonViewRelyFolder,
+    ViewDocNpc:ViewDocNpc
   },
   data() {
     return {
