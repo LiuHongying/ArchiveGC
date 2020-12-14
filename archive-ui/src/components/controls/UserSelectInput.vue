@@ -99,7 +99,7 @@ export default {
       tranList: [],
       rightNameList: "",
       rightListId: [],
-      inputData:"",
+      inputData:this.inputValue,
     };
   },
   model: {

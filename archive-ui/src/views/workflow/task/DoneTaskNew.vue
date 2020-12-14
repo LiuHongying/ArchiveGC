@@ -11,6 +11,7 @@
         :istask="1"
         :formParameter="formParameter"
         :allowEdit="false"
+        :isTodoTask="false"
         :processDefinitionId="currentData.processDefinitionId"
         :activityName="currentData.name"
         :formEditPermision=0
@@ -170,6 +171,7 @@ import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
 import CancelView from "@/views/workflow/CancelView.vue"
 import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue"
 import CommonViewRelyFolder from "@/views/workflow/CommonViewRelyFolder.vue";
+import ViewDocNpc from "@/views/npc/ViewDocNpc.vue"
 export default {
   name: "DoneTask",
   permit: 1,
@@ -188,7 +190,8 @@ export default {
     CommonViewRelyDocType:CommonViewRelyDocType,
     CancelView:CancelView,
     CancelViewReadOnly : CancelViewReadOnly,
-    CommonViewRelyFolder : CommonViewRelyFolder
+    CommonViewRelyFolder : CommonViewRelyFolder,
+    ViewDocNpc:ViewDocNpc
   },
   data() {
     return {
