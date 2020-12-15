@@ -315,8 +315,9 @@
                     });
                      })
                 },
-                closePage(pv){
-                    this.$emit("close");
+                closePage(){
+                    let flag = false;
+                    this.$emit("closedialog", flag);
                 },
                 // 保存文档
                 saveItem()
