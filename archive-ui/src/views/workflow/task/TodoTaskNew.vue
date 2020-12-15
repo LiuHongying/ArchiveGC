@@ -237,6 +237,8 @@ import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue"
 import DesignCancelViewReadOnly from "@/views/workflow/DesignCancelViewReadOnly.vue"
 import DesignCancelView from "@/views/workflow/DesignCancelView.vue"
 import ViewDocNpc from "@/views/npc/ViewDocNpc.vue"
+import AppraisalView from "@/views/workflow/AppraisalView.vue"
+import AppraisalViewReadOnly from "@/views/workflow/AppraisalViewReadOnly.vue"
 export default {
   name: "TodoTask",
   permit: 1,
@@ -258,7 +260,9 @@ export default {
     CancelViewReadOnly : CancelViewReadOnly,
     DesignCancelView:DesignCancelView,
     DesignCancelViewReadOnly:DesignCancelViewReadOnly,
-    ViewDocNpc:ViewDocNpc
+    ViewDocNpc:ViewDocNpc,
+    AppraisalViewReadOnly:AppraisalViewReadOnly,
+    AppraisalView:AppraisalView
   },
   data() {
     return {
@@ -325,6 +329,8 @@ export default {
         this.formData=value;
       }
       
+      this.taskForm = value.get("metaData");
+      console.log(this.taskForm)
     },
     refreshData() {
       let _self = this;
