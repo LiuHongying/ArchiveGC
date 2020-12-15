@@ -6,6 +6,7 @@
       <component
         :is="taskName"
         :typeName="taskName"
+        v-model="formData"
         :formId="currentFormId"
         :docId="currentFormId"
         :istask="1"

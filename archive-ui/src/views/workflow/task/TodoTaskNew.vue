@@ -319,7 +319,12 @@ export default {
   },
   methods: {
     click(value) {
-      this.formData = value.get("metaData");
+      if(value.get("metaData")){
+        this.formData = value.get("metaData");
+      }else{
+        this.formData=value;
+      }
+      
     },
     refreshData() {
       let _self = this;
@@ -391,17 +396,17 @@ export default {
           _self.form.taskId[i] = _self.selectedItems[i].id;
         }
       }
-      let docMap = _self.getFormdataMap();
+      // let docMap = _self.getFormdataMap();
       _self.loading = true;
-      if (_self.formEditPermision == 1) {
-        switch (_self.currentData.processDefinitionId.split(":")[0]) {
-          case "BianJiaoShenPi":
-            _self.$refs.propertiesComp.$refs.ShowProperty.saveItem();
-            break;
-          case "process_borrow":
-            _self.$refs.propertiesComp.saveCurrentForm();
-            break;
-        }
+      // if (_self.formEditPermision == 1) {
+      //   switch (_self.currentData.processDefinitionId.split(":")[0]) {
+      //     case "BianJiaoShenPi":
+      //       _self.$refs.propertiesComp.$refs.ShowProperty.saveItem();
+      //       break;
+      //     case "process_borrow":
+      //       _self.$refs.propertiesComp.saveCurrentForm();
+      //       break;
+      //   }
         // if(_self.currentData.processDefinitionId.split(":")[0]=="BianJiaoShenPi"){
           try{
             
@@ -420,9 +425,9 @@ export default {
             console.log(error);
             _self.loading = false;
           });
-      } else {
-        _self.completetaskFinal(_self);
-      }
+      // } else {
+      //   _self.completetaskFinal(_self);
+      // }
     },
     completetaskFinal(indata) {
       let _self = indata;
