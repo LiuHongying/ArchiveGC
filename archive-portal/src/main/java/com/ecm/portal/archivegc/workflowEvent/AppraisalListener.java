@@ -111,8 +111,9 @@ public class AppraisalListener implements JavaDelegate {
 		excel.setContentSize(size);
 		excel.setName("鉴定清册.xlsx");
 		excel.setInputStream(XLS);
-		XLS.close();					//关闭输入流
+				//关闭输入流
 		documentService.updateObject(ecmSession.getToken(), form, excel);
+		XLS.close();	
 		/**
 		 * upload file
 		 */

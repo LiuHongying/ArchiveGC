@@ -60,6 +60,18 @@
         <PrintBarCode ref="printBarCode" :archiveObjects="selectedItems" :isBarCode="true"></PrintBarCode>
       </div>
     </el-dialog>
+
+    <el-dialog
+      title="打印pdf417条码"
+      width="43%"
+      :visible="printPdf417Visible"
+      @close="printPdf417Visible=false"
+    >
+      <div style="height:900px;">
+        <PrintPdf417 ref="printPdf417" :archiveObjects="selectedItems" :isBarCode="true"></PrintPdf417>
+      </div>
+    </el-dialog>
+
     <el-dialog
       title="打印档号"
       width="43%"
@@ -263,6 +275,14 @@
                         @click="beforePrintArchiveCode(selectedItems,'打印档号')"
                         title="打印档号"
                       ></el-button>
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-printer"
+                        @click="beforePrintPdf417(selectedItems,'打印档号')"
+                        title="打印pdf417"
+                      ></el-button>
                         <el-button
                         type="primary"
                         plain
@@ -417,6 +437,7 @@ import PrintRidge from "@/views/record/PrintRidge";
 import PreparationTablePrint from "@/views/record/PreparationTablePrint.vue"
 import PrintBarCode from "@/views/record/PrintBarCode.vue"
 import PrintArchiveCode from "@/views/record/PrintArchiveCode.vue"
+import PrintPdf417 from "@/views/record/PrintPdf417.vue"
 export default {
   name: "ArchiveArrange",
   components: {
@@ -432,6 +453,7 @@ export default {
     PrintArchiveCode:PrintArchiveCode,
     //Prints:Prints
     DataLayout:DataLayout,
+    PrintPdf417:PrintPdf417
 
   },
   data() {
@@ -542,7 +564,8 @@ export default {
       pieceNumVisible:false,//是否显示取批次号dialog
       PreparationTablePrintVisible:false,
       printBarCodeVisible:false,
-      printArchiveCodeVisible:false
+      printArchiveCodeVisible:false,
+      printPdf417Visible:false,
     };
   },
   
@@ -671,6 +694,24 @@ export default {
         _self.$refs.printArchiveCode.refresh(selectedRows, 1);
       }, 10);
 
+    },
+
+    beforePrintPdf417(selectedRows){
+      let _self = this;
+      if (selectedRows == undefined||selectedRows.length==0) {
+        // _self.$message('请选择一条数据进行打印');
+        _self.$message({
+          showClose: true,
+          message: "请选择一条数据进行打印",
+          duration: 2000,
+          type: "warning"
+        });
+        return;
+      }
+      _self.printPdf417Visible = true;
+      setTimeout(() => {
+        _self.$refs.printPdf417.refresh(selectedRows, 1);
+      }, 10);
     },
     ///打印条码
     beforePrintBarCode(selectedRows,vtitle) {

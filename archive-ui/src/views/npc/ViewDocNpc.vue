@@ -144,12 +144,12 @@
             <div v-for="(approver,index)  in approvalUserList" :key="'approver_'+index">
                 <!-- <label>{{'approver_'+index}}</label> -->
                 <el-form-item :label="approver.activityName"  :label-width="formLabelWidth" style="float:left">
-                <UserSelectInput
+                <UserSelectInput v-if="isTodoTask"
                     v-model="taskForm[approver.performerPolicy]"
                     v-bind:inputValue="vdata[approver.performerPolicy]"
                     v-bind:roleName="approver.roleName"
-                    
                 ></UserSelectInput>
+                <div style="width:80px;" v-else>{{vdata[approver.performerPolicy]}}</div>
                 <!-- :buttonType = "formEnableType != 'TodoTask'" -->
                 </el-form-item>
             </div>
@@ -204,6 +204,7 @@ export default {
         }
       },
       allowEdit: { type: Boolean, default: false },
+      isTodoTask:{type:Boolean,default:true},
       processDefinitionId: {
         type: String,
         default: ""
@@ -212,11 +213,20 @@ export default {
         type: String,
         default: ""
       },
+      needAllUser:{
+        type:Boolean,
+        default:false
+      }
   },
   mounted() {
     debugger
       console.log(this.vdata);
-      this.getApprovalUserList();
+      if(this.needAllUser){
+        this.getApprovalAllUserList();
+      }else{
+        this.getApprovalUserList();
+      }
+      
       
   },
   components: {
@@ -313,7 +323,19 @@ export default {
       //console.log(href);
       window.open(href.href, "_blank");
     },
-      
+      sendData() {
+        let _self=this;
+          let formData= _self.$refs.ShowProperty.getFormData();
+          let jsonStr= formData.get('metaData');
+          let m= JSON.parse(jsonStr);
+           for(let key in _self.taskForm){
+              let p=new Array();
+              p.push(key);
+              p.push(_self.taskForm[key]);
+              m.push(p);
+          }
+          this.$emit("click", new Map(m));
+      },
       saveData(isStartupWorkflow){
           let _self=this;
           let formData= _self.$refs.ShowProperty.getFormData();
@@ -354,6 +376,26 @@ export default {
       this.fileAttachList = fileList;
       //console.log(file);
       // console.log(fileList);
+    },
+    getApprovalAllUserList() {
+      let _self = this;
+      var m = new Map();
+      m.set("processDefinitionName", "图纸文件审批流程");
+      axios
+        .post("/workflow/getApprovalAllUserList", JSON.stringify(m))
+        .then(function(response) {
+          if (response.data.code == 1) {
+            _self.approvalUserList = response.data.data;
+          } else {
+            _self.$message({
+              showClose: true,
+              message: response.data.message,
+              duration: 2000,
+              type: "warning"
+            });
+            return;
+          }
+        });
     },
     getApprovalUserList(){
       let _self = this;

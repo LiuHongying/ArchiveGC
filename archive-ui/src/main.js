@@ -28,6 +28,7 @@ import splitPane from 'vue-splitpane'
 import 'normalize.css/normalize.css'// A modern alternative to CSS resets
 import '@/styles/index.scss' // global css
 import '@/icons'
+import '@/assets/scss/icon.scss'
 import { global } from '@/global/global'
 
  import '@/assets/icons/iconfont.css'

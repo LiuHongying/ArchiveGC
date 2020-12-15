@@ -118,33 +118,47 @@ public class Receiving4TC extends ControllerAbstract {
 			String idsStr=args.get("ids").toString();
 			List<String> list = JSONUtils.stringToArray(idsStr);
 			for(String id : list) {
-				if(!StringUtils.isEmpty(id)) {
-					EcmDocument doc = documentService.getObjectById(getToken(), id);
-					String sql = "select CHILD_ID from ecm_relation where PARENT_ID = '"+id+"'";
-					List<Map<String, Object>> childId = relationService.getMapList(getToken(), sql);
-					EcmDocument docu = documentService.getObjectById(getToken(), childId.get(0).get("CHILD_ID").toString());
-					if(docu != null) {
-						ReplyCfgEntity en = customCacheService.getReplyCfg(getToken(), doc.getTypeName());
-						if( en == null) {
-							mp.put("code", ActionContext.FAILURE);
-						}else {
-							mp.put("code", ActionContext.SUCESS);
-							mp.put("typeName", en.getToType());
-							mp.put("includeRefDoc", en.isIncludeRefDoc());
-							for(String attr: en.getAttrNames().keySet()) {
-								valmp.put(attr, docu.getAttributeValue(en.getAttrNames().get(attr)));
-							}
-							valmp.put("IS_CHILD", 0);
-							valmp.put("TYPE_NAME",en.getToType());
-							valmp.put("C_ITEM_TYPE","案卷");
-							String folderId = folderPathService.getFolderByPath(getToken(), "/整编库/工程设计");
-							valmp.put("FOLDER_ID", folderId);
-							String parentId = documentService.newObject(getToken(), valmp);
-							newRelation(id,parentId);
-						}
+				//查询移交单下的文件的id
+				String sql = "select CHILD_ID from ecm_relation where PARENT_ID='"+id+"'";
+				List<Map<String, Object>> lis = relationService.getMapList(getToken(), sql);
+				for(Map<String,Object> a:lis) {
+					//查询移交单下文件的属性信息
+					Map<String, Object> doc = documentService.getObjectMapById(getToken(), a.get("CHILD_ID").toString());
+					String coding=doc.get("CODING").toString();
+					//查询是否存在相同coding的文件
+					String condition = "CODING='"+coding+"' and C_ITEM_TYPE='文件' and id !='"+a.get("CHILD_ID")+"'";
+					List<EcmDocument> res = documentService.getObjects(getToken(), condition);
+					if(res != null && res.size() > 0) {
+						//获取文件的案卷id
+						String sql1 = "select PARENT_ID from ecm_relation where CHILD_ID='"+res.get(0).getId()+"'";
+						List<Map<String, Object>> lis2 = relationService.getMapList(getToken(), sql1);
+						//通过id获取属性信息
+						String parentId2 = lis2.get(0).get("PARENT_ID").toString();
+						EcmDocument result2 = documentService.getObjectById(getToken(), parentId2);
+						//库位号
+						String LOCATION = result2.getAttributeValue("C_LOCATION").toString()==null?""
+								:result2.getAttributeValue("C_LOCATION").toString();
+						//库号
+						String StoreCoding = result2.getAttributeValue("C_STORE_CODING").toString()==null?""
+								:result2.getAttributeValue("C_STORE_CODING").toString();
+						//档案号
+						String ArchiveCoding = result2.getAttributeValue("C_ARCHIVE_CODING").toString()==null?""
+								:result2.getAttributeValue("C_ARCHIVE_CODING").toString();
+						
+						String folderId=folderPathService.getFolderId(getToken(), doc, "2");
+						doc.put("C_LOCATION", LOCATION);
+						doc.put("C_STORE_CODING", StoreCoding);
+						doc.put("C_ARCHIVE_CODING", ArchiveCoding);
+						doc.put("FOLDER_ID", folderId);
+						EcmFolder folder = folderService.getObjectById(getToken(), folderId);
+						doc.put("ACL_NAME", folder.getAclName());
+						doc.put("STATUS", "整编");
+						documentService.updateObject(getToken(), doc);
+					}else {
+						mp.put("code", ActionContext.FAILURE);
+						mp.put("message", "文件"+coding+"没有对应案卷");
+						return mp;
 					}
-				}else {
-					mp.put("code", ActionContext.FAILURE);
 				}
 				documentService.updateStatus(getToken(), id, "整编", "");
 			}
@@ -157,17 +171,5 @@ public class Receiving4TC extends ControllerAbstract {
 			e.printStackTrace();
 		}
 		return mp;
-	}
-	private void newRelation(String oldParentId,String parentId) throws Exception {
-		String sql = "select CHILD_ID from ecm_relation where PARENT_ID = '"+oldParentId+"'";
-		List<Map<String, Object>> childId = relationService.getMapList(getToken(), sql);
-		for(Map<String,Object> id:childId) {
-			EcmRelation relation=new EcmRelation();
-			relation.setParentId(parentId);
-			relation.setChildId(id.get("CHILD_ID").toString());
-			relation.setName("irel_children");
-			String ids=relationService.newObject(getToken(), relation);
-			documentService.updateStatus(getToken(), id.get("CHILD_ID").toString(), "整编", "");
-		} 
 	}
 }

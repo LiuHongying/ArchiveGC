@@ -1,13 +1,16 @@
 <template>
   <DataLayout>
     <template v-slot:header>
-      <el-dialog title="保存当前查询条件" :visible.sync="saveDialogVisible" width="65%">
+      <el-dialog title="保存当前查询条件" :visible.sync="saveDialogVisible" width="50%">
         <span>
-          <el-form :inline="true">
-            <el-form-item>
-              <el-input></el-input>
-            </el-form-item>
-          </el-form>
+          <el-row :gutter="10">
+            <el-col :span="4">
+              <p>条件名称：</p>
+            </el-col>
+            <el-col :span="20">
+              <el-input v-model="inputValueName"></el-input>
+            </el-col>
+          </el-row>
         </span>
         <span slot="footer" class="dialog-footer">
         <el-button @click="saveDialogVisible = false">取消</el-button>
@@ -20,7 +23,7 @@
       </el-dialog>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:200px" v-model="inputValueNum" :placeholder="$t('message.inputQuestionLimit')"></el-input>
+          <el-input style="width:200px" v-model="inputValueNum" placeholder="查询字段范围：编码/题名"></el-input>
         </el-form-item>
         <el-form-item>
           <el-date-picker
@@ -40,7 +43,7 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search()">查询</el-button>
+          <el-button type="primary" @click="search()" icon="el-icon-search">查询</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="saveDialogVisible = true">保存当前查询条件</el-button>
@@ -115,6 +118,7 @@ export default {
 
       restaurants: [],
       inputValueNum: "",
+      inputValueName: "",
 
       gridList: [],
       itemDataList: [],
@@ -142,8 +146,6 @@ export default {
   },
 
   mounted() {
-    this.restaurants = this.loadAll();
-
     setTimeout(() => {
       this.topPercent = this.getStorageNumber(this.topStorageName, 60);
     }, 300);
@@ -155,32 +157,6 @@ export default {
       this.topPercent = topPercent;
       this.setStorageNumber(this.topStorageName, topPercent);
       //console.log(JSON.stringify(topPercent))
-    },
-
-    querySearch(queryString, cb) {
-      var restaurants = this.restaurants;
-      var results = queryString
-        ? restaurants.filter(this.createFilter(queryString))
-        : restaurants;
-      // 调用 callback 返回建议列表的数据
-      cb(results);
-    },
-
-    createFilter(queryString) {
-      return (restaurant) => {
-        return (
-          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
-          0
-        );
-      };
-    },
-
-    loadAll(indata) {
-      let _self = this;
-    },
-
-    handleSelect(val) {
-      this.selectedCondition = val;
     },
 
     onSelectChange(val) {
