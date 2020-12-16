@@ -60,6 +60,26 @@ export default {
     };
   },
   created() {
+    var integrityurl = window.location.href;
+    //是否包含ticket
+    let _self = this;
+    if(integrityurl.indexOf("ticket")>-1){
+      //var thirdPartyInterface = "http://10.100.3.168/sso/proxyValidate";
+      var thirdPartyInterface = "http://127.0.0.1:8089/sso/proxyValidate";
+      var m = new Map();
+      var ticket = integrityurl.substring(integrityurl.lastIndexOf("ticket")+7)
+      m.set("ticket",ticket);
+      m.set("service",thirdPartyInterface)
+      axios.post(thirdPartyInterface,JSON.stringify(m)).then(function(response){
+        if(response!=null){
+          var userName = response.data
+          console.log(userName)
+          _self.autoLogin(userName);
+        }
+      })
+    }else{
+      console.log("外部登录")
+    }
     // let loginName = this.$route.query.LoginName;
     
     // if(!loginName){
@@ -148,6 +168,46 @@ export default {
             });
         }
       });
+    },
+    autoLogin(userName) {
+      let _self = this;
+      var tocomp = _self.$route.query.redirect;
+      if (!tocomp) {
+        tocomp = "/";
+      }
+      _self.loading = true;
+      axios
+        .post("/archive/userLogin", JSON.stringify(userName))
+        .then(function(response) {
+          //console.log(response.data);
+          if (response.data.code == 1) {
+            _self.setCurrentUser(response.data.data);
+            sessionStorage.setItem("access-token", response.data.token);
+            sessionStorage.setItem("access-userName", response.data.userName);
+            sessionStorage.setItem("access-department",  response.data.department);
+            if (_self.rememberInfo) {
+              localStorage.setItem("ziecm-rememberInfo", "1");
+              localStorage.setItem("ziecm-ass12bn", _self.account.username);
+              localStorage.setItem("ziecm-ass12bp", _self.account.password);
+            } else {
+              localStorage.removeItem("ziecm-rememberInfo");
+              localStorage.removeItem("ziecm-ass12bn");
+              localStorage.removeItem("ziecm-ass12bp");
+            }
+            _self.$router.push({ path: tocomp });
+          } else if(response.data.code == 2){
+            _self.$message(response.data.msg);
+          }
+          else{
+            _self.$message(_self.$t("message.loginFailured"));
+          }
+          _self.loading = false;
+        })
+        .catch(function(error) {
+          console.log(error);
+          _self.$message(_self.$t("message.loginFailured"));
+          _self.loading = false;
+        });
     }
   }
 };
