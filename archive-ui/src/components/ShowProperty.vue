@@ -67,7 +67,7 @@ export default {
       formLabelWidth: "150px",
       currentLanguage: "zh-cn",
       permit:5,
-      activeNames:'',
+      activeNames:[],
       dataList: {
         rowdata: {
           parentId:"",
@@ -116,7 +116,8 @@ export default {
     formName:{type:String,default:""},
     folderId: {type:String,default:""},
     folderPath:{type:String,default:""},
-    showUploadFile: {type:Boolean, default:true}
+    showUploadFile: {type:Boolean, default:true},
+    extendAllTab:{type:Boolean, default:true}
   },
   methods: {
     setMainObject(obj){
@@ -233,9 +234,16 @@ export default {
         .then(function(response) {
          
           _self.bindData(response.data.data);
-          if(response.data.data[0]){
-             //console.log(JSON.stringify(response.data.data[0].label));
-            _self.activeNames = [response.data.data[0].label];
+          _self.activeNames = [];
+          if(_self.extendAllTab && response.data.data){
+            for(var i=0 ; i<response.data.data.length;i++){
+              _self.activeNames.push(response.data.data[i].label);
+            }
+          }
+          else{
+            if(response.data.data[0]){
+              _self.activeNames.push(response.data.data[0].label);
+            }
           }
           _self.file=[];
           _self.fileList = [];
