@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.druid.util.StringUtils;
 import com.ecm.common.util.JSONUtils;
 import com.ecm.core.ActionContext;
 import com.ecm.core.dao.EcmDocumentMapper;
@@ -47,21 +48,34 @@ public class RecordProcessController extends ControllerAbstract {
 	public Map<String, Object> createStorageNum(@RequestBody String argStr) throws Exception {		
 		Map<String,Object> params= JSONUtils.stringToMap(argStr);
 		String ID= params.get("ids").toString();
-		String Store= params.get("Store").toString();
-		String Location= params.get("Location").toString();
 		List<String> listID = JSONUtils.stringToArray(ID);
-		List<String> listStore = JSONUtils.stringToArray(Store);
-		List<String> listLocation = JSONUtils.stringToArray(Location);
 		
-		int i = 0;
+		String strID =  "'" + listID.get(0) + "'";
+		for(int i=1;i<listID.size();i++){
+			strID += ", '";
+			strID += listID.get(i);
+			strID += "'";
+		}
 		
-		for(String fileId: listID) {
-			EcmDocument doc = documentService.getObjectById(getToken(), fileId);
-			doc.addAttribute("C_STORE_CODING", listStore.get(i));
-			doc.addAttribute("C_LOCATION", listLocation.get(i));
+		String sqlSearchStore = "select * from ecm_document ed where ID in ("+ strID +") order by C_ARCHIVE_DATE, C_DRAFT_DATE desc";
+		List<Map<String, Object>> store = documentService.getMapList(getToken(), sqlSearchStore);
+		
+		for(int i = 0; i<store.size(); i++) {
+			String storeID = (String) store.get(i).get("ID");
+			String typeNameStore = (String) store.get(i).get("TYPE_NAME");
 			
-			documentService.updateObject(getToken(), doc, null);
-			i += 1;
+			EcmDocument doc = documentService.getObjectById(getToken(), storeID);
+			
+			String archiveDate = (String) doc.getAttributes().get("C_STORE_CODING");
+			
+			if (StringUtils.isEmpty(archiveDate)) {
+				String sqlSearchComment = "select ITEM_CONTENT, C_ORDER_INDEX from ecm_document ed where C_COMMENT like '%"+ typeNameStore +"%'";
+				List<Map<String, Object>> docType = documentService.getMapList(getToken(), sqlSearchComment);
+				int orderIndex = (docType.get(i).get("C_ORDER_INDEX") != null)?(int)docType.get(i).get("C_ORDER_INDEX")+1:1;
+				
+				doc.addAttribute("C_STORE_CODING", orderIndex);
+				documentService.updateObject(getToken(), doc, null);
+			}
 		}
 		
 		Map<String, Object> mp = new HashMap<String, Object>();

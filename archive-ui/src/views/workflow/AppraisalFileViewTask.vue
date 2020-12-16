@@ -1,6 +1,26 @@
 <template>
   <DataLayout>
     <template v-slot:header>
+            <el-dialog :title="$t('application.Import')" :visible.sync="importdialogVisible" width="70%" :close-on-click-modal="false" :append-to-body="true">
+                <el-form size="mini" :label-width="formLabelWidth" v-loading='uploading'>
+                    <div style="height:150px;overflow-y:scroll; overflow-x:scroll;">
+                    <el-upload
+                        :limit="1"
+                        :file-list="fileListA"
+                        action
+                        :on-change="handleChange"
+                        :auto-upload="false"
+                        :multiple="true"
+                    >
+                        <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
+                    </el-upload>
+                    </div>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="importdialogVisible = false">{{$t('application.cancel')}}</el-button>
+                    <el-button type="primary" @click="uploadData()">{{$t('application.start')+$t('application.Import')}}</el-button>
+                </div>
+            </el-dialog>
       <el-dialog
         :title="$t('application.pendNot')"
         :visible.sync="pendNotVisible"
@@ -59,7 +79,7 @@
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
-          gridViewName="DesignCancelGrid"
+          gridViewName="AppraisalGrid"
           :condition="searchFileCondition"
           :optionWidth="1"
           :isShowMoreOption="false"
@@ -113,20 +133,15 @@
       <div :style="{position:'relative'}">
             <el-tabs value="t01" >
               <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01" >
-                <el-row v-if="allowEdit||isShowReject">
+                <el-row >
                   <el-col :span="24" style="text-align: left">
                     <el-form :inline="true" :model="filters" @submit.native.prevent>
-                      <template v-if="allowEdit">
-                        <el-form-item>
-                          <el-button
-                            type="primary"
-                            @click="beforeAddFile"
-                          >{{ $t("application.new") }}</el-button>
-                        </el-form-item>
-                        <el-form-item>
-                          <el-button type="warning" @click="removeRelation">{{ $t("application.delete") }}</el-button>
-                        </el-form-item>
-                      </template>
+                      <el-form-item>
+                        <el-button type="primary" @click="download()">下载鉴定清册</el-button>
+                      </el-form-item>
+                      <el-form-item v-if='isShowUpdate'>
+                        <el-button type="primary" @click="beforeUploadFile('/dc/updatePrimaryContent')">更新鉴定清册</el-button>
+                      </el-form-item>
                       <template v-if="isShowReject">
                         <el-form-item>
                           <el-button type="primary" @click="pendNot">{{ $t("application.pendNot") }}</el-button>
@@ -194,12 +209,13 @@ export default {
     event: "change"
   },
   props: {
-    allowEdit: { type: Boolean, default: true },
+    allowEdit: { type: Boolean, default: false },
     isShowPage: { type: Boolean, default: true },
     parentId: { type: String, default: "" },
     processDefinitionId: { type: String, default: "" },
     activityName: { type: String, default: "" },
-    isShowReject: { type: Boolean, default: false }
+    isShowReject: { type: Boolean, default: false },
+    isShowUpdate: { type: Boolean,default:false}
   },
   data() {
     return {
@@ -234,13 +250,67 @@ export default {
       archiveId: "", //案卷ID
       volumesFileVisible: false,
       pendNotVisible:false,
-      tableHeight:427
+      tableHeight:427,
+      importdialogVisible:false,
+      fileListA: [],
+      uploadUrl:''      
     };
   },
   mounted() {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
+        beforeUploadFile(uploadpath){
+            let _self=this;
+            if(_self.parentId==undefined||_self.parentId==''){
+                _self.$message({
+                        showClose: true,
+                        message: _self.$t('message.PleaseSelectOneFile'),
+                        duration: 2000,
+                        type: "warning"
+                    });
+                return;
+            }
+            _self.uploadUrl=uploadpath;
+            _self.fileList=[];
+            _self.importdialogVisible=true;
+        },
+          uploadData() {
+            let _self = this;
+            let formdata = _self.getFormData();
+            _self.uploading=true;
+            formdata.append("id",_self.parentId)
+            _self
+                .axios({
+                headers: {
+                    "Content-Type": "application/json;charset=UTF-8"
+                },
+                datatype: "json",
+                method: "post",
+                data: formdata,
+                url: _self.uploadUrl
+                })
+                .then(function(response) {
+                _self.importdialogVisible = false;
+                _self.uploading=false;
+                _self.$message({
+                        showClose: true,
+                        message: _self.$t('application.Import')+_self.$t('message.success'),
+                        duration: 2000,
+                        type: 'success'
+                    });
+                })
+                .catch(function(error) {
+                _self.uploading=false;
+                console.log(error);
+                });
+            },
+    download(){
+         console.log(this.allowEdit)
+    console.log(this.isShowUpdate)
+     // let url = this.axios.defaults.baseURL+"/dc/getContent?id="+this.parentId+"&token="+sessionStorage.getItem('access-token')+"&action=download";
+      //window.open(url, '_blank');
+    }, 
         checkCondition(){    
      let _self = this
      let cond = this.searchFileCondition
@@ -309,6 +379,25 @@ export default {
                 });
            
     },
+
+
+    getFormData(){
+            let _self = this;
+            let formdata = new FormData();
+            var data = {};
+            data["id"] = _self.parentId;
+            formdata.append("metaData", JSON.stringify(data));
+            _self.fileListA.forEach(function(file) {
+                formdata.append("uploadFile", file.raw, file.name);
+            });
+            console.log(data)
+            console.log(formdata)
+            return formdata;
+    },
+      handleChange(file, fileList) {
+            this.fileListA = fileList;
+            console.log(this.fileListA)
+                    },
     removeRelation(){
       let ids = []
       let _self = this

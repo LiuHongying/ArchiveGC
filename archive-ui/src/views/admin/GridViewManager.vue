@@ -70,17 +70,17 @@
             <el-input  v-model="scope.row.name"></el-input>
           </template>
         </el-table-column>
-        <el-table-column label="说明" width="20%">
+        <el-table-column label="说明" min-width="180">
           <template slot-scope="scope">
             <el-input  v-model="scope.row.description"></el-input>
           </template>
         </el-table-column>
-        <el-table-column label="条件"  min-width="160">
+        <el-table-column label="条件"  width="180">
           <template slot-scope="scope">
             <el-input  v-model="scope.row.condition"></el-input>
           </template>
         </el-table-column>
-        <el-table-column label="排序"  min-width="90">
+        <el-table-column label="排序"  width="180">
           <template slot-scope="scope">
             <el-input  v-model="scope.row.orderBy"></el-input>
           </template>
@@ -95,10 +95,9 @@
             </el-select>
           </template>
         </el-table-column>
-        <el-table-column label="操作"  width="320">
+        <el-table-column label="操作"  width="280">
           <template slot-scope="scope">
             <router-link :to="{path:'/managercenter/gridviewitemmanager',query:{parentid:scope.row.id,name:scope.row.name}}"><el-button :plain="true" type="info" size="small" icon="edit">查看</el-button></router-link>
-            &nbsp; 
             <el-button :plain="true" type="primary" size="small" icon="edit" @click="saveitem(scope.row)">保存</el-button>
             <el-button :plain="true" type="warning" size="small" icon="edit" @click="copyitem(scope.row)">复制</el-button>
             <el-button :plain="true" type="danger" size="small" icon="delete" @click="delitem(scope.row)">{{$t('application.delete')}}</el-button>

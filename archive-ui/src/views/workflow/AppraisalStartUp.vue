@@ -1,7 +1,7 @@
 <template>
-    <el-container>
-        <el-main>
-            <ShowProperty
+   <el-container>
+       <el-main>
+           <ShowProperty
                     ref="ShowProperty"
                     @onSaved="onSaved"
                     width="100%"
@@ -10,147 +10,68 @@
                     v-bind:typeName="typeName"
                 >
                 </ShowProperty>
-        <el-form :inline="true">
-        <el-form-item label="本单位/部门领导:" label-width="150px">
-        <UserSelectInput :roleName='departmentLeader' v-model="reviewer1" v-bind:inputValue="reviewer1" ></UserSelectInput>
-        </el-form-item>
-        <el-form-item label="文件形成单位/部门领导:" label-width="200px">
-        <UserSelectInput :roleName='departmentLeader' v-model="reviewer2" v-bind:inputValue="reviewer2" ></UserSelectInput>
-        </el-form-item>
-        <el-form-item label="公司主管领导:" label-width="150px">
-        <UserSelectInput :roleName='companyLeader' v-model="reviewer3" v-bind:inputValue="reviewer3" ></UserSelectInput>                
-        </el-form-item>
-        </el-form>
-                <BorrowFile ref="workflowFile"
+                <DesignFile ref="workflowFile"
                     allowEdit
                     :isShowPage="false"
                     v-model="workflowFileList"
                     :workflowObj="workflowObj"
                 >
-                </BorrowFile>
-                <el-dialog
-                title="档案利用承诺书"
-                :visible.sync="dialogVisible"
-                :show-close="true"
-                width="50%"
-                :append-to-body="true"
-                modal-append-to-body="false" 
-                >
-                <span>
-                中国核电工程有限公司</br>
-                档案利用承诺书  </br>
-
-                根据《中华人民共和国档案法》以及中国核电工程有限公司（以下简称“公司”）档案利用工作有关规定，作为公司员工，本人对档案利用作以下承诺：</br>
-                一、自觉遵守国家档案法律、法规及公司的档案利用规章制度；</br>
-                二、所借阅档案不得做任何涂改、抽取、替换或添加信息；</br>
-                三、所借阅档案应妥善保管、不得损坏、丢失，已装订成册的不得拆散；</br>
-                四、所借阅档案不得扩大知悉范围，不得拍照、复制或转借他人；</br>
-                五、所借阅档案应在规定时间内归还；</br>
-                六、本《承诺书》未尽事宜按国家有关法律法规和公司规定执行。</span>
-
-                </el-dialog>
-
-            <el-radio v-model="accept" label="接受">接受档案承诺利用书</el-radio>
-            <el-button type="success" @click="open">档案利用承诺书</el-button>
-
-                <div class="dialog-footer" style="float:right">
-                    <slot name="footerButton">
-                        <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
-                        
-                        <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button>
-                        <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
-                    </slot>
-                    
-                </div>
-
-        </el-main>
-                    
-    </el-container>
-    
+                </DesignFile>
+       </el-main>
+       <el-footer>
+           <el-button type="primary" @click="closePage()">{{$t('application.cancel')}}</el-button>
+           <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
+       </el-footer>
+   </el-container>    
 </template>
 <script type="text/javascript">
     import ShowProperty from "@/components/ShowProperty";
     import DataGrid from "@/components/DataGrid";
-    import AddCondition from '@/views/record/AddCondition';
-    import RejectButton from "@/components/RejectButton";
-    import ExcelUtil from '@/utils/excel.js'
-    import DataSelect from '@/components/ecm-data-select'
-    import DataLayout from '@/components/ecm-data-layout'
-    import AttachmentFile from "@/views/dc/AttachmentFile.vue"
-    import BorrowFile from "@/views/workflow/BorrowFile.vue"
-    import UserSelectInput from '@/components/controls/BorrowUserSelectInput'
+    import DesignFile from "@/views/workflow/AppraisalFile.vue";
     export default {
         name: "StartupWorkflow",
         permit: 1,
         components: {
             ShowProperty:ShowProperty,
             DataGrid:DataGrid,
-            AddCondition:AddCondition,
-            DataSelect:DataSelect,
-            RejectButton:RejectButton,
-            DataLayout:DataLayout,
-            AttachmentFile:AttachmentFile,
-            BorrowFile:BorrowFile,
-            UserSelectInput:UserSelectInput
+            DesignFile:DesignFile
         },
         data() {
                 return {
-      // 本地存储高度名称
-      topStorageName: "ReceivedDCHeight",
-      // 非split pan 控制区域高度
-      startHeight: 135,
-      // 顶部百分比*100
-      topPercent: 65,
-      // 顶部除列表高度
-      topbarHeight: 35,
-      // 底部除列表高度
-      bottomHeight: 120,
-      dialogName: "",
-      propertyVisible: false,
-      typeName: "借阅单",
-      isOnly: false,
-      butt: false,
-      workflowFileList: [],
-      saveButt: false,
-      departmentLeader:'部门领导',
-      companyLeader:'公司领导',
-      reviewer1:'',
-      reviewer2:'',
-      reviewer3:'',
-      accept:"不接受",
-      dialogVisible:false
+                    // 本地存储高度名称
+                    topStorageName: 'ReceivedDCHeight',
+                    // 非split pan 控制区域高度
+                    startHeight: 135,
+                    // 顶部百分比*100
+                    topPercent: 65,
+                    // 顶部除列表高度
+                    topbarHeight: 35,
+                    // 底部除列表高度
+                    bottomHeight: 120,
+                    dialogName:"",
+                    propertyVisible:false,
+                    
+                    isOnly:false,
+                    butt:false,
+                    typename:"设计文件作废审批单",
+                    saveButt:false
                 }
             },
             props:{
                 workflowObj:{type:Object,default:{}},
                 showUploadFile:{type:Boolean,default:true},
-                workflowFileList:{type:Array,default:[]}
+                workflowFileList:{type:Array,default:new Array()},
             },
+            
             mounted(){
                 // this.getWorkflows();
             },
             methods:{
-            open(){
-                this.dialogVisible=true
-            },
                 loadFormInfo(){
-                    this.$refs.ShowProperty.myTypeName=this.typeName;
+                    this.$refs.ShowProperty.myTypeName=this.workflowObj.FORMNAME;
                     this.$refs.ShowProperty.loadFormInfo();
                 },
                 startUpWorkflow(workflow){
-                  if(this.accept!="接受"){
-                      this.$message("请接受档案利用承诺书!")
-                      return
-                  }
-                  if(this.reviewer1==''){
-                      this.$message("请完成借阅单必填项！本部门领导为必填项!")
-                      return
-                    }
-                   if(this.$refs.workflowFile.sameDepartMent == false){
-                   if(this.reviewer2==''){
-                    this.$message("请完成借阅单必填项！形成部门领导为必填项!")
-                      return                }
-                   }
                    let _self = this;
                     _self.butt=true;
                     if(!this.$refs.ShowProperty.validFormValue()){
@@ -164,16 +85,7 @@
                         fileIds.push(_self.workflowFileList[n].ID);
                     }
                     m.set("childFileId",fileIds);
-                    axios.post("/dc/countDocuments", JSON.stringify(m))
-                                        .then(function (response) {
-                        let code = response.data.code
-                        if(code==1){
-                        if(_self.reviewer3==''){
-                            _self.$message("需要选择公司领导!")
-                            return
-                        }
-                        }
-                    _self.butt = false
+                    // m.set("STATUS","流程中")
                     var c;
                     for(c in _self.$refs.ShowProperty.dataList)
                     {
@@ -185,7 +97,7 @@
                             if(dataRows[i].attrName !='FOLDER_ID'&&dataRows[i].attrName !='ID')
                             {
                             var val = dataRows[i].defaultValue;
-                            if(val && dataRows[i].isRepeat){
+                            if(val && dataRows[i].isRepeat && val instanceof Array){
                                 var temp = "";
                             // console.log(val);
                                 for(let j=0,len=val.length;j<len;j++){
@@ -194,6 +106,7 @@
                                 }
                                 temp = temp.substring(0,temp.length-1);
                                 val = temp;
+                                console.log(val);
                             }
                             m.set(dataRows[i].attrName, val);
                             }
@@ -210,6 +123,8 @@
                         m.set('FOLDER_ID',_self.$refs.ShowProperty.myFolderId);
                         m.set("parentDocId", _self.parentId);
                         m.set("relationName",_self.relationName);
+                        console.log(_self.$refs.ShowProperty.myTypeName)
+                        console.log(_self.$refs.ShowProperty.myFolderId)
                     }
                     _self.validateData(m,function(isOk)
                     {
@@ -225,9 +140,6 @@
                             _self.butt=false;
                             return;
                         }
-                        m.set("C_REVIEWER1",_self.reviewer1)
-                        m.set("C_REVIEWER2",_self.reviewer2)
-                        m.set("C_REVIEWER3",_self.reviewer3)
                         let formdata = new FormData();
                         formdata.append("metaData",JSON.stringify(m));
                         if(_self.$refs.ShowProperty.file!="")
@@ -265,6 +177,7 @@
                                 axios
                                     .post("/workflow/startWorkflowById", JSON.stringify(m))
                                     .then(function (response) {
+                                    console.log(response);
                                     _self.$message({
                                         showClose: true,
                                         message: "流程发起成功!",
@@ -313,11 +226,10 @@
                         }
                         
                     });
-                     })
+
                 },
-                closePage(){
-                    let flag = false;
-                    this.$emit("closedialog", flag);
+                closePage(pv){
+                    this.$emit("close");
                 },
                 // 保存文档
                 saveItem()
@@ -355,6 +267,7 @@
                                 }
                                 temp = temp.substring(0,temp.length-1);
                                 val = temp;
+                                console.log(val);
                             }
                             m.set(dataRows[i].attrName, val);
                             }
@@ -371,6 +284,8 @@
                         m.set('FOLDER_ID',_self.$refs.ShowProperty.myFolderId);
                         m.set("parentDocId", _self.parentId);
                         m.set("relationName",_self.relationName);
+                        console.log(_self.$refs.ShowProperty.myTypeName)
+                        console.log(_self.$refs.ShowProperty.myFolderId)
                     }
                     _self.validateData(m,function(isOk)
                     {
@@ -482,5 +397,8 @@
     }
 </script>
 <style scoped>
-
+.el-footer {
+    text-align: right;
+    padding: 10px;
+  }
 </style>

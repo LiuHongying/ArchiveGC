@@ -286,7 +286,7 @@ public class DocMutiStartUp implements ExecutionListener, JavaDelegate, TaskList
 			}
 		}
 		return multiInstanceRootExecution;
-	}
+	} 
 
 	private Map<String, Object> loadProcessBusinessLogicToVariable(IEcmSession ecmSession,
 			org.flowable.variable.api.delegate.VariableScope arg0) {

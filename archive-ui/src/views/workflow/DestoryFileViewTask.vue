@@ -59,7 +59,7 @@
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
-          gridViewName="DesignCancelGrid"
+          gridViewName="AppraisalGrid"
           :condition="searchFileCondition"
           :optionWidth="1"
           :isShowMoreOption="false"
@@ -92,7 +92,7 @@
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
-          gridViewName="WorkflowFileGrid"
+          gridViewName="AppraisalGrid"
           condition=" and a.NAME='irel_children'"
           :optionWidth="1"
           :isShowPropertyButton="false"
@@ -144,7 +144,7 @@
                   v-bind:tableHeight="200"
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
-                  gridViewName="DesignCancelGrid"
+                  gridViewName="AppraisalGrid"
                   condition=" and a.NAME='irel_children'"
                   :optionWidth="1"
                   :isshowCustom="false"
@@ -194,7 +194,7 @@ export default {
     event: "change"
   },
   props: {
-    allowEdit: { type: Boolean, default: true },
+    allowEdit: { type: Boolean, default: false },
     isShowPage: { type: Boolean, default: true },
     parentId: { type: String, default: "" },
     processDefinitionId: { type: String, default: "" },

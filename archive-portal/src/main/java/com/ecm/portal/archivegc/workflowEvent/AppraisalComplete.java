@@ -38,10 +38,14 @@ import com.ecm.core.service.ContentService;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
+import com.ecm.core.service.RelationService;
 import com.ecm.icore.service.IEcmSession;
 
 @Component(value = "AppraisalCompleteListener")
 public class AppraisalComplete implements JavaDelegate {
+	
+	@Autowired
+	private RelationService relationService;
 	@Autowired
 	private ContentService contentService;
 	@Autowired
@@ -68,12 +72,12 @@ public class AppraisalComplete implements JavaDelegate {
 			EcmDocument ecmObject = documentService.getObjectById(ecmSession.getToken(), formId);
 			EcmContent content = new EcmContent();
 			content = contentService.getPrimaryContent(ecmSession.getToken(), formId);
-			InputStream is = content.getInputStream();
+			InputStream is = contentService.getContentStream(ecmSession.getToken(), content);
 			XSSFWorkbook wb = new XSSFWorkbook(is);
 			//获取到EXCEL了，现在开始操作//
 			Sheet sheet = wb.getSheet("Data");					
 			Map<String,Integer> mapping = new HashMap<>();
-			for (Cell cell : sheet.getRow(0)) {
+			for (Cell cell : sheet.getRow(1)) {
 				mapping.put(cell.getStringCellValue(), cell.getColumnIndex());		//获取所有key labels
 			}
 			int idIndex = mapping.get("ID");
@@ -81,15 +85,16 @@ public class AppraisalComplete implements JavaDelegate {
 			int newDateIndex = mapping.get("新保管期限");//获取相关列的index
 			for(int i = 2 ;i <= sheet.getLastRowNum();i++) {
 				Row temp = sheet.getRow(i);
-				Cell ress = temp.getCell(i);
+				Cell ress = temp.getCell(resIndex);
 				if(ress!=null && ress.getStringCellValue().equals("销毁")) {
 					isCancel = true;		//有状态为销毁的记录，这个时候说明需要创建销毁单
 				}
 			}
 			if(isCancel == true) {
 				Map<String,Object> cancelMap = new HashMap<String,Object>();
-				cancelMap.put("status","新建");
+				cancelMap.put("STATUS","新建");
 				cancelMap.put("TYPE_NAME", "档案销毁单");
+				cancelMap.put("CODING", "@sequence");
 				CancelId = documentService.newObject(ecmSession.getToken(), cancelMap);
 			}
 			for(int rownum = 2;rownum <= sheet.getLastRowNum();rownum++) {		//默认第三行是数据
@@ -100,18 +105,25 @@ public class AppraisalComplete implements JavaDelegate {
 		    if(res!=null) {
 		    	if(res.getStringCellValue().equals("销毁")) {	//把表单文件加到销毁单上
 		    	String id = idres.getStringCellValue();
+		    	EcmDocument dc = documentService.getObjectById(ecmSession.getToken(), id);
+		    	Map<String,Object> dcAttr = dc.getAttributes();
+		    	dcAttr.put("C_APPRAISAL_RESULT", res.getStringCellValue());
+		    	documentService.updateObject(ecmSession.getToken(), dcAttr);
 		    	EcmRelation relation = new EcmRelation();
 		    	relation.setParentId(CancelId);
 		    	relation.setChildId(id);
 		    	relation.setName("irel_children");
+		    	relationService.newObject(ecmSession.getToken(),relation);
+		    	
 		    	}
 		    	//自动延期更新属性
-		    	if(res.getStringCellValue().equals("自动延期")&&newDate.getStringCellValue()!=null) {
+		    	if(res.getStringCellValue().equals("延期")&&newDate.getStringCellValue()!=null) {
 		    		String id = idres.getStringCellValue();
 		    		EcmDocument ecs = documentService.getObjectById(ecmSession.getToken(), id);
 		    		String date = newDate.getStringCellValue();
 		    		Map<String,Object> temps = ecs.getAttributes();
 		    		temps.put("C_RETENTION",date);
+		    		temps.put("C_APPRAISAL_RESULT", res.getStringCellValue());
 		    		documentService.updateObject(ecmSession.getToken(), temps);         //更新
 		    	}
 		    }

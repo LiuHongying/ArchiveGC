@@ -78,6 +78,8 @@
     import CancelStartUp from "@/views/workflow/CancelStartUp.vue"
     import DesignChangeFileStartup from "@/views/workflow/DesignChangeFileStartup.vue"
     import DesignCancelStartUp from "@/views/workflow/DesignCancelStartUp.vue"
+    import AppraisalStartUp from "@/views/workflow/AppraisalStartUp.vue"
+    import DestoryStartUp from "@/views/workflow/DestoryStartUp.vue"
     export default {
         name: "TodoTask",
         permit: 1,
@@ -96,7 +98,9 @@
             RelyOnFolderSelectStartUp : RelyOnFolderSelectStartUp,
             CancelStartUp : CancelStartUp,
             DesignChangeFileStartup :DesignChangeFileStartup,
-            DesignCancelStartUp:DesignCancelStartUp
+            DesignCancelStartUp:DesignCancelStartUp,
+            AppraisalStartUp:AppraisalStartUp,
+            DestoryStartUp:DestoryStartUp
         },
         data() {
                 return {

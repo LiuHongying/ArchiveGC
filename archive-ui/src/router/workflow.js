@@ -213,5 +213,68 @@ path: '/workflow/CancelViewReadOnly',
 name: '作废通知单作废流程只读视图',
 component: () => import('@/views/workflow/CancelViewReadOnly.vue')
 },
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'DesignCancelStartUp'
+},
+path: '/workflow/DesignCancelStartUp',
+name: '设计文件作废审批流程启动',
+component: () => import('@/views/workflow/DesignCancelStartUp.vue')
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'DesignCancelViewReadOnly'
+},
+path: '/workflow/DesignCancelViewReadOnly',
+name: 'DesignCancelViewReadOnly',
+component: () => import('@/views/workflow/DesignCancelViewReadOnly.vue')
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'DesignCancelView'
+},
+path: '/workflow/DesignCancelView',
+name: 'DesignCancelView',
+component: () => import('@/views/workflow/DesignCancelView.vue')
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'AppraisalView'
+},
+path: '/workflow/AppraisalView',
+name: 'AppraisalView',
+component: () => import('@/views/workflow/AppraisalView.vue')
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'AppraisalViewReadOnly'
+},
+path: '/workflow/AppraisalViewReadOnly',
+name: 'AppraisalViewReadOnly',
+component: () => import('@/views/workflow/AppraisalViewReadOnly.vue')
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'DestoryViewReadOnly'
+},
+path: '/workflow/DestoryViewReadOnly',
+name: 'DestoryViewReadOnly',
+component: () => import('@/views/workflow/DestoryViewReadOnly.vue')
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'DestoryStartUp'
+},
+path: '/workflow/DestoryStartUp',
+name: 'DestoryStartUp',
+component: () => import('@/views/workflow/DestoryStartUp.vue')
+},
     ]
   }

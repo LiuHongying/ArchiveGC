@@ -1,6 +1,23 @@
 <template>
   <el-container>
     <el-main>
+      <div>
+        <el-dialog
+          append-to-body
+          :visible="dialogVisable"
+          @close="dialogVisable = false"
+          width="90%"
+          :close-on-click-modal="false"
+          v-dialogDrag
+        >
+          <component
+            :is="dialogComponent"
+            :workflowObj="workflow"
+            :typeName="workflow.FORMNAME"
+            @closedialog="closeDialog"
+          ></component>
+        </el-dialog>
+      </div>
       <el-row>
         <el-col :span="16">
           <el-card :body-style="{ height: '120px' }">
@@ -137,8 +154,20 @@
               <span style="float: left" class="ecmtitle">流程配置</span>
             </div>
             <el-row>
-              <el-col :xs="8" :sm="6" :md="4" :lg="4" :xl="4" v-for="item in icons" :key="item.title" >
-                <div :title="item.title" :class="item.icon"></div>
+              <el-col
+                :xs="8"
+                :sm="6"
+                :md="4"
+                :lg="4"
+                :xl="4"
+                v-for="item in icons"
+                :key="item.title"
+              >
+                <div
+                  :title="item.title"
+                  :class="item.icon"
+                  @click="onIconClick(item)"
+                ></div>
                 <div class="ecm-icon-desc">{{ item.name }}</div>
               </el-col>
             </el-row>
@@ -274,6 +303,12 @@
   </el-container>
 </template>
 <script>
+import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue";
+import CopyStartUp from "@/views/workflow/CopyStartUp.vue";
+import DesignCancelStartUp from "@/views/workflow/DesignCancelStartUp.vue";
+import DesignChangeFileStartup from "@/views/workflow/DesignChangeFileStartup.vue";
+import RelyOnFolderSelectStartUp from "@/views/workflow/RelyOnFolderSelectStartUp.vue";
+import CancelStartUp from "@/views/workflow/CancelStartUp.vue";
 export default {
   data() {
     return {
@@ -295,43 +330,58 @@ export default {
         carouselData: [],
         regulationData: [],
       },
-      icons:[
+      icons: [
         {
           title: "文档借阅",
           icon: "ecm-icon-borrow",
-          name: "文档借阅",
+          name: "文档借阅流程",
+          type: "dialog",
+          openpath: "BorrowStartUp",
         },
         {
           title: "文档复制",
           icon: "ecm-icon-cp",
-          name: "文档复制",
+          name: "文档复制流程",
+          type: "dialog",
+          openpath: "CopyStartUp",
         },
         {
           title: "文档违规处理",
           icon: "ecm-icon-docviolatehandle",
           name: "文档违规处理",
+          type: "dialog",
         },
         {
           title: "设计文件修改",
           icon: "ecm-icon-designdoc",
-          name: "设计文件修改",
+          name: "设计文件修改流程",
+          type: "dialog",
+          openpath: "DesignChangeFileStartup",
         },
         {
           title: "科研预归档借阅",
           icon: "ecm-icon-prearchive",
-          name: "科研预归档借阅",
+          name: "科研预归档借阅流程",
+          type: "dialog",
+          openpath: "RelyOnFolderSelectStartUp",
         },
         {
           title: "科研文件修改",
           icon: "ecm-icon-scdoc",
-          name: "科研文件修改",
+          name: "科研文件修改流程",
+          type: "dialog",
+          openpath: "RelyOnFolderSelectStartUp",
         },
         {
           title: "作废通知单",
           icon: "ecm-icon-cancelnotice",
-          name: "作废通知单",
+          name: "作废通知单作废流程",
+          type: "dialog",
+          openpath: "CancelStartUp",
         },
       ],
+      dialogVisable: false,
+      dialogComponent: "",
       inputkey: "",
       scroll: true,
       loading: false,
@@ -350,7 +400,16 @@ export default {
       groupData: [],
       collectionChart: Object,
       dialogVisible: false,
+      workflow: {},
     };
+  },
+  components: {
+    BorrowStartUp: BorrowStartUp,
+    CopyStartUp: CopyStartUp,
+    DesignCancelStartUp: DesignCancelStartUp,
+    DesignChangeFileStartup: DesignChangeFileStartup,
+    RelyOnFolderSelectStartUp: RelyOnFolderSelectStartUp,
+    CancelStartUp: CancelStartUp,
   },
   created() {
     let _self = this;
@@ -366,6 +425,35 @@ export default {
     _self.docChart5 = _self.echarts.init(document.getElementById("docChart5"));
   },
   methods: {
+    onIconClick(item) {
+      let _self = this;
+      let _type = item.type;
+
+      var m = new Map();
+      m.set("processDefinitionKey", item.name);
+
+      axios
+        .post("/dc/getWorkflow", JSON.stringify(m))
+        .then(function (response) {
+          _self.workflow = response.data.data[0];
+          console.log(_self.workflow);
+          _self.borrowVisible = true;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
+      if (_type == null || _type == undefined) {
+        _type = "dialog";
+      }
+      if (_type == "dialog") {
+        _self.dialogComponent = item.openpath;
+        _self.dialogVisable = true;
+      }
+    },
+    closeDialog(val) {
+      this.dialogVisable = val;
+    },
     //获取待办任务列表，最多五条
     getToDoList() {
       let _self = this;
@@ -623,5 +711,4 @@ export default {
   max-width: 100%;
   max-height: 100%;
 }
-
 </style>
