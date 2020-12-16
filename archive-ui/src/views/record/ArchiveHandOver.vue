@@ -204,20 +204,14 @@ export default {
       }
 
       var id = [];
-      var fieldStr = [];
-      var locationList = [];
 
       var i;
       for (i in _self.selectedItems) {
         id.push(_self.selectedItems[i]["ID"]);
-        fieldStr.push(_self.DCinputValueNum);
-        locationList.push(_self.DCinputValueNum + i);
       }
 
       let mp = new Map();
       mp.set("ids", id);
-      mp.set("Store", fieldStr);
-      mp.set("Location", locationList);
 
       axios
         .post("/record/createStorageNum", JSON.stringify(mp), {
