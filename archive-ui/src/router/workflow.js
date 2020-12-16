@@ -258,6 +258,23 @@ path: '/workflow/AppraisalViewReadOnly',
 name: 'AppraisalViewReadOnly',
 component: () => import('@/views/workflow/AppraisalViewReadOnly.vue')
 },
-
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'DestoryViewReadOnly'
+},
+path: '/workflow/DestoryViewReadOnly',
+name: 'DestoryViewReadOnly',
+component: () => import('@/views/workflow/DestoryViewReadOnly.vue')
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'DestoryStartUp'
+},
+path: '/workflow/DestoryStartUp',
+name: 'DestoryStartUp',
+component: () => import('@/views/workflow/DestoryStartUp.vue')
+},
     ]
   }
