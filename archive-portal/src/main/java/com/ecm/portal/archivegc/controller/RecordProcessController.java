@@ -78,31 +78,49 @@ public class RecordProcessController extends ControllerAbstract {
 		String ID= args.get("ids").toString();
 		List<String> listID = JSONUtils.stringToArray(ID);
 		
-		int i = 0;
 		
 		for (String fileId: listID) {
-			String sqlSecurity = "select C_SECURITY_LEVEL from ecm_document ed where ID = '" + fileId + "'";
-			List<Map<String, Object>> listSecurity = documentService.getMapList(getToken(), sqlSecurity.toString());
-			String SecurityLevel = (String) listSecurity.get(0).get("C_SECURITY_LEVEL");
-			String sqlAcl = "select NAME from ecm_acl ea where DESCRIPTION = '" + SecurityLevel + "'";
-			List<Map<String, Object>> listAcl = documentService.getMapList(getToken(), sqlAcl.toString());
-			String aclName = (String) listAcl.get(0).get("NAME");
+			
+			EcmDocument parentDoc= documentService.getObjectById(getToken(), fileId);
+			
+			String parentSecurityLevel= parentDoc.getSecurityLevel();
+			if(parentSecurityLevel==null||"".equals(parentSecurityLevel)) {
+				parentSecurityLevel="内部公开";
+			}
+			String sqlAcl = "select NAME from ecm_acl ea where DESCRIPTION = '" + parentSecurityLevel + "'";
+			List<Map<String, Object>> listAcl = documentService.getMapList(getToken(), sqlAcl);
+			String parentAclName= listAcl.get(0).get("NAME").toString();
+			
+			String parentFolderId = folderpathService.getReleaseFolderId(getToken(), parentDoc.getAttributes());
+			parentDoc.addAttribute("FOLDER_ID", parentFolderId);
+			parentDoc.addAttribute("STATUS", Constants.INSTORAGE);
+			parentDoc.addAttribute("IS_RELEASED", "1");
+			parentDoc.addAttribute("ACL_NAME", parentAclName);
+			
+			documentService.updateObject(getToken(), parentDoc, null);
+			
 			String sql1="select child_id from ecm_relation where parent_id='"+fileId+"' "+ " and name='irel_children'";
-			List<Map<String,Object>> childrenId= documentService.getMapList(getToken(), sql1);
-			Map<String,Object> child= childrenId.get(i);
-			String childidStr=(String) child.get("child_id");
+			List<Map<String,Object>> childrenIds= documentService.getMapList(getToken(), sql1);
 			
-			EcmDocument doc = documentService.getObjectById(getToken(), fileId);
-			EcmDocument docChild= documentService.getObjectById(getToken(), childidStr);
-			Map<String,Object> attr=docChild.getAttributes();
+			for(int n=0;childrenIds!=null&&n<childrenIds.size();n++ ) {
+				Map<String,Object> child= childrenIds.get(n);
+				String childId=child.get("child_id").toString();
+				EcmDocument childDoc=documentService.getObjectById(getToken(), childId);
+				String childSecurityLevel= childDoc.getSecurityLevel();
+				if(childSecurityLevel==null||"".equals(childSecurityLevel)) {
+					childSecurityLevel="内部公开";
+				}
+				String sqlAclChild = "select NAME from ecm_acl ea where DESCRIPTION = '" + childSecurityLevel + "'";
+				
+				List<Map<String, Object>> listAclChild = documentService.getMapList(getToken(), sqlAclChild);
+				String childAclName= listAclChild.get(0).get("NAME").toString();
+				childDoc.addAttribute("FOLDER_ID", parentFolderId);
+				childDoc.addAttribute("STATUS", Constants.INSTORAGE);
+				childDoc.addAttribute("IS_RELEASED", "1");
+				childDoc.addAttribute("ACL_NAME", childAclName);
+				documentService.updateObject(getToken(), childDoc, null);
+			}
 			
-			String folderRelease = folderpathService.getReleaseFolderId(getToken(), attr);
-			doc.addAttribute("FOLDER_ID", folderRelease);;
-			doc.addAttribute("STATUS", Constants.INSTORAGE);;
-			doc.addAttribute("IS_RELEASED", "1");
-			doc.addAttribute("ACL_NAME", aclName);;
-			
-			documentService.updateObject(getToken(), doc, null);
 		}
 		
 		Map<String, Object> mp = new HashMap<String, Object>();

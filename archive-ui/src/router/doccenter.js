@@ -13,6 +13,16 @@ export const dcRouter = [
 			meta: {
 				requireAuth: true,
 				permit: 1,
+				title:'docStorage'
+			},
+			path: '/dc/docStorage',
+			component: () => import('@/views/dc/DocStorage.vue'),
+			name: '文件库',
+		},
+		{
+			meta: {
+				requireAuth: true,
+				permit: 1,
 				title:'preArchive'
 			},
 			path: '/dc/preArchive',

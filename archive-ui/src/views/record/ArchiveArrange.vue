@@ -352,7 +352,7 @@
                         key="main"
                         dataUrl="/dc/getInnerFolderDocuments"
                         :isInitData="false"
-                        v-bind:tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
+                        v-bind:tableHeight="(layout.height-startHeight)*(topPercent-15)/100-topbarHeight"
                         :isshowOption="true"
                         :isshowSelection="true"
                         :condition="mainParam.condition"
@@ -364,7 +364,7 @@
                     </el-col>
                   </el-row>
                 </template>
-                <template slot="paneR">
+                <template slot="paneR" v-if="isFile">
                   <el-row>
                     <span style="float:left;text-align:left;">卷内文件列表</span>
                     <!-- <el-button type="primary" plain size="small" title="自动组卷"  @click="autoPaper()">自动组卷</el-button> -->
@@ -403,7 +403,7 @@
                         gridViewName='ArrangeInnerGrid'
                         condition="and a.NAME='irel_children' and b.IS_HIDDEN=0"
                         :parentId="parentId"
-                        v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
+                        v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent-15)/100-bottomHeight"
                         :isshowOption="true"
                         :isshowSelection="true"
                         @selectchange="selectInnerChange"
@@ -566,6 +566,7 @@ export default {
       printBarCodeVisible:false,
       printArchiveCodeVisible:false,
       printPdf417Visible:false,
+      isFile:true,
     };
   },
   
@@ -887,7 +888,16 @@ export default {
     },
     changeRadio(val) {
       let _self = this;
-      _self.$refs.leftDataGrid.itemDataList=[];
+      if(val=='文件'){
+        _self.isFile=false;
+        _self.topPercent=95;
+        // _self.$refs.mainDataGrid.tableHeight=(window.innerHeight-_self.startHeight);
+      }else{
+        _self.isFile=true;
+        _self.topPercent=65;
+        _self.$refs.leftDataGrid.itemDataList=[];
+      }
+      
       _self.loadGridData(_self.currentFolder);
       
     },

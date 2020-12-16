@@ -535,7 +535,8 @@
     "desfolderid":"Destinction Folder ID",
     "importJson":"Import Json",
     "filelist":"File List",
-    "workflowCenter":"Workflow Center"
+    "workflowCenter":"Workflow Center",
+    "docStorage":"Doc storage"
 },
 "message": {
     "conditionS":"Select Condition",
