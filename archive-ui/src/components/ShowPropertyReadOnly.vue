@@ -256,7 +256,8 @@ export default {
       if(_self.myTypeName!='')
       {
         m.set('TYPE_NAME',_self.myTypeName);
-        m.set('FOLDER_ID',_self.myFolderId);
+        if(_self.myFolderId!=""){
+        m.set('FOLDER_ID',_self.myFolderId);}
       }
       let formdata = new FormData();
       formdata.append("metaData",JSON.stringify(m));

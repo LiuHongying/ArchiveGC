@@ -3,7 +3,7 @@
     <el-main>
       <div >
         <el-dialog width="80%" append-to-body :visible="dialogVisable" close-on-click-modal>
-          <component :is="dialogComponent" :workflowObj="workflow" @closedialog="closeDialog"></component>
+          <component :is="dialogComponent" :workflowObj="workflow" :typeName="workflow.FORMNAME" @closedialog="closeDialog"></component>
         </el-dialog>
       </div>
       <el-row>
@@ -293,7 +293,10 @@
 <script>
 import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue";
 import CopyStartUp from "@/views/workflow/CopyStartUp.vue";
+import DesignCancelStartUp from "@/views/workflow/DesignCancelStartUp.vue";
+import DesignChangeFileStartup from "@/views/workflow/DesignChangeFileStartup.vue";
 import RelyOnFolderSelectStartUp from "@/views/workflow/RelyOnFolderSelectStartUp.vue";
+import CancelStartUp from "@/views/workflow/CancelStartUp.vue";
 export default {
   data() {
     return {
@@ -341,6 +344,7 @@ export default {
           icon: "ecm-icon-designdoc",
           name: "设计文件修改流程",
           type: "dialog",
+          openpath: "DesignChangeFileStartup",
         },
         {
           title: "科研预归档借阅",
@@ -354,12 +358,14 @@ export default {
           icon: "ecm-icon-scdoc",
           name: "科研文件修改流程",
           type: "dialog",
+          openpath: "RelyOnFolderSelectStartUp",
         },
         {
           title: "作废通知单",
           icon: "ecm-icon-cancelnotice",
           name: "作废通知单作废流程",
           type: "dialog",
+          openpath: "CancelStartUp",
         },
       ],
       dialogVisable: false,
@@ -388,7 +394,10 @@ export default {
   components: {
     BorrowStartUp: BorrowStartUp,
     CopyStartUp: CopyStartUp,
+    DesignCancelStartUp: DesignCancelStartUp,
+    DesignChangeFileStartup: DesignChangeFileStartup,
     RelyOnFolderSelectStartUp: RelyOnFolderSelectStartUp,
+    CancelStartUp: CancelStartUp,
   },
   created() {
     let _self = this;
