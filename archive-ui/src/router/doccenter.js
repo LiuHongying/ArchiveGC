@@ -32,6 +32,16 @@ export const dcRouter = [
 		{
 			meta: {
 				requireAuth: true,
+				permit: 1,
+				title:'recordReport'
+			},
+			path: '/record/recordReport',
+			component: () => import('@/views/record/RecordReport.vue'),
+			name: '报表',
+		},
+		{
+			meta: {
+				requireAuth: true,
 				permit: 1
 			},
 			path: '/borrow',
