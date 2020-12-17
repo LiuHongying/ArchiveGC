@@ -3,7 +3,6 @@ package com.ecm.portal.archivegc.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +14,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ecm.core.ActionContext;
 import com.ecm.core.AuditContext;
-import com.ecm.core.cache.manager.CacheManagerOper;
-import com.ecm.core.entity.EcmUser;
-import com.ecm.core.entity.UserEntity;
 import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.service.AuditService;
 import com.ecm.core.service.AuthService;
-import com.ecm.core.service.UserService;
 import com.ecm.icore.service.IEcmSession;
 import com.ecm.portal.controller.ControllerAbstract;
 
@@ -56,11 +51,12 @@ public class ArchiveLoginController extends ControllerAbstract {
 				IEcmSession s = authService.loginSSO("portal",loginName.replace("\"", ""));
 				mp.put("code", ActionContext.SUCESS);
 				mp.put("token", s.getToken());
-				mp.put("department", s.getCurrentUser().getDepartment());
-				mp.put("clientPermission", s.getCurrentUser().getClientPermission());
-				mp.put("systemPermission", s.getCurrentUser().getSystemPermission());
-				mp.put("loginName", s.getCurrentUser().getLoginName());
-				mp.put("userName", s.getCurrentUser().getUserName());
+				mp.put("data", s.getCurrentUser());
+//				mp.put("department", s.getCurrentUser().getDepartment());
+//				mp.put("clientPermission", s.getCurrentUser().getClientPermission());
+//				mp.put("systemPermission", s.getCurrentUser().getSystemPermission());
+//				mp.put("loginName", s.getCurrentUser().getLoginName());
+//				mp.put("userName", s.getCurrentUser().getUserName());
 				session.setAttribute("ECMUserToken", s.getToken());
 			} catch (Exception e) {
 				e.printStackTrace();

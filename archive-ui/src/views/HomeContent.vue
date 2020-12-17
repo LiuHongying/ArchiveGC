@@ -2,9 +2,11 @@
   <el-container>
     <el-main>
       <div>
+      </div>
+      <div>
         <el-dialog
           append-to-body
-          :visible="dialogVisable"
+          :visible.sync="dialogVisable"
           @close="dialogVisable = false"
           width="90%"
           :close-on-click-modal="false"
