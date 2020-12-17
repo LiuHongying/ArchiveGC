@@ -241,8 +241,6 @@ export default {
       }
 
       var id = [];
-      var fieldStr = [];
-      var locationList = [];
 
       var i;
       for (i in _self.selectedItems) {
@@ -261,7 +259,23 @@ export default {
         .then(function (response) {
           _self.$refs.mainDataGrid.loadGridData();
           let code = response.data.code;
+          var j;
+          for (j in _self.selectedItems) {
+            writeAudit(_self.selectedItems[j]["ID"]);
+          }
         });
+    },
+
+    writeAudit(docId){
+      var m = new Map();
+      m.set("docId",docId)
+      m.set("actionName","ecm_read")
+      m.set("appName","portal")
+      axios
+        .post("/audit/addAudit", JSON.stringify(m))
+        .then(function(response){
+          
+        })
     },
 
     onDataGridRowClick: function (row) {
