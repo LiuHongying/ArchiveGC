@@ -83,7 +83,6 @@ export default {
       if (!tocomp) {
         tocomp = "/";
       }
-      _self.loading = true;
       axios
         .post("/archive/userLogin", JSON.stringify(userName))
         .then(function(response) {
@@ -104,17 +103,18 @@ export default {
             }
             _self.$router.push({ path: tocomp });
           } else if(response.data.code == 2){
+            _self.isSSO = false;
             _self.$message(response.data.msg);
           }
           else{
-            _self.$message(_self.$t("message.loginFailured"));
+            _self.isSSO = false;
+            _self.$message(_self.$t("message.SSOloginFailured"));
           }
-          _self.loading = false;
         })
         .catch(function(error) {
           console.log(error);
-          _self.$message(_self.$t("message.loginFailured"));
-          _self.loading = false;
+          _self.isSSO = false;
+          _self.$message(_self.$t("message.SSOloginFailured"));
         });
     }
   }

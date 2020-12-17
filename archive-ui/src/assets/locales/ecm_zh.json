@@ -569,6 +569,7 @@
     "success":"成功",
     "failured":"失败",
     "loginFailured":"提示: 登录失败！",
+    "SSOloginFailured":"提示: 登录失败！转到用户密码登录",
     "pleaseInput":"请输入",
     "pleaseSelectFolder":"请选择文件夹！",
     "pleaseSelectTransfer":"请选择移交单",

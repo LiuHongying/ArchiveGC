@@ -556,6 +556,7 @@
     "success":"Success",
     "failured":"Failured",
     "loginFailured":"Login Failured",
+    "SSOloginFailured":"Login Failured! Please login use username&password",
     "pleaseInput":"Please Input ",
     "pleaseSelectFolder":"Please Select Folder",
     "pleaseSelectTransfer":"Please Select Transfer",
