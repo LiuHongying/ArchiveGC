@@ -65,6 +65,17 @@
           </template>
         </DataLayout>
       </el-dialog>
+       <el-dialog
+      title="档案鉴定流程"
+      :visible.sync="flowVisible"
+      @close="flowVisible = false"
+      width="90%"
+      style="width: 100%"
+      :close-on-click-modal="false"
+      v-dialogDrag
+    >
+      <div><AppraisalStartUp :workflowObj="workflow" :showUploadFile="true" :parentId="parentID" :workflowFileList="selectedThItems" @close="flowVisible = false"></AppraisalStartUp></div>
+    </el-dialog>
       <el-form :inline="true">
         <el-form-item>
           <el-input
@@ -92,7 +103,7 @@
             <el-button type="primary" @click="propertyVisible=true">新建</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">发起流程</el-button>
+          <el-button type="primary"  @click="getWorkFlow">发起流程</el-button>
         </el-form-item>
       </el-form>
     </template>
@@ -159,6 +170,7 @@ import ShowProperty from "@/components/ShowProperty";
 import DataGrid from "@/components/DataGrid";
 import DataLayout from "@/components/ecm-data-layout";
 import DataSelect from "@/components/ecm-data-select";
+import AppraisalStartUp from "@/views/workflow/AppraisalStartUp.vue"
 
 export default {
   name: "TC",
@@ -217,6 +229,10 @@ export default {
       valueField:"",
       dataTextField:"",
       allType:"select NAME from ecm_document where TYPE_NAME='配置项' and SUB_TYPE='档案类目'",
+      flowVisible:false,
+      workflow:{},
+      selectedDCItems:[],
+      parentID:""
     };
   },
   mounted() {
@@ -507,7 +523,36 @@ export default {
     },
     handleClose(){
       let _self = this;
-    }
+    },
+    getWorkFlow() {
+      let _self = this;
+      if(_self.selectThChange==''||_self.selectThChange==undefined){
+        _self.$message({
+            showClose: true,
+            message:"请选择一个档案鉴定单",
+            duration: 2000,
+            type: "warning",
+          });
+        return
+      }
+
+      var m = new Map();
+      m.set("processDefinitionKey", "档案鉴定流程");
+
+      axios
+        .post("/dc/getWorkflow", JSON.stringify(m))
+        .then(function (response) {
+          _self.workflow = response.data.data[0];
+          console.log(_self.workflow)
+          _self.parentID=_self.selectedThItems[0].ID
+          _self.flowVisible = true;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
+      
+    },
   },
   props: {}, 
   components: {
@@ -515,6 +560,7 @@ export default {
     DataGrid: DataGrid,
     DataLayout: DataLayout,
     DataSelect: DataSelect,
+    AppraisalStartUp:AppraisalStartUp
   },
 };
 </script>
