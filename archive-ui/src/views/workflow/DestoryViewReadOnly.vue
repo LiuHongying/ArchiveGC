@@ -1,28 +1,25 @@
 <template>
   <div>
     <el-row>
-        <ShowProperty
-          v-if="true"
+        <ShowPropertyReadOnly
           ref="ShowPropertyForm"
-          @onSaved="onSaved"
           width="100%"
-          folderPath
-          :showUploadFile="showUploadFile"
-          v-bind:typeName="typeName"
           :itemId="formId"
-        ></ShowProperty>
+          :typeName="typeName"
+        ></ShowPropertyReadOnly>
 
       </el-row>
       <el-row>
         <BorrowFileViewTask
           ref="workflowFile"
-          :allowEdit="allowEdit"
+          :allowEdit="false"
           :isShowPage="true"
           v-model="workflowFileList"
           :activityName="activityName"
           :processDefinitionId="processDefinitionId"
           :parentId="formId"
-          :isShowReject="isShowReject"
+          :isShowReject="false"
+          :isShowUpdate="false"
         ></BorrowFileViewTask>
       </el-row>
   </div>
@@ -36,7 +33,7 @@ import ExcelUtil from "@/utils/excel.js";
 import DataSelect from "@/components/ecm-data-select";
 import DataLayout from "@/components/ecm-data-layout";
 import AttachmentFile from "@/views/dc/AttachmentFile.vue";
-import BorrowFileViewTask from "@/views/workflow/BorrowFileViewTask.vue";
+import BorrowFileViewTask from "@/views/workflow/DestoryFileViewTask.vue";
 import ShowPropertyReadOnly from "@/components/ShowPropertyReadOnly.vue";
 export default {
   name: "StartupWorkflow",
@@ -49,8 +46,8 @@ export default {
     RejectButton: RejectButton,
     DataLayout: DataLayout,
     AttachmentFile: AttachmentFile,
-    BorrowFileViewTask : BorrowFileViewTask,
-    ShowPropertyReadOnly: ShowPropertyReadOnly
+    ShowPropertyReadOnly: ShowPropertyReadOnly,
+    BorrowFileViewTask : BorrowFileViewTask
   },
   data() {
     return {

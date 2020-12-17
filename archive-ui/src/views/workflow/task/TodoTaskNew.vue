@@ -239,6 +239,9 @@ import DesignCancelView from "@/views/workflow/DesignCancelView.vue"
 import ViewDocNpc from "@/views/npc/ViewDocNpc.vue"
 import AppraisalView from "@/views/workflow/AppraisalView.vue"
 import AppraisalViewReadOnly from "@/views/workflow/AppraisalViewReadOnly.vue"
+import DestoryStartUp from "@/views/workflow/DestoryStartUp.vue"
+import DestoryViewReadOnly from "@/views/workflow/DestoryViewReadOnly.vue"
+
 export default {
   name: "TodoTask",
   permit: 1,
@@ -262,7 +265,10 @@ export default {
     DesignCancelViewReadOnly:DesignCancelViewReadOnly,
     ViewDocNpc:ViewDocNpc,
     AppraisalViewReadOnly:AppraisalViewReadOnly,
-    AppraisalView:AppraisalView
+    AppraisalView:AppraisalView,
+    DestoryStartUp:DestoryStartUp,
+    DestoryViewReadOnly:DestoryViewReadOnly
+
   },
   data() {
     return {

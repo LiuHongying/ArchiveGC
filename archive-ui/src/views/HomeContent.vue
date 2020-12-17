@@ -1,9 +1,21 @@
 <template>
   <el-container>
     <el-main>
-      <div >
-        <el-dialog width="80%" append-to-body :visible="dialogVisable" close-on-click-modal>
-          <component :is="dialogComponent" :workflowObj="workflow" :typeName="workflow.FORMNAME" @closedialog="closeDialog"></component>
+      <div>
+        <el-dialog
+          append-to-body
+          :visible="dialogVisable"
+          @close="dialogVisable = false"
+          width="90%"
+          :close-on-click-modal="false"
+          v-dialogDrag
+        >
+          <component
+            :is="dialogComponent"
+            :workflowObj="workflow"
+            :typeName="workflow.FORMNAME"
+            @closedialog="closeDialog"
+          ></component>
         </el-dialog>
       </div>
       <el-row>
