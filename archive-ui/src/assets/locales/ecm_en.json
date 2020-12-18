@@ -539,7 +539,8 @@
     "CreateDoc":"Create docs",
     "CreateDrawingDoc":"Create drawing docs",
     "docStorage":"Doc storage",
-    "DesignDocCreate":"Create design docs"
+    "DesignDocCreate":"Create design docs",
+    "Drafts":"drafts"
     
 },
 "message": {

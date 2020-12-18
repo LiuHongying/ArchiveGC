@@ -10,7 +10,10 @@
           ></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" v-on:click="searchItem">{{$t('application.SearchData')}}</el-button>
+          <el-button type="primary" icon="el-icon-search" v-on:click="searchItem">{{$t('application.SearchData')}}</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="danger" icon="el-icon-delete" v-on:click="onDeleleItem(selectedFiles,[$refs.draftList])">{{$t('application.delete')}}</el-button>
         </el-form-item>
       </el-form>
     </template>
