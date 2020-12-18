@@ -53,8 +53,12 @@
              <AudioPlayer v-else-if="viewerType==5" v-bind:id="doc.id" v-bind:format="doc.format"></AudioPlayer>
              <!-- <CADViewer v-else-if="viewerType==6" v-bind:id="doc.id" format="ocf"></CADViewer> -->
              <CADViewerHtml5 v-else-if="viewerType==6" v-bind:id="doc.id" format="ocf"></CADViewerHtml5>
-             <JTViewer v-else-if="viewerType==7" v-bind:id="doc.id" format="obj" :fileName="doc.C_IMPORT_NAME"></JTViewer>
-             <!-- <ThreeDsViewer v-else-if="viewerType==8" v-bind:id="doc.id" ></ThreeDsViewer> -->
+             <!-- Begin -->
+             <!-- <JTViewer v-else-if="viewerType==7" v-bind:id="doc.id" format="obj" :fileName="doc.C_IMPORT_NAME"></JTViewer>
+             <ThreeDsViewer v-else-if="viewerType==8" v-bind:id="doc.id" ></ThreeDsViewer> -->
+             <!-- End -->
+             <!-- 以下是新的代码 -->
+             <ThreeDsViewer v-else-if="viewerType==7" v-bind:id="doc.id" ></ThreeDsViewer>
              <div v-else-if="doc.contentSize==0" style="padding-top:40px;">
                 {{$t('application.noE-File')}}
             </div>
@@ -159,7 +163,7 @@ import ChangeDocViewer from "./ChangeDocViewer.vue"
 import CADViewer from "./CADViewer.vue"
 import CADViewerHtml5 from "./CADViewerHtml5.vue"
 import JTViewer from "./JTViewer2.vue"
-// import ThreeDsViewer from "./ThreeDsViewer.vue"
+import ThreeDsViewer from "./ThreeDsViewer copy.vue"
 import Borrow from "@/components/form/Borrow.vue"
 import InTransferDoc from "@/views/dc/InTransferDoc.vue"
 import RelevantDoc from "@/views/dc/RelevantDoc.vue"
@@ -186,7 +190,7 @@ export default {
     CADViewerHtml5:CADViewerHtml5,
     JTViewer:JTViewer,
     Borrow:Borrow,
-    // ThreeDsViewer: ThreeDsViewer,
+    ThreeDsViewer: ThreeDsViewer,
     InTransferDoc:InTransferDoc,
     RelevantDoc:RelevantDoc,
     AttachmentFile:AttachmentFile,
