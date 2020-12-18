@@ -655,6 +655,7 @@ export default {
             let data=response.data.data;
             let fileType=data[0].C_TO;
             _self.newArchiveFileItem(fileType,row);
+            writeAudit(_self.parentId);
           }else{
             _self.$message({
                 showClose: true,
@@ -677,6 +678,19 @@ export default {
       
 
     },
+
+    writeAudit(docId){
+      var m = new Map();
+      m.set("docId",docId)
+      m.set("actionName","ecm_read")
+      m.set("appName","portal")
+      axios
+        .post("/audit/addAudit", JSON.stringify(m))
+        .then(function(response){
+          
+        })
+    },
+
     ///打印档号
     beforePrintArchiveCode(selectedRows,vtitle) {
       let _self = this;

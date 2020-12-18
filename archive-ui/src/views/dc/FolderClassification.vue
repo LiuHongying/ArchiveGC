@@ -34,6 +34,13 @@
         }}</el-button>
       </div>
     </el-dialog>
+     <el-dialog :title="$t('message.Batch')+' '+$t('application.Import')+$t('application.document')" :visible.sync="batchDialogVisible" width="80%" >
+        <BatchImport ref="BatchImport" tmpPath="/系统配置/导入模板/系统数据导入" :deliveryId="currentFolder.id" relationName="FolderId"  
+        @onImported="onBatchImported" width="100%" importUrl="/import/batchSystemImport"></BatchImport>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="batchDialogVisible=false" size="medium">{{$t('application.close')}}</el-button>
+         </div>
+      </el-dialog>
     <el-dialog
       :title="$t('application.property')"
       :visible.sync="propertyVisible"
@@ -398,11 +405,9 @@
           @click="importDialogVisible = true"
           >{{ $t("application.Import") }}</el-button
         >
-        <el-form :inline="true">
-          <el-form-item>
-            <el-button type="primary" @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
-          </el-form-item>
-        </el-form>  
+        <el-button type="primary" icon="el-icon-upload2" @click="batchDialogVisible=true">批量导入</el-button>
+        
+        <el-button type="primary" @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
       </el-col>
     </el-row>
     <div :style="{ position: 'relative', height: asideHeight + 'px' }">
@@ -595,6 +600,7 @@ import StartupComponent from "@/views/workflow/StartupComponent.vue";
 import ArchieveStorage from "@/components/SubmitFolder.vue";
 import ExcelUtil from "@/utils/excel.js";
 import "url-search-params-polyfill";
+import BatchImport from "@/components/controls/ImportDocument";
 
 export default {
   name: "FolderClassification",
@@ -611,6 +617,7 @@ export default {
     StartupComponent: StartupComponent,
     ArchieveStorage: ArchieveStorage,
     ExcelUtil: ExcelUtil,
+    BatchImport:BatchImport
   },
   data() {
     return {
@@ -693,6 +700,7 @@ export default {
         label: "name",
       },
       tempShow: false,
+      batchDialogVisible:false
     };
   },
   watch: {
@@ -1207,6 +1215,9 @@ export default {
           //   message: '已取消删除'
           // });
         });
+    },
+    onBatchImported(){
+      this.loadGridData(_self.currentFolder);
     },
     // 删除文档
     deleleItem() {

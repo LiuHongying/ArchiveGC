@@ -391,6 +391,10 @@ export default {
               type: 'success'
           });
           _self.$refs.Drawing.itemDataList=[];
+          var j;
+          for (j in tab) {
+            writeAudit(tab[j]["ID"]);
+          }
         }else{
               
           _self.$message({
@@ -412,6 +416,18 @@ export default {
         console.log(error);
       });
       
+    },
+
+    writeAudit(docId){
+      var m = new Map();
+      m.set("docId",docId)
+      m.set("actionName","ecm_read")
+      m.set("appName","portal")
+      axios
+        .post("/audit/addAudit", JSON.stringify(m))
+        .then(function(response){
+          
+        })
     },
   },
   props: {},
