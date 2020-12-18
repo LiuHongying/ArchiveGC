@@ -232,7 +232,8 @@ export default {
       flowVisible:false,
       workflow:{},
       selectedDCItems:[],
-      parentID:""
+      parentID:"",
+      //files4Start:[]
     };
   },
   mounted() {
@@ -535,7 +536,7 @@ export default {
           });
         return
       }
-
+      _self.selectedThItems = _self.$refs.AppraisalFile.itemDataList
       var m = new Map();
       m.set("processDefinitionKey", "档案鉴定流程");
 
