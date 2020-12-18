@@ -241,6 +241,8 @@ import AppraisalView from "@/views/workflow/AppraisalView.vue"
 import AppraisalViewReadOnly from "@/views/workflow/AppraisalViewReadOnly.vue"
 import DestoryStartUp from "@/views/workflow/DestoryStartUp.vue"
 import DestoryViewReadOnly from "@/views/workflow/DestoryViewReadOnly.vue"
+import ViolationStartUp from "@/views/workflow/ViolationStartUp.vue"
+import ViolationViewReadOnly from "@/views/workflow/ViolationViewReadOnly.vue"
 
 export default {
   name: "TodoTask",
@@ -267,7 +269,9 @@ export default {
     AppraisalViewReadOnly:AppraisalViewReadOnly,
     AppraisalView:AppraisalView,
     DestoryStartUp:DestoryStartUp,
-    DestoryViewReadOnly:DestoryViewReadOnly
+    DestoryViewReadOnly:DestoryViewReadOnly,
+    ViolationStartUp:ViolationStartUp,
+    ViolationViewReadOnly:ViolationViewReadOnly
 
   },
   data() {
