@@ -276,5 +276,23 @@ path: '/workflow/DestoryStartUp',
 name: 'DestoryStartUp',
 component: () => import('@/views/workflow/DestoryStartUp.vue')
 },
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'ViolationStartUp'
+},
+path: '/workflow/ViolationStartUp',
+name: 'ViolationStartUp',
+component: () => import('@/views/workflow/ViolationStartUp.vue')
+},
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'ViolationReadOnly'
+},
+path: '/workflow/ViolationViewReadOnly',
+name: 'ViolationViewReadOnly',
+component: () => import('@/views/workflow/ViolationViewReadOnly.vue')
+},
     ]
   }
