@@ -547,7 +547,9 @@
     "filelist":"文件列表",
     "workflowCenter":"流程中心",
     "CreateDoc":"文件创建",
-    "docStorage":"文件库"
+    "CreateDrawingDoc":"图纸文件创建",
+    "docStorage":"文件库",
+    "DesignDocCreate":"设计文件创建"
 },
 "message": {
     "conditionS":"条件选择",
