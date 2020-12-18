@@ -212,8 +212,13 @@ export default {
     },
     saveFileToWorkflow(){
         let _self=this;
-        if(this.files.length>0){
-          this.createUnit = this.files[0].C_CREATE_UNIT
+        if(this.files.length>0||this.selectedFiles.length>1){
+          if(this.files.length>0){
+            this.createUnit = this.files[0].C_CREATE_UNIT
+          }
+          if(this.files.length==0&&this.selectedFiles.length>1){
+            this.createUnit = this.selectedFiles[0].C_CREATE_UNIT
+          }
           this.checkCreateUnit()
           if(this.sameCreate==false){
           this.$message("请选择相同编制单位的文件！")
