@@ -218,7 +218,9 @@
                         icon="el-icon-delete"
                         @click="logicallyDel(selectedItems,function(){
                           let _self=this;
-                          _self.$refs.leftDataGrid.itemDataList=[];
+                          if(_self.$refs.leftDataGrid){
+                              _self.$refs.leftDataGrid.itemDataList = [];
+                            }
                           _self.loadGridData(_self.currentFolder);
                         })"
                         :title="$t('application.delete')+$t('application.document')"
@@ -895,7 +897,12 @@ export default {
       }else{
         _self.isFile=true;
         _self.topPercent=65;
-        _self.$refs.leftDataGrid.itemDataList=[];
+        _self.$nextTick(()=>{
+          if(_self.$refs.leftDataGrid){
+             _self.$refs.leftDataGrid.itemDataList = [];
+          }
+        });
+        
       }
       
       _self.loadGridData(_self.currentFolder);
@@ -1081,7 +1088,9 @@ export default {
       }
       _self.parentId=row.ID;
       _self.$nextTick(()=>{
-        _self.$refs.leftDataGrid.loadGridData();
+        if(_self.$refs.leftDataGrid){
+             _self.$refs.leftDataGrid.itemDataList = [];
+          }
       });
       
     },
@@ -1364,7 +1373,9 @@ export default {
                 _self.showInnerFile(_self.selectRow);
                
               }else{
-                 _self.$refs.leftDataGrid.itemDataList=[];
+                 if(_self.$refs.leftDataGrid){
+                    _self.$refs.leftDataGrid.itemDataList = [];
+                  }
                  _self.loadGridData(_self.currentFolder);
               }
               
@@ -1522,7 +1533,9 @@ export default {
               duration: 2000,
               type: "success"
             });
-            _self.$refs.leftDataGrid.itemDataList=[];
+            if(_self.$refs.leftDataGrid){
+              _self.$refs.leftDataGrid.itemDataList = [];
+            }
             _self.searchItem();
           })
           .catch(function(error) {
@@ -1563,7 +1576,9 @@ export default {
               duration: 2000,
               type: "success"
             });
-            _self.$refs.leftDataGrid.itemDataList=[];
+            if(_self.$refs.leftDataGrid){
+              _self.$refs.leftDataGrid.itemDataList = [];
+            }
             _self.searchItem();
           })
           .catch(function(error) {
@@ -1580,7 +1595,9 @@ export default {
         p.push(m);
       });
       _self.updateData(p,function(){
-        _self.$refs.leftDataGrid.itemDataList=[];
+        if(_self.$refs.leftDataGrid){
+             _self.$refs.leftDataGrid.itemDataList = [];
+          }
         _self.searchItem();
       });
     },
@@ -1663,7 +1680,9 @@ export default {
               .then(function(response) {
                 if (response.data.code == "1") {
                   _self.loadGridData(_self.currentFolder);
-                  _self.$refs.leftDataGrid.itemDataList=[];
+                  if(_self.$refs.leftDataGrid){
+                      _self.$refs.leftDataGrid.itemDataList = [];
+                    }
                   // _self.showInnerFile(null);
                   // _self.$message(_self.$t("message.fetchInformationSuccess"));
                   _self.$message({
@@ -1722,7 +1741,9 @@ export default {
         p.push(m);
       });
       _self.updateData(p,function(){
-        _self.$refs.leftDataGrid.itemDataList=[];
+        if(_self.$refs.leftDataGrid){
+             _self.$refs.leftDataGrid.itemDataList = [];
+          }
         _self.searchItem();
       });
       
@@ -1814,7 +1835,10 @@ export default {
           _self.getNumLoading = false;
           _self.loadGridData(_self.currentFolder);
           // _self.showInnerFile(null);
-          _self.$refs.leftDataGrid.itemDataList = [];
+          if(_self.$refs.leftDataGrid){
+             _self.$refs.leftDataGrid.itemDataList = [];
+          }
+         
           let code = response.data.code;
           if (code == 1) {
             //  _self.$message("取号成功！");
