@@ -159,7 +159,7 @@
           size="small" icon="el-icon-right" @click="onArchived">移交</el-button> -->
           <el-button type="primary"
           plain
-          size="small" icon="el-icon-right" @click="startworkflow()">发起流程</el-button>
+          size="small" icon="el-icon-right" @click="startworkflow()" :loading="butt">发起流程</el-button>
           
           <el-button type="primary"
           plain
@@ -462,7 +462,8 @@ export default {
       },
       classicNames:[],
       selectedClassic:"",
-      parentId:""
+      parentId:"",
+      butt:false
     };
   },
   watch: {
@@ -903,10 +904,25 @@ export default {
                 duration: 2000,
                 type: "warning"
               });
+              return;
       }
+      _self.butt=true;
+      let formIds=new Array();
       for(let i=0;i<_self.selectTransferRow.length;i++){
-        _self.startWorkflowFun(_self.selectTransferRow[i].ID,"文档提交归档流程",null,"SubmissionDC");
+        formIds.push(_self.selectTransferRow[i].ID);
       }
+      _self.startWorkflowFunByIds(formIds,"文档提交归档流程",null,"SubmissionDC",function(){
+        _self.loadTransferGridData();
+        _self.selectedFileItem=[];
+        _self.selectRow=[];
+        _self.itemDataList = [];
+        _self.itemDataListFull = [];
+        _self.itemCount = 0;
+        _self.innerDataList = [];
+        _self.innerDataListFull = [];
+        _self.innerCount = 0;
+        _self.butt=false;
+      });
       
     },
     // 表格行选择

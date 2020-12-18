@@ -303,6 +303,7 @@ export default {
               type: "success"
             });
             _self.pendNotVisible = false;
+            _self.$refs.fileList.loadGridData();
           } else {
             _self.$message({
               showClose: true,

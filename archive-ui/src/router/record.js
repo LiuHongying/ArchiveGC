@@ -6,7 +6,7 @@ export const recordRouter =  [
             title:"archivedelivery"
         },
         path: '/record/archivedelivery',
-        name: '档案移交',
+        name: '文档提交',
         component: () => import('@/views/record/ArchiveDelivery.vue')
     },
     {
