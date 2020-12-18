@@ -536,7 +536,11 @@
     "importJson":"Import Json",
     "filelist":"File List",
     "workflowCenter":"Workflow Center",
-    "docStorage":"Doc storage"
+    "CreateDoc":"Create docs",
+    "CreateDrawingDoc":"Create drawing docs",
+    "docStorage":"Doc storage",
+    "DesignDocCreate":"Create design docs"
+    
 },
 "message": {
     "conditionS":"Select Condition",

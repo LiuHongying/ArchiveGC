@@ -240,8 +240,9 @@ export default {
       let _self=this;
       _self.getObjectById(this.selectedItemId,function(data){
         _self.vdata=data;
+        _self.getApprovalUserList();
       });
-      _self.getApprovalUserList();
+      
     },
     attachmentDocSelect(val) {
       this.selectedAttachment = val;
@@ -370,7 +371,7 @@ export default {
     getApprovalUserList() {
       let _self = this;
       var m = new Map();
-      m.set("processDefinitionName", "图纸文件审批流程");
+      m.set("processDefinitionName", _self.vdata['C_PROCESS_DEF_NAME']);
       axios
         .post("/workflow/getApprovalAllUserList", JSON.stringify(m))
         .then(function(response) {

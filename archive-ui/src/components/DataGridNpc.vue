@@ -415,7 +415,8 @@ export default {
     isShowChangeList: { type: Boolean, default: true }, //是否显示列表选择
     optionWidth: { type: Number, default: 3.5 }, //操作列宽度，放几个按钮
     pageSize: { type: Number, default: 20 }, //每页显示数量
-    folderId: { type: String, default: "" } //目录ID
+    folderId: { type: String, default: "" }, //目录ID
+    // rowData:{type:Object,default: () => ({})}
   },
   watch: {
     showFields(val, oldVal) {
@@ -483,7 +484,7 @@ export default {
       _self.loading = true;
       let d = new Map(m);
       form["formId"] = d.get("ID");
-      form["processInstanceKey"] = "图纸文件审批流程";
+      form["processInstanceKey"] = _self.selectedRow["C_PROCESS_DEF_NAME"];// "图纸文件审批流程";
       axios
         .post("/workflow/startWorkflow", JSON.stringify(form))
         .then(function(response) {
@@ -491,7 +492,7 @@ export default {
           _self.loading = false;
           _self.butt = false;
           _self.propertyVisible = false;
-          this.loadGridData();
+          _self.loadGridData();
         })
         .catch(function(error) {
           console.log(error);

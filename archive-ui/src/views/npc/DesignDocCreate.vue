@@ -28,7 +28,7 @@
               @onSaved="onSaved"
               @onSaveSuccess="onPropertiesSaveSuccess"
               width="95%"
-              typeName="图纸文件审批单"
+              typeName="设计文件审批单"
               :showUploadFile="false"
               v-bind:itemId="selectedItemId"
             ></ShowProperty>
@@ -205,7 +205,7 @@ export default {
         p.push(_self.taskForm[key]);
         m.push(p);
       }
-      m.push(["C_PROCESS_DEF_NAME","图纸文件审批流程"]);
+      m.push(["C_PROCESS_DEF_NAME","设计文件审批流程"]);
       let formdataNew = new FormData();
       formdataNew.append("metaData", JSON.stringify(m));
       if (_self.file != "") {
@@ -245,6 +245,7 @@ export default {
             }else{
               _self.reload();
             }
+            
           } else {
             _self.$message(_self.$t("message.newFailured"));
             _self.butt=false;
@@ -265,7 +266,7 @@ export default {
       _self.loading = true;
       let d=new Map(m);
       form['formId']=d.get('ID');
-      form['processInstanceKey']='图纸文件审批流程';
+      form['processInstanceKey']='设计文件审批流程';
       axios.post('/workflow/startWorkflow',JSON.stringify(form))
       .then(function(response) {
         _self.$message({
@@ -298,7 +299,7 @@ export default {
     getApprovalUserList() {
       let _self = this;
       var m = new Map();
-      m.set("processDefinitionName", "图纸文件审批流程");
+      m.set("processDefinitionName", "设计文件审批流程");
       axios
         .post("/workflow/getApprovalAllUserList", JSON.stringify(m))
         .then(function(response) {
