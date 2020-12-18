@@ -74,7 +74,7 @@
       :close-on-click-modal="false"
       v-dialogDrag
     >
-      <div><AppraisalStartUp :workflowObj="workflow" :showUploadFile="true" :parentId="parentID" :workflowFileList="selectedThItems" @close="flowVisible = false"></AppraisalStartUp></div>
+      <div><AppraisalStartUp :workflowObj="workflow" :showUploadFile="true" :parentId="parentID" :workflowFileList="files4Start" @close="flowVisible = false"></AppraisalStartUp></div>
     </el-dialog>
       <el-form :inline="true">
         <el-form-item>
@@ -233,7 +233,7 @@ export default {
       workflow:{},
       selectedDCItems:[],
       parentID:"",
-      //files4Start:[]
+      files4Start:[]
     };
   },
   mounted() {
@@ -536,7 +536,7 @@ export default {
           });
         return
       }
-      _self.selectedThItems = _self.$refs.AppraisalFile.itemDataList
+      _self.files4Start = _self.$refs.AppraisalFile.itemDataList
       var m = new Map();
       m.set("processDefinitionKey", "档案鉴定流程");
 
