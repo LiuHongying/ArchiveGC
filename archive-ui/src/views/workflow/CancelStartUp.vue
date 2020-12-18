@@ -26,7 +26,7 @@
                     @onSaved="onSaved"
                     width="100%"
                     folderPath=""
-                    :showUploadFile="showUploadFile"
+                    :showUploadFile="false"
                     v-bind:typeName="typeName"
                 >
                 </ShowProperty>

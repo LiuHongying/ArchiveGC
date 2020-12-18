@@ -2,9 +2,8 @@
   <el-container>
     <el-main>
       <div>
-      </div>
-      <div>
         <el-dialog
+          :title="dialogtitle"
           append-to-body
           :visible.sync="dialogVisable"
           @close="dialogVisable = false"
@@ -403,6 +402,7 @@ export default {
       collectionChart: Object,
       dialogVisible: false,
       workflow: {},
+      dialogtitle:"",
     };
   },
   components: {
@@ -430,6 +430,8 @@ export default {
     onIconClick(item) {
       let _self = this;
       let _type = item.type;
+      _self.dialogtitle = item.title;
+      _self.workflow = {};
 
       var m = new Map();
       m.set("processDefinitionKey", item.name);
@@ -439,19 +441,19 @@ export default {
         .then(function (response) {
           _self.workflow = response.data.data[0];
           console.log(_self.workflow);
-          _self.borrowVisible = true;
+          _self.$nextTick(() => {
+            if (_type == null || _type == undefined) {
+              _type = "dialog";
+            }
+            if (_type == "dialog") {
+              _self.dialogComponent = item.openpath;
+              _self.dialogVisable = true;
+            }
+          });
         })
         .catch(function (error) {
           console.log(error);
         });
-
-      if (_type == null || _type == undefined) {
-        _type = "dialog";
-      }
-      if (_type == "dialog") {
-        _self.dialogComponent = item.openpath;
-        _self.dialogVisable = true;
-      }
     },
     closeDialog(val) {
       this.dialogVisable = val;

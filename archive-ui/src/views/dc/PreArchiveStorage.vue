@@ -198,7 +198,7 @@ export default {
       .post("/admin/getPreArchivesFolder", 0)
       .then(function (response) {
         _self.dataList = response.data.data;
-        console.log(JSON.stringify(_self.dataList));
+        //console.log(JSON.stringify(_self.dataList));
         _self.loading = false;
         _self.$refs.mainDataGrid.loadGridInfo(_self.defaultData);
         _self.$refs.mainDataGrid.loadGridData(_self.defaultData);

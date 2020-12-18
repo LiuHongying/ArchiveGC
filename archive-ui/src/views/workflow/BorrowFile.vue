@@ -175,10 +175,8 @@ export default {
   methods: {
     checkCreateUnit(){
       let crUnit = null
-      this.createUnit = null
       this.sameCreate = true      //指示器清空
     for(let tab in this.selectedFiles){
-
       if(this.selectedFiles[tab].C_CREATE_UNIT==undefined){
         this.createUnit = "未定义"
         crUnit = "未定义"
@@ -214,11 +212,20 @@ export default {
     },
     saveFileToWorkflow(){
         let _self=this;
-        this.checkCreateUnit()
-        if(this.sameCreate==false){
-        this.$message("请选择相同编制单位的文件！")
-        return
+        if(this.files.length>0||this.selectedFiles.length>1){
+          if(this.files.length>0){
+            this.createUnit = this.files[0].C_CREATE_UNIT
+          }
+          if(this.files.length==0&&this.selectedFiles.length>1){
+            this.createUnit = this.selectedFiles[0].C_CREATE_UNIT
+          }
+          this.checkCreateUnit()
+          if(this.sameCreate==false){
+          this.$message("请选择相同编制单位的文件！")
+          return
+          }
         }
+        
         if(_self.$refs.fileList.itemDataList==null){
             _self.$refs.fileList.itemDataList=_self.selectedFiles;
         }else{

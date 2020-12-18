@@ -406,6 +406,7 @@ export default {
     optionWidth: { type: Number, default: 3.5 }, //操作列宽度，放几个按钮
     pageSize: { type: Number, default: 20 },//每页显示数量
     folderId:{type:String,default:""},//目录ID
+    isLoadGridInfo: { type: Boolean, default: true },
   },
   watch: {
     showFields(val, oldVal) {
@@ -448,7 +449,9 @@ export default {
     this.gridviewInfo.isCustom = false;
     this.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     this.loadCustomName();
-    this.loadGridInfo();
+    if(this.isLoadGridInfo){
+      this.loadGridInfo();
+    }
     if (this.isInitData) {
       this.loadGridData();
     }
