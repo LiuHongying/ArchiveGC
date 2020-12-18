@@ -108,18 +108,20 @@
                     </el-col>
                 </el-header>
                 <el-main>
+                    <!-- v-bind:columnList="gridList" -->
                     <DataGrid
                         ref="rowDataGrid"
                         key="rowDataGrid"
                         v-bind:itemDataList="rowList"
-                        v-bind:columnList="gridList"
-                        @pagesizechange="pageSizeChange"
-                        @pagechange="pageChange"
+                        
                         v-bind:itemCount="itemCount"
                         v-bind:tableHeight="height"
                         v-bind:isshowOption="false" v-bind:isshowSelection ="false"
                         @rowclick="selectOneFile"
                         @refreshdatagrid="refreshRow"
+                        :isLoadGridInfo="false"
+                        :condition="selectColumnCoding"
+                        dataUrl="/dc/getRowByColumn"
                         ></DataGrid>
                 </el-main>
             </el-container>
@@ -302,6 +304,7 @@ export default {
                         _self.showFields.push(element.attrName);
                         }
                     });
+                    _self.$refs.rowDataGrid.columnList=_self.gridList;
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -499,36 +502,41 @@ export default {
             _self.selectColumnIndex=key;
             _self.selectColumnCoding=coding;
             _self.selectedColumnId=id;
-            var m = new Map();
-            // m.set("gridName", "ArchiveGrid");
-            // m.set('folderId',indata.id);
-            m.set("pageSize", _self.pageSize);
-            m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
-            m.set("columnCoding",_self.selectColumnCoding);
-           _self
-            .axios({
-            headers: {
-                "Content-Type": "application/json;charset=UTF-8"
-            },
-            method: "post",
-            data:JSON.stringify(m),
-            url: "/dc/getRowByColumn"
-            })
-            .then(function(response) {
+            _self.$nextTick(()=>{
+                _self.$refs.rowDataGrid.loadGridData();
+            });
+            
+        //     var m = new Map();
+        //     // m.set("gridName", "ArchiveGrid");
+        //     // m.set('folderId',indata.id);
+        //     m.set("pageSize", _self.pageSize);
+        //     m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
+        //     m.set("columnCoding",_self.selectColumnCoding);
+        //    _self
+        //     .axios({
+        //     headers: {
+        //         "Content-Type": "application/json;charset=UTF-8"
+        //     },
+        //     method: "post",
+        //     data:JSON.stringify(m),
+        //     url: "/dc/getRowByColumn"
+        //     })
+        //     .then(function(response) {
                 
-                _self.rowList=response.data.data;
-                _self.itemCount = response.data.pager.total;
-            })
-            .catch(function(error) {
-            // _self.$message(_self.$t("message.deleteFailured"));
-            _self.$message({
-                showClose: true,
-                message: "查询失败！",
-                duration: 5000,
-                type: 'error'
-            });
-            console.log(error);
-            });
+        //         _self.rowList=response.data.data;
+        //         _self.itemCount = response.data.pager.total;
+        //         _self.$refs.rowDataGrid.itemCount=_self.itemCount;
+        //     })
+        //     .catch(function(error) {
+        //     // _self.$message(_self.$t("message.deleteFailured"));
+        //     _self.$message({
+        //         showClose: true,
+        //         message: "查询失败！",
+        //         duration: 5000,
+        //         type: 'error'
+        //     });
+        //     console.log(error);
+        //     });
         },
         searchByStore(roomCoding,key,roomID){
             let _self=this;

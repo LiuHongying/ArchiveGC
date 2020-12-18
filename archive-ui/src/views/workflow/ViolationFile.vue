@@ -9,20 +9,8 @@
         width="90%"
         :close-on-click-modal="false"
         v-dialogDrag
-        modal-append-to-body="false" 
       >
         <el-form :inline="true" :model="filters" @submit.native.prevent>
-          <el-form-item>
-            <el-select v-model="filters.docType">
-              <el-option :label="$t('application.all')+' '+$t('application.subDC')" value></el-option>
-              <el-option
-                v-for="(name,nameIndex) in childrenTypes"
-                :key="'Type2_'+nameIndex"
-                :label="name"
-                :value="name"
-              ></el-option>
-            </el-select>
-          </el-form-item>
           <el-form-item>
             <el-input
               v-model="filters.title"
@@ -38,11 +26,11 @@
           ref="searchDoc"
           key="searchDoc"
           data-url="/dc/getDocuments"
-          v-bind:tableHeight="tableHeight"
-          v-bind:isshowOption="true"
-          v-bind:isshowSelection="true"
+          :tableHeight="tableHeight"
+          :isshowOption="true"
+          :isshowSelection="true"
           :condition="searchFileCondition"
-          gridViewName="BorrowSequenceGrid"
+          gridViewName="DocumentViolationGrid"
           :optionWidth="1"
           :isShowMoreOption="false"
           :isshowCustom="false"
@@ -58,14 +46,9 @@
       </el-dialog>
     </template>
     <template v-slot:main="{layout}">
-      <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
-        <split-pane
-          v-on:resize="onSplitResize"
-          :min-percent="20"
-          :default-percent="topPercent"
-          split="horizontal"
-        >
-          <template slot="paneL">
+      <!-- <div :style="{position:'relative',height: layout.height-startHeight+'px'}"> -->
+      <div :style="{position:'relative'}">
+
             <el-tabs value="t01">
               <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01">
                 <el-row v-if="allowEdit">
@@ -75,8 +58,10 @@
                         <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
                       </el-form-item>
                       <el-form-item>
-                        <el-button type="warning">{{ $t("application.delete") }}</el-button>
+                        <el-button type="warning" @click="removeFile">{{ $t("application.remove") }}</el-button>
                       </el-form-item>
+                    <el-form-item>
+                    </el-form-item>
                     </el-form>
                   </el-col>
                 </el-row>
@@ -85,25 +70,27 @@
                   ref="fileList"
                   key="fileList"
                   data-url="/dc/getDocuByRelationParentId"
-                  v-bind:tableHeight="tableHeight"
-                  v-bind:isshowOption="true"
-                  v-bind:isshowSelection="true"
-                  gridViewName="WorkflowFileGrid"
+                  :tableHeight="tableHeight"
+                  :isshowOption="true"
+                  :isshowSelection="true"
+                  gridViewName="DocumentViolationGrid"
                   condition=" and a.NAME='irel_children'"
                   :optionWidth="1"
                   :itemDataList="files"
-                  :isShowMoreOption="false"
+                  :isShowMoreOption="true"
+                  showOptions="查看内容,查看属性"
                   :isshowCustom="false"
-                  :isEditProperty="allowEdit"
+                  :isEditProperty="false"
+                  :isShowPropertyButton="false"
                   :isShowChangeList="false"
                   :isshowicon="false"
                   :isshowPage="isShowPage"
+                  :isInitData="false"
                   @selectchange="relevantDocRVSelect"
                 ></DataGrid>
               </el-tab-pane>
             </el-tabs>
-          </template>
-        </split-pane>
+
       </div>
     </template>
   </DataLayout>
@@ -117,6 +104,7 @@ import ExcelUtil from "@/utils/excel.js";
 import DataSelect from "@/components/ecm-data-select";
 import DataLayout from "@/components/ecm-data-layout";
 import AttachmentFile from "@/views/dc/AttachmentFile.vue";
+import MountFile from '@/components/MountFile.vue';
 export default {
   components: {
     ShowProperty: ShowProperty,
@@ -125,7 +113,8 @@ export default {
     DataSelect: DataSelect,
     RejectButton: RejectButton,
     DataLayout: DataLayout,
-    AttachmentFile: AttachmentFile
+    AttachmentFile: AttachmentFile,
+    MountFile:MountFile
   },
    model: {
      prop:"files",
@@ -143,14 +132,14 @@ export default {
       topStorageName: "ReceivedDCHeight",
       // 非split pan 控制区域高度
       startHeight: 135,
-      // 顶部百分比*100
-      topPercent: 65,
+      tableHeight:"400px",
       // 顶部除列表高度
       topbarHeight: 35,
       // 底部除列表高度
       bottomHeight: 120,
       childrenTypes: [],
       propertyVisible: false,
+      cost:0,
       filters: {
         projectCode: "",
         docType: "",
@@ -161,44 +150,16 @@ export default {
         relationName: ""
       },
       selectedFiles:[],
-      selectedItems:[],
       butt:false,
       searchFileCondition:"",
-      createUnit:'',
-      sameCreate:true,
-      sameDepartMent:true
+      selectedRemoveFiles:[]
     };
   },
   mounted() {
     this.getTypeNamesByMainList("DCTypeSubContractor");
+    this.searchItem()
   },
   methods: {
-    checkCreateUnit(){
-      let crUnit = null
-      this.sameCreate = true      //指示器清空
-    for(let tab in this.selectedFiles){
-      if(this.selectedFiles[tab].C_CREATE_UNIT==undefined){
-        this.createUnit = "未定义"
-        crUnit = "未定义"
-      }
-       if(this.selectedFiles[tab].C_CREATE_UNIT!=undefined){
-        
-        crUnit =  this.selectedFiles[tab].C_CREATE_UNIT           //当前编制单位指示器
-        if(this.createUnit!=crUnit){
-        this.sameCreate = false
-      }
-         this.createUnit = this.selectedFiles[tab].C_CREATE_UNIT       //全局指示器
-      }
-
-      if(crUnit!=this.currentUser().department){
-        this.sameDepartMent = false
-      }
-    }
-    },
-
-    // select(val){
-    //   this.selectedItems=val
-    // },
     beforeAddFile() {
       let _self=this;
       this.getEcmcfgActive(_self.workflowObj.ID,"start",function(ecmCfgActivity){
@@ -207,37 +168,131 @@ export default {
       });
         
     },
+    relevantDocRVSelect(val){
+      this.selectedRemoveFiles=val;
+    },
+    removeFile(){
+      let _self=this;
+      this.removeCost();
+      _self.$emit('getCost',_self.cost);
+      for(let i=0;i<_self.selectedRemoveFiles.length;i++){
+        let e=_self.selectedRemoveFiles[i];
+        for(let n=0;n<_self.$refs.fileList.itemDataList.length;n++){
+          if(e.ID==_self.$refs.fileList.itemDataList[n].ID){
+            _self.$refs.fileList.itemDataList.splice(n, 1);
+            n--;
+          }
+        }
+        _self.selectedRemoveFiles.splice(i,1);
+        i--;
+      }
+
+      _self.selectedRemoveFiles.forEach(e=>{
+
+        
+        
+      });
+    },
     fileSelect(val){
         this.selectedFiles=val;
     },
+    removeCost(){
+      if(this.selectedRemoveFiles.length!=0){
+          for(let tab in this.selectedRemoveFiles){ 
+            //先判断实物文件类型，找到了就快进到下一轮循环
+            if(this.selectedRemoveFiles[tab].TYPE_NAME == '财务会计文件'){
+                this.cost = this.cost - 300
+                continue
+            }
+              if(this.selectedRemoveFiles[tab].TYPE_NAME == '党群行政文件'){
+                this.cost = this.cost - 1000
+                continue
+            }
+            if(this.selectedRemoveFiles[tab].TYPE_NAME == '奖状等'){
+                this.cost = this.cost - 1000
+                continue
+            }
+            if(this.selectedRemoveFiles[tab].C_SECURITY_LEVEL == '内部公开'){
+                this.cost = this.cost - 500
+                continue
+            }
+            if(this.selectedRemoveFiles[tab].C_SECURITY_LEVEL == '受限'){
+                this.cost = this.cost - 800
+                continue
+            }
+            if(this.selectedRemoveFiles[tab].C_SECURITY_LEVEL == '普通商密'){
+                this.cost = this.cost - 800
+                continue
+            }
+            if(this.selectedRemoveFiles[tab].C_SECURITY_LEVEL != ''){
+                this.cost = this.cost - 800
+                continue
+            }            
+        }
+      }
+    },
+
+
+    checkCost(){  
+        let _self = this
+        for(let tab in this.selectedFiles){
+          let include = false 
+          this.$refs.fileList.itemDataList.find(function(value) {
+                if(value.ID === _self.selectedFiles[tab].ID) {
+                //新加的文件已经包含在itemDataList里了，跳过
+                include = true
+                    }
+                })
+            if(include==true){
+              continue
+            }
+            //先判断实物文件类型，找到了就快进到下一轮循环
+            if(this.selectedFiles[tab].TYPE_NAME == '财务会计文件'){
+                this.cost = this.cost + 300
+                continue
+            }
+              if(this.selectedFiles[tab].TYPE_NAME == '党群行政文件'){
+                this.cost = this.cost + 1000
+                continue
+            }
+            if(this.selectedFiles[tab].TYPE_NAME == '奖状等'){
+                this.cost = this.cost + 1000
+                continue
+            }
+            if(this.selectedFiles[tab].C_SECURITY_LEVEL == '内部公开'){
+                this.cost = this.cost + 500
+                continue
+            }
+            if(this.selectedFiles[tab].C_SECURITY_LEVEL == '受限'){
+                this.cost = this.cost + 800
+                continue
+            }
+            if(this.selectedFiles[tab].C_SECURITY_LEVEL == '普通商密'){
+                this.cost = this.cost + 800
+                continue
+            }
+            if(this.selectedFiles[tab].C_SECURITY_LEVEL != ''){
+                this.cost = this.cost + 800
+                continue
+            }            
+        }
+
+    },
     saveFileToWorkflow(){
         let _self=this;
-        if(this.files.length>0||this.selectedFiles.length>1){
-          if(this.files.length>0){
-            this.createUnit = this.files[0].C_CREATE_UNIT
-          }
-          if(this.files.length==0&&this.selectedFiles.length>1){
-            this.createUnit = this.selectedFiles[0].C_CREATE_UNIT
-          }
-          this.checkCreateUnit()
-          if(this.sameCreate==false){
-          this.$message("请选择相同编制单位的文件！")
-          return
-          }
-        }
-        
+        this.checkCost()
         if(_self.$refs.fileList.itemDataList==null){
             _self.$refs.fileList.itemDataList=_self.selectedFiles;
         }else{
             _self.selectedFiles.forEach(e=>{
                 let isContain=false;
-                _self.$refs.fileList.itemDataList.find((function(value) {
-                if(value === e) {
+                _self.$refs.fileList.itemDataList.find(function(value) {
+                if(value.ID === e.ID) {
                     isContain=true;
                     return;
                     //则包含该元素
                     }
-                }))
+                })
                 if(!isContain){
                     _self.$refs.fileList.itemDataList.push(e);
                 }
@@ -246,6 +301,7 @@ export default {
         }
         _self.files=_self.$refs.fileList.itemDataList;
         _self.$emit('change',_self.$refs.fileList.itemDataList);
+        _self.$emit('getCost',_self.cost);
         this.butt=false;
         this.propertyVisible=false;
     },

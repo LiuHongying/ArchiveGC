@@ -448,10 +448,10 @@
     "archiveoutgoing":"出入库管理",
     "archivebackup":"光盘刻录",
     "showdrawing":"晒图管理",
-    "archivedelivery":"档案移交",
+    "archivedelivery":"文档提交",
     "archivetool":"档案工具",
     "batchmount":"批量挂载",
-    "batchserverimport":"服务器批量导入",
+    "batchserverimport":"批量导入",
     "archivependingout":"待出库",
     "archivegiveback":"待归还",
     "archivependingin":"待入库",
@@ -547,7 +547,9 @@
     "filelist":"文件列表",
     "workflowCenter":"流程中心",
     "CreateDoc":"文件创建",
-    "docStorage":"文件库"
+    "CreateDrawingDoc":"图纸文件创建",
+    "docStorage":"文件库",
+    "DesignDocCreate":"设计文件创建"
 },
 "message": {
     "conditionS":"条件选择",

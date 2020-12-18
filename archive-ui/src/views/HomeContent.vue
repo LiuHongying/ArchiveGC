@@ -3,6 +3,7 @@
     <el-main>
       <div>
         <el-dialog
+          :title="dialogtitle"
           append-to-body
           :visible.sync="dialogVisable"
           @close="dialogVisable = false"
@@ -401,6 +402,7 @@ export default {
       collectionChart: Object,
       dialogVisible: false,
       workflow: {},
+      dialogtitle:"",
     };
   },
   components: {
@@ -428,6 +430,7 @@ export default {
     onIconClick(item) {
       let _self = this;
       let _type = item.type;
+      _self.dialogtitle = item.title;
       _self.workflow = {};
 
       var m = new Map();

@@ -3,11 +3,21 @@ export const npcRouter =  [
         meta: {
             requireAuth: true,
             permit: 1,
-            title:"CreateDoc"
+            title:"CreateDrawingDoc"
         },
         path: '/npc/CreateDoc',
-        name: '新建文档',
+        name: '图纸文件创建',
         component: () => import('@/views/npc/CreateDoc.vue')
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:"DesignDocCreate"
+        },
+        path: '/npc/DesignDocCreate',
+        name: '设计文件创建',
+        component: () => import('@/views/npc/DesignDocCreate.vue')
     },
     {
         meta: {

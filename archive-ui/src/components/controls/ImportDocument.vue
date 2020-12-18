@@ -92,7 +92,8 @@ export default {
     deliveryId: { type: [String], required: true },
     relationName: { type: [String],default:'' },
     tmpPath:{type:String,required:true,default:'/系统配置/导入模板'},
-    templateUrl:{type:String,default:'/import/getImportTemplates'}
+    templateUrl:{type:String,default:'/import/getImportTemplates'},
+    importUrl:{type:String,default:'/import/batchImport'},
   },
   methods: {
     loadTemplate(){
@@ -104,6 +105,7 @@ export default {
         })
         .catch(function(error) {
           _self.$message(_self.$t('application.LoadTemplateFailed'));
+          _self.loading = false;
           console.log(error);
         });
     },
@@ -149,7 +151,7 @@ export default {
       });
       // _self.loading = true;
       axios
-        .post("/import/batchImport", formdata, {headers:{
+        .post(_self.importUrl, formdata, {headers:{
           "Content-Type": "multipart/form-data"
         },
         onUploadProgress: progressEvent => {
