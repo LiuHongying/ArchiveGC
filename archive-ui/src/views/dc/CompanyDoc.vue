@@ -136,7 +136,7 @@
           </el-container>
         </template>
         <template slot="paneR">
-          <el-form :inline="true">
+          <el-form :inline="true" @submit.native.prevent>
             <el-form-item>
               <el-input
                 v-model="inputkey"
@@ -446,14 +446,14 @@ export default {
       .post("/admin/getArchivesFolder", 0)
       .then(function (response) {
         _self.dataList = response.data.data;
-        console.log(JSON.stringify(_self.dataList));
+        _self.loadGridInfo(_self.defaultData);
         _self.loading = false;
       })
       .catch(function (error) {
         console.log(error);
         _self.loading = false;
       });
-    _self.loadGridInfo(_self.defaultData);
+    
   },
   methods: {
     getWorkFlow() {
