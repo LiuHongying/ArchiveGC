@@ -43,6 +43,7 @@
               v-bind:tableHeight="rightTableHeight"
               :isshowOption="true"
               :isshowSelection="true"
+              :isShowChangeList="false"
               :condition="mainParam.condition"
               :folderId="mainParam.folderId"
               gridViewName="RecyclebinGrid"
@@ -62,6 +63,7 @@
                 v-bind:tableHeight="rightTableHeight"
                 :isshowOption="true"
                 :isshowSelection="true"
+                :isShowChangeList="false"
                 @selectchange="selectInnerChange"
               ></DataGrid>
             </div>
