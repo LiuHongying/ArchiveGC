@@ -554,6 +554,7 @@ export default {
           .then(function (response) {
             indata.children = response.data.data;
             //console.log(JSON.stringify(indata));
+            _self.inputkey = "";
             indata.extended = true;
             _self.loading = false;
           })

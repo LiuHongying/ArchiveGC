@@ -286,6 +286,7 @@ export default {
             indata.children = response.data.data;
             //console.log(JSON.stringify(indata));
             indata.extended = true;
+            _self.inputkey = "";
             _self.loading = false;
           })
           .catch(function (error) {
