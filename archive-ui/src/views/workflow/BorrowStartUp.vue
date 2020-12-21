@@ -122,6 +122,8 @@
       accept:"不接受",
       dialogVisible:false,
       borrowType:''
+      flag: false,
+      dialogVisible:false
                 }
             },
             props:{
@@ -335,8 +337,7 @@
                      })
                 },
                 closePage(){
-                    let flag = false;
-                    this.$emit("closedialog", flag);
+                    this.$emit("closedialog", this.flag);
                 },
                 // 保存文档
                 saveItem()

@@ -225,6 +225,15 @@ export default {
     },
     searchDCing() {
       let _self = this;
+      if(_self.parentId==""||_self.parentId==undefined){
+        _self.$message({
+            showClose: true,
+            message: "请选择一条文件",
+            duration: 2000,
+            type: "warning",
+          });
+          return
+      }
       let key = _self.condition1
       if(_self.inputdcing!=''&&_self.inputdcing!=undefined){
         key+=" and (CODING LIKE '%"+_self.inputdcing+"%')";
@@ -236,6 +245,15 @@ export default {
     },
     searchDCed() {
       let _self = this;
+      if(_self.parentId==""||_self.parentId==undefined){
+        _self.$message({
+            showClose: true,
+            message: "请选择一条文件",
+            duration: 2000,
+            type: "warning",
+          });
+          return
+      }
       let key = _self.condition2
       if(_self.inputdced!=''&&_self.inputdced!=undefined){
         key+=" and (CODING LIKE '%"+_self.inputdced+"%')";
@@ -262,8 +280,26 @@ export default {
       var a = [];
       let tab;
       if(type=="主表"){
+        if(_self.selectedItems==''||_self.selectedItems==undefined){
+           _self.$message({
+            showClose: true,
+            message: "请选择一条文件",
+            duration: 2000,
+            type: "warning",
+          });
+          return
+        }
         tab = _self.selectedItems;
       }else{
+        if(_self.selectedDCItems==''||_self.selectedDCItems==undefined){
+           _self.$message({
+            showClose: true,
+            message: "请选择一条文件",
+            duration: 2000,
+            type: "warning",
+          });
+          return
+        }
         tab = _self.selectedDCItems;
       }
       var i;

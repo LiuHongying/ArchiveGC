@@ -28,12 +28,8 @@
       <router-link ref="borrowRouteLink" to="/borroworder"></router-link>
       <!-- <el-button  v-if="formId!=''" @click="addToFormFromShopingCart()" style="float:left">添加到表单</el-button> -->
       <div v-if="formId == ''">
-        <el-button type="primary" @click="cancel(false)">{{
-          $t("application.cancel")
-        }}</el-button>
-        <el-button @click="cleanShopingCart()">清空借阅单</el-button>
+        <el-button @click="cleanShopingCart()">清空</el-button>
         <el-button @click="removeShopingCart()">移除所选</el-button>
-        <el-button @click="showDrawingItem()">调晒</el-button>
         <el-button @click="borrowItem()">借阅</el-button>
       </div>
     </div>
@@ -53,7 +49,7 @@ export default {
   },
   data() {
     return {
-      gridviewName: "shopingCartGrid",
+      gridviewName: "favoriteGrid",
       gridList: [],
       inputkey: "",
       itemDataList: [],
@@ -119,7 +115,7 @@ export default {
       let _self = this;
       _self.loading = true;
       var m = new Map();
-      m.set("gridName", "shopingCartGrid");
+      m.set("gridName", "favoriteGrid");
       m.set("lang", _self.currentLanguage);
       _self
         .axios({
@@ -163,7 +159,7 @@ export default {
         m.set("condition", "");
       }
 
-      m.set("gridName", "shopingCartGrid");
+      m.set("gridName", "favoriteGrid");
 
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);

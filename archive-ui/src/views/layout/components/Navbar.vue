@@ -24,8 +24,9 @@
       <el-tooltip effect="dark" v-bind:content="$t('application.fullscreen')" placement="bottom">
         <ecm-full-screen class="screenfull right-menu-item"></ecm-full-screen>
       </el-tooltip>
-
+      <!--
       <ecm-lang-select class="international right-menu-item"></ecm-lang-select>
+      -->
       <ecm-skin class="theme-switch right-menu-item"></ecm-skin>
       <span class="ecm-help">
         <router-link to="/ShopingCart">{{$t('route.favorite')}}</router-link>&nbsp;
