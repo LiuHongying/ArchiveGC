@@ -6,9 +6,13 @@
     v-bind:columnList="columnList"
     v-bind:itemCount="itemCount"
     v-bind:tableHeight="tableHeight"
+    :optionWidth = "2"
+    gridViewName="GeneralSubGrid"
     :isshowOption="true"
-    @pagesizechange="pageSizeChange"
-    @pagechange="pageChange"
+    :isshowCustom="false"
+    :isEditProperty="false"
+    showOptions="查看内容"
+    :isShowChangeList="false"
   ></DataGrid>
 </template>
 <script type="text/javascript">
@@ -43,7 +47,7 @@ export default {
       let _self = this;
       _self.loading = true;
       var m = new Map();
-      m.set("gridName", "InnerItemGrid");
+      m.set("gridName", "GeneralSubGrid");
       m.set("lang", _self.getLang());
       axios.post("/dc/getGridViewInfo",JSON.stringify(m))
         .then(function(response) {
@@ -59,7 +63,7 @@ export default {
     bindData(){
       let _self = this;
       var m = new Map();
-      m.set("gridName", "InnerItemGrid");
+      m.set("gridName", "GeneralSubGrid");
       m.set("condition", "");
       m.set("id", _self.id);
       m.set("pageSize", _self.pageSize);
