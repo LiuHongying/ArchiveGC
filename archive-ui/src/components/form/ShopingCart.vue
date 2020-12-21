@@ -28,7 +28,7 @@
                     border="0"
                   />
                   <img
-                    v-else-if="scope.row.TYPE_NAME=='卷盒'"
+                    v-else-if="scope.row.C_ITEM_TYPE=='案卷'"
                     :src="'./static/img/box.gif'"
                     :title="scope.row.TYPE_NAME"
                     border="0"
@@ -41,13 +41,55 @@
                   />
                 </template>
               </el-table-column>>
-              <template v-for="item in gridList">
-                <el-table-column :key="item.id" :label="item.label" :prop="item.attrName" sortable>
+              <template v-for="(citem, idx) in gridList">
+                <template v-if="citem.visibleType == 1">
+              <template v-if="(citem.width + '').indexOf('%') > 0">
+                <el-table-column
+                  :label="citem.label"
+                  :prop="citem.attrName"
+                  :min-width="citem.width"
+                  :sortable="citem.allowOrderby"
+                  :key="idx + '_C'"
+                >
                   <template slot-scope="scope">
-                    <template v-if="item.attrName=='ADD_DATE'">{{dateFormat(scope.row.ADD_DATE)}}</template>
-                    <template v-else>{{scope.row[item.attrName]}}</template>
+                    <div v-if="citem.attrName.indexOf('DATE') > 0">
+                      <span>{{ dateFormat(scope.row[citem.attrName]) }}</span>
+                    </div>
+                    <div v-else>
+                      <span
+                        :class="
+                          scope.row['LIFECYCLE_DIR'] == 0 ? 'reject' : 'success'
+                        "
+                        >{{ scope.row[citem.attrName] }}</span
+                      >
+                    </div>
                   </template>
                 </el-table-column>
+              </template>
+              <template v-else>
+                <el-table-column
+                  :label="citem.label"
+                  :width="citem.width"
+                  :prop="citem.attrName"
+                  :sortable="citem.allowOrderby"
+                  :key="idx + '_C'"
+                >
+                  <template slot-scope="scope">
+                    <div v-if="citem.attrName.indexOf('DATE') > 0">
+                      <span>{{ dateFormat(scope.row[citem.attrName]) }}</span>
+                    </div>
+                    <div v-else>
+                      <span
+                        :class="
+                          scope.row['LIFECYCLE_DIR'] == 0 ? 'reject' : 'success'
+                        "
+                        >{{ scope.row[citem.attrName] }}</span
+                      >
+                    </div>
+                  </template>
+                </el-table-column>
+              </template>
+              </template>
               </template>
               <el-table-column align="right" width="80">
                 <template slot-scope="scope">
@@ -65,9 +107,7 @@
       <!-- <el-button  v-if="formId!=''" @click="addToFormFromShopingCart()" style="float:left">添加到表单</el-button> -->
       <!-- <div v-if="formId==''"> -->
         <div v-if="showFooter == true">
-        <el-button type="primary" @click="cancel(false)">{{$t('application.cancel')}}</el-button>
-        <el-button type="primary" @click="openShopingCart()">获取列表</el-button>
-        <el-button @click="cleanShopingCart()">清空借阅单</el-button>
+        <el-button @click="cleanShopingCart()">清空</el-button>
         <el-button @click="removeShopingCart()">移除所选</el-button>
         <!-- <el-button @click="showDrawingItem()">调晒</el-button> -->
         <el-button @click="borrowItem()">借阅</el-button>
@@ -123,7 +163,7 @@ export default {
     _self.loadGridView();
   },
   methods: {
-    //获取待办任务列表，最多五条
+    //获取
     openShopingCart() {
       let _self = this;
       var m = new Map();

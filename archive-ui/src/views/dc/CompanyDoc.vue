@@ -174,27 +174,23 @@
                 size="medium"
                 icon="el-icon-folder-add"
                 @click="addToShopingCart()"
-                >{{ $t("application.addToShopingCart") }}</el-button
+                >添加到收藏</el-button
               >
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" plain size="medium" icon="el-icon-right" @click="getWorkFlow">发起流程</el-button>
+              <el-button type="primary" plain size="medium" icon="el-icon-right" @click="getWorkFlow">发起借阅</el-button>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
             </el-form-item>
             <el-form-item>
-              <template v-if="isFileAdmin">
+            
                 <!-- `checked` 为 true显示卷宗 或 false不显示卷宗 -->
                 <el-checkbox
                   v-model="showBox"
-                  :disabled="disable"
                   @change="showFileBox"
-                  >{{
-                    $t("application.show") + $t("application.fileBox")
-                  }}</el-checkbox
+                  >显示案卷</el-checkbox
                 >
-              </template>
             </el-form-item>
           </el-form>
           <el-row>
@@ -230,7 +226,7 @@
                     border="0"
                   />
                   <img
-                    v-else-if="scope.row.TYPE_NAME == '卷盒'"
+                    v-else-if="scope.row.C_ITEM_TYPE == '案卷'"
                     :src="'./static/img/box.gif'"
                     :title="scope.row.TYPE_NAME"
                     border="0"
@@ -485,7 +481,7 @@ export default {
       let _self = this;
       _self.loading = true;
       var m = new Map();
-      m.set("gridName", "OfficialGrid");
+      m.set("gridName", "GeneralGrid");
       m.set("lang", _self.currentLanguage);
       axios
         .post("/dc/getGridViewInfo", JSON.stringify(m))
@@ -506,12 +502,14 @@ export default {
     },
     rowClick(row) {
       this.currentId = row.ID;
-      if (row.TYPE_NAME == "卷盒" || row.TYPE_NAME == "图册") {
+      if (row.TYPE_NAME == "卷盒" || row.C_ITEM_TYPE == "案卷") {
         this.itemDialogVisible = true;
         let _self = this;
         setTimeout(() => {
+          _self.$refs.innerItemViewer.id = _self.currentId;
           _self.$refs.innerItemViewer.loadGridInfo();
-        }, 10);
+          //_self.$refs.innerItemViewer.bindData();
+        }, 100);
       }
     },
     renderContent: function (h, { node, data, store }) {
@@ -608,7 +606,7 @@ export default {
     loadGridData(indata) {
       let _self = this;
       _self.tableLoading = true;
-      var key = _self.inputkey;
+      var key = _self.sqlStringFilter(_self.inputkey);
       var m = new Map();
       _self.gridViewTrans = indata.gridView;
       _self.idTrans = indata.id;
@@ -632,7 +630,7 @@ export default {
     //获取包含卷盒在内的所有信息
     loadAllGridData(indata) {
       let _self = this;
-      var key = _self.inputkey;
+      var key = _self.sqlStringFilter(_self.inputkey);
       var m = new Map();
       m.set("gridName", indata.gridView);
       m.set("folderId", indata.id);

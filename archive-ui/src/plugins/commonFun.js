@@ -85,3 +85,12 @@ Vue.prototype.getObjectById=function(id,callback){
             }
           });
 }
+
+Vue.prototype.sqlStringFilter = function(keyString){
+	if(keyString && keyString.length>0){
+    keyString = keyString.replace(new RegExp("'","gm"),"''");//.replace(new RegExp("(","gm"),"").replace(new RegExp(")","gm"),"");
+    keyString = keyString.replace("(","");
+    keyString = keyString.replace(")","");
+	}
+	return keyString;
+}
