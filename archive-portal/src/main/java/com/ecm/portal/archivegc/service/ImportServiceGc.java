@@ -85,6 +85,7 @@ public class ImportServiceGc extends EcmService {
 		StringBuilder sb = new StringBuilder();
 		int sucessCount = 0;
 		int failedCount = 0;
+		relationName = "irel_children";
 		sb.append("开始导入:").append(DateUtils.currentDate("yyyy-MM-dd HH:mm:ss")).append("\r\n");
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("TYPE_NAME", "导入批次");
@@ -250,9 +251,6 @@ public class ImportServiceGc extends EcmService {
 							}else {
 								failedCount ++;
 							}
-							if("设计文件".equals(childType)) {
-								continue;
-							}
 //							if(!StringUtils.isEmpty(newId)) {
 //								if("设计文件".equals(parentType)&&(relationName==null||"".equals(relationName.trim()))) {
 //									relationName="设计文件";
@@ -269,15 +267,7 @@ public class ImportServiceGc extends EcmService {
 								&& isEmptyCell(sheet.getRow(i).getCell(childStartIndex + 2))) {
 							continue;
 						}
-						if("设计文件".equals(childType)) {
-							relationName="设计文件";
-						}else if("相关文件".equals(childType)) {
-							relationName="相关文件";
-							tempId = newDocument(token, childType, null,null, sheet.getRow(i),
-									fileList, attrNames, parentId, relationName, number, childStartIndex,
-									sheet.getRow(i).getLastCellNum(), sameValues, null);
-							continue;
-						}
+						
 						tempId = null;
 						String fileNameStr = getCellValue(sheet.getRow(i).getCell(0));
 						String[] fileNames = fileNameStr.split(";");
@@ -472,53 +462,6 @@ public class ImportServiceGc extends EcmService {
 											sucessCount ++;
 										}else {
 											failedCount ++;
-										}
-										// 设计文件更新文件传递单属性
-										if ("设计文件".equals(parentType)) {
-											EcmDocument parentDoc = documentService.getObjectById(token, deliveryId);
-											EcmDocument techDoc = null;
-											if (!StringUtils.isEmpty(sameFields)) {
-
-												techDoc = documentService.getObjectById(token, tempId);
-												if (parentDoc != null) {
-													String[] ps = sameFields.split(";");
-
-													for (String p : ps) {
-														if (!StringUtils.isEmpty(p)) {
-															String[] names = p.split(":");
-															String fromName = "";
-															String toName = "";
-															if (names.length == 2) {
-																fromName = names[0];
-																toName = names[1];
-															} else if (names.length == 1) {
-																fromName = names[0];
-																toName = fromName;
-															}
-															techDoc.getAttributes().put(toName,
-																	parentDoc.getAttributeValue(fromName));
-
-														}
-													}
-													documentService.updateObject(token, techDoc, null);
-												}
-											}
-											if (StringUtils.isEmpty(parentDoc.getTitle())) {
-												if (techDoc == null) {
-													techDoc = documentService.getObjectById(token, tempId);
-												}
-												if (techDoc != null && !StringUtils.isEmpty(parentDoc.getTitle())) {
-													parentDoc.setTitle(techDoc.getTitle());
-													documentService.updateObject(token, parentDoc, null);
-												}
-											}
-
-										}
-
-										if ("设计文件".equals(parentType)
-												&& (relationName == null || "".equals(relationName.trim()))) {
-											relationName = "设计文件";
-
 										}
 										// 添加子文件关联关系
 										if(!StringUtils.isEmpty(deliveryId)) {

@@ -295,7 +295,7 @@ export default {
       let _self = this;
       if(_self.doc){
         console.log("typename:"+_self.doc.typeName);
-        if(_self.doc.typeName == "卷盒" || _self.doc.typeName=="图册"){
+        if(_self.doc.typeName == "卷盒" || _self.doc.typeName=="图册" || _self.docObj.C_ITEM_TYPE=='案卷'){
           _self.viewerType = 100;
         } else if(_self.doc.format == "pdf"){
           _self.viewerType = 1; 
