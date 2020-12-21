@@ -8,6 +8,7 @@
                     folderPath=""
                     :showUploadFile="false"
                     v-bind:typeName="typeName"
+                    v-bind:itemId="parentId"
                 >
                 </ShowProperty>
                 <DesignFile ref="workflowFile"
@@ -53,14 +54,16 @@
                     
                     isOnly:false,
                     butt:false,
-                    typename:"设计文件作废审批单",
-                    saveButt:false
+                    typename:"档案销毁单",
+                    saveButt:false,
+                    parentId:"",
                 }
             },
             props:{
                 workflowObj:{type:Object,default:{}},
                 showUploadFile:{type:Boolean,default:true},
                 workflowFileList:{type:Array,default:new Array()},
+                parentId:{type:String,default:""},
             },
             
             mounted(){

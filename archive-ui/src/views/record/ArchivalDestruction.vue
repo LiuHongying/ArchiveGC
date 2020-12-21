@@ -1,6 +1,17 @@
 <template>
   <DataLayout>
     <template v-slot:header>
+      <el-dialog
+      title="档案销毁流程"
+      :visible.sync="flowVisible"
+      @close="flowVisible = false"
+      width="90%"
+      style="width: 100%"
+      :close-on-click-modal="false"
+      v-dialogDrag
+    >
+      <div><DestoryStartUp :workflowObj="workflow" :showUploadFile="true" :parentId="parentID" :workflowFileList="files4Start" @close="flowVisible = false"></DestoryStartUp></div>
+    </el-dialog>
       <el-form :inline="true">
         <el-form-item>
           <el-input
@@ -24,8 +35,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item>
-            <el-button type="primary" @click="startFlow()">发起流程</el-button>
+        <el-form-item v-if="showFlow">
+            <el-button type="primary"  @click="getWorkFlow">发起流程</el-button>
         </el-form-item>
       </el-form>
     </template>
@@ -43,7 +54,7 @@
                   condition="TYPE_NAME='档案销毁单' and STATUS='新建' and IS_RELEASED=1 "
                   :optionWidth = "2"
                   :isshowCustom="false"
-                  :isEditProperty="true"
+                  :isEditProperty="false"
                   :isInitData="false"
                   showOptions="查看内容"
                   :isShowChangeList="false"
@@ -77,6 +88,7 @@
 <script type="text/javascript">
 import DataGrid from "@/components/DataGrid";
 import DataLayout from "@/components/ecm-data-layout";
+import DestoryStartUp from "@/views/workflow/DestoryStartUp.vue"
 
 export default {
   name: "TC",
@@ -110,6 +122,12 @@ export default {
         },
       ],
       value:"新建",
+      flowVisible:false,
+      workflow:{},
+      selectedDCItems:[],
+      parentID:"",
+      files4Start:[],
+      showFlow:true,
     };
   },
   mounted() {
@@ -160,12 +178,56 @@ export default {
     },
     changeStatus:function(){
       this.search()
+      if(this.value!='新建'){
+       this.showFlow=false
+      }else{
+        this.showFlow=true
+      }
+    },
+    getWorkFlow() {
+      let _self = this;
+      if(_self.value!='新建'){
+        _self.$message({
+            showClose: true,
+            message:"只有新建状态的文件才能发起流程",
+            duration: 2000,
+            type: "warning",
+          });
+        return
+      }
+      if(_self.selectedThItems==''||_self.selectedThItems==undefined){
+        _self.$message({
+            showClose: true,
+            message:"请选择一个档案销毁单",
+            duration: 2000,
+            type: "warning",
+          });
+        return
+      }
+      _self.files4Start = _self.$refs.DestructionFileGrid.itemDataList
+      var m = new Map();
+      m.set("processDefinitionKey", "档案销毁流程");
+
+      axios
+        .post("/dc/getWorkflow", JSON.stringify(m))
+        .then(function (response) {
+          _self.workflow = response.data.data[0];
+          console.log(_self.workflow)
+          _self.parentID=_self.selectedThItems[0].ID
+          _self.flowVisible = true;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
+      
     },
   },
   props: {},
   components: {
     DataGrid: DataGrid,
     DataLayout: DataLayout,
+    DestoryStartUp:DestoryStartUp
   },
 };
 </script>
