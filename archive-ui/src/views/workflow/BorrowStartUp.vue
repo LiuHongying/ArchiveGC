@@ -118,6 +118,7 @@
       reviewer2:'',
       reviewer3:'',
       accept:"不接受",
+      flag: false,
       dialogVisible:false
                 }
             },
@@ -316,8 +317,7 @@
                      })
                 },
                 closePage(){
-                    let flag = false;
-                    this.$emit("closedialog", flag);
+                    this.$emit("closedialog", this.flag);
                 },
                 // 保存文档
                 saveItem()

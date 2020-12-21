@@ -9,7 +9,7 @@
       :close-on-click-modal="false"
       v-dialogDrag
     >
-      <div><BorrowStartUp :workflowObj="workflow" :showUploadFile="true" :workflowFileList="itemDataList"></BorrowStartUp></div>
+      <div><BorrowStartUp :workflowObj="workflow" :showUploadFile="true" :workflowFileList="selectedItemList" @closedialog="closeDialog"></BorrowStartUp></div>
     </el-dialog>
     <el-dialog
       :title="$t('application.openShopingCart')"
@@ -711,6 +711,10 @@ export default {
       } else {
         _self.loadGridData(_self.currentFolder);
       }
+    },
+
+    closeDialog(val) {
+      this.borrowVisible = val;
     },
     //借阅
     borrowItem() {
