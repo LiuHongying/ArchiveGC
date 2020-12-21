@@ -121,7 +121,7 @@
       reviewer3:'',
       accept:"不接受",
       dialogVisible:false,
-      borrowType:''
+      borrowType:'',
       flag: false,
       dialogVisible:false
                 }
