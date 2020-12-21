@@ -26,6 +26,8 @@
                     :isShowPage="false"
                     v-model="workflowFileList"
                     :workflowObj="workflowObj"
+                    :type="borrowType"
+                    @getType="getTypeResult"
                 >
                 </BorrowFile>
                 <el-dialog
@@ -118,7 +120,8 @@
       reviewer2:'',
       reviewer3:'',
       accept:"不接受",
-      dialogVisible:false
+      dialogVisible:false,
+      borrowType:''
                 }
             },
             props:{
@@ -130,6 +133,22 @@
                 // this.getWorkflows();
             },
             methods:{
+            getTypeResult(){
+                 let _self = this
+                 _self.$refs.workflowFile.setSubTypeCondition(false)
+                 let ecmFormItems = this.$refs.ShowProperty.dataList[0].ecmFormItems
+                    ecmFormItems.forEach(element => {
+                        if(element.attrName=="SUB_TYPE"){
+                          _self.borrowType = element.defaultValue
+                          if(_self.borrowType=='纸质借阅'||_self.borrowType=='查阅'){
+                          _self.$refs.workflowFile.setSubTypeCondition(true)}
+                          else{
+                          _self.$refs.workflowFile.setSubTypeCondition(false)
+                          }
+                        }
+                    });
+            },
+            
             open(){
                 this.dialogVisible=true
             },
