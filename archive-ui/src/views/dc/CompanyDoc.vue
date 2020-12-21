@@ -9,7 +9,7 @@
       :close-on-click-modal="false"
       v-dialogDrag
     >
-      <div><BorrowStartUp :workflowObj="workflow" :showUploadFile="true" :workflowFileList="itemDataList"></BorrowStartUp></div>
+      <div><BorrowStartUp :workflowObj="workflow" :showUploadFile="true" :workflowFileList="selectedItemList" @closedialog="closeDialog"></BorrowStartUp></div>
     </el-dialog>
     <el-dialog
       :title="$t('application.openShopingCart')"
@@ -174,11 +174,11 @@
                 size="medium"
                 icon="el-icon-folder-add"
                 @click="addToShopingCart()"
-                >{{ $t("application.addToShopingCart") }}</el-button
+                >添加到收藏夹</el-button
               >
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" plain size="medium" icon="el-icon-right" @click="getWorkFlow">发起流程</el-button>
+              <el-button type="primary" plain size="medium" icon="el-icon-right" @click="getWorkFlow">发起借阅流程</el-button>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
@@ -713,6 +713,10 @@ export default {
       } else {
         _self.loadGridData(_self.currentFolder);
       }
+    },
+
+    closeDialog(val) {
+      this.borrowVisible = val;
     },
     //借阅
     borrowItem() {
