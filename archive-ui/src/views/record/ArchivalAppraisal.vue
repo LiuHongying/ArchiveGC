@@ -333,7 +333,7 @@ export default {
               type: "success",
             });
             _self.propertyVisible = false;
-            _self.$refs.ArchiveAppraisal.loadGridData();
+            _self.search()
             _self.$refs.AppraisalFile.itemDataList=[];
           } else {
             _self.$message({
@@ -527,7 +527,7 @@ export default {
     },
     getWorkFlow() {
       let _self = this;
-      if(_self.selectThChange==''||_self.selectThChange==undefined){
+      if(_self.selectedThItems==''||_self.selectedThItems==undefined){
         _self.$message({
             showClose: true,
             message:"请选择一个档案鉴定单",
