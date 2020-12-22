@@ -163,6 +163,46 @@ public class WorkFlowCenter extends ControllerAbstract {
 
 	}
 
+	
+	@RequestMapping(value = "/dc/createWorkflowFormData4Appraisal", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> createWorkflowFormData4Appraisal(String metaData, MultipartFile uploadFile) throws Exception {
+
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		Object saveType = args.get("saveType");
+
+		args.keySet().remove("childFileId");
+		args.keySet().remove("saveType");
+		EcmDocument doc = new EcmDocument();
+		doc.setAttributes(args);
+
+		Object fid = args.get("folderId");
+
+		String folderId = "";
+		if (fid == null) {
+			folderId = folderPathService.getFolderId(getToken(), doc.getAttributes(),
+					(saveType != null && !"".equals(saveType.toString())) ? saveType.toString() : "3");
+		} else {
+			folderId = fid.toString();
+		}
+		doc.setFolderId(folderId);
+		String id = doc.getId();
+			if(id!=null) {
+				documentService.updateObject(getToken(), doc.getAttributes());
+			
+		mp.put("code", ActionContext.SUCESS);
+		mp.put("MES", "");
+		mp.put("id", id);}
+			if(id==null) {
+				mp.put("code", ActionContext.FAILURE);
+			}
+		return mp;
+	}
+	
+	
+	
+	
 	@RequestMapping(value = "/dc/createWorkflowFormData4Copy", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> createWorkflowFormData4Copy(String metaData, MultipartFile uploadFile) throws Exception {
