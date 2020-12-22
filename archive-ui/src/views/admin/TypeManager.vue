@@ -40,7 +40,7 @@
           <el-breadcrumb-item>类型管理</el-breadcrumb-item>
         </el-breadcrumb> -->
 
-        <el-form :inline="true" style="text-align: left;" class="topbar">
+        <el-form :inline="true" style="text-align: left;" class="topbar" @submit.native.prevent>
           <el-form-item>
             <el-input
               v-model="inputkey"

@@ -540,8 +540,8 @@
     "CreateDrawingDoc":"Create drawing docs",
     "docStorage":"Doc storage",
     "DesignDocCreate":"Create design docs",
-    "Drafts":"drafts"
-    
+    "Drafts":"drafts",
+    "preArchive":"PreArchive"
 },
 "message": {
     "conditionS":"Select Condition",

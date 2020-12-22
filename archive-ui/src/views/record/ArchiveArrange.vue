@@ -212,7 +212,7 @@
                       >{{$t('application.newVolume')}}</el-button> -->
                       <el-col :span="17">
                       <el-button
-                        type="primary"
+                        type="warning"
                         plain
                         size="small"
                         icon="el-icon-delete"
@@ -260,7 +260,7 @@
                         icon="el-icon-printer"
                         @click="beforePrintRidge(selectRow,'printRidgeGrid','打印背脊')"
                         title="打印"
-                      ></el-button> -->
+                      ></el-button> 
                       <el-button
                         type="primary"
                         plain
@@ -269,6 +269,7 @@
                         @click="beforePrintBarCode(selectedItems,'打印条码')"
                         title="打印条码"
                       ></el-button>
+                      -->
                       <el-button
                         type="primary"
                         plain
@@ -283,24 +284,7 @@
                         size="small"
                         icon="el-icon-printer"
                         @click="beforePrintPdf417(selectedItems,'打印档号')"
-                        title="打印pdf417"
-                      ></el-button>
-                        <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-printer"
-                        @click="arrangeComplete('已整编')"
-                        title="整编完成"
-                      ></el-button>
-                    
-                      <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-printer"
-                        @click="arrangeComplete('已质检')"
-                        title="质检完成"
+                        title="打印条码"
                       ></el-button>
                       <el-button
                         type="primary"
@@ -322,16 +306,33 @@
                         type="primary"
                         plain
                         size="small"
-                        icon="el-icon-help"
+                        icon="el-icon-folder-add"
                         @click="pieceNumVisible=true"
                         title="生成批次号"
+                      ></el-button>
+                        <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-right"
+                        @click="arrangeComplete('已整编')"
+                        title="整编完成"
+                      ></el-button>
+                    
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-check"
+                        @click="arrangeComplete('已质检')"
+                        title="质检完成"
                       ></el-button>
                       <el-button
                         type="primary"
                         plain
                         :loading="releaseLoading"
                         size="small"
-                        icon="el-icon-sell"
+                        icon="el-icon-right"
                         @click="moveToPreFilling"
                         title="提交预归档库"
                       ></el-button>
@@ -340,7 +341,7 @@
                         plain
                         :loading="releaseLoading"
                         size="small"
-                        icon="el-icon-sell"
+                        icon="el-icon-right"
                         @click="penddingStorage"
                         title="提交入库"
                       ></el-button>
@@ -359,6 +360,9 @@
                         :isshowSelection="true"
                         :condition="mainParam.condition"
                         :folderId="mainParam.folderId"
+                        showOptions="查看内容"
+                        :isShowChangeList="false"
+                        :optionWidth = "2"
                         gridViewName="ArrangeGrid"
                         @rowclick="beforeShowInnerFile"
                         @selectchange="selectChange"
@@ -408,6 +412,9 @@
                         v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
                         :isshowOption="true"
                         :isshowSelection="true"
+                        showOptions="查看内容"
+                        :isShowChangeList="false"
+                        :optionWidth = "2"
                         @selectchange="selectInnerChange"
                       ></DataGrid>
                     </el-col>
@@ -560,7 +567,7 @@ export default {
       folderPath:"",
       parentId:"",
       folderId:"",
-      archiveStatus:"",
+      archiveStatus:"整编",
       extendMap:{},
       pieceNum:"",//批次号
       pieceNumVisible:false,//是否显示取批次号dialog

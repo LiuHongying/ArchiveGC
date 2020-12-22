@@ -2,7 +2,7 @@
   <DataLayout>
     <template v-slot:header>
       <el-dialog
-        title="添加库(位)号"
+        title="添加库号"
         :visible.sync="propertyVisible"
         @close="propertyVisible = false"
         width="30%"
@@ -10,6 +10,7 @@
         v-dialogDrag
       >
         <el-form>
+          <!--
           <el-form-item>
             <el-input
               style="width: 90%"
@@ -18,6 +19,7 @@
             >
             </el-input>
           </el-form-item>
+          -->
           <el-form-item>
             <el-button type="primary" @click="addStoreNum()">{{
               $t("application.ok")
@@ -28,12 +30,12 @@
           </el-form-item>
         </el-form>
       </el-dialog>
-      <el-form :inline="true">
+      <el-form :inline="true" @submit.native.prevent>
         <el-form-item>
           <el-input
             style="width: 200px"
             v-model="inputValueNum"
-            placeholder="请输入编码或标题"
+            placeholder="请输入编码、题名或批次"
           ></el-input>
         </el-form-item>
         <el-form-item>
@@ -42,10 +44,10 @@
           }}</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="propertyVisible = true">添加库(位)号</el-button>
+          <el-button type="primary" @click="propertyVisible = true">添加库号</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handOver()">移交入库</el-button>
+          <el-button type="primary" @click="handOver()">入库</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click.native="exportData">{{
@@ -130,7 +132,7 @@ export default {
       // 顶部除列表高度
       topbarHeight: 35,
       // 底部除列表高度
-      bottomHeight: 80,
+      bottomHeight: 40,
 
       tables: {
         main: {
@@ -181,6 +183,8 @@ export default {
           _self.inputValueNum +
           "%' OR TITLE LIKE '%" +
           _self.inputValueNum +
+          "%' OR C_BATCH_CODING2 LIKE '%" +
+          _self.inputValueNum +
           "%')";
       }
 
@@ -220,7 +224,7 @@ export default {
           },
         })
         .then(function (response) {
-          _self.$refs.mainDataGrid.loadGridData();
+          _self.search();
           let code = response.data.code;
         });
 
