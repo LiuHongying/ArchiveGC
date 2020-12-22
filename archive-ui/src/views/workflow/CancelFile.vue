@@ -243,7 +243,7 @@ export default {
     this.$refs.attach.loadGridData();  
     this.$refs.fileList.loadGridData();
     },
-            beforeUploadFile(uploadpath){
+        beforeUploadFile(uploadpath){
             let _self=this;
             _self.parentId = _self.GUID          
             if(_self.parentId==undefined||_self.parentId==''){
@@ -261,7 +261,16 @@ export default {
         },
             uploadData() {
             let _self = this;
-            let formdata = _self.getFormData();
+            _self.$emit("getParentId",_self.parentId)
+            let formdata = new FormData();
+            let data = {}
+            data["parentDocId"] = _self.parentId;
+            data["relationName"]='irel_children';
+            data["TYPE_NAME"]='附件';
+            formdata.append("metaData", JSON.stringify(data));
+            _self.fileList.forEach(function(file) {
+                formdata.append("uploadFile", file.raw, file.name);
+            });
             _self.uploading=true;
             console.log(formdata)
             _self
@@ -277,7 +286,6 @@ export default {
                 .then(function(response) {
                 _self.importdialogVisible = false;
                 _self.uploading=false;
-                //_self.$refs.attachmentDoc.loadGridData();
                 _self.$refs.attach.loadGridData();  
                 _self.$message({
                         showClose: true,
@@ -288,14 +296,13 @@ export default {
                 })
                 .catch(function(error) {
                 _self.uploading=false;
-                console.log(error);
                 });
             },
             getFormData() {
             let _self = this;
             let formdata = new FormData();
             var data = {};
-            data["parentDocId"] = _self.parentId;//_self.selectedInnerItems[0].ID;//_self.selectedFileId;
+            data["parentDocId"] = _self.parentId;
             data["relationName"]='irel_children';
             data["TYPE_NAME"]='附件';
             formdata.append("metaData", JSON.stringify(data));
