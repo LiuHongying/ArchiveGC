@@ -351,7 +351,7 @@ export default {
             })
       axios.post("/exchange/doc/deleteRelations",ids).then(function(response){
         let code = response.data.code
-        if(code==0){
+        if(code==1){
           _self.$message("删除成功")
           _self.$refs.attach.loadGridData()
         }
