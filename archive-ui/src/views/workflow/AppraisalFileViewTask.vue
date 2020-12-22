@@ -306,10 +306,9 @@ export default {
                 });
             },
     download(){
-         console.log(this.allowEdit)
-    console.log(this.isShowUpdate)
-     // let url = this.axios.defaults.baseURL+"/dc/getContent?id="+this.parentId+"&token="+sessionStorage.getItem('access-token')+"&action=download";
-      //window.open(url, '_blank');
+
+      let url = this.axios.defaults.baseURL+"/dc/getContent?id="+this.parentId+"&token="+sessionStorage.getItem('access-token')+"&action=download";
+      window.open(url, '_blank');
     }, 
         checkCondition(){    
      let _self = this
