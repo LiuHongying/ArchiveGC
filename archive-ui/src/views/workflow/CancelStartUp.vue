@@ -34,6 +34,7 @@
                     allowEdit
                     :isShowPage="false"
                     v-model="workflowFileList"
+                    @getParentId="getParentIdResult"
                     :workflowObj="workflowObj"
                 >
                 </BorrowFile>
@@ -43,7 +44,8 @@
                 :show-close="true"
                 width="50%"
                 :append-to-body="true"
-                modal-append-to-body="false" 
+                modal-append-to-body="false"
+
                 >
                 <span>
                 中国核电工程有限公司</br>
@@ -65,7 +67,6 @@
                 <div class="dialog-footer" style="float:right">
                     <slot name="footerButton">
                         <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
-                        
                         <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button>
                         <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
                     </slot>
@@ -144,82 +145,11 @@
                 workflowFileList:{type:Array,default:[]}
             },
             mounted(){
-                this.getGUID()
             },
             methods:{
-            beforeUploadFile(uploadpath){
-            let _self=this;
-            _self.parentId = _self.GUID
-            console.log(_self.parentId)
-            if(_self.parentId==undefined||_self.parentId==''){
-                _self.$message({
-                        showClose: true,
-                        message: _self.$t('message.PleaseSelectOneFile'),
-                        duration: 2000,
-                        type: "warning"
-                    });
-                return;
-            }
-            _self.uploadUrl=uploadpath;
-            _self.fileList=[];
-            _self.importdialogVisible=true;
-        },
-            uploadData() {
-            let _self = this;
-            let formdata = _self.getFormData();
-            _self.uploading=true;
-            console.log(formdata)
-            _self
-                .axios({
-                headers: {
-                    "Content-Type": "application/json;charset=UTF-8"
-                },
-                datatype: "json",
-                method: "post",
-                data: formdata,
-                url: _self.uploadUrl
-                })
-                .then(function(response) {
-                console.log(response)
-                _self.importdialogVisible = false;
-                _self.uploading=false;
-                //_self.$refs.attachmentDoc.loadGridData();
-                _self.$message({
-                        showClose: true,
-                        message: _self.$t('application.Import')+_self.$t('message.success'),
-                        duration: 2000,
-                        type: 'success'
-                    });
-                })
-                .catch(function(error) {
-                _self.uploading=false;
-                console.log(error);
-                });
+            getParentIdResult(val){
+            this.parentId = val
             },
-            getFormData() {
-            let _self = this;
-            let formdata = new FormData();
-            var data = {};
-            data["parentDocId"] = _self.parentId;//_self.selectedInnerItems[0].ID;//_self.selectedFileId;
-            data["relationName"]='附件';
-            data["TYPE_NAME"]='附件';
-            formdata.append("metaData", JSON.stringify(data));
-            _self.fileList.forEach(function(file) {
-                formdata.append("uploadFile", file.raw, file.name);
-            });
-            return formdata;
-            },
-            handleChange(file, fileList) {
-            this.fileList = fileList;
-            console.log(this.fileList)
-        },
-            getGUID(){
-             let _self = this
-             if(this.GUID==''){
-             axios.get("/dc/GUID").then(function(response) {
-            _self.GUID = response.data.data
-            console.log(_self.GUID)
-            })}},
             open(){
                 this.dialogVisible=true
             },
@@ -283,15 +213,14 @@
                     {
                         m.set('TYPE_NAME',_self.$refs.ShowProperty.myTypeName);
                         m.set('FOLDER_ID',_self.$refs.ShowProperty.myFolderId);
-                        m.set("parentDocId", _self.parentId);
+                        m.set("ID", _self.parentId);
                         m.set("relationName",_self.relationName);
                         console.log(_self.$refs.ShowProperty.myTypeName)
-                        console.log(_self.$refs.ShowProperty.myFolderId)
                     }
                     _self.validateData(m,function(isOk)
                     {
                         _self.isOnly=isOk;
-
+                        console.log(m)
                         if(_self.isOnly==false){
                             _self.$message({
                                 showClose: true,
@@ -327,8 +256,6 @@
                                     type: "success"
                                 });
                                 //发起流程
-
-                                _self.butt=false;
                                 _self.propertyVisible = false;
                                 _self.propertyrela=false
 
@@ -346,6 +273,7 @@
                                         duration: 2000,
                                         type: "success",
                                     });
+                                    _self.butt=false;
                                     _self.closePage();
                                    
                                     })
@@ -368,7 +296,7 @@
                                     type: "warning"
                                 });
                                 _self.butt=false;
-                            
+                                
                             }else{
                                 _self.$message({
                                     showClose: true,
@@ -386,7 +314,7 @@
                             });
                         }
                         
-                    });
+                     });
                 },
                 closePage(){
                     let flag = false;
