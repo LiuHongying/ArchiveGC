@@ -29,8 +29,8 @@ import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
 import com.ecm.core.service.RelationService;
 import com.ecm.portal.archivegc.entity.ReplyCfgEntity;
-import com.ecm.portal.archivegc.impl.CustomCacheService;
 import com.ecm.portal.controller.ControllerAbstract;
+import com.ecm.portal.service.CustomCacheService;
 import com.ecm.portal.util.CustomInfo;
 @Controller
 public class Receiving4TC extends ControllerAbstract {

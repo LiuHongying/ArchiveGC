@@ -354,7 +354,7 @@
                         key="main"
                         dataUrl="/dc/getInnerFolderDocuments"
                         :isInitData="false"
-                        v-bind:tableHeight="(layout.height-startHeight)*(topPercent-15)/100-topbarHeight"
+                        v-bind:tableHeight="(layout.height-startHeight)*(topPercent)/100-topbarHeight"
                         :isshowOption="true"
                         :isshowSelection="true"
                         :condition="mainParam.condition"
@@ -405,7 +405,7 @@
                         gridViewName='ArrangeInnerGrid'
                         condition="and a.NAME='irel_children' and b.IS_HIDDEN=0"
                         :parentId="parentId"
-                        v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent-15)/100-bottomHeight"
+                        v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
                         :isshowOption="true"
                         :isshowSelection="true"
                         @selectchange="selectInnerChange"
@@ -474,7 +474,7 @@ export default {
       // 底部除列表高度
       bottomHeight: 35,
       isExpand: false,
-      rightTableHeight: (window.innerHeight - 232) / 2,
+      rightTableHeight: (window.innerHeight - 160) / 2,
       asideHeight: window.innerHeight - 85,
       treeHight: window.innerHeight - 125,
       asideWidth: "100%",
@@ -646,7 +646,7 @@ export default {
             "Content-Type": "application/json;charset=UTF-8"
           },
           method: "post",
-          data: row.TYPE_NAME,
+          data: row.ID,
           url: "/dc/getArchiveFileConfig"
         })
         .then(function(response) {
@@ -654,8 +654,8 @@ export default {
           if(code=='1'){
             let data=response.data.data;
             let fileType=data[0].C_TO;
-            _self.newArchiveFileItem(fileType,row);
-            writeAudit(_self.parentId);
+            _self.newArchiveFileItem(fileType,row, response.data.copyInfo);
+            //writeAudit(_self.parentId);
           }else{
             _self.$message({
                 showClose: true,
@@ -918,7 +918,7 @@ export default {
         });
         
       }
-      
+
       _self.loadGridData(_self.currentFolder);
       
     },
@@ -1104,6 +1104,7 @@ export default {
       _self.$nextTick(()=>{
         if(_self.$refs.leftDataGrid){
              _self.$refs.leftDataGrid.itemDataList = [];
+             _self.$refs.leftDataGrid.loadGridData();
           }
       });
       
@@ -1258,6 +1259,7 @@ export default {
             _self.extendMap=null;
             _self.$refs.ShowProperty.myTypeName = typeName;
             _self.$refs.ShowProperty.myFolderId = _self.currentFolder.id;
+           
             _self.$refs.ShowProperty.loadFormInfo();
           }
         }, 10);
@@ -1271,7 +1273,7 @@ export default {
         });
       }
     },
-    newArchiveFileItem(typeName, selectedRow) {
+    newArchiveFileItem(typeName, selectedRow, copyInfo) {
       let _self = this;
       if (selectedRow.ID) {
         _self.selectedItemId = "";
@@ -1287,6 +1289,14 @@ export default {
             _self.$refs.ShowProperty.parentDocId = selectedRow.ID;
             _self.$refs.ShowProperty.folderId = _self.currentFolder.id;
             // _self.$refs.ShowProperty.myFolderId = _self.selectTransferRow.id;
+             if(copyInfo){
+              let mp = new Map();
+              for (const key in copyInfo) {
+                  mp.set(key, key);
+              }
+              _self.$refs.ShowProperty.setMainSubRelation(mp);
+              _self.$refs.ShowProperty.setMainObject(copyInfo);
+            }
             _self.$refs.ShowProperty.loadFormInfo();
           }
         }, 10);

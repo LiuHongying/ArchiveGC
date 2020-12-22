@@ -9,8 +9,6 @@ import { reportRouter } from "@/router/report.js";
 import { userRouter } from "@/router/user.js";
 import { workflowRouter } from "@/router/workflow.js";
 import { testRouter } from "@/router/test.js";
-import { docexchange } from "@/router/docexchange.js";
-import {cnpeRouter} from "@/router/cnpe.js"
 import {workflowCenter} from "@/router/workflowCenter.js"
 import {npcRouter} from "@/router/npc.js";
 import store from "@/store";
@@ -41,9 +39,6 @@ const router = new Router({
           component: () => import("@/views/HomeContent.vue"),
           name: "首页内容"
         },
-        
-        ...docexchange,
-        ...cnpeRouter,
         searchRouter,
         ...dcRouter,
         ...recordRouter,
@@ -55,7 +50,6 @@ const router = new Router({
         // docexchange,
         ...testRouter,
         ...adminRouter,
-        ...npcRouter,
         {
           meta: {
             requireAuth: true,
@@ -113,16 +107,6 @@ const router = new Router({
           component: () => import("@/components/form/Borrow.vue")
         }
       ]
-    },
-    {
-      meta: {
-        requireAuth: true,
-        permit: 3
-      },
-      path: "/FeedbackDetail",
-      name: "问题详情",
-      component: () =>
-        import(/* webpackChunkName: "home1" */ "@/views/docexchange/Feedback/FeedbackDetail.vue"),
     },
     {
       path: "/login",

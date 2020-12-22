@@ -1,12 +1,5 @@
 <template>
   <DataLayout>
-    <el-dialog title="添加复用文件" :visible.sync="reuseVisible" width="80%">
-      <AddReuse ref="addReuseModel"></AddReuse>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="reuseVisible = false">{{$t('application.cancel')}}</el-button>
-        <el-button type="primary" @click="addReuseToVolume()">确定</el-button>
-      </div>
-    </el-dialog>
     <el-dialog :title="$t('message.Batch')+' '+$t('application.Import')+$t('application.document')" :visible.sync="batchDialogVisible" width="80%" >
         <BatchImport ref="BatchImport" templateUrl="/import/getImportTemplatesCommon"  @onImported="onBatchImported" width="100%" v-bind:deliveryId="selectedOneTransfer.ID"></BatchImport>
         <div slot="footer" class="dialog-footer">
@@ -64,7 +57,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button
-          @click="typeSelectVisible=false;newArchiveItem(selectedTypeName,selectedOneTransfer)"
+          @click="typeSelectVisible=false;newArchiveItem(selectedTypeName,selectedOneTransfer,null)"
         >{{$t('application.ok')}}</el-button>
       </div>
     </el-dialog>
@@ -86,7 +79,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button
-          @click="childrenTypeSelectVisible=false;newArchiveItem(selectedChildrenType,selectRow)"
+          @click="childrenTypeSelectVisible=false;newArchiveItem(selectedChildrenType,selectRow,null)"
         >{{$t('application.ok')}}</el-button>
       </div>
     </el-dialog>
@@ -236,6 +229,11 @@
                   @pagechange="handleCurrentChange"
                   :isInitData="false"
                   gridViewName="DeliveryGrid"
+                  :isshowOption="true"
+                  :isshowCustom="false"
+                  :isshowicon="false"
+                  :isShowMoreOption="false"
+                  :isShowChangeList="false"
                   v-bind:itemCount="transferCount"
                   v-bind:tableHeight="layout.height-136"
                   @rowclick="beforeLoadGridData"
@@ -568,7 +566,7 @@ export default {
             "Content-Type": "application/json;charset=UTF-8"
           },
           method: "post",
-          data: row.TYPE_NAME,
+          data: row.ID,
           url: "/dc/getArchiveFileConfig"
         })
         .then(function(response) {
@@ -576,7 +574,7 @@ export default {
           if(code=='1'){
             let data=response.data.data;
             let fileType=data[0].C_TO;
-            _self.newArchiveItem(fileType,row);
+            _self.newArchiveItem(fileType,row,response.data.copyInfo);
           }else{
             _self.$message({
                 showClose: true,
@@ -596,7 +594,6 @@ export default {
               });
           console.log(error);
         });
-      
 
     },
     beforeUploadFile(uploadpath){
@@ -1431,7 +1428,7 @@ export default {
         });
     },
     
-    newArchiveItem(typeName, selectedRow) {
+    newArchiveItem(typeName, selectedRow, copyInfo) {
       let _self = this;
       if (selectedRow.ID) {
         _self.selectedItemId = "";
@@ -1444,6 +1441,14 @@ export default {
         _self.selectedItemId="";
         _self.propertyVisible = true;
         _self.$nextTick(()=>{
+          if(copyInfo){
+            let mp = new Map();
+            for (const key in copyInfo) {
+                mp.set(key, key);
+            }
+            _self.$refs.ShowProperty.setMainSubRelation(mp);
+            _self.$refs.ShowProperty.setMainObject(copyInfo);
+          }
           _self.$refs.ShowProperty.loadFormInfo();
         });
         // setTimeout(()=>{

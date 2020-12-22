@@ -52,6 +52,8 @@ import com.ecm.core.service.RelationService;
 import com.ecm.portal.archive.common.ChildrenObjAction;
 import com.ecm.portal.archivegc.service.ImportServiceGc;
 import com.ecm.portal.controller.ControllerAbstract;
+import com.ecm.portal.entity.AttrCopyCfgEntity;
+import com.ecm.portal.service.CustomCacheService;
 import com.ecm.icore.service.IEcmSession;
 import com.ecm.portal.controller.ControllerAbstract;
 @Controller
@@ -74,6 +76,10 @@ public class ArchiveDcController extends ControllerAbstract{
 	private RelationService relationService;
 	@Autowired
 	private ImportServiceGc importService;
+	
+	@Autowired
+	private CustomCacheService customCacheService;
+	
 	@RequestMapping(value = "/dc/getEcmDefTypes", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> getEcmDefTypes(@RequestBody String argStr) throws Exception {
@@ -99,8 +105,24 @@ public class ArchiveDcController extends ControllerAbstract{
 		Map<String, Object> mp = new HashMap<String, Object>();
 		
 		if(argStr!=null) {
-			String archiveType=argStr.toString();
-			String condition=" TYPE_NAME='案卷文件配置' and C_FROM='"+argStr.toString()+"'";
+			String obj=argStr.toString();
+			String condition=" TYPE_NAME='案卷文件配置' and C_FROM='"+obj+"'";
+			if(obj.length()>30)
+			{
+				EcmDocument doc = documentService.getObjectById(getToken(), obj);
+				if(doc != null) {
+					condition=" TYPE_NAME='案卷文件配置' and C_FROM='"+doc.getTypeName()+"'";
+					AttrCopyCfgEntity en = customCacheService.getAttrCopyCfg(getToken(), doc.getTypeName());
+					if(en != null) {
+						Map<String, Object> valmp = new HashMap<String, Object>();
+						for(String attr: en.getAttrNames().keySet()) {
+							valmp.put(attr, doc.getAttributeValue(en.getAttrNames().get(attr)));
+						}
+						mp.put("copyInfo", valmp);
+					}
+					
+				}
+			}
 			List<Map<String,Object>> docList= documentService.getObjectMap(this.getToken(), condition);
 			if(docList==null||docList.size()==0) {
 				mp.put("code", ActionContext.FAILURE);
