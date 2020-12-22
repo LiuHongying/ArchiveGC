@@ -7,7 +7,7 @@
                     width="100%"
                     folderPath=""
                     :showUploadFile="false"
-                    v-bind:typeName="typeName"
+                    v-bind:typeName="typename"
                 >
                 </ShowProperty>
                 <DesignFile ref="workflowFile"
