@@ -145,10 +145,7 @@ export default {
         this.currentUser().systemPermission
       );
     if(systemPermission<5){
-      //跳转至权限提醒页
-      _self.$nextTick(()=>{
-         _self.$router.push({ path: '/NoPermission' })
-      })     
+      _self.$router.push({ path: '/NoPermission' });  
     }
     if (_self.$route.query.name) {
       _self.inputkey = _self.$route.query.name;

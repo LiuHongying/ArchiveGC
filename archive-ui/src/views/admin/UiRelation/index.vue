@@ -124,6 +124,9 @@ export default {
       language:""
     }
   },
+  created(){
+    this.validataSystemPermission(9);
+  },
   methods:{
     formatterReadOnly:function(row, column, cellValue){
       return cellValue?this.$t('application.yes'):this.$t('application.no');

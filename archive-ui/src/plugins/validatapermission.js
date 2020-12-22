@@ -1,20 +1,45 @@
-
-function validataPermission(){
-    let _self = this;
-    var m = new Map();
-    var username = sessionStorage.getItem("access-userName")
-    m.set("username",username);
-     axios.post("/user/validatapermission",JSON.stringify(m)).then(function(response){
+import Vue from 'vue'
+import $router from '../router'
+Vue.prototype.validataPermission=async (compName)=>{
+    let haspermission=false;
+    let user = sessionStorage.getItem("ecm-current-user");
+    if(user){
+      let cuser =  JSON.parse(user);
+      let systemPermission = Number(
+        cuser.systemPermission
+      );
+      if(systemPermission>=9){
+        return true;
+       }
+    }
+    await axios.post("/user/validatapermission",compName).then(function(response){
          let code= response.data.code;
-         let haspermission=false;
          if(code==1){
-            haspermission = response.data.data;
+            haspermission = true;
          }
+         if(!haspermission){
+             
+            $router.push({ path: "/NoPermission" });
+          }
          
-        return haspermission;
-        
     })
+    return haspermission;
 }
-export default validataPermission
+
+Vue.prototype.validataSystemPermission=async (permitNum)=>{
+  let haspermission=false;
+  let user = sessionStorage.getItem("ecm-current-user");
+  if(user){
+    let cuser =  JSON.parse(user);
+    let systemPermission = Number(
+      cuser.systemPermission
+    );
+    if(systemPermission>=permitNum){
+      return true;
+     }
+  }
+  $router.push({ path: "/NoPermission" });
+  return false;
+}
 
 
