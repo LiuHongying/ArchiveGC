@@ -117,7 +117,7 @@ export default {
         Drawing: {
           gridViewName: "DrawingGrid",
           dataUrl: "/dc/getDocuments",
-          condition: "TYPE_NAME='设计文件'",
+          condition: "",
           isInitData:false,
           isshowCustom:false,
           isEditProperty:false,
@@ -177,7 +177,7 @@ export default {
     //文档模糊查询
     search() {
       let _self = this;
-      _self.$refs.Drawing.condition ="TYPE_NAME='设计文件' AND (CODING LIKE '%"+_self.inputValueNum+"%' OR TITLE LIKE '%"+_self.inputValueNum+"%') and (" + _self.condition1 + ") ";
+      _self.$refs.Drawing.condition ="(CODING LIKE '%"+_self.inputValueNum+"%' OR TITLE LIKE '%"+_self.inputValueNum+"%') and (" + _self.condition1 + ") ";
       _self.tables.Drawing.condition = _self.$refs.Drawing.condition;
       _self.$refs.Drawing.currentPage = 1;
       _self.$refs.Drawing.loadGridInfo();

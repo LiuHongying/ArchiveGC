@@ -143,7 +143,7 @@
               border="0"
             />
             <img
-              v-else-if="scope.row.TYPE_NAME == '卷盒'"
+              v-else-if="scope.row.TYPE_NAME == '卷盒' || scope.row.C_ITEM_TYPE == '案卷'"
               :src="'./static/img/box.gif'"
               :title="scope.row.TYPE_NAME"
               border="0"

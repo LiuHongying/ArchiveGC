@@ -9,7 +9,8 @@
         width="90%"
         :close-on-click-modal="false"
         v-dialogDrag
-        modal-append-to-body="false" 
+        modal-append-to-body="false"
+        @opened="refresh"
       >
         <el-form :inline="true" :model="filters" @submit.native.prevent>
           <el-form-item>
@@ -135,7 +136,8 @@ export default {
     allowEdit: { type: Boolean, default: true },
     isShowPage:{type:Boolean,default:true},
     files:{type:Array,default:[]},
-    workflowObj:{type:Object,default:{}}
+    workflowObj:{type:Object,default:{},
+    borrowType:{type:String,default:""}}
   },
   data() {
     return {
@@ -166,7 +168,9 @@ export default {
       searchFileCondition:"",
       createUnit:'',
       sameCreate:true,
-      sameDepartMent:true
+      sameDepartMent:true,
+      TP:'',
+      subtypeCondition:false
     };
   },
   mounted() {
@@ -196,16 +200,27 @@ export default {
     }
     },
 
-    // select(val){
-    //   this.selectedItems=val
-    // },
+    refresh(){
+    this.$refs.searchDoc.loadGridData()      
+    },
     beforeAddFile() {
       let _self=this;
-      this.getEcmcfgActive(_self.workflowObj.ID,"start",function(ecmCfgActivity){
+      this.getEcmcfgActive(this.workflowObj.ID,"start",function(ecmCfgActivity){
         _self.searchFileCondition=ecmCfgActivity.formCondition;
+        _self.$emit('getType')
+        if(_self.subtypeCondition==false){
+          _self.searchFileCondition=ecmCfgActivity.formCondition;
+        }
+        if(_self.subtypeCondition==true){
+          _self.searchFileCondition += " and C_STORE_STATUS='在库'"
+        }
         _self.propertyVisible=true;
+
       });
         
+    },
+    setSubTypeCondition(isEnabled){
+        this.subtypeCondition=isEnabled
     },
     fileSelect(val){
         this.selectedFiles=val;

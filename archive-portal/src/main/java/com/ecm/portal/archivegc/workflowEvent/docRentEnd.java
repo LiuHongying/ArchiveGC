@@ -1,5 +1,6 @@
 package com.ecm.portal.archivegc.workflowEvent;
 
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.delegate.DelegateExecution;
@@ -46,6 +47,17 @@ public class docRentEnd implements JavaDelegate {
 			}
 			
 			if(type.equals("纸质借阅")||type.equals("纸质复制")) {
+				
+				String sql = "select * from ecm_relation where parent_id = '"+formId+"'";		
+				List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);		//找到表单挂载文件关系集
+				if(mps!=null) {
+				for(Map<String,Object> mp : mps) {
+				String id =	mp.get("child_id").toString();
+				EcmDocument doc = documentService.getObjectById(ecmSession.getToken(), id);		//找到表单挂载文件了
+				Map<String,Object> docAttr = doc.getAttributes();
+				docAttr.put("STATUS", "待出库");
+				documentService.updateObject(ecmSession.getToken(),docAttr);
+				}}
 				ecmObject.setStatus("待出库");
 				documentService.updateObject(ecmSession.getToken(), ecmObject,null);
 			}
