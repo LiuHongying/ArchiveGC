@@ -92,7 +92,7 @@
         <el-form-item>
           <el-select v-model="value" placeholder="新建" v-on:change="changeStatus(val)">
             <el-option
-              v-for="item in options"
+              v-for="item in option"
               :key="item.value"
               :label="item.label"
               :value="item.label"
@@ -189,7 +189,7 @@ export default {
       selectedDCItems: [],//文档
       selectedThItems:[],//专题
       inputValueNum:"",
-      options: [
+      option: [
         {
           value: "新建",
           label: "新建",
