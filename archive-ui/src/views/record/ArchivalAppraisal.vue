@@ -119,7 +119,7 @@
                   v-bind:isshowOption="true" v-bind:isshowSelection ="true"
                   gridViewName="ArchiveAppraisalGrid"
                   :isInitData="false"
-                  condition="TYPE_NAME='档案鉴定单' and STATUS='新建'"
+                  condition="TYPE_NAME='档案鉴定单' and STATUS='新建' and IS_RELEASED=1 "
                   :optionWidth = "2"
                   :isshowCustom="false"
                   :isEditProperty="true"
