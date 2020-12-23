@@ -14,7 +14,7 @@
         <split-pane split="vertical" @resize="onHorizontalSplitResize" :min-percent='1' :default-percent='leftPercent'>
           <template slot="paneL">
             <el-row>
-              <el-form :inline="true">
+              <el-form :inline="true" @submit.native.prevent>
                 <el-form-item>
                   <el-input
                     style="width: 200px"
@@ -51,7 +51,7 @@
           </template>
           <template slot="paneR">
             <el-row>
-              <el-form :inline="true">
+              <el-form :inline="true" @submit.native.prevent>
                 <el-form-item>
                   <el-input
                     style="width: 200px"

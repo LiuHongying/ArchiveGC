@@ -12,7 +12,7 @@
     >
       <div><DesignCancelStartUp :workflowObj="workflow" :showUploadFile="true" :workflowFileList="selectedDCItems" :typeName="typename" @close="flowVisible = false"></DesignCancelStartUp></div>
     </el-dialog>
-      <el-form :inline="true">
+      <el-form :inline="true" @submit.native.prevent>
         <el-form-item>
           <el-input
             style="width: 200px"

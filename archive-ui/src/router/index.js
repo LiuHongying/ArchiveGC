@@ -9,7 +9,7 @@ import { reportRouter } from "@/router/report.js";
 import { userRouter } from "@/router/user.js";
 import { workflowRouter } from "@/router/workflow.js";
 import { testRouter } from "@/router/test.js";
-import {workflowCenter} from "@/router/workflowCenter.js"
+import {workflowCenter} from "@/router/workflowCenter.js";
 import {npcRouter} from "@/router/npc.js";
 import store from "@/store";
 import Layout from "../views/layout/Layout";
@@ -50,6 +50,7 @@ const router = new Router({
         // docexchange,
         ...testRouter,
         ...adminRouter,
+        ...npcRouter,
         {
           meta: {
             requireAuth: true,
