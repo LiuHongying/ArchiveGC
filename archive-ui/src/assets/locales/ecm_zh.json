@@ -113,6 +113,7 @@
     "objectPermission9":"设置权限",
     "targetType1":"用户",
     "targetType2":"组",
+    "currentPassword":"旧密码",
     "newPassword":"新密码",
     "confirmPassword":"确认密码",
     "select":"选择",

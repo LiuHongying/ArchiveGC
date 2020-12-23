@@ -147,7 +147,7 @@ export default {
     },
     saveUserInfo(){
       let _self = this;
-	  axios.post("/exc/updateUser",JSON.stringify(_self.userData)).then(function(response){
+	  axios.post("/user/updateUser",JSON.stringify(_self.userData)).then(function(response){
         if(response.data.code == 1){
           _self.$message(_self.$t('message.saveSuccess'));
         }else{

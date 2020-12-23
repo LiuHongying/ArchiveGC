@@ -115,6 +115,7 @@
     "targetType1":"User",
     "targetType2":"Role",
     "newPassword":"New Password",
+    "currentPassword":"Current Password",
     "confirmPassword":"Confirm Password",
     "select":"Select",
     "selectUser":"Select User",
