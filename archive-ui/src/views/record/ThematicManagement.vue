@@ -53,7 +53,7 @@
           </template>
         </DataLayout>
       </el-dialog>
-      <el-form :inline="true">
+      <el-form :inline="true" @submit.native.prevent>
         <el-form-item>
           <el-input
             style="width: 200px"

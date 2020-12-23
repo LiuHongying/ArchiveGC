@@ -76,7 +76,7 @@
     >
       <div><AppraisalStartUp :workflowObj="workflow" :showUploadFile="true" :parentId="parentID" :workflowFileList="files4Start" @close="flowVisible = false"></AppraisalStartUp></div>
     </el-dialog>
-      <el-form :inline="true">
+      <el-form :inline="true" @submit.native.prevent>
         <el-form-item>
           <el-input
             style="width: 200px"
@@ -133,7 +133,7 @@
           <template slot="paneR">
             <el-row>
               <el-col :span="24">
-              <el-form :inline="true">
+              <el-form :inline="true" @submit.native.prevent>
                 <el-form-item>
                     <el-button type="primary" @click="beforeAdd()">添加</el-button>
                 </el-form-item>
