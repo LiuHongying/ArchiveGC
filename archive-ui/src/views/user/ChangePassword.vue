@@ -10,7 +10,7 @@
       </el-row>
       <el-row v-if="loginType=='1'">
         <el-col :span="8">
-          <el-form-item :label="$t('application.password')" :required="true">
+          <el-form-item :label="$t('application.currentPassword')" :required="true">
             <el-input type="password" v-model="userData.password"></el-input>
           </el-form-item>
         </el-col>
