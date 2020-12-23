@@ -38,12 +38,30 @@ public class docRentEnd implements JavaDelegate {
 			ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
 			Map<String, Object> varMap = execution.getVariables();
 			String formId = varMap.get("formId").toString();
-			
 			EcmDocument ecmObject = documentService.getObjectById(ecmSession.getToken(), formId);
 			String type = varMap.get("SUB_TYPE").toString();
+			Map<String,Object> ecmAttr = ecmObject.getAttributes();
+			String sqls = "select  distinct C_SECURITY_LEVEL from ecm_document where id in(select CHILD_ID from ecm_relation where parent_id = '"+formId+"')";
+			List<Map<String,Object>> Res = documentService.getMapList(ecmSession.getToken(), sqls);
+			for(Map<String,Object> mp : Res) {
+			String level = mp.get("C_SECURITY_LEVEL").toString();
+			if(level.equals("普通商密")) {
+			ecmAttr.put("C_SECURITY_LEVEL", level);
+			break;
+			}
+			if(level.equals("受限")) {
+			ecmAttr.put("C_SECURITY_LEVEL", level);
+			break;
+			}
+			if(level.equals("内部公开")){
+			ecmAttr.put("C_SECURITY_LEVEL", level);
+			break;	
+			}
+			}
+			//改密级完毕，现在开始改表单
 			if(!type.equals("纸质借阅")||!type.equals("纸质复制")) {
-				ecmObject.setStatus("已完成");
-				documentService.updateObject(ecmSession.getToken(), ecmObject,null);
+				ecmAttr.put("STATUS", "已审批");
+				documentService.updateObject(ecmSession.getToken(), ecmAttr);
 			}
 			
 			if(type.equals("纸质借阅")||type.equals("纸质复制")) {
@@ -58,8 +76,9 @@ public class docRentEnd implements JavaDelegate {
 				docAttr.put("STATUS", "待出库");
 				documentService.updateObject(ecmSession.getToken(),docAttr);
 				}}
-				ecmObject.setStatus("待出库");
-				documentService.updateObject(ecmSession.getToken(), ecmObject,null);
+				ecmAttr.put("STATUS", "待出库");
+				documentService.updateObject(ecmSession.getToken(), ecmAttr);
+
 			}
 	}
 		catch (Exception e) {

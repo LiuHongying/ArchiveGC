@@ -1,7 +1,7 @@
 <template>
     <DataLayout>
     <template v-slot:header>
-      <el-form :inline="true">
+      <el-form :inline="true" @submit.native.prevent>
         <el-form-item>
           <el-input
             style="width: 200px"
@@ -64,7 +64,7 @@
           <template slot="paneR">
             <el-tabs v-model="activeName">
               <el-tab-pane label="待入库" name="ArchivePendingOut">
-                <el-form :inline="true">
+                <el-form :inline="true" @submit.native.prevent>
                   <el-form-item>
                     <el-input
                       style="width: 200px"
@@ -101,7 +101,7 @@
                 </DataGrid>
               </el-tab-pane>
               <el-tab-pane label="已入库" name="ArchivePending">
-                <el-form :inline="true">
+                <el-form :inline="true" @submit.native.prevent>
                   <el-form-item>
                     <el-input
                       style="width: 200px"

@@ -76,7 +76,7 @@
                         <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
                       </el-form-item>
                       <el-form-item>
-                        <el-button type="warning">{{ $t("application.delete") }}</el-button>
+                        <el-button @click="removeFile" type="warning">{{ $t("application.delete") }}</el-button>
                       </el-form-item>
                     </el-form>
                   </el-col>
@@ -199,7 +199,26 @@ export default {
       }
     }
     },
+        removeFile(){
+      let _self=this;
+      for(let i=0;i<_self.selectedRemoveFiles.length;i++){
+        let e=_self.selectedRemoveFiles[i];
+        for(let n=0;n<_self.$refs.fileList.itemDataList.length;n++){
+          if(e.ID==_self.$refs.fileList.itemDataList[n].ID){
+            _self.$refs.fileList.itemDataList.splice(n, 1);
+            n--;
+          }
+        }
+        _self.selectedRemoveFiles.splice(i,1);
+        i--;
+      }
 
+      _self.selectedRemoveFiles.forEach(e=>{
+
+        
+        
+      });
+    },
     refresh(){
     this.$refs.searchDoc.loadGridData()      
     },

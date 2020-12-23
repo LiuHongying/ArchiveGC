@@ -53,7 +53,7 @@
           </template>
         </DataLayout>
       </el-dialog>
-      <el-form :inline="true">
+      <el-form :inline="true" @submit.native.prevent>
         <el-form-item>
           <el-input
             style="width: 200px"
@@ -126,7 +126,7 @@
           <template slot="paneR">
             <el-row>
               <el-col :span="24">
-              <el-form :inline="true">
+              <el-form :inline="true" @submit.native.prevent>
                 <el-form-item>
                     <el-button type="primary" @click="beforeCreat">添加文档</el-button>
                 </el-form-item>
