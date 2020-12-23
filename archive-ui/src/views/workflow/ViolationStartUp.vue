@@ -6,8 +6,8 @@
                     @onSaved="onSaved"
                     width="100%"
                     folderPath=""
-                    :showUploadFile="showUploadFile"
-                    v-bind:typeName="typeName"
+                    :showUploadFile="false"
+                    typeName="文档违规处理单"
                 >
                 </ShowProperty>
                 <DesignFile ref="workflowFile"
@@ -35,7 +35,7 @@
         components: {
             ShowProperty:ShowProperty,
             DataGrid:DataGrid,
-            DesignFile:DesignFile
+            DesignFile:DesignFile,
         },
         data() {
                 return {
@@ -53,7 +53,7 @@
                     propertyVisible:false,
                     isOnly:false,
                     butt:false,
-                    typename:"设计文件作废审批单",
+                    typename:"文档违规处理单",
                     saveButt:false,
                     Cost:'',
                 }
@@ -240,8 +240,8 @@
                     //this.$refs.ShowProperty.dataList[0].ecmFormItems[6].defaultValue = val
                     
                 },
-                closePage(pv){
-                    this.$emit("close");
+                closePage(){
+                    this.$emit("closedialog", this.flag);
                 },
                 // 保存文档
                 saveItem()

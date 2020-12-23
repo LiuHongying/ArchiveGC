@@ -310,6 +310,7 @@ import DesignCancelStartUp from "@/views/workflow/DesignCancelStartUp.vue";
 import DesignChangeFileStartup from "@/views/workflow/DesignChangeFileStartup.vue";
 import RelyOnFolderSelectStartUp from "@/views/workflow/RelyOnFolderSelectStartUp.vue";
 import CancelStartUp from "@/views/workflow/CancelStartUp.vue";
+import ViolationStartUp from "@/views/workflow/ViolationStartUp.vue";
 export default {
   data() {
     return {
@@ -349,8 +350,9 @@ export default {
         {
           title: "文档违规处理",
           icon: "ecm-icon-docviolatehandle",
-          name: "文档违规处理",
+          name: "文档违规处理流程",
           type: "dialog",
+          openpath: "ViolationStartUp",
         },
         {
           title: "设计文件修改",
@@ -412,6 +414,7 @@ export default {
     DesignChangeFileStartup: DesignChangeFileStartup,
     RelyOnFolderSelectStartUp: RelyOnFolderSelectStartUp,
     CancelStartUp: CancelStartUp,
+    ViolationStartUp: ViolationStartUp,
   },
   created() {
     let _self = this;
