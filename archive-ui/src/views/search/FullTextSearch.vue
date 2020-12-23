@@ -50,12 +50,13 @@
         style="width:60%"
       ></el-autocomplete> -->
       <el-input prefix-icon="el-icon-search" v-model="inputkey" :placeholder="$t('application.placeholderSearch')" @keyup.enter.native="enterDown"
-        style="width:40%;padding-top:10px;margin-left:20%"></el-input>
-      <el-checkbox :label="$t('application.propertyOnly')" v-model="propertyOnly"></el-checkbox>
-      <el-button type="primary" plain @click="beforeSecondSearch()">{{$t('application.scendSearch')}}</el-button>
+        style="width:35%;padding-top:10px;margin-left:20%"></el-input>
+      <el-button style="margin-left:5px;width:60px" type="primary" plain @click="enterDown">{{$t('application.search')}}</el-button>
+      <el-checkbox style="margin-left:5px" :label="$t('application.propertyOnly')" v-model="propertyOnly"></el-checkbox>
+      <el-button style="margin-left:5px" type="primary" plain @click="beforeSecondSearch()">{{$t('application.scendSearch')}}</el-button>
     </div>
     <el-row>
-      <el-col :span="13" style="text-align:left;margin-left:20%">
+      <el-col :span="13" style="text-align:left;margin-left:20%;margin-top:5px">
         <span>{{$t('application.docTypeName')}}:</span>
         <el-checkbox
           :indeterminate="isIndeterminate"
@@ -76,8 +77,8 @@
 
     </el-row>
     <div v-if="searched">
-      <div style="margin-left:20%">
-        <span>{{$t('application.searchResult')}} {{itemCount}}, &nbsp; {{$t('application.takeTime')}} {{searchTime}}{{$t('application.scend')}}</span>
+      <div style="margin-top:5px;text-align:center">
+        <span>{{$t('application.searchResult')}} {{itemCount}} &nbsp;&nbsp; {{$t('application.takeTime')}} {{searchTime}}{{$t('application.scend')}}</span>
       </div>
       <el-container>
         <!-- <el-col :span="3">

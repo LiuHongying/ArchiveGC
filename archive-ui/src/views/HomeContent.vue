@@ -43,11 +43,13 @@
                 <el-input
                   prefix-icon="el-icon-search"
                   @keyup.enter.native="jumpToFullSearch"
-                  style="width: 80%"
+                  style="width: 70%"
                   v-model="inputkey"
                   :placeholder="$t('application.placeholderSearch')"
                 ></el-input>
+                <el-button style="margin-left:5px;width:60px" type="primary" plain @click="jumpToFullSearch">{{$t('application.search')}}</el-button>
                 <el-checkbox
+                  style="margin-left:5px"
                   :label="$t('application.propertyOnly')"
                   v-model="propertyOnly"
                 ></el-checkbox>
