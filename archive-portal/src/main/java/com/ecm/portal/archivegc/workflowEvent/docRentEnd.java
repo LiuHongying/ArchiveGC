@@ -71,7 +71,7 @@ public class docRentEnd implements JavaDelegate {
 				List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);		//找到表单挂载文件关系集
 				if(mps!=null) {
 				for(Map<String,Object> mp : mps) {
-				String id =	mp.get("child_id").toString();
+				String id =	mp.get("CHILD_ID").toString();
 				EcmDocument doc = documentService.getObjectById(ecmSession.getToken(), id);		//找到表单挂载文件了
 				Map<String,Object> docAttr = doc.getAttributes();
 				docAttr.put("STATUS", "待出库");

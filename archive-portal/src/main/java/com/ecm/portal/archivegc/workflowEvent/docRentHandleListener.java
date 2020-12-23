@@ -38,8 +38,8 @@ public class docRentHandleListener implements JavaDelegate {
 		IEcmSession ecmSession = null;
 		try {
 			Date now = new Date();
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-			String nowDate = df.format(now);
+
+
 			ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
 			Map<String, Object> varMap = execution.getVariables();
 			String formId = varMap.get("formId").toString();
@@ -57,7 +57,7 @@ public class docRentHandleListener implements JavaDelegate {
 				docAttr.put("STATUS", "待出库");
 				documentService.updateObject(ecmSession.getToken(),docAttr);
 				}}
-				ecmAttr.put("C_APPROVE_DATE", nowDate);
+				ecmAttr.put("C_APPROVE_DATE", now);
 				ecmAttr.put("STATUS", "待出库");
 				documentService.updateObject(ecmSession.getToken(), ecmAttr);
 
