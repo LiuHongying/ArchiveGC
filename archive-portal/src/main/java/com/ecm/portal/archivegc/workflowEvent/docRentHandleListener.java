@@ -12,22 +12,19 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.ecm.core.entity.EcmDocument;
-import com.ecm.core.entity.EcmFolder;
-import com.ecm.core.entity.EcmUser;
 import com.ecm.core.service.AuthService;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
 import com.ecm.icore.service.IEcmSession;
-
-@Component(value = "JudgeInsideListener")
-public class JudgeInsideListener implements JavaDelegate{
+@Component(value = "docRentEndListener")
+public class docRentHandleListener implements JavaDelegate {
 	@Autowired
 	private AuthService authService;
 	@Autowired
 	private Environment env;
 	@Autowired
-	private FolderPathService folderPathService;
+    private FolderPathService folderPathService;
 	@Autowired
 	private DocumentService documentService;
 	@Autowired
@@ -35,32 +32,34 @@ public class JudgeInsideListener implements JavaDelegate{
 	private final Logger logger = LoggerFactory.getLogger(DocCommitComplete.class);
 	@Override
 	public void execute(DelegateExecution execution) {
-		// TODO Auto-generated method stub
 		String workflowSpecialUserName = env.getProperty("ecm.username");
 		IEcmSession ecmSession = null;
 		try {
-
 			ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
 			Map<String, Object> varMap = execution.getVariables();
 			String formId = varMap.get("formId").toString();
-			if(varMap.get("SUB_TYPE").toString().equals("查阅")) {
-				execution.setVariable("isOK", "是");				//这个时候先默认是查阅&&密级为内部公开
+			EcmDocument ecmObject = documentService.getObjectById(ecmSession.getToken(), formId);
+			String type = varMap.get("SUB_TYPE").toString();
+			Map<String,Object> ecmAttr = ecmObject.getAttributes();
+			if(type.equals("纸质借阅")) {
+				String sql = "select * from ecm_relation where parent_id = '"+formId+"'";		
+				List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);		//找到表单挂载文件关系集
+				if(mps!=null) {
+				for(Map<String,Object> mp : mps) {
+				String id =	mp.get("child_id").toString();
+				EcmDocument doc = documentService.getObjectById(ecmSession.getToken(), id);		//找到表单挂载文件了
+				Map<String,Object> docAttr = doc.getAttributes();
+				docAttr.put("STATUS", "待出库");
+				documentService.updateObject(ecmSession.getToken(),docAttr);
+				}}
+				ecmAttr.put("STATUS", "待出库");
+				documentService.updateObject(ecmSession.getToken(), ecmAttr);
+
 			}
-			String sql = "select  distinct C_SECURITY_LEVEL from ecm_document where id in(select CHILD_ID from ecm_relation where parent_id = '"+formId+"')";
-			List<Map<String,Object>> Res = documentService.getMapList(ecmSession.getToken(), sql);
-			for(Map<String,Object> mp : Res) {
-			String level = mp.get("C_SECURITY_LEVEL").toString();
-			if((level.equals("普通商密")||level.equals("受限"))&&varMap.get("SUB_TYPE").toString().equals("查阅")) {
-				execution.setVariable("isOK", "否");				//有任意子文件不满足条件，跳出
-				break;
-			}
-			}
-		
-		} catch (Exception e) {
+	}
+		catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		logger.info("完成");
-	}
+}
 }
