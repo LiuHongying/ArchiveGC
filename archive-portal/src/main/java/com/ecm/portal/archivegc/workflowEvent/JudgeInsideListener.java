@@ -45,7 +45,7 @@ public class JudgeInsideListener implements JavaDelegate{
 			String formId = varMap.get("formId").toString();
 			if(varMap.get("SUB_TYPE").toString().equals("查阅")) {
 				execution.setVariable("isOK", "是");				//这个时候先默认是查阅&&密级为内部公开
-			}
+			
 			String sql = "select  distinct C_SECURITY_LEVEL from ecm_document where id in(select CHILD_ID from ecm_relation where parent_id = '"+formId+"')";
 			List<Map<String,Object>> Res = documentService.getMapList(ecmSession.getToken(), sql);
 			for(Map<String,Object> mp : Res) {
@@ -55,7 +55,10 @@ public class JudgeInsideListener implements JavaDelegate{
 				break;
 			}
 			}
-		
+			}
+			else if(!varMap.get("SUB_TYPE").toString().equals("查阅")) {
+				execution.setVariable("isOK", "否");
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
