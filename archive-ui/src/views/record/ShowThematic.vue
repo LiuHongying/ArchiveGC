@@ -80,13 +80,6 @@ export default {
     };
   },
   mounted() {
-    if (!this.validataPermission()) {
-      //跳转至权限提醒页
-      let _self = this;
-      _self.$nextTick(() => {
-        _self.$router.push({ path: "/NoPermission" });
-      });
-    }
   },
   methods: {
     // 上下分屏事件

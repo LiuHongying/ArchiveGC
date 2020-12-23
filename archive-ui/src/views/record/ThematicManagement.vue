@@ -43,7 +43,7 @@
               gridViewName="GeneralGrid"
               :optionWidth = "2"
               :isshowCustom="false"
-              :isEditProperty="true"
+              :isEditProperty="false"
               showOptions="查看内容"
               :isShowChangeList="false">
               <template slot="customMoreOption" slot-scope="scope">
@@ -207,13 +207,6 @@ export default {
     };
   },
   mounted() {
-    if (!this.validataPermission()) {
-      //跳转至权限提醒页
-      let _self = this;
-      _self.$nextTick(() => {
-        _self.$router.push({ path: "/NoPermission" });
-      });
-    }
   },
   methods: {
     // 上下分屏事件
