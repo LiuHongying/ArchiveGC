@@ -97,7 +97,7 @@
               :isShowMoreOption="true"
               showOptions="查看内容,查看属性"
               :isShowPropertyButton="false"
-              :isEditProperty="allowEdit"
+              :isEditProperty="false"
               :isShowChangeList="false"
               :isshowicon="false"
               :isshowPage="isShowPage"
