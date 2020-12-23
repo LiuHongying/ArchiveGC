@@ -13,7 +13,7 @@ import './plugins/workflowFunctions.js'
 import './plugins/commonFun.js'
 import echarts from 'echarts'
 import addToShoppingCar from './plugins/shoppingcar'
-import validataPermission from './plugins/validatapermission'
+import './plugins/validatapermission'
 
 import {onDeleleItem,nextStatus,previousStatus,withdraw,previousStatusCnpe,nextStatusCnpe} from './plugins/exchange'
 
