@@ -24,7 +24,26 @@
         <div v-for="(item,keys) in getArchiveObjs()" :key="'divk'+keys">
           <!-- <img :id="'barcode'+keys" :key="'itmk'+keys" /> -->
           <!-- 档 号 {{item.CODING}} -->
-          <canvas :ref="'canvas'+keys" ></canvas>
+          <el-row>
+            <el-col :span="20" style="color: #000000;text-align: left;font-size:20px">{{item.TYPE_NAME}}</el-col>
+            <el-col :span="4" style="color: #000000;text-align: left;font-size:20px"></el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="24" style="color: #000000;text-align: left;font-size:28px">{{item.CODING}}</el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="24" style="color: #000000;text-align: left;font-size:20px">密级：{{item.C_SECURITY_LEVEL}}</el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="24" style="color: #000000;text-align: left;font-size:20px">保管期限：{{item.C_RETENTION}}</el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="24" style="color: #000000;text-align: left;font-size:20px">归档日期：{{dateFormat(item.C_ARCHIVE_DATE)}}</el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12" style="color: #000000;font-size:48px;padding-top:20px;">{{item.C_STORE_CODING}}</el-col>
+            <el-col :span="12"><canvas :ref="'canvas'+keys" :style="'display:'+noneStr"></canvas><img :ref="'image'+keys" /></el-col>
+          </el-row>
         </div>
         <!-- <div v-if="isQRCode"  ref='qrCodeUrl2'></div> -->
   　　</div>
@@ -53,7 +72,7 @@ export default {
       volumeTitle:"",
       ridgeData:[],
       selectedPx:'112',
-      
+      noneStr:"block",
       barCodeWidth:2,
       barCodeHeight:40,
     };
@@ -101,7 +120,7 @@ export default {
         _self.archiveObjects=objs;
         
         for(let i=0;i<objs.length;i++){
-            let obj=objs[i];
+          let obj=objs[i];
           _self.generate(obj["CODING"],_self.$refs['canvas'+i][0]);
         }
         
@@ -137,7 +156,15 @@ export default {
         });
     },
     printCode(){
+      this.noneStr = "none";
+      if(this.archiveObjects && this.archiveObjects.length>0){
+        for(var i=0; i<this.archiveObjects.length; i++){
+          this.$refs["image"+i][0].src = this.$refs['canvas'+i][0].toDataURL();
+        }
+      }
+      setTimeout(() => {
       this.$print(this.$refs.print);
+    }, 200);
     },
     
     generate(content,showCanvas) {

@@ -350,14 +350,14 @@ export default {
           }
         }
       }
-      if(_self.myItemId!='')
+      if(_self.myItemId != null && _self.myItemId!='')
       {
         m.set('ID',_self.myItemId);
       }
-      if(_self.myTypeName!='')
+      if(_self.myTypeName!='' && _self.myTypeName != null)
       {
         m.set('TYPE_NAME',_self.myTypeName);
-        if(_self.myFolderId!=""){
+        if(_self.myFolderId!="" && _self.myFolderId != null){
         m.set('FOLDER_ID',_self.myFolderId);}
       }
       let formdata = new FormData();

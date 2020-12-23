@@ -165,11 +165,8 @@ export default {
     let systemPermission = Number(
         this.currentUser().systemPermission
       );
-    if(systemPermission<9){
-      //跳转至权限提醒页
-      _self.$nextTick(()=>{
-         _self.$router.push({ path: '/NoPermission' })
-      })     
+    if(systemPermission<5){
+      _self.$router.push({ path: '/NoPermission' });   
     }
     var psize = localStorage.getItem("langInfoPageSize");
     if (psize) {

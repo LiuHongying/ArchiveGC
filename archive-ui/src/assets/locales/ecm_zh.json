@@ -444,7 +444,7 @@
     "allWorkflow": "流程查看",
     "logManager":"日志管理",
 	"archiveReceive":"档案接收",
-    "archiveArrange":"档案整理",
+    "archiveArrange":"“档案著录",
     "archiveoutgoing":"出入库管理",
     "archivebackup":"光盘刻录",
     "showdrawing":"晒图管理",
@@ -550,7 +550,8 @@
     "CreateDrawingDoc":"图纸文件创建",
     "docStorage":"文件库",
     "DesignDocCreate":"设计文件创建",
-    "Drafts":"草稿箱"
+    "Drafts":"草稿箱",
+    "preArchive":"预归档库"
 },
 "message": {
     "conditionS":"条件选择",
