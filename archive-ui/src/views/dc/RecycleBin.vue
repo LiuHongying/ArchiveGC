@@ -26,7 +26,7 @@
                 prefix-icon="el-icon-search"
               ></el-input>
             </el-col>
-            <el-col :span="4" style="padding-top:8px;">
+            <el-col :span="4" style="padding:15px;">
               <el-radio style="margin-right:5px;" v-model="radio" label="案卷" @change="changeRadio">案卷</el-radio>
               <el-radio style="margin-left:5px;" v-model="radio" label="文件" @change="changeRadio">文件</el-radio>
             </el-col>
@@ -54,7 +54,7 @@
               @selectchange="selectChange"
             ></DataGrid>
             <div>
-              <span style="float:left;text-align:left;">卷内文件列表</span>
+              <span style="float:left;text-align:left;padding:10px;">卷内文件列表</span>
               <DataGrid
                 ref="leftDataGrid"
                 key="left"
