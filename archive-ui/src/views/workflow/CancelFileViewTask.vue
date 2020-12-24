@@ -1,6 +1,31 @@
 <template>
   <DataLayout>
     <template v-slot:header>
+                  <el-dialog :title="$t('application.Import')" :visible.sync="importdialogVisible" width="70%" :close-on-click-modal="false" :append-to-body="true">
+                <el-form size="mini" :label-width="formLabelWidth" v-loading='uploading'>
+                    <div style="height:150px;overflow-y:scroll; overflow-x:scroll;">
+                    <el-upload
+                        :limit="100"
+                        :file-list="fileList"
+                        action
+                        :on-change="handleChange"
+                        :auto-upload="false"
+                        :multiple="true"
+                    >
+                        <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
+                    </el-upload>
+                    </div>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="importdialogVisible = false">{{$t('application.cancel')}}</el-button>
+                    <el-button type="primary" @click="uploadData()">{{$t('application.start')+$t('application.Import')}}</el-button>
+                </div>
+            </el-dialog>
+      
+
+
+
+
       <el-dialog
         :title="$t('application.pendNot')"
         :visible.sync="pendNotVisible"
@@ -92,7 +117,7 @@
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
-          gridViewName="WorkflowFileGrid"
+          gridViewName="DesignCancelGrid"
           condition=" and a.NAME='irel_children'"
           :optionWidth="1"
           :isShowPropertyButton="false"
@@ -136,9 +161,9 @@
                         </el-form-item>
                       </template>
                       <template v-if="isShowReject">
-                        <el-form-item>
+                        <!-- <el-form-item>
                           <el-button type="primary" @click="pendNot">{{ $t("application.pendNot") }}</el-button>
-                        </el-form-item>
+                        </el-form-item> -->
                       </template>
                     </el-form>
                   </el-col>
@@ -166,10 +191,10 @@
                   @selectchange="archiveSelect"
                   @dbclick="showVolumesFile"
                 >
-                  <template slot="sequee" slot-scope="scope">
+                  <!-- <template slot="sequee" slot-scope="scope">
                       <span :style="(scope.data.row['C_REJECT_COMMENT']!=null
                       &&scope.data.row['C_REJECT_COMMENT']!='')?{'background':'red'}:''">{{(scope.currentPage-1) * scope.pageSize+ scope.data.$index+1}}</span>
-                  </template>
+                  </template> -->
                 </DataGrid>
               </el-tab-pane>
                            <el-tab-pane label="附件列表" name="t02">
@@ -177,7 +202,7 @@
                   <el-col :span="24" style="text-align: left">
                     <el-form :inline="true" :model="filters" @submit.native.prevent>
                       <el-form-item>
-                      <el-button type="primary" @click="beforeUploadFile('/dc/addAttachment4Copy')">添加附件</el-button>
+                      <el-button type="primary" @click="beforeUploadFile('/exchange/doc/addAttachment4Copy')">添加附件</el-button>
                       </el-form-item>
                       <el-form-item>
                         <el-button type="warning" @click="removeAttachs">{{ $t("application.delete") }}</el-button>
@@ -278,14 +303,87 @@ export default {
       volumesFileVisible: false,
       pendNotVisible:false,
       selectedAttachment:[],
-      searchCondition:"TYPE_NAME='设计文件'"
+      searchCondition:"TYPE_NAME='设计文件'",
+      uploadUrl:'',
+      fileList:[],
+      importdialogVisible:false
     };
   },
   mounted() {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
-            checkCondition(){    
+        handleChange(file, fileList) {
+            this.fileList = fileList;
+        },
+        getFormData() {
+            let _self = this;
+            let formdata = new FormData();
+            var data = {};
+            data["parentDocId"] = _self.parentId;
+            data["relationName"]='irel_children';
+            data["TYPE_NAME"]='附件';
+            formdata.append("metaData", JSON.stringify(data));
+            _self.fileList.forEach(function(file) {
+                formdata.append("uploadFile", file.raw, file.name);
+            });
+            return formdata;
+            },
+            beforeUploadFile(uploadpath){
+            let _self=this;     
+            if(_self.parentId==undefined||_self.parentId==''){
+                _self.$message({
+                        showClose: true,
+                        message: _self.$t('message.PleaseSelectOneFile'),
+                        duration: 2000,
+                        type: "warning"
+                    });
+                return;
+            }
+            _self.uploadUrl=uploadpath;
+            _self.fileList=[];
+            _self.importdialogVisible=true;
+        },
+            uploadData() {
+            let _self = this;
+            _self.$emit("getParentId",_self.parentId)
+            let formdata = new FormData();
+            let data = {}
+            data["parentDocId"] = _self.parentId;
+            data["relationName"]='irel_children';
+            data["TYPE_NAME"]='附件';
+            formdata.append("metaData", JSON.stringify(data));
+            _self.fileList.forEach(function(file) {
+                formdata.append("uploadFile", file.raw, file.name);
+            });
+            _self.uploading=true;
+            console.log(formdata)
+            _self
+                .axios({
+                headers: {
+                    "Content-Type": "application/json;charset=UTF-8"
+                },
+                datatype: "json",
+                method: "post",
+                data: formdata,
+                url: _self.uploadUrl
+                })
+                .then(function(response) {
+                _self.importdialogVisible = false;
+                _self.uploading=false;
+                _self.$refs.attach.loadGridData();  
+                _self.$message({
+                        showClose: true,
+                        message: _self.$t('application.Import')+_self.$t('message.success'),
+                        duration: 2000,
+                        type: 'success'
+                    });
+                })
+                .catch(function(error) {
+                _self.uploading=false;
+                });
+            },
+      checkCondition(){    
      let _self = this
      let cond = this.searchFileCondition
      let ids =  _self.$refs.fileList.itemDataList
@@ -325,7 +423,7 @@ export default {
       let ids = []
       let _self = this
       ids.push(_self.parentId)
-      this.selectedFiles.forEach(function(item){
+      this.selectedAttachment.forEach(function(item){
                 ids.push(item.ID)
             })
       axios.post("/exchange/doc/deleteRelations",ids).then(function(response){
@@ -333,8 +431,8 @@ export default {
         let code = response.data.code
         if(code==1){
           _self.$message("删除成功")
+        _self.$refs.attach.loadGridData()
         }
-                  _self.$refs.fileList.loadGridData()
       })
     },
 
@@ -424,7 +522,6 @@ export default {
     },
     fileSelect(val) {
       this.selectedFiles = val;
-      console.log(this.selectedFiles)
     },
     saveFileToWorkflow() {
       let _self = this;
