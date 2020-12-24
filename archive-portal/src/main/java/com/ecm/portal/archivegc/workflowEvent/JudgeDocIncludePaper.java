@@ -43,6 +43,9 @@ public class JudgeDocIncludePaper implements JavaDelegate{
 			List<Map<String, Object>> list = documentService.getMapList(ecmSession.getToken(), formSqlStr);
 			Boolean flag = false;
 			for (Map<String, Object> map : list) {
+				if(map == null) {
+					continue;
+				}
 				if (map.get("hasPaper").equals("是")) {
 					flag = true;
 					break;

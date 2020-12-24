@@ -41,6 +41,7 @@ public class docRentEnd implements JavaDelegate {
 			EcmDocument ecmObject = documentService.getObjectById(ecmSession.getToken(), formId);
 			String type = varMap.get("SUB_TYPE").toString();
 			Map<String,Object> ecmAttr = ecmObject.getAttributes();
+			//下面开始改密级
 			String sqls = "select  distinct C_SECURITY_LEVEL from ecm_document where id in(select CHILD_ID from ecm_relation where parent_id = '"+formId+"')";
 			List<Map<String,Object>> Res = documentService.getMapList(ecmSession.getToken(), sqls);
 			for(Map<String,Object> mp : Res) {
@@ -70,7 +71,7 @@ public class docRentEnd implements JavaDelegate {
 				List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);		//找到表单挂载文件关系集
 				if(mps!=null) {
 				for(Map<String,Object> mp : mps) {
-				String id =	mp.get("child_id").toString();
+				String id =	mp.get("CHILD_ID").toString();
 				EcmDocument doc = documentService.getObjectById(ecmSession.getToken(), id);		//找到表单挂载文件了
 				Map<String,Object> docAttr = doc.getAttributes();
 				docAttr.put("STATUS", "待出库");
