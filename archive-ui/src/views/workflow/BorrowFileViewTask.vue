@@ -128,9 +128,9 @@
                         </el-form-item>
                       </template>
                       <template v-if="isShowReject">
-                        <el-form-item>
+                        <!-- <el-form-item>
                           <el-button type="primary" @click="pendNot">{{ $t("application.pendNot") }}</el-button>
-                        </el-form-item>
+                        </el-form-item> -->
                       </template>
                     </el-form>
                   </el-col>

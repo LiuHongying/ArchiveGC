@@ -110,7 +110,7 @@
                   v-bind:tableHeight="tableHeight"
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
-                  gridViewName="WorkflowFileGrid"
+                  gridViewName="DesignCancelGrid"
                   condition=" and a.NAME='irel_children'"
                   :optionWidth="1"
                   :itemDataList="files"
@@ -145,7 +145,7 @@
                   v-bind:tableHeight="tableHeight"
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
-                  gridViewName="BorrowSequenceGrid"
+                  gridViewName="DesignCancelGrid"
                   condition=" and a.NAME='irel_children' and b.TYPE_NAME='附件'"
                   :optionWidth="1"
                   :isShowMoreOption="false"
@@ -223,7 +223,7 @@ export default {
       createUnit:'',
       sameCreate:true,
       sameDepartMent:true,
-      selectedRemoveFiles:'',
+      selectedRemoveFiles:[],
       importdialogVisible:false,
       dialogVisible:false,
       parentId:'',

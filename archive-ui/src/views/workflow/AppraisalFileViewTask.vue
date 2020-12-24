@@ -143,9 +143,9 @@
                         <el-button type="primary" @click="beforeUploadFile('/dc/updatePrimaryContent')">更新鉴定清册</el-button>
                       </el-form-item>
                       <template v-if="isShowReject">
-                        <el-form-item>
+                        <!-- <el-form-item>
                           <el-button type="primary" @click="pendNot">{{ $t("application.pendNot") }}</el-button>
-                        </el-form-item>
+                        </el-form-item> -->
                       </template>
                     </el-form>
                   </el-col>
