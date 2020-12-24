@@ -3,8 +3,8 @@
     <split-pane
       split="vertical"
       @resize="resize"
-      :min-percent="10"
-      :default-percent="15"
+      :min-percent="1"
+      :default-percent="leftPercent"
     >
       <template slot="paneL">
         <el-container
@@ -141,7 +141,10 @@ export default {
 
       isNotCnpe: true,
       batchDialogVisible: false, //导入对话框可见性
+
+      leftPercent: 20,
       // 本地存储高度名称
+      leftStorageName: "ArchiveHandOverLeftHeight",
       topStorageName: "ArchiveHandOverTopHeight",
       // 非split pan 控制区域高度
       startHeight: 140,
@@ -151,6 +154,11 @@ export default {
       topbarHeight: 35,
       // 底部除列表高度
       bottomHeight: 80,
+
+      rightTableHeight: (window.innerHeight - 160) / 2,
+      asideHeight: window.innerHeight - 85,
+      treeHight: window.innerHeight - 125,
+      asideWidth: "100%",
 
       defaultProps: {
         children: "children",
@@ -261,6 +269,12 @@ export default {
           _self.tableHeight = window.innerHeight - 170;
           _self.tableLoading = false;
         });
+    },
+
+    resize(leftPercent) {
+      // 左边百分比*100
+      this.leftPercent = leftPercent;
+      this.setStorageNumber(this.leftStorageName, leftPercent);
     },
 
     onSplitResize(topPercent) {
