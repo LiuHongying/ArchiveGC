@@ -170,13 +170,18 @@ export default {
       sameCreate:true,
       sameDepartMent:true,
       TP:'',
-      subtypeCondition:false
+      subtypeCondition:false,
+      selectedRemoveFiles:[]
     };
   },
   mounted() {
     this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
+    
+    relevantDocRVSelect(val){
+        this.selectedRemoveFiles = val
+    },
     checkCreateUnit(){
       let crUnit = null
       this.sameCreate = true      //指示器清空
