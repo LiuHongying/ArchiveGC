@@ -283,6 +283,13 @@ export default {
     },
     selectThChange(val) {
       this.selectedThItems = val;
+       this.parentID=this.selectedThItems[0].ID
+      var condition1 =
+        "SELECT CHILD_ID from ecm_relation where NAME='irel_children'and PARENT_ID ='" +this.selectedThItems[0].ID +"'";
+      var key1 = "ID IN (" + condition1 + ") AND IS_RELEASED=1";
+      this.$refs.AppraisalFile.condition = key1;
+      this.$refs.AppraisalFile.loadGridInfo();
+      this.$refs.AppraisalFile.loadGridData();
     },
     selectedChooseDC(val) {
       this.selectedChooseDCItems = val;

@@ -226,6 +226,9 @@ import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue";
 import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue";
 import CommonViewRelyFolder from "@/views/workflow/CommonViewRelyFolder.vue";
 import ViewDocNpc from "@/views/npc/ViewDocNpc.vue";
+import DesignCancelViewReadOnly from "@/views/workflow/DesignCancelViewReadOnly.vue";
+import DestoryViewReadOnly from "@/views/workflow/DestoryViewReadOnly.vue";
+import ViolationViewReadOnly from "@/views/workflow/ViolationViewReadOnly.vue";
 export default {
   name: "MyWorkflow",
   permit: 1,
@@ -244,7 +247,10 @@ export default {
     BorrowViewReadOnly:BorrowViewReadOnly,
     CancelViewReadOnly:CancelViewReadOnly,
     CommonViewRelyFolder:CommonViewRelyFolder,
-    ViewDocNpc:ViewDocNpc
+    ViewDocNpc:ViewDocNpc,
+    DesignCancelViewReadOnly:DesignCancelViewReadOnly,
+    DestoryViewReadOnly:DestoryViewReadOnly,
+    ViolationViewReadOnly:ViolationViewReadOnly
   },
   data() {
     return {
@@ -293,7 +299,11 @@ export default {
           "作废通知单作废流程":"审核",
           "文档提交归档流程":"文档提交检查",
           "文档复制流程":"本部门领导审批",
-          "图纸文件审批流程":"校对"}
+          "图纸文件审批流程":"校对",
+          "设计文件作废流程":"档案科审批",
+          "档案销毁流程":"审批",
+          "文档违规处理流程":"本部门审批"
+          }
     };
   },
   created() {
