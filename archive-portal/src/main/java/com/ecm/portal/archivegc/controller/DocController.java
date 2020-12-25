@@ -377,8 +377,11 @@ public class DocController  extends ControllerAbstract  {
 			temp = documentService.getObjectMapById(getToken(), parentId);
 			form.setId(parentId);
 			if(temp==null) {
-			form.setTypeName("临时表单");
-			documentService.newObject(getToken(), form.getAttributes());		//要是表单没有的话就先创建一个空白表单
+			Map<String,Object> mps = form.getAttributes();
+			mps.put("CODING","@sequence");
+			mps.put("TYPE_NAME", "设计文件作废审批单");
+			form.setTypeName("设计文件作废审批单");
+			documentService.newObject(getToken(), mps);		//要是表单没有的话就先创建一个空白表单
 			
 			}
 			if (uploadFile != null&&uploadFile.length>0) {
