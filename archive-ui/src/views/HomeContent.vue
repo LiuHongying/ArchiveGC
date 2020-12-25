@@ -161,7 +161,7 @@
                 :xs="8"
                 :sm="6"
                 :md="4"
-                :lg="4"
+                :lg="6"
                 :xl="4"
                 v-for="item in icons"
                 :key="item.title"
@@ -199,7 +199,7 @@
           </el-card> -->
         </el-col>
         <el-col :span="8">
-          <el-card :body-style="{ height: '32px' }">
+          <!-- <el-card :body-style="{ height: '32px' }">
             <div slot="header" class="clearfix" style="padding-bottom: 5px">
               <span style="float: left" class="ecmtitle">个人中心</span>
             </div>
@@ -219,7 +219,7 @@
                 >我的授权</el-link
               >
             </el-col>
-          </el-card>
+          </el-card> -->
           <el-card :body-style="{ height: '190px' }">
             <div slot="header" class="clearfix" style="padding-bottom: 5px">
               <span style="float: left" class="ecmtitle">通知公告</span>
@@ -257,7 +257,7 @@
               </el-table-column>
             </el-table>
           </el-card>
-          <el-card :body-style="{ height: '310px' }">
+          <!-- <el-card :body-style="{ height: '310px' }">
             <div slot="header" class="clearfix" style="padding-bottom: 5px">
               <span style="float: left" class="ecmtitle">管理文件</span>
               <el-link
@@ -293,7 +293,7 @@
                 }}</template>
               </el-table-column>
             </el-table>
-          </el-card>
+          </el-card> -->
           <!-- <el-card :body-style="{ height: '310px',width:'100%' }">
             <div slot="header" class="clearfix" style="padding-bottom:5px;">
               <span style="float: left;" class="ecmtitle">馆藏状态</span>
@@ -679,7 +679,7 @@ export default {
       let _self = this;
       _self.$router.push({
         path: "/dc/folderviewer",
-        query: { folderName: folderName },
+        query: { cfgName: folderName },
       });
     },
   },
