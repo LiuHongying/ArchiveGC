@@ -27,6 +27,7 @@
       <DataGrid
           ref="mainDataGrid"
           key="main"
+          gridViewName = "GeneralGrid"
           v-bind:itemDataList="itemDataList"
           v-bind:columnList="gridList"
           @pagesizechange="pageSizeChange"
@@ -69,7 +70,7 @@ export default {
     };
   },
   mounted() {
-   let _self = this
+   let _self = this;
    let cfgName = _self.$route.query.cfgName;
    if(cfgName){
      _self.loadFolderByCfg(cfgName);
@@ -102,6 +103,7 @@ export default {
         .then(function(response) {
           if(response.data.code == 1){
             _self.currentFolder = response.data.data;
+            console.log(_self.currentFolder);
             _self.loadGridInfo(_self.currentFolder);
           }
           _self.loading = false;
@@ -115,6 +117,7 @@ export default {
       let _self = this;
       _self.loading = true;
       var m = new Map();
+      debugger;
       m.set("gridName", indata.gridView);
       m.set("lang", _self.getLang());
       axios
