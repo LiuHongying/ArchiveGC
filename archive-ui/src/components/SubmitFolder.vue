@@ -22,7 +22,7 @@ export default {
       let _self = this;
       var m = [];
       let tab = _self.selectRowData;
-
+      
       if (_self.selectRowData.length == 0) {
         _self.$message({
           showClose: true,
@@ -39,7 +39,7 @@ export default {
       }
 
       axios
-        .post("/dc/archiveStorage", JSON.stringify(m), {
+        .post("/record/archiveStorage", JSON.stringify(m), {
           headers: {
             "Content-Type": "application/json;charset=UTF-8",
           },

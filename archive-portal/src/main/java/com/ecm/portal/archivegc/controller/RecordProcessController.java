@@ -31,8 +31,9 @@ public class RecordProcessController extends ControllerAbstract {
 	
 	@RequestMapping(value = "/record/archiveStorage", method = RequestMethod.POST)
 	@ResponseBody
-	public void archiveStorage(@RequestBody String argStr) throws Exception {
+	public Map<String,Object> archiveStorage(@RequestBody String argStr) throws Exception {
 		List<String> list = JSONUtils.stringToArray(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
 		
 		for(String fileId:list) {
 			//EcmDocument doc= this.getObjectById(getToken(), fileId);
@@ -40,7 +41,10 @@ public class RecordProcessController extends ControllerAbstract {
 			doc.addAttribute("Status", "待入库");
 			doc.addAttribute("IS_RELEASED", "1");
 			documentService.updateObject(getToken(), doc);
-		}		
+		}	
+		
+		mp.put("code", ActionContext.SUCESS);
+		return mp;
 	}
 	
 	@RequestMapping(value = "/record/createStorageNum", method = RequestMethod.POST)
