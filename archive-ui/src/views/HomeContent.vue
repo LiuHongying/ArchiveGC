@@ -158,9 +158,9 @@
             </div>
             <el-row>
               <el-col
-                :xs="8"
-                :sm="6"
-                :md="4"
+                :xs="12"
+                :sm="8"
+                :md="6"
                 :lg="6"
                 :xl="4"
                 v-for="item in icons"
