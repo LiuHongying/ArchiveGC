@@ -16,6 +16,7 @@
                     :isShowPage="false"
                     v-model="workflowFileList"
                     :workflowObj="workflowObj"
+                    @getDraft="getDrafter"
                 >
                 </DesignFile>
        </el-main>
@@ -67,9 +68,23 @@
             },
             
             mounted(){
-                // this.getWorkflows();
+            this.getDrafter()
+                
             },
             methods:{
+                getDrafter(){
+                let _self = this
+            setTimeout(() => {
+                    let ecmFormItems = _self.$refs.ShowProperty.dataList[0].ecmFormItems
+                    ecmFormItems.forEach(element => {
+                        if(element.attrName=="C_DRAFTER"){
+                            element.defaultValue=_self.currentUser().userName
+                        }
+                    });
+                    //this.$refs.ShowProperty.dataList[0].ecmFormItems[6].defaultValue = val
+                        }, 5000);      
+                }
+                ,
                 loadFormInfo(){
                     this.$refs.ShowProperty.myTypeName=this.workflowObj.FORMNAME;
                     this.$refs.ShowProperty.loadFormInfo();
@@ -152,9 +167,9 @@
                             formdata.append("uploadFile",_self.$refs.ShowProperty.file.raw);
                         }
                         // console.log(JSON.stringify(m));
-                        if(_self.$refs.ShowProperty.myItemId!='')
+                        if(_self.$refs.ShowProperty.myItemId=='')
                         {
-                            axios.post("/dc/createWorkflowFormData4Appraisal",formdata,{
+                            axios.post("/dc/createWorkflowFormData",formdata,{
                                 'Content-Type': 'multipart/form-data'
                             })
                             .then(function(response) {
