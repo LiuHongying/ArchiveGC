@@ -271,7 +271,8 @@ export default {
             _self.selectedFiles.forEach(e=>{
                 let isContain=false;
                 _self.$refs.fileList.itemDataList.find((function(value) {
-                if(value === e) {
+
+                if(value.ID === e.ID) {
                     isContain=true;
                     return;
                     //则包含该元素
