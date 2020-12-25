@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -527,12 +528,17 @@ public class ArchiveDcController extends ControllerAbstract{
 				EcmDocument doc = null;
 				doc = documentService.getObjectById(getToken(), boxId);
 				String coding="";
-				if(doc.getCoding()!=null&&!"".equals(doc.getCoding())) {
-					coding=doc.getCoding();
+				String storeNumber = (String)doc.getAttributeValue("C_STORE_CODING");
+				if(StringUtils.isEmpty(storeNumber)) {
+					storeNumber = numberService.getStoreNumber(getToken(), doc.getAttributes());
+					doc.getAttributes().put("C_STORE_CODING", storeNumber);
+				}
+				if(!StringUtils.isEmpty((String)doc.getAttributeValue("C_ARCHIVE_CODING"))) {
+					coding=(String)doc.getAttributeValue("C_ARCHIVE_CODING");
 				}else {
 					while(true) {
 						coding= numberService.getNumber(getToken(), doc.getAttributes());
-						String validataSql="select coding from ecm_document where coding='"+coding+"'";
+						String validataSql="select coding from ecm_document where C_ARCHIVE_CODING='"+coding+"'";
 						List<Map<String,Object>> result= documentService.getMapList(getToken(),validataSql);
 						if(result==null||result.size()==0) {
 							doc.setCoding(coding);
@@ -547,6 +553,7 @@ public class ArchiveDcController extends ControllerAbstract{
 					String childidStr=(String) childId.get("child_id");
 					EcmDocument childDoc= documentService.getObjectById(getToken(), childidStr);
 					childDoc.addAttribute("C_ARCHIVE_CODING", coding);
+					childDoc.addAttribute("C_STORE_CODING", storeNumber);
 					try {
 						documentService.updateObject(getToken(), childDoc,null);
 					}catch(NullPointerException nu) {
