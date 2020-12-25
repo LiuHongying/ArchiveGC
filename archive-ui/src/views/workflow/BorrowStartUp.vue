@@ -191,10 +191,10 @@
                         if(code==1){
                         if(_self.reviewer3==''){
                             _self.$message("需要选择公司领导!")
+                            _self.butt = false
                             return
                         }
                         }
-                    _self.butt = false
                     var c;
                     for(c in _self.$refs.ShowProperty.dataList)
                     {
