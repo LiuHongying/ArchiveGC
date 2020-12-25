@@ -62,7 +62,7 @@
     </el-dialog>
 
     <el-dialog
-      title="打印pdf417条码"
+      title="打印条码"
       width="43%"
       :visible="printPdf417Visible"
       @close="printPdf417Visible=false"
@@ -170,6 +170,7 @@
             <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
               <split-pane v-on:resize="onSplitResize" :min-percent='20' :default-percent='topPercent' split="horizontal">
                 <template slot="paneL">
+                  <el-form inline="true">
                   <el-row>
                     <el-col :span="3" class="topbar-input">
                       <el-input
@@ -178,6 +179,7 @@
                         @change="searchItem"
                         prefix-icon="el-icon-search"
                       ></el-input>
+                       
                     </el-col>
                     <el-col :span="3" class="topbar-input">
                       <el-select v-model="archiveStatus" placeholder="请选择状态" @change="searchItem">
@@ -186,31 +188,16 @@
                         <el-option label="已整编" value="已整编"></el-option>
                         <el-option label="已质检" value="已质检"></el-option>
                       </el-select>
+                      <div style="padding-top:5px;">
+                        <el-radio style="margin-right:5px;" v-model="radio" label="案卷" @change="changeRadio">案卷</el-radio>
+                        <el-radio style="margin-left:5px;" v-model="radio" label="文件" @change="changeRadio">文件</el-radio>
+                      </div>
                     </el-col>
-                    <el-col :span="4" style="padding-top:8px;">
-                      <el-radio style="margin-right:5px;" v-model="radio" label="案卷" @change="changeRadio">案卷</el-radio>
-                      <el-radio style="margin-left:5px;" v-model="radio" label="文件" @change="changeRadio">文件</el-radio>
-                    </el-col>
-                    <el-col :span="14" class="topbar-button">
-                      <el-col :span="4">
+                    <el-col :span="18" class="topbar-input">
+                      <el-form-item>
                         <TypeSelectComment @afterSelecteType="newArchiveItem"></TypeSelectComment>
-                      </el-col>
-                      
-                      <!-- <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-edit"
-                        @click="newArchiveItem('卷盒')"
-                      >{{$t('application.newArchive')}}</el-button> -->
-                      <!-- <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-edit"
-                        @click="newArchiveItem('文件')"
-                      >{{$t('application.newVolume')}}</el-button> -->
-                      <el-col :span="17">
+                      </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="warning"
                         plain
@@ -224,8 +211,9 @@
                           _self.loadGridData(_self.currentFolder);
                         })"
                         :title="$t('application.delete')+$t('application.document')"
-                      ><!--{{$t('application.delete')+$t('application.document')}}--></el-button> 
-                      
+                      >{{$t('application.delete')+$t('application.document')}}</el-button> 
+                      </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
@@ -233,9 +221,10 @@
                         size="small"
                         icon="el-icon-s-order"
                         @click="takeNumbers"
-                        :title="$t('application.takeNumbers')"
-                      ></el-button>
-                      
+                        :title="文档取号"
+                      >文档取号</el-button>
+                      </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
@@ -244,7 +233,9 @@
                         icon="el-icon-notebook-2"
                         @click="fetchInformation"
                         :title="$t('application.fetchInformation')"
-                      ></el-button>
+                      >{{$t('application.fetchInformation')}}</el-button>
+                      </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
@@ -252,7 +243,9 @@
                         title="挂载文件"
                         icon="el-icon-upload2"
                         @click="beforeMount(selectedItems);uploadUrl='/dc/mountFile'"
-                      ></el-button>
+                      >挂载文件</el-button>
+                      </el-form-item>
+                      <el-form-item>
                       <!-- <el-button
                         type="primary"
                         plain
@@ -277,7 +270,9 @@
                         icon="el-icon-printer"
                         @click="beforePrintArchiveCode(selectedItems,'打印档号')"
                         title="打印档号"
-                      ></el-button>
+                      >打印档号</el-button>
+                      </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
@@ -285,7 +280,9 @@
                         icon="el-icon-printer"
                         @click="beforePrintPdf417(selectedItems,'打印档号')"
                         title="打印条码"
-                      ></el-button>
+                      >打印条码</el-button>
+                      </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
@@ -293,7 +290,9 @@
                         icon="el-icon-printer"
                         @click="beforePrint(selectRow,'ArrangeInnerGridPrint','卷内目录')"
                         title="打印卷内目录"
-                      ></el-button>
+                      >打印卷内目录</el-button>
+                      </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
@@ -301,7 +300,9 @@
                         icon="el-icon-printer"
                         @click="beforePrintPreparationTable(selectRow,'备考表')"
                         title="打印备考表"
-                      ></el-button>
+                      >打印备考表</el-button>
+                      </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
@@ -309,24 +310,29 @@
                         icon="el-icon-folder-add"
                         @click="pieceNumVisible=true"
                         title="生成批次号"
-                      ></el-button>
+                      >生成批次号</el-button>
+                      </el-form-item>
+                      <el-form-item>
                         <el-button
                         type="primary"
                         plain
                         size="small"
                         icon="el-icon-right"
                         @click="arrangeComplete('已整编')"
-                        title="整编完成"
-                      ></el-button>
-                    
+                        title="完成整编"
+                      >完成整编</el-button>
+                    </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
                         size="small"
                         icon="el-icon-check"
                         @click="arrangeComplete('已质检')"
-                        title="质检完成"
-                      ></el-button>
+                        title="完成质检"
+                      >完成质检</el-button>
+                      </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
@@ -335,7 +341,9 @@
                         icon="el-icon-right"
                         @click="moveToPreFilling"
                         title="提交预归档库"
-                      ></el-button>
+                      >提交预归档库</el-button>
+                      </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
@@ -343,9 +351,9 @@
                         size="small"
                         icon="el-icon-right"
                         @click="penddingStorage"
-                        title="提交入库"
-                      ></el-button>
-                    </el-col>
+                        title="提库交入"
+                      >提库交入</el-button>
+                      </el-form-item>
                     </el-col>
                   </el-row>
                   <el-row>
@@ -369,6 +377,7 @@
                       ></DataGrid>
                     </el-col>
                   </el-row>
+                  </el-form>
                 </template>
                 <template slot="paneR" v-if="isFile">
                   <el-row>
@@ -479,11 +488,11 @@ export default {
       // 顶部除列表高度
       topbarHeight: 35,
       // 底部除列表高度
-      bottomHeight: 35,
+      bottomHeight: 25,
       isExpand: false,
-      rightTableHeight: (window.innerHeight - 160) / 2,
-      asideHeight: window.innerHeight - 85,
-      treeHight: window.innerHeight - 125,
+      rightTableHeight: (window.innerHeight - 140) / 2,
+      asideHeight: window.innerHeight - 95,
+      treeHight: window.innerHeight - 135,
       asideWidth: "100%",
       currentLanguage: this.getLang(),
       printsVisible: false,

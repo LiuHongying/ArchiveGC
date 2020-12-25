@@ -95,7 +95,7 @@
               </el-row>
             </div>
           </el-card>
-          <el-card :body-style="{ height: '180px' }">
+          <el-card :body-style="{ height: '160px' }">
             <div slot="header" class="clearfix" style="padding-bottom: 5px">
               <span style="float: left" class="ecmtitle"
                 >待办任务<el-badge :value="totalCount" class="item"></el-badge>
@@ -154,7 +154,7 @@
              </PaoMaDeng> -->
           <el-card :body-style="{ height: '280px' }">
             <div slot="header" class="clearfix" style="padding-bottom: 5px">
-              <span style="float: left" class="ecmtitle">流程配置</span>
+              <span style="float: left" class="ecmtitle">业务流程</span>
             </div>
             <el-row>
               <el-col
@@ -199,11 +199,19 @@
           </el-card> -->
         </el-col>
         <el-col :span="8">
-          <!-- <el-card :body-style="{ height: '32px' }">
+          <el-card :body-style="{ height: '40px' }">
             <div slot="header" class="clearfix" style="padding-bottom: 5px">
               <span style="float: left" class="ecmtitle">个人中心</span>
             </div>
-            <el-col :span="12">
+            <el-col :span="8">
+              <i style="font-size: 28px" class="el-icon-star-off"></i>
+              <el-link
+                :underline="false"
+                @click="$router.push('/ShopingCart')"
+                >我的收藏</el-link
+              >
+            </el-col>
+            <el-col :span="8">
               <i style="font-size: 28px" class="el-icon-user"></i>
               <el-link
                 :underline="false"
@@ -211,7 +219,7 @@
                 >我的信息</el-link
               >
             </el-col>
-            <el-col :span="12">
+            <el-col :span="8">
               <i style="font-size: 28px" class="el-icon-s-claim"></i>
               <el-link
                 :underline="false"
@@ -219,7 +227,7 @@
                 >我的授权</el-link
               >
             </el-col>
-          </el-card> -->
+          </el-card>
           <el-card :body-style="{ height: '190px' }">
             <div slot="header" class="clearfix" style="padding-bottom: 5px">
               <span style="float: left" class="ecmtitle">通知公告</span>

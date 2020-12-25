@@ -16,7 +16,7 @@
      </el-dialog>
 </div>
     <el-header style="height: 40px;padding-top:8px;">
-      <el-col :span="20">
+      <el-col :span="20" style="padding-top:8px;">
         {{doc.typeName}} &nbsp;&nbsp; {{doc.code}} &nbsp;&nbsp; {{doc.revision}} &nbsp;&nbsp; {{doc.title}}
       </el-col>
       <el-col :span="4" style="float:right; text-align:right;">
@@ -75,26 +75,18 @@
             <div>
               <template v-if="docObj!=null">
               <el-button type="primary" plain @click="menuClick($t('application.dcproper'))">{{$t('application.dcproper')}}</el-button><br/>
-              <template v-if="doc.typeName=='设计文件'">
-                <el-button type="primary" plain @click="menuClick($t('application.relationDC'))">{{$t('application.relationDC')}}</el-button><br/>
-              </template>
+              <el-button type="primary" plain @click="menuClick($t('application.relationDC'))">{{$t('application.relationDC')}}</el-button><br/>
               <el-button type="primary" plain @click="menuClick($t('application.DCver'))">{{$t('application.DCver')}}</el-button><br/>
               <el-button type="primary" plain @click="menuClick($t('application.Rendition'))">{{$t('application.Rendition')}}</el-button><br/>
               <!-- <el-button type="primary" plain @click="menuClick('利用信息')">利用信息</el-button><br/> -->
               <template v-if="doc.typeName=='文件传递单'" >
                 <el-button type="primary" plain @click="menuClick($t('application.TransferDoc'))">{{$t('application.TransferDoc')}}</el-button><br/>
               </template>
-              <template v-if="('FU申请、FU通知单、作废通知单、CR澄清要求申请单、CR澄清要求答复单、CR澄清要求关闭单、'
-              +'FCR现场变更申请单、FCR现场变更答复单、FCR现场变更关闭单、NCR不符合项报告单、NCR不符合项报告答复单、NCR不符合项报告关闭单、'+
-            'DCR设计变更申请单、DCR设计变更答复单、DCR设计变更关闭单、TCR试验澄清申请单、TCR试验澄清答复单、'+
-            'TCR试验澄清关闭单、DEN设计变更通知单、DEN设计变更通知关闭单、设计审查意见、设计审查意见答复').indexOf(doc.typeName)!=-1">
-                <el-button type="primary" plain @click="menuClick($t('application.relevantDoc'))">{{$t('application.relevantDoc')}}</el-button><br/>
-              </template>
               <template v-if="revertType.indexOf(doc.typeName)!=-1">
                 <el-button type="primary" plain @click="menuClick($t('application.replyDoc'))">{{$t('application.replyDoc')}}</el-button><br/>
               </template>
               <el-button type="primary" plain @click="menuClick($t('application.Attachment'))">{{$t('application.Attachment')}}</el-button><br/>
-              <el-button v-if="doc.typeName=='图纸文件'" type="primary" plain @click="menuClick($t('application.Changeinfo'))">{{$t('application.change')}}( {{doc.changeCount}} )</el-button>
+              <el-button v-if="doc.typeName=='设计文件'" type="primary" plain @click="menuClick($t('application.Changeinfo'))">{{$t('application.change')}}( {{doc.changeCount}} )</el-button>
               </template>
             </div>
         </el-col>
@@ -262,7 +254,7 @@ export default {
         _self.doc.id=_self.docObj.ID;
         _self.doc.code=_self.docObj.CODING;
         _self.doc.revision=_self.docObj.REVISION;
-        _self.doc.title=_self.docObj.NAME;
+        _self.doc.title=_self.docObj.TITLE;
         _self.doc.contentSize = _self.docObj.CONTENT_SIZE;
         _self.doc.folderId=_self.docObj.FOLDER_ID;
         if(!_self.doc.hasPdf){
