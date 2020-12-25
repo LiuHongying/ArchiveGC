@@ -248,6 +248,7 @@ public class WorkFlowCenter extends ControllerAbstract {
 					: "irel_children";
 			String childFileIds = childObj.toString();
 			if(id!=null) {
+				doc.getAttributes().keySet().remove("CODING");
 				documentService.updateObject(getToken(), doc.getAttributes());
 			}
 			if(id==null)
