@@ -72,7 +72,6 @@
     </el-dialog>
     <el-row>
       <el-form ref="workflowForm" :model="workflowForm">
-        <el-row class="topbar-button">
           <el-col>
             <el-form-item
               v-if="currentUserName=='all'"
@@ -129,7 +128,6 @@
               <el-button type="primary" :plain="true" size="small" @click="search()">查询</el-button>
             </el-form-item>
           </el-col>
-        </el-row>
       </el-form>
     </el-row>
     <el-table
@@ -153,21 +151,21 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="名称" min-width="10%"></el-table-column>
+      <el-table-column prop="name" label="名称" min-width="120%"></el-table-column>
       <el-table-column v-if="showAllWorkflow=='1'" prop="startUser" label="发起者" min-width="20%"></el-table-column>
       <el-table-column
         prop="startTime"
         label="开始时间"
         sortable
         :formatter="dateFormatter"
-        min-width="20%"
+        width="200"
       ></el-table-column>
       <el-table-column
         prop="endTime"
         label="完成时间"
         sortable
         :formatter="dateFormatter"
-        min-width="20%"
+        width="200"
       ></el-table-column>
       <el-table-column label="操作" width="210px" v-if="currentUserName=='all'">
         <template slot-scope="scope">
@@ -270,7 +268,7 @@ export default {
       currentPage: 1,
       loading: false,
       dialogVisible: false,
-      tableHeight: window.innerHeight - 175,
+      tableHeight: window.innerHeight - 205,
       formLabelWidth: "80px",
       currentProcessId: "",
       workflowPicVisible: "",

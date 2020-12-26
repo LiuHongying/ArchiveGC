@@ -68,7 +68,6 @@
     </el-dialog>
     <el-row>
       <el-form ref="workflowForm" :model="workflowForm">
-        <el-row class="topbar-button">
           <el-form-item label="流程名称" :label-width="formLabelWidth" style="float:left">
               <el-select v-model="workflowForm.workflowName" @change="changeJobNames()">
                 <div v-for="item in workflowNames" :key="item.id" >
@@ -98,7 +97,6 @@
             <el-form-item style="float:left;padding-left:3px">
               <el-button type="primary" :plain="true" size="small" @click="search()">查询</el-button>
             </el-form-item>
-        </el-row>
       </el-form>
     </el-row>
     <el-table
@@ -211,7 +209,7 @@ export default {
       currentPage: 1,
       loading: false,
       dialogVisible: false,
-      tableHeight: window.innerHeight - 120,
+      tableHeight: window.innerHeight - 170,
       formLabelWidth: "120px",
       processDiagram: "",
       currentProcessId: "",

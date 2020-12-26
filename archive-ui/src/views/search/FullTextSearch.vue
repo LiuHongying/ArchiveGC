@@ -74,7 +74,6 @@
           </el-col>
         </el-checkbox-group>
       </el-col>
-
     </el-row>
     <div v-if="searched">
       <div style="margin-top:5px;text-align:center">
@@ -135,7 +134,7 @@
             default-expand-all
             @header-dragend="onHeaderDragend"
           >
-            <el-table-column type="expand">
+            <el-table-column type="expand"  :key="1">
               <template slot-scope="scope">
                 <el-table
                   :data="scope.row.childrens"
@@ -151,19 +150,14 @@
                 </el-table>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('field.indexNumber')" width="60">
+            <el-table-column :label="$t('field.indexNumber')" width="60"  :key="2">
               <template slot-scope="scope">
                 <span>{{(currentPage-1) * pageSize + scope.$index+1}}</span>
               </template>
             </el-table-column>
-            <el-table-column width="40">
+            <el-table-column width="40"  :key="3">
               <template slot-scope="scope">
-                 <img v-if="scope.row.TYPE_NAME=='图册'"
-                    :src="'./static/img/drawing.gif'"
-                    :title="scope.row.TYPE_NAME"
-                    border="0"
-                  />
-                  <img v-else-if="scope.row.TYPE_NAME=='卷盒'"
+                  <img v-if="scope.row.C_ITEM_TYPE=='卷盒'"
                     :src="'./static/img/box.gif'"
                     :title="scope.row.TYPE_NAME"
                     border="0"
@@ -171,14 +165,15 @@
                   <img v-else :title="scope.row.FORMAT_NAME" :src="'./static/img/format/f_'+scope.row.FORMAT_NAME+'_16.gif'" border="0" />
               </template>
             </el-table-column>
-            <div v-for="(citem,idx) in gridList" :key="idx+'_C'">
-              <div v-if="citem.visibleType==1">
-                <div v-if="(citem.width+'').indexOf('%')>0">
+            <template v-for="(citem,idx) in gridList">
+              <template v-if="citem.visibleType==1">
+                <template v-if="(citem.width+'').indexOf('%')>0">
                   <el-table-column
                     :label="citem.label"
                     :prop="citem.attrName"
                     :min-width="citem.width"
                     :sortable="citem.allowOrderby"
+                    :key="idx+4"
                   >
                     <template slot-scope="scope">
                       <div v-if="citem.attrName.indexOf('DATE')>0">
@@ -189,13 +184,14 @@
                       </div>
                     </template>
                   </el-table-column>
-                </div>
-                <div v-else>
+                </template>
+                <template v-else>
                   <el-table-column
                     :label="citem.label"
                     :width="citem.width"
                     :prop="citem.attrName"
                     :sortable="citem.allowOrderby"
+                    :key="idx+4"
                   >
                     <template slot-scope="scope">
                       <div v-if="citem.attrName.indexOf('_DATE')>0">
@@ -207,9 +203,9 @@
                       <!--span>{{scope.row[citem.attrName]}}</span-->
                     </template>
                   </el-table-column>
-                </div>
-              </div>
-            </div>
+                </template>
+              </template>
+            </template>
             <!--
           <el-table-column
             :label="$t('application.content')"

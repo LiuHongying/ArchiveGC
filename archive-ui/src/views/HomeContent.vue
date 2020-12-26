@@ -81,16 +81,15 @@
                     text-align: left;
                   "
                 >
-                  <el-checkbox-group v-model="checkedCards">
+                <el-checkbox-group v-model="checkedCards">
+                    <el-col :xs="8" :sm="6" :md="6" :lg="4" :xl="3" v-for="card in cards" :key="card.id">
                     <el-checkbox
-                      v-for="card in cards"
                       :label="card.name"
-                      :key="card.id"
                       checked
                       @change="handleCheckedTypeChange"
-                      >{{ card.name }}</el-checkbox
-                    >
-                  </el-checkbox-group>
+                    >{{card.name}}</el-checkbox>
+                    </el-col>
+                </el-checkbox-group>
                 </el-row>
               </el-row>
             </div>
@@ -204,7 +203,7 @@
               <span style="float: left" class="ecmtitle">个人中心</span>
             </div>
             <el-col :span="8">
-              <i style="font-size: 28px" class="el-icon-star-off"></i>
+              <i style="font-size: 28px;color: #409EFF;" class="el-icon-star-off"></i>
               <el-link
                 :underline="false"
                 @click="$router.push('/ShopingCart')"
@@ -212,7 +211,7 @@
               >
             </el-col>
             <el-col :span="8">
-              <i style="font-size: 28px" class="el-icon-user"></i>
+              <i style="font-size: 28px;color: #409EFF;" class="el-icon-user"></i>
               <el-link
                 :underline="false"
                 @click="$router.push(jumpPath.userCenter)"
@@ -220,7 +219,7 @@
               >
             </el-col>
             <el-col :span="8">
-              <i style="font-size: 28px" class="el-icon-s-claim"></i>
+              <i style="font-size: 28px;color: #409EFF;" class="el-icon-finished "></i>
               <el-link
                 :underline="false"
                 @click="$router.push('/user/userroleinfo')"

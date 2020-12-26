@@ -43,7 +43,7 @@ export default {
 }
 .el-date-editor.el-input,
 .el-date-editor.el-input__inner {
-  width: 140px;
+  width: 140px !important;
 }
 .el-table .cell,
 .el-table th div {
@@ -114,26 +114,28 @@ export default {
   box-sizing: border-box;
 }
 .el-card__body {
-    padding: 1px 12px 1px 12px !important;
+  padding: 1px 12px 1px 12px !important;
 }
 .el-collapse {
-     border-top: 0 solid #ebeef5 !important; 
+  border-top: 0 solid #ebeef5 !important; 
 }
 .el-collapse-item__header {
-    height: 40px !important;
-    line-height: 40px !important;
-    /* background-color: #ebeef5 !important; */
-    /* border-bottom: 1px solid #ccc !important; */
-    border-bottom: 0 solid #ccc !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
+ 
+  height: 40px !important;
+  line-height: 40px !important;
+  /* background-color: #ebeef5 !important; */
+  /* border-bottom: 1px solid #ccc !important; */
+  border-bottom: 0 solid rgb(161, 161, 161) !important;
+  background-color: rgb(241, 241, 241) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
 }
 .el-collapse-item__arrow{
-      line-height: normal !important;
+  line-height: normal !important;
 }
 
 .el-collapse-item__wrap {
-     border-bottom: 0px solid #EBEEF5!important;
+  border-bottom: 0px solid #EBEEF5!important;
 }
 .el-button {
   height: 30px !important;

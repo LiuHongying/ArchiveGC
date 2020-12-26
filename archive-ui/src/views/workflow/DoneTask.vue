@@ -77,12 +77,14 @@
         :formatter="dateFormatter"
         min-width="12%"
         sortable
+        class="ecm-date-small"
       ></el-table-column>
       <el-table-column
         prop="endTime"
         label="完成时间"
         :formatter="dateFormatter"
         min-width="12%"
+        class="ecm-date-small"
         sortable
       ></el-table-column>
       <!-- <el-table-column prop="result" label="完成结果"  min-width="10%">

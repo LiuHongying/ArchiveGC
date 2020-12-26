@@ -100,7 +100,8 @@
       :title="dialogName+$t('application.property')"
       :visible.sync="propertyVisible"
       @close="propertyVisible = false"
-      width="80%"
+      width="96%"
+      :close-on-click-modal="false"
     >
       <ShowProperty
         ref="ShowProperty"
@@ -145,7 +146,7 @@
            plain
             size="small"
           icon="el-icon-printer"
-          @click="beforePrint(selectedOneTransfer,'PrintDelivery','文件清单')"
+          @click="beforePrint(selectedOneTransfer,'PrintDelivery','文档移交单')"
         >打印</el-button>
           <!-- <el-button type="primary"
           plain

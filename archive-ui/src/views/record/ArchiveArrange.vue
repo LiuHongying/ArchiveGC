@@ -20,10 +20,11 @@
     </el-dialog>
     
     <el-dialog
-      width="80%"
+      width="96%"
       :title="dialogName+$t('application.property')"
       :visible.sync="propertyVisible"
       @close="propertyVisible = false"
+      :close-on-click-modal="false"
     >
       <ShowProperty
         ref="ShowProperty"

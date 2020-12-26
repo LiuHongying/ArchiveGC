@@ -10,25 +10,25 @@
     >
       <el-form style="padding-bottom:30px">
           <el-form-item
-          label="流程名称"
+          label="流程名称:"
           :label-width="formLabelWidth"
           style="float:left"
         >{{currentData.workflowName}}</el-form-item>
         <el-form-item
-          label="任务名称"
+          label="任务名称:"
           :label-width="formLabelWidth"
           style="float:left"
         >{{currentData.name}}</el-form-item>
         <el-form-item
-          label="发起人"
+          label="发起人:"
           :label-width="formLabelWidth"
           style="float:left"
         >{{currentData.startUser}}</el-form-item>
         <el-form-item
-          label="到达时间"
+          label="到达时间:"
           :label-width="formLabelWidth"
           style="float:left"
-        >{{dateFormat(currentData.createTime,'')}}</el-form-item>
+        >{{datetimeFormat(currentData.createTime,'')}}</el-form-item>
       </el-form>
       <!-- <el-divider content-position="left">表单信息</el-divider> -->
 
@@ -138,7 +138,6 @@
     </el-dialog>
     <el-row>
       <el-form ref="workflowForm" :model="workflowForm">
-        <el-row class="topbar-button">
           <el-form-item label="流程名称" :label-width="formLabelWidth" style="float:left">
               <el-select v-model="workflowForm.workflowName" @change="changeJobNames()">
                 <div v-for="item in workflowNames" :key="item.id" >
@@ -168,7 +167,6 @@
             <el-form-item style="float:left;padding-left:3px">
               <el-button type="primary" :plain="true" size="small" @click="search()">查询</el-button>
             </el-form-item>
-        </el-row>
       </el-form>
     </el-row>
     <el-table
@@ -293,7 +291,7 @@ export default {
       dialogVisible: false,
       dialogTitle: "查看任务",
       isCompleteSelected: false,
-      tableHeight: window.innerHeight - 120,
+      tableHeight: window.innerHeight - 170,
       delegateDialogVisible: false,
       delegateButton: "委托代理",
       ecmCfgActivity: [],
