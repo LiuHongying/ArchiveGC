@@ -27,14 +27,14 @@
       </div>
     </el-dialog>
 
-    <el-dialog :visible.sync="typeSelectVisible">
-      <el-form>
+    <el-dialog :visible.sync="typeSelectVisible" width="400px">
+      <el-form label-position="top">
         <el-form-item :label="$t('application.fileType')" :rules="[{required:true,message:'必填',trigger:'blur'}]">
           <el-select
             name="selectName"
             v-model="selectedClassic"
             :placeholder="$t('application.selectFileType')"
-            style="display:block;"
+            
             @change="getTypeNameByClassic(selectedClassic)"
           >
             <div v-for="(name,nameIndex) in classicNames" :key="'T_'+nameIndex">
@@ -47,7 +47,7 @@
             name="selectName"
             v-model="selectedTypeName"
             :placeholder="$t('application.selectFileType')"
-            style="display:block;"
+            
           >
             <div v-for="(name,nameIndex) in typeNames" :key="'T_'+nameIndex">
               <el-option :label="name" :value="name" :key="nameIndex"></el-option>
