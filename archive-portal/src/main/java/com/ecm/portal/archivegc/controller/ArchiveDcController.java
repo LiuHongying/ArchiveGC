@@ -541,7 +541,7 @@ public class ArchiveDcController extends ControllerAbstract{
 						String validataSql="select coding from ecm_document where C_ARCHIVE_CODING='"+coding+"'";
 						List<Map<String,Object>> result= documentService.getMapList(getToken(),validataSql);
 						if(result==null||result.size()==0) {
-							doc.setCoding(coding);
+							doc.getAttributes().put("C_ARCHIVE_CODING", coding);
 							documentService.updateObject(getToken(), doc,null);
 							break;
 						}

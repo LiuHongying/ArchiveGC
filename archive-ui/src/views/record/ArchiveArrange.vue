@@ -334,7 +334,7 @@
                       >完成质检</el-button>
                       </el-form-item>
                       <el-form-item>
-                      <el-button
+                      <el-button v-if="currentFolder.folderPath.indexOf('商务管理')>0"
                         type="primary"
                         plain
                         :loading="releaseLoading"

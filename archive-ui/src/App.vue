@@ -120,7 +120,7 @@ export default {
   border-top: 0 solid #ebeef5 !important; 
 }
 .el-collapse-item__header {
- 
+  width: 100% !important;
   height: 40px !important;
   line-height: 40px !important;
   /* background-color: #ebeef5 !important; */
