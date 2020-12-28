@@ -30,6 +30,9 @@
           </template>
           </el-collapse-item>
         </el-collapse>
+        <el-row v-if="showTypeName">
+            <el-form-item style="float:left"  :label="$t('application.type')" >{{myTypeName}}</el-form-item>
+        </el-row>
     </el-row>
     <el-row>
       
@@ -117,7 +120,8 @@ export default {
     folderId: {type:String,default:""},
     folderPath:{type:String,default:""},
     showUploadFile: {type:Boolean, default:true},
-    extendAllTab:{type:Boolean, default:true}
+    extendAllTab:{type:Boolean, default:true},
+    showTypeName: {type:Boolean, default: false},
   },
   methods: {
     setMainObject(obj){
@@ -245,6 +249,7 @@ export default {
               _self.activeNames.push(response.data.data[0].label);
             }
           }
+          _self.myTypeName = response.data.typeName;
           _self.file=[];
           _self.fileList = [];
           //console.log(JSON.stringify(response.data.data));

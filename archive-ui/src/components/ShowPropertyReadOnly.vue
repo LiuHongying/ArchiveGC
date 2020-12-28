@@ -11,11 +11,12 @@
                   </el-form-item>
                 </el-col>
               </template>
-              <el-col v-if="showTypeName">
-                <el-form-item style="float:left"  :label="$t('application.type')" >{{myTypeName}}</el-form-item>
-              </el-col>
+              
          </el-collapse-item>
-      </el-collapse>
+        </el-collapse>
+        <el-row v-if="showTypeName">
+            <el-form-item style="float:left"  :label="$t('application.type')" >{{myTypeName}}</el-form-item>
+        </el-row>
     </el-form>
   </div>
 </template>

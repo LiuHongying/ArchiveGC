@@ -97,7 +97,7 @@
 
     <el-dialog v-dialogDrag  :title="dialog.title" :visible.sync="dialog.visible" width="90%" :before-close="handleClose">      
       <template v-if="dialog.title==$t('application.dcproper')">
-        <ShowProperty ref="ShowProperty" :itemId="doc.id" :typeName="doc.typeName" :folderId="doc.folderId"></ShowProperty>
+        <ShowProperty ref="ShowProperty" :itemId="doc.id" :typeName="doc.typeName" :folderId="doc.folderId" :showTypeName="true"></ShowProperty>
       </template>
       <template v-if="dialog.title==$t('application.relationDC')">
        <RelationDocs :docId="docId"></RelationDocs>

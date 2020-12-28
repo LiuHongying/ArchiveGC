@@ -60,6 +60,7 @@
         v-bind:itemId="selectedItemId"
         v-bind:folderId="currentFolder.id"
         v-bind:typeName="currentFolder.typeName"
+        :showTypeName="true"
       ></ShowProperty>
       <div slot="footer" class="dialog-footer">
         <el-button @click="propertyVisible = false">{{
