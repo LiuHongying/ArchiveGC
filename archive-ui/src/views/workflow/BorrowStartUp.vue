@@ -123,7 +123,8 @@
       dialogVisible:false,
       borrowType:'',
       flag: false,
-      dialogVisible:false
+      dialogVisible:false,
+      isLimited:true
                 }
             },
             props:{
@@ -135,6 +136,29 @@
                 // this.getWorkflows();
             },
             methods:{
+            getBorrowType(){            //获取当前借阅类型
+                let _self = this
+                let ecmFormItems = this.$refs.ShowProperty.dataList[0].ecmFormItems
+                    ecmFormItems.forEach(element => {
+                        if(element.attrName=="SUB_TYPE"){
+                          _self.borrowType = element.defaultValue
+                        }
+                    });
+            },
+            checkLevel(){
+                this.getBorrowType()
+                let _self = this
+                if(this.borrowType=='查阅'){                //默认都要验证选人，查阅的时候先默认不选人，然后判断密级
+                    this.isLimited=false//无限制，可立即发起
+                    this.workflowFileList.forEach(element => {
+                        if(element.C_SECURITY_LEVEL=='受限'||element.C_SECURITY_LEVEL=='普通商密'){
+                            _self.isLimited=true       //找到了，借阅文件包含商密，将在下一步进行判断
+                        }
+                    })
+                }             
+            },
+
+
             getTypeResult(){
                  let _self = this
                  _self.$refs.workflowFile.setSubTypeCondition(false)
@@ -159,15 +183,20 @@
                     this.$refs.ShowProperty.loadFormInfo();
                 },
                 startUpWorkflow(workflow){
+                this.checkLevel()                                   //在这里获取当前文件安全等级
+                console.log(this.isLimited)
                   if(this.accept!="接受"){
                       this.$message("请接受档案利用承诺书!")
                       return
                   }
-                  if(this.reviewer1==''){
+                if(this.borrowType=='查阅'&&this.isLimited==true&&this.reviewer1==''){       //查阅提醒
+                    this.$message("查阅文件包含涉密和限制文件，请选择本部门领导!")
+                }
+                  if(this.reviewer1==''&&this.borrowType!='查阅'){
                       this.$message("请完成借阅单必填项！本部门领导为必填项!")
                       return
                     }
-                   if(this.$refs.workflowFile.sameDepartMent == false){
+                   if(this.$refs.workflowFile.sameDepartMent == false&&this.isLimited==true){                     //查阅&普通借阅提醒
                    if(this.reviewer2==''){
                     this.$message("请完成借阅单必填项！形成部门领导为必填项!")
                       return                }
@@ -189,7 +218,7 @@
                                         .then(function (response) {
                         let code = response.data.code
                         if(code==1){
-                        if(_self.reviewer3==''){
+                        if(_self.reviewer3==''&&_self.isLimited==true){
                             _self.$message("需要选择公司领导!")
                             _self.butt = false
                             return

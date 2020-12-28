@@ -43,7 +43,7 @@ public class JudgeBorrowType implements JavaDelegate {
 			if(!type.equals("纸质借阅")||!type.equals("纸质复制")) {
 				execution.setVariable("C_INCLUDE_PAPER", "否");
 			}
-			if(type.equals("纸质借阅")||!type.equals("纸质复制")) {
+			if(type.equals("纸质借阅")||type.equals("纸质复制")||type.equals("查阅")) {
 				execution.setVariable("C_INCLUDE_PAPER", "是");
 			}
 	}
