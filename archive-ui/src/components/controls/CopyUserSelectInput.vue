@@ -79,7 +79,7 @@
       </div>
     </el-dialog>
     <el-col >
-      <el-input style="width:200px" type="text" :placeholder="$t('application.selectUser')" readonly="readonly" v-model="inputValue"></el-input>
+      <el-input style="width:400px" type="text" :placeholder="$t('application.selectUser')" readonly="readonly" v-model="inputValue"></el-input>
       <input value="value1" type="hidden" />
     </el-col>
     <el-col >

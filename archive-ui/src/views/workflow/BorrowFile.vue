@@ -14,17 +14,6 @@
       >
         <el-form :inline="true" :model="filters" @submit.native.prevent>
           <el-form-item>
-            <el-select v-model="filters.docType">
-              <el-option :label="$t('application.all')+' '+$t('application.subDC')" value></el-option>
-              <el-option
-                v-for="(name,nameIndex) in childrenTypes"
-                :key="'Type2_'+nameIndex"
-                :label="name"
-                :value="name"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item>
             <el-input
               v-model="filters.title"
               :placeholder="$t('application.Coding')+$t('application.or')+$t('application.Title')"
@@ -39,9 +28,9 @@
           ref="searchDoc"
           key="searchDoc"
           data-url="/dc/getDocuments"
-          v-bind:tableHeight="tableHeight"
-          v-bind:isshowOption="true"
-          v-bind:isshowSelection="true"
+          :tableHeight="tableHeight"
+          :isshowOption="true"
+          :isshowSelection="true"
           :condition="searchFileCondition"
           gridViewName="BorrowSequenceGrid"
           :optionWidth="1"
@@ -59,14 +48,9 @@
       </el-dialog>
     </template>
     <template v-slot:main="{layout}">
-      <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
-        <split-pane
-          v-on:resize="onSplitResize"
-          :min-percent="20"
-          :default-percent="topPercent"
-          split="horizontal"
-        >
-          <template slot="paneL">
+      <!-- <div :style="{position:'relative',height: layout.height-startHeight+'px'}"> -->
+      <div :style="{position:'relative'}">
+
             <el-tabs value="t01">
               <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01">
                 <el-row v-if="allowEdit">
@@ -76,8 +60,10 @@
                         <el-button type="primary" @click="beforeAddFile">{{ $t("application.new") }}</el-button>
                       </el-form-item>
                       <el-form-item>
-                        <el-button @click="removeFile" type="warning">{{ $t("application.delete") }}</el-button>
+                        <el-button type="warning" @click="removeFile">{{ $t("application.remove") }}</el-button>
                       </el-form-item>
+                    <el-form-item>
+                    </el-form-item>
                     </el-form>
                   </el-col>
                 </el-row>
@@ -86,25 +72,27 @@
                   ref="fileList"
                   key="fileList"
                   data-url="/dc/getDocuByRelationParentId"
-                  v-bind:tableHeight="tableHeight"
-                  v-bind:isshowOption="true"
-                  v-bind:isshowSelection="true"
+                  :tableHeight="tableHeight"
+                  :isshowOption="true"
+                  :isshowSelection="true"
                   gridViewName="BorrowSequenceGrid"
                   condition=" and a.NAME='irel_children'"
                   :optionWidth="1"
                   :itemDataList="files"
                   :isShowMoreOption="false"
+                  showOptions="查看内容,查看属性"
                   :isshowCustom="false"
-                  :isEditProperty="allowEdit"
+                  :isEditProperty="false"
+                  :isShowPropertyButton="false"
                   :isShowChangeList="false"
                   :isshowicon="false"
                   :isshowPage="isShowPage"
+                  :isInitData="false"
                   @selectchange="relevantDocRVSelect"
                 ></DataGrid>
               </el-tab-pane>
             </el-tabs>
-          </template>
-        </split-pane>
+
       </div>
     </template>
   </DataLayout>
@@ -195,8 +183,6 @@ export default {
         crUnit =  this.selectedFiles[tab].C_CREATE_UNIT           //当前编制单位指示器
         if(this.createUnit!=crUnit){
         this.sameCreate = false
-        console.log(this.createUnit)
-        console.log(crUnit)
       }
          this.createUnit = this.selectedFiles[tab].C_CREATE_UNIT       //全局指示器
       }
@@ -238,7 +224,7 @@ export default {
           _self.searchFileCondition=ecmCfgActivity.formCondition;
         }
         if(_self.subtypeCondition==true){
-          //_self.searchFileCondition += " and C_STORE_STATUS='在库'"
+          _self.searchFileCondition += " and C_STORE_STATUS='在库'"
         }
         _self.propertyVisible=true;
 

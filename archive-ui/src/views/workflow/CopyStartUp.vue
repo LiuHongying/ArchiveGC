@@ -46,22 +46,13 @@
                 六、本《承诺书》未尽事宜按国家有关法律法规和公司规定执行。</span>
 
                 </el-dialog>
-
+        </el-main>
+        <el-footer>
             <el-radio v-model="accept" label="接受">接受档案承诺利用书</el-radio>
             <el-button type="success" @click="open">档案利用承诺书</el-button>
-
-                <div class="dialog-footer" style="float:right">
-                    <slot name="footerButton">
-                        <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
-                        
-                        <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button>
-                        <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
-                    </slot>
-                    
-                </div>
-
-        </el-main>
-                    
+            <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
+            <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
+        </el-footer>
     </el-container>
     
 </template>
@@ -75,7 +66,7 @@
     import DataLayout from '@/components/ecm-data-layout'
     import AttachmentFile from "@/views/dc/AttachmentFile.vue"
     import BorrowFile from "@/views/workflow/BorrowFile.vue"
-    import UserSelectInput from '@/components/controls/BorrowUserSelectInput'
+    import UserSelectInput from '@/components/controls/CopyUserSelectInput'
     export default {
         name: "StartupWorkflow",
         permit: 1,
@@ -479,5 +470,8 @@
     }
 </script>
 <style scoped>
-
+.el-footer {
+    text-align: center;
+    padding: 10px;
+  }
 </style>
