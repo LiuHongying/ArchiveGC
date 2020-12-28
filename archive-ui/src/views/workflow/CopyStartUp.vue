@@ -49,7 +49,7 @@
         </el-main>
         <el-footer>
             <el-radio v-model="accept" label="接受">接受档案承诺利用书</el-radio>
-            <el-button type="success" @click="open">档案利用承诺书</el-button>
+            <el-button type="success" @click="open">查看档案利用承诺书</el-button>
             <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
             <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
         </el-footer>
