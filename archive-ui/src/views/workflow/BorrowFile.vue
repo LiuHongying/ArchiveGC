@@ -89,7 +89,7 @@
                   v-bind:tableHeight="tableHeight"
                   v-bind:isshowOption="true"
                   v-bind:isshowSelection="true"
-                  gridViewName="WorkflowFileGrid"
+                  gridViewName="BorrowSequenceGrid"
                   condition=" and a.NAME='irel_children'"
                   :optionWidth="1"
                   :itemDataList="files"
@@ -195,6 +195,8 @@ export default {
         crUnit =  this.selectedFiles[tab].C_CREATE_UNIT           //当前编制单位指示器
         if(this.createUnit!=crUnit){
         this.sameCreate = false
+        console.log(this.createUnit)
+        console.log(crUnit)
       }
          this.createUnit = this.selectedFiles[tab].C_CREATE_UNIT       //全局指示器
       }
@@ -236,7 +238,7 @@ export default {
           _self.searchFileCondition=ecmCfgActivity.formCondition;
         }
         if(_self.subtypeCondition==true){
-          _self.searchFileCondition += " and C_STORE_STATUS='在库'"
+          //_self.searchFileCondition += " and C_STORE_STATUS='在库'"
         }
         _self.propertyVisible=true;
 

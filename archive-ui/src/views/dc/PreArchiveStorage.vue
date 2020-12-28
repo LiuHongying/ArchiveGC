@@ -20,8 +20,7 @@
             node-key="id"
             style="width: 100%"
             :render-content="renderContent"
-            default-expand-all
-            highlight-current
+            :default-checked-keys="highlight - current"
             @node-click="handleNodeClick"
           ></el-tree>
         </el-container>
@@ -41,6 +40,22 @@
                 <el-button type="primary" @click="search()">{{
                   $t("application.SearchData")
                 }}</el-button>
+              </el-form-item>
+              <el-form-item>
+                <el-radio
+                  style="margin-right: 5px"
+                  v-model="radio"
+                  label="案卷"
+                  @change="changeRadio"
+                  >案卷</el-radio
+                >
+                <el-radio
+                  style="margin-left: 5px"
+                  v-model="radio"
+                  label="文件"
+                  @change="changeRadio"
+                  >文件</el-radio
+                >
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click.native="exportData">{{
@@ -87,6 +102,7 @@
                     "
                     v-bind:isshowOption="true"
                     v-bind:isshowSelection="true"
+                    :itemDataList="itemDataList"
                     :optionWidth="2"
                     :isshowCustom="false"
                     :isEditProperty="true"
@@ -97,25 +113,22 @@
                   >
                   </DataGrid>
                 </template>
-                <template slot="paneR">
-                  <el-tabs v-model="tabs.activeNum">
-                    <el-tab-pane label="案卷" name="relevantFile">
+                <template slot="paneR" v-if="isFile">
+                  <el-row>
+                    <span style="float: left; text-align: left; padding: 5px"
+                      >文件</span
+                    >
+                  </el-row>
+                  <el-row>
+                    <el-col>
                       <DataGrid
                         ref="relevantFileDataGrid"
                         key="relevantFile"
                         v-bind="tables.relevantFileDataGrid"
                       >
                       </DataGrid>
-                    </el-tab-pane>
-                    <el-tab-pane label="文件" name="initFile">
-                      <DataGrid
-                        ref="GeneralFileGrid"
-                        key="GeneralFile"
-                        v-bind="tables.GeneralFileGrid"
-                      >
-                      </DataGrid>
-                    </el-tab-pane>
-                  </el-tabs>
+                    </el-col>
+                  </el-row>
                 </template>
               </split-pane>
             </div>
@@ -147,17 +160,17 @@ export default {
       leftStorageName: "ArchiveHandOverLeftHeight",
       topStorageName: "ArchiveHandOverTopHeight",
       // 非split pan 控制区域高度
-      startHeight: 140,
+      startHeight: 135,
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
       topbarHeight: 35,
       // 底部除列表高度
-      bottomHeight: 80,
+      bottomHeight: 25,
 
-      rightTableHeight: (window.innerHeight - 160) / 2,
-      asideHeight: window.innerHeight - 85,
-      treeHight: window.innerHeight - 125,
+      rightTableHeight: (window.innerHeight - 150) / 2,
+      asideHeight: window.innerHeight - 95,
+      treeHight: window.innerHeight - 135,
       asideWidth: "100%",
 
       defaultProps: {
@@ -165,32 +178,39 @@ export default {
         label: "name",
       },
 
+      radio: "案卷",
+      isFile: true,
+
       dataList: [],
       gridList: [],
       itemDataList: [],
       itemDataListFull: [],
+      selectedItems: [],
+      currentPage: 1,
+      pageSize: 20,
+      judgement: "",
 
       tables: {
         main: {
           gridViewName: "GeneralPre",
-          dataUrl: "/dc/getDocuments",
           condition: "",
         },
         relevantFileDataGrid: {
           gridViewName: "GeneralPre",
-          dataUrl: "/dc/getDocuments",
-          condition: "C_ITEM_TYPE='案卷'",
-        },
-        GeneralFileGrid: {
-          gridViewName: "GeneralPre",
-          dataUrl: "/dc/getDocuments",
-          condition: "C_ITEM_TYPE='文件'",
+          condition: " a.NAME='irel_children' and b.IS_HIDDEN=0 ",
         },
       },
       tabs: {
         activeNum: "",
       },
     };
+  },
+
+  created() {
+    setTimeout(() => {
+      this.topPercent = this.getStorageNumber(this.topStorageName, 60);
+      this.leftPercent = this.getStorageNumber(this.leftStorageName, 20);
+    }, 300);
   },
 
   mounted() {
@@ -206,7 +226,6 @@ export default {
       .post("/admin/getPreArchivesFolder", 0)
       .then(function (response) {
         _self.dataList = response.data.data;
-        //console.log(JSON.stringify(_self.dataList));
         _self.loading = false;
         _self.$refs.mainDataGrid.loadGridInfo(_self.defaultData);
         _self.$refs.mainDataGrid.loadGridData(_self.defaultData);
@@ -215,10 +234,6 @@ export default {
         console.log(error);
         _self.loading = false;
       });
-
-    setTimeout(() => {
-      _self.topPercent = _self.getStorageNumber(_self.topStorageName, 60);
-    }, 300);
   },
 
   methods: {
@@ -257,11 +272,12 @@ export default {
       m.set("gridName", indata.gridView);
       m.set("folderId", indata.id);
       m.set("condition", key);
+      m.set("judgement", _self.judgement);
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
       m.set("orderBy", "MODIFIED_DATE desc");
       axios
-        .post("/dc/getExceptBoxDocuments", JSON.stringify(m))
+        .post("/dc/getContainStorageDocuments", JSON.stringify(m))
         .then(function (response) {
           _self.itemDataList = response.data.data;
           _self.itemDataListFull = response.data.data;
@@ -298,18 +314,16 @@ export default {
           .post("/admin/getFolder", indata.id)
           .then(function (response) {
             indata.children = response.data.data;
-            //console.log(JSON.stringify(indata));
             indata.extended = true;
             _self.inputkey = "";
             _self.loading = false;
+            _self.loadGridData(indata);
           })
           .catch(function (error) {
             console.log(error);
             _self.loading = false;
           });
       }
-      _self.$refs.mainDataGrid.loadGridInfo(indata);
-      _self.$refs.mainDataGrid.loadGridData(indata);
     },
 
     renderContent: function (h, { node, data, store }) {
@@ -366,22 +380,35 @@ export default {
       var key1 = "ID IN (" + condition1 + ") ";
       this.$refs.relevantFileDataGrid.condition = key1;
       this.$refs.relevantFileDataGrid.gridViewName = "GeneralPre";
-      if (typeChose == "案卷") {
-        this.$refs.relevantFileDataGrid.loadGridInfo();
-        this.$refs.relevantFileDataGrid.loadGridData();
-      }
-      if (typeChose == "文件") {
-        this.$refs.GeneralFileGrid.loadGridInfo();
-        this.$refs.GeneralFileGrid.loadGridData();
-      }
+      this.$refs.relevantFileDataGrid.loadGridInfo();
+      this.$refs.relevantFileDataGrid.loadGridData();
     },
 
     reload() {
       this.loadGridData(this.currentFolder);
     },
 
+    changeRadio(val) {
+      let _self = this;
+      if (val == "文件") {
+        _self.judgement += " and C_ITEM_TYPE = '文件' ";
+        _self.isFile = false;
+        _self.topPercent = 95;
+        // _self.$refs.mainDataGrid.tableHeight=(window.innerHeight-_self.startHeight);
+      } else {
+        _self.isFile = true;
+        _self.topPercent = 65;
+        _self.judgement += " and C_ITEM_TYPE = '案卷' ";
+      }
+
+      _self.loadGridData(_self.currentFolder);
+      _self.judgement = "";
+    },
+
     exportData() {
       let _self = this;
+      console.log(_self.currentPage);
+      console.log(_self.pageSize);
       let params = {
         URL: "/file/exportFolderPath",
         gridName: _self.currentFolder.gridView,
