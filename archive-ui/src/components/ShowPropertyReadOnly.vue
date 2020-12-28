@@ -1,33 +1,21 @@
 <template>
-<div>
+  <div>
     <el-form label-position="right" label-width="100px">
-      <!--
-      <div>
-        <el-button :plain="true" type="primary" size="small" icon="edit" @click="loaddata()">刷新数据</el-button>
-      </div>
-      -->
-      <el-row>
-        <!-- <el-col style="padding:3px;text-align:left">
-          <el-form-item>{{typeName}}</el-form-item></el-col> -->
         <el-collapse v-model="activeNames" >
-          <el-collapse-item v-for="(citem,cindex) in dataList"  :name="citem.label" :id="citem.label" :key="cindex"> 
-         <template slot="title" >
-          <div class="el-divider el-divider--horizontal"><div class="el-divider__text is-left">{{citem.label}}</div></div>
-        </template>
-         <template v-for="(item,itemIndex) in citem.ecmFormItems">
-            <el-col v-show="itemId || (!itemId && !item.readOnly)" :span="showCellValue(item)" v-bind:key="itemIndex" style="text-align:left;">
-              <el-form-item :hidden="item.isHide" :label="item.label">
-              {{item.defaultValue}}
-              </el-form-item>
-            </el-col>
-          </template>
-          <el-col>
-             <el-form-item style="float:left"  :label="$t('application.type')" >{{myTypeName}}</el-form-item>
-          </el-col>
+          <el-collapse-item v-for="(citem,cindex) in dataList"  :title="citem.label" :name="citem.label"  :id="citem.label"  :key="cindex"> 
+
+            <template v-for="(item,itemIndex) in citem.ecmFormItems">
+                <el-col v-show="itemId || (!itemId && !item.readOnly)" :span="showCellValue(item)" v-bind:key="itemIndex" style="text-align:left;">
+                  <el-form-item :hidden="item.isHide" :label="item.label+':'">
+                  {{getDisplayValue(item)}}
+                  </el-form-item>
+                </el-col>
+              </template>
+              <el-col v-if="showTypeName">
+                <el-form-item style="float:left"  :label="$t('application.type')" >{{myTypeName}}</el-form-item>
+              </el-col>
          </el-collapse-item>
       </el-collapse>
-    </el-row>
-      
     </el-form>
   </div>
 </template>
@@ -91,9 +79,30 @@ export default {
     typeName: {type:String,default:""},
     folderId: {type:String,default:""},
     folderPath:{type:String,default:""},
-    
+    showTypeName: {type:Boolean, default: false},
+    extendAllTab: {type:Boolean, default: true}
   },
   methods: {
+    getDisplayValue(item){
+      let val = item.defaultValue;
+      var retVal = val;
+      if(item.attrName.indexOf("_DATE")>0){
+        return this.formatDate(val);
+      }
+      if(item.isRepeat){
+        retVal = "";
+        if(val){
+          for(var i=0;i<val.length;i++){
+            if(retVal.length>0){
+              retVal += ','+val[i];
+            }else{
+              retVal = val[i];
+            }
+          }
+        }
+      }
+      return retVal;
+    },
     validateValue(itemData){
       if(itemData.required){
         if(itemData.validatePolicy != null && itemData.validatePolicy != ""){
@@ -179,9 +188,16 @@ export default {
         .then(function(response) {
          
           _self.bindData(response.data.data);
-          if(response.data.data[0]){
-             //console.log(JSON.stringify(response.data.data[0].label));
-            _self.activeNames = [response.data.data[0].label];
+           _self.activeNames = [];
+          if(_self.extendAllTab && response.data.data){
+            for(var i=0 ; i<response.data.data.length;i++){
+              _self.activeNames.push(response.data.data[i].label);
+            }
+          }
+          else{
+            if(response.data.data[0]){
+              _self.activeNames.push(response.data.data[0].label);
+            }
           }
           _self.file=[];
           _self.fileList = [];
@@ -413,22 +429,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1,
-h2 {
-  font-weight: normal;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-.el-date-editor.el-input, .el-date-editor.el-input__inner {
-    width: 140px;
-}
+
 </style>

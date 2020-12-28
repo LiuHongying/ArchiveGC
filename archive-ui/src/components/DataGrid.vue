@@ -1005,10 +1005,11 @@ export default {
     },
     rowClick(row) {
       this.selectedRow = row;
+      /*
       if(row&&this.isshowSelection){
         this.$refs.datatable.clearSelection();
         this.$refs.datatable.toggleRowSelection(row);
-      }
+      }*/
       this.$emit("rowclick", row);
     },
     dbclick(row) {

@@ -15,12 +15,14 @@
     <el-form-item>
       <el-button type="primary" size="small" @click.native.prevent="handleLogin" class="login-submit">{{$t("application.login")}}</el-button>
     </el-form-item>
+    <!--
     <el-form-item>
       <el-select v-model="currentLanguage" @change="languageChange" style="width:105px">
         <el-option label="简体中文" value="zh-cn" key="zh-cn"></el-option>
         <el-option label="English" value="en" key="en"></el-option>
       </el-select>
     </el-form-item>
+    -->
   </el-form>
 </template>
 

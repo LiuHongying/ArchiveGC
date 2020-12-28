@@ -1,6 +1,6 @@
 <template>
   <div >
-    <el-dialog :visible.sync="typeSelectVisible" width="360px">
+    <el-dialog :visible.sync="typeSelectVisible" width="400px">
       <div style="width: 80%">
         <el-form>
           <el-form-item

@@ -3,6 +3,7 @@ package com.ecm.portal.archivegc.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.text.Collator;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -92,6 +93,13 @@ public class ArchiveDcController extends ControllerAbstract{
 			String classicNameStr=argStr.toString();
 			List<EcmDefType> types= CacheManagerOper.getEcmDefTypes().values().stream()
 					.filter(t -> classicNameStr.equals(t.getTypeTag())).collect(Collectors.toList());
+			//Comparator cmp = Collator.getInstance(java.util.Locale.CHINA); 
+			Collections.sort(types,new Comparator<EcmDefType>() {
+		       @Override
+		       public int compare(EcmDefType o1, EcmDefType o2) {
+		         return o1.getName().compareTo(o2.getName());
+		       }
+		    });
 			mp.put("code", ActionContext.SUCESS);
 			mp.put("data", types);
 			return mp;
@@ -541,7 +549,7 @@ public class ArchiveDcController extends ControllerAbstract{
 						String validataSql="select coding from ecm_document where C_ARCHIVE_CODING='"+coding+"'";
 						List<Map<String,Object>> result= documentService.getMapList(getToken(),validataSql);
 						if(result==null||result.size()==0) {
-							doc.setCoding(coding);
+							doc.getAttributes().put("C_ARCHIVE_CODING", coding);
 							documentService.updateObject(getToken(), doc,null);
 							break;
 						}

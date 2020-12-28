@@ -110,7 +110,9 @@
     <el-dialog title="取批次号"
     :visible.sync="pieceNumVisible"
     @close="pieceNumVisible = false"
+    width="640px"
     >
+    <el-row>
       <el-form label-width="80px">
         <el-col :span="12">
           <el-form-item label="批次号">
@@ -118,7 +120,7 @@
           </el-form-item>
           
         </el-col>
-        <el-col :span="3">
+        <el-col :span="12">
           <div style="margin-top:6px">
             <el-button type="primary" @click="takePiecesNumber">取批次号</el-button>
           </div>
@@ -126,7 +128,8 @@
         </el-col>
         
       </el-form>
-      <div slot="footer" class="dialog-footer">
+    </el-row>
+      <div slot="footer" class="dialog-footer" style="text-align:center;">
         <el-button type="primary" @click="savePiecesNumber">{{$t('application.ok')}}</el-button>
         <el-button @click="pieceNumVisible = false">{{$t('application.cancel')}}</el-button>
       </div>
@@ -194,7 +197,7 @@
                         <el-radio style="margin-left:5px;" v-model="radio" label="文件" @change="changeRadio">文件</el-radio>
                       </div>
                     </el-col>
-                    <el-col :span="18" class="topbar-input">
+                    <el-col :span="18" style="padding-left:10px;">
                       <el-form-item>
                         <TypeSelectComment @afterSelecteType="newArchiveItem"></TypeSelectComment>
                       </el-form-item>
@@ -334,7 +337,7 @@
                       >完成质检</el-button>
                       </el-form-item>
                       <el-form-item>
-                      <el-button
+                      <el-button v-if="currentFolder.folderPath.indexOf('科技与信息')>0"
                         type="primary"
                         plain
                         :loading="releaseLoading"
@@ -382,7 +385,7 @@
                 </template>
                 <template slot="paneR" v-if="isFile">
                   <el-row>
-                    <span style="float:left;text-align:left;">卷内文件列表</span>
+                    <span style="float:left;text-align:left;padding:5px;">卷内文件列表</span>
                     <!-- <el-button type="primary" plain size="small" title="自动组卷"  @click="autoPaper()">自动组卷</el-button> -->
                     <!-- <el-button type="primary" plain size="small"  @click="childrenTypeSelectVisible=true">{{$t('application.createDocument')}}</el-button>
                             <el-button type="primary" plain size="small" :title="$t('application.addReuseFile')"  @click="reuseVisible=true">{{$t('application.addReuseFile')}}</el-button>
@@ -491,7 +494,7 @@ export default {
       // 底部除列表高度
       bottomHeight: 25,
       isExpand: false,
-      rightTableHeight: (window.innerHeight - 140) / 2,
+      rightTableHeight: (window.innerHeight - 150) / 2,
       asideHeight: window.innerHeight - 95,
       treeHight: window.innerHeight - 135,
       asideWidth: "100%",
@@ -1552,9 +1555,21 @@ export default {
         });
         return;
       }
+      for(var i=0;i<_self.selectedItems.length;i++){
+         if(_self.selectedItems[i].C_BATCH_CODING2==null || _self.selectedItems[i].C_BATCH_CODING2.length == 0){
+           _self.$message({
+            showClose: true,
+            message: "请生成批次号后再提交！",
+            duration: 5000,
+            type: "warning"
+          });
+          return;
+        }
+      }
       let p=new Array();
       _self.selectedItems.forEach(e=>{
         p.push(e.ID);
+       
       });
       _self
           .axios({
@@ -1941,47 +1956,6 @@ html {
   height: 100%;
 }
 
-/* *{
-        margin: 0;
-        padding: 0;
-      }            
-             .middle{
-                 position: absolute;
-                 left: 50.3%;
-                 right: 41%;
-                 background-color: red;
-                 word-break: break-word;
-                 height: 20%;
-             }
-             .left{
-               position:relative;
-                 width: 45%;
-                 height: 200px;
-                 float: left;
-                background-color: blue;
-             }
-            .right{
-              position:relative;
-                 width: 45%;
-                 height: 200px;
-                 float: right;
-                 background-color: yellow;
-            } */
-h1,
-h2 {
-  font-weight: normal;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after {
   position: absolute;
   right: 2px;
@@ -1991,5 +1965,8 @@ a {
   font-weight: 700;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+.el-form-item__content {
+    line-height: 36px ;
 }
 </style>
