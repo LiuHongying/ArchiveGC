@@ -6,7 +6,7 @@
       @close="propertyVisible = false"
       width="90%"
     >
-      <ShowProperty ref="ShowProperty" width="100%" v-bind:itemId="selectedItemId"></ShowProperty>
+      <ShowProperty ref="ShowProperty" width="100%" v-bind:itemId="selectedItemId" :showTypeName="true"></ShowProperty>
       <div slot="footer" class="dialog-footer">
         <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
       </div>
@@ -157,7 +157,7 @@
             </el-table-column>
             <el-table-column width="40"  :key="3">
               <template slot-scope="scope">
-                  <img v-if="scope.row.C_ITEM_TYPE=='卷盒'"
+                  <img v-if="scope.row.C_ITEM_TYPE=='案卷'"
                     :src="'./static/img/box.gif'"
                     :title="scope.row.TYPE_NAME"
                     border="0"
