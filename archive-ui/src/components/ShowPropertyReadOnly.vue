@@ -88,7 +88,7 @@ export default {
       let val = item.defaultValue;
       var retVal = val;
       if(item.attrName.indexOf("_DATE")>0){
-        return this.formatDate(val);
+        return this.dateFormat(val);
       }
       if(item.isRepeat){
         retVal = "";
