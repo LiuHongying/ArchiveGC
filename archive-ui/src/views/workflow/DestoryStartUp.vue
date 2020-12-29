@@ -418,7 +418,7 @@
 </script>
 <style scoped>
 .el-footer {
-    text-align: right;
+    text-align: center;
     padding: 10px;
   }
 </style>

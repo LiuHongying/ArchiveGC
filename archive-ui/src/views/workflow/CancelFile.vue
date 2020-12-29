@@ -80,14 +80,8 @@
       </el-dialog>
     </template>
     <template v-slot:main="{layout}">
-      <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
-        <split-pane
-          v-on:resize="onSplitResize"
-          :min-percent="20"
-          :default-percent="topPercent"
-          split="horizontal"
-        >
-          <template slot="paneL">
+    <div :style="{position:'relative'}">
+ 
             <el-tabs value="t01">
               <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01">
                 <el-row v-if="allowEdit">
@@ -158,8 +152,6 @@
                 ></DataGrid>
               </el-tab-pane>
             </el-tabs>
-          </template>
-        </split-pane>
       </div>
     </template>
   </DataLayout>

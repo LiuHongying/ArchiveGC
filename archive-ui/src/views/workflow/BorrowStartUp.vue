@@ -14,10 +14,10 @@
         <el-form-item label="本单位/部门领导:" label-width="150px">
         <UserSelectInput :roleName='departmentLeader' v-model="reviewer1" v-bind:inputValue="reviewer1" ></UserSelectInput>
         </el-form-item>
-        <el-form-item label="文件形成单位/部门领导:" label-width="200px">
+        <el-form-item label="文件形成单位/部门领导:" label-width="170px">
         <UserSelectInput :roleName='departmentLeader' v-model="reviewer2" v-bind:inputValue="reviewer2" ></UserSelectInput>
         </el-form-item>
-        <el-form-item label="公司主管领导:" label-width="150px">
+        <el-form-item label="公司主管领导:" label-width="130px">
         <UserSelectInput :roleName='companyLeader' v-model="reviewer3" v-bind:inputValue="reviewer3" ></UserSelectInput>                
         </el-form-item>
         </el-form>
@@ -51,22 +51,14 @@
                 六、本《承诺书》未尽事宜按国家有关法律法规和公司规定执行。</span>
 
                 </el-dialog>
-
-            <el-radio v-model="accept" label="接受">接受档案承诺利用书</el-radio>
-            <el-button type="success" @click="open">档案利用承诺书</el-button>
-
-                <div class="dialog-footer" style="float:right">
-                    <slot name="footerButton">
-                        <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
-                        
-                        <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button>
-                        <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
-                    </slot>
-                    
-                </div>
-
         </el-main>
-                    
+         <el-footer>
+            <el-radio v-model="accept" label="接受">接受档案承诺利用书</el-radio>
+            <el-button type="success" @click="open">查看档案利用承诺书</el-button>
+            <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
+            <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
+        </el-footer>
+    
     </el-container>
     
 </template>
@@ -531,5 +523,8 @@
     }
 </script>
 <style scoped>
-
+.el-footer {
+    text-align: center;
+    padding: 10px;
+  }
 </style>

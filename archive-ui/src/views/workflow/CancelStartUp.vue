@@ -38,40 +38,10 @@
                     :workflowObj="workflowObj"
                 >
                 </BorrowFile>
-                <el-dialog
-                title="档案利用承诺书"
-                :visible.sync="dialogVisible"
-                :show-close="true"
-                width="50%"
-                :append-to-body="true"
-                modal-append-to-body="false"
-
-                >
-                <span>
-                中国核电工程有限公司</br>
-                档案利用承诺书  </br>
-
-                根据《中华人民共和国档案法》以及中国核电工程有限公司（以下简称“公司”）档案利用工作有关规定，作为公司员工，本人对档案利用作以下承诺：</br>
-                一、自觉遵守国家档案法律、法规及公司的档案利用规章制度；</br>
-                二、所借阅档案不得做任何涂改、抽取、替换或添加信息；</br>
-                三、所借阅档案应妥善保管、不得损坏、丢失，已装订成册的不得拆散；</br>
-                四、所借阅档案不得扩大知悉范围，不得拍照、复制或转借他人；</br>
-                五、所借阅档案应在规定时间内归还；</br>
-                六、本《承诺书》未尽事宜按国家有关法律法规和公司规定执行。</span>
-
-                </el-dialog>
-
-            <el-radio v-model="accept" label="接受">接受档案承诺利用书</el-radio>
-            <el-button type="success" @click="open">档案利用承诺书</el-button>
-
-                <div class="dialog-footer" style="float:right">
-                    <slot name="footerButton">
+                <el-footer>
                         <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
-                        <el-button  v-on:click="saveItem" :loading="saveButt" >{{$t('application.SaveTo')+$t('application.Drafts')}}</el-button>
                         <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>
-                    </slot>
-                    
-                </div>
+                </el-footer>
 
         </el-main>
                     
@@ -486,5 +456,8 @@
     }
 </script>
 <style scoped>
-
+.el-footer {
+    text-align: center;
+    padding: 10px;
+  }
 </style>
