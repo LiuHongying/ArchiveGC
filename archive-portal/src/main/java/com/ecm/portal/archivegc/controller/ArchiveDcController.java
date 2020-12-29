@@ -367,8 +367,8 @@ public class ArchiveDcController extends ControllerAbstract{
 				String boxId=list.get(i);
 				EcmDocument doc = null;
 				doc = documentService.getObjectById(getToken(), boxId);
-				
-				if(doc.getCoding()==null||"".equals(doc.getCoding())) {
+				String archiveCoding = (String)doc.getAttributeValue("C_ARCHIVE_CODING");
+				if(archiveCoding==null||"".equals(archiveCoding)) {
 					mp.put("code", ActionContext.FAILURE);
 					mp.put("message", "请先取号！");
 					return mp;
@@ -376,7 +376,7 @@ public class ArchiveDcController extends ControllerAbstract{
 
 					String sqlSumPage="select sum(C_PAGE_COUNT) as pageCount from ecm_document "
 							+ "where id in(select child_id from ecm_relation where parent_id='"+boxId+"' "
-									+ " and name='irel_children' and (DESCRIPTION!='复用' or DESCRIPTION is null))";
+									+ " and name='irel_children'";
 					List<Map<String, Object>> pages= documentService.getMapList(getToken(),sqlSumPage);
 					if(pages!=null&&pages.size()>0&&pages.get(0)!=null) {
 						doc.addAttribute("C_PAGE_COUNT", pages.get(0).get("pageCount"));
@@ -435,7 +435,28 @@ public class ArchiveDcController extends ControllerAbstract{
 		String msg;
 		try {
 			String relationName=args.get("relationName")==null?"":args.get("relationName").toString();
-			msg = importService.importExcel(getToken(),args.get("id").toString(),relationName,excel, files);
+			msg = importService.importExcel(getToken(),args.get("id").toString(),relationName,excel, files,0);
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("data", msg);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("data", e.getMessage());
+		}
+		
+		return mp;
+	}
+	
+	@RequestMapping(value = "/import/batchImportFolder", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> batchImportFolder(@RequestParam("metaData")String metaData,@RequestParam("excel") MultipartFile excel, @RequestParam("files") MultipartFile[] files) throws AccessDeniedException{
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		String msg;
+		try {
+			String relationName=args.get("relationName")==null?"":args.get("relationName").toString();
+			msg = importService.importExcel(getToken(),args.get("id").toString(),relationName,excel, files,1);
 			mp.put("code", ActionContext.SUCESS);
 			mp.put("data", msg);
 		} catch (Exception e) {

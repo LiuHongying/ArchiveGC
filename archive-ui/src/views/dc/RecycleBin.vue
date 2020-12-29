@@ -30,7 +30,8 @@
               <el-radio style="margin-right:5px;" v-model="radio" label="案卷" @change="changeRadio">案卷</el-radio>
               <el-radio style="margin-left:5px;" v-model="radio" label="文件" @change="changeRadio">文件</el-radio>
             </el-col>
-            <el-col :span="4" style="padding-top:8px;">
+             <el-col :span="16" style="padding-top:8px;">
+               <el-button type="warning" @click="onDeleleItem()">删除</el-button>
                <el-button type="primary" @click="reset()">恢复</el-button>
             </el-col>
           </el-row>
@@ -281,6 +282,46 @@ export default {
     //查询文档
     searchItem() {
       this.loadGridData(this.currentFolder);
+    },
+    onDeleleItem() {
+      let _self = this;
+      this.$confirm(
+        _self.$t("message.deleteInfo"),
+        _self.$t("application.info"),
+        {
+          confirmButtonText: _self.$t("application.ok"),
+          cancelButtonText: _self.$t("application.cancel"),
+          type: "warning",
+        }
+      )
+        .then(() => {
+          _self.deleleItem();
+        })
+        .catch(() => {
+          // this.$message({
+          //   type: 'info',
+          //   message: '已取消删除'
+          // });
+        });
+    },
+    deleleItem() {
+      let _self = this;
+      var m = [];
+      let tab = _self.selectedItems;
+      var i;
+      for (i in tab) {
+        m.push(tab[i]["ID"]);
+      }
+      axios
+        .post("/dc/delDocument", JSON.stringify(m))
+        .then(function (response) {
+          _self.loadGridData(_self.currentFolder);
+          _self.$message(_self.$t("message.deleteSuccess"));
+        })
+        .catch(function (error) {
+          _self.$message(_self.$t("message.deleteFailured"));
+          console.log(error);
+        });
     },
     reset(){
       //恢复
