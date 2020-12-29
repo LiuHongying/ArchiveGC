@@ -47,7 +47,7 @@
       :visible="printRidgeVisible"
       @close="printRidgeVisible=false"
     >
-      <div style="height:900px;">
+      <div style="height:600px;">
         <PrintRidge ref="printRidge"></PrintRidge>
       </div>
     </el-dialog>
@@ -57,7 +57,7 @@
       :visible="printBarCodeVisible"
       @close="printBarCodeVisible=false"
     >
-      <div style="height:900px;">
+      <div style="height:600px;">
         <PrintBarCode ref="printBarCode" :archiveObjects="selectedItems" :isBarCode="true"></PrintBarCode>
       </div>
     </el-dialog>
@@ -68,7 +68,7 @@
       :visible="printPdf417Visible"
       @close="printPdf417Visible=false"
     >
-      <div style="height:900px;">
+      <div style="height:600px;">
         <PrintPdf417 ref="printPdf417" :archiveObjects="selectedItems" :isBarCode="true"></PrintPdf417>
       </div>
     </el-dialog>
@@ -79,7 +79,7 @@
       :visible="printArchiveCodeVisible"
       @close="printArchiveCodeVisible=false"
     >
-      <div style="height:900px;">
+      <div style="height:600px;">
         <PrintArchiveCode ref="printArchiveCode" :archiveObjects="selectedItems" :isBarCode="true"></PrintArchiveCode>
       </div>
     </el-dialog>
@@ -480,11 +480,11 @@ export default {
   },
   data() {
     return {
-      leftStorageName: 'ProjectViewerWidth',
+      leftStorageName: 'ArchiveArrangeWidth',
       leftPercent: 20,
 
       // 本地存储高度名称
-      topStorageName: 'ProjectViewerHeight',
+      topStorageName: 'ArchiveArrangeHeight',
       // 非split pan 控制区域高度
       startHeight: 135,
       // 顶部百分比*100

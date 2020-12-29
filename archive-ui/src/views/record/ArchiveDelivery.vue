@@ -358,11 +358,11 @@ export default {
   name: "ArchiveDelivery",
   data() {
     return {
-      leftStorageName: 'ProjectViewerWidth',
+      leftStorageName: 'ArchiveDeliveryWidth',
       leftPercent: 20,
 
       // 本地存储高度名称
-      topStorageName: 'ProjectViewerHeight',
+      topStorageName: 'ArchiveDeliveryHeight',
       // 非split pan 控制区域高度
       startHeight: 175,
       // 顶部百分比*100
