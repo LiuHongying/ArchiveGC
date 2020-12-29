@@ -138,7 +138,7 @@
         >
         <template slot="paneL">-->
         <el-tabs value="t01">
-          <el-tab-pane :label="$t('application.replaceFile')" name="t01">
+          <el-tab-pane label="盒装案卷" name="t01">
             <el-row v-if="allowEdit||isShowReject">
               <el-col :span="24" style="text-align: left">
                 <el-form :inline="true" :model="filters" @submit.native.prevent>
@@ -152,12 +152,12 @@
                         @click="deleteRelation"
                       >{{ $t("application.delete") }}</el-button>
                     </el-form-item>
-                    <el-form-item>
+                    <!-- <el-form-item>
                       <MountFile
                         :selectedItem="selectedArchives"
                         :title="$t('application.ReplaceDoc')"
                       >{{$t('application.replace')}}</MountFile>
-                    </el-form-item>
+                    </el-form-item> -->
                   </template>
                 </el-form>
               </el-col>

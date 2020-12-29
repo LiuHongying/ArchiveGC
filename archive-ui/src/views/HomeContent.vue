@@ -198,10 +198,11 @@
           </el-card> -->
         </el-col>
         <el-col :span="8">
-          <el-card :body-style="{ height: '40px' }">
+          <el-card :body-style="{ height: '100px'}">
             <div slot="header" class="clearfix" style="padding-bottom: 5px">
               <span style="float: left" class="ecmtitle">个人中心</span>
             </div>
+            <el-row class="person-row">
             <el-col :span="8">
               <i style="font-size: 28px;color: #409EFF;" class="el-icon-star-off"></i>
               <el-link
@@ -226,8 +227,9 @@
                 >我的授权</el-link
               >
             </el-col>
+            </el-row>
           </el-card>
-          <el-card :body-style="{ height: '190px' }">
+          <el-card :body-style="{ height: '300px' }">
             <div slot="header" class="clearfix" style="padding-bottom: 5px">
               <span style="float: left" class="ecmtitle">通知公告</span>
               <el-link
@@ -726,5 +728,11 @@ export default {
 .carousel-image {
   max-width: 100%;
   max-height: 100%;
+}
+.ecm-icon-desc {
+  padding: 0px 0px 30px 0px;
+}
+.person-row {
+  padding: 35px 0px 40px 0px;
 }
 </style>

@@ -32,7 +32,7 @@
           :isShowReject="isShowReject"
         ></FormFileViewTask>
       </el-row>
-      <!-- <el-row>
+      <el-row>
         <DeliverFormFile
           ref="relevantArchives"
           :allowEdit="true"
@@ -44,7 +44,7 @@
           :parentId="formId"
           :isShowReject="isShowReject"
         ></DeliverFormFile>
-      </el-row> -->
+      </el-row>
   </div>
 </template>
 <script type="text/javascript">

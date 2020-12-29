@@ -158,7 +158,10 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 									}
 								}
 								Task tsk = taskService.createTaskQuery().taskId(task.getId()).singleResult();
-								serviceDocMail.sendTaskMailMultipleUsers(userMails, tsk);
+								if(userMails!=null&&userMails.size()>0) {
+									serviceDocMail.sendTaskMailMultipleUsers(userMails, tsk);
+								}
+								
 							} else {
 								EcmUser user = userService.getObjectByName(ecmSession.getToken(), assignee);
 								if (user == null) {
@@ -171,7 +174,10 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 										}
 									}
 									Task tsk = taskService.createTaskQuery().taskId(task.getId()).singleResult();
-									serviceDocMail.sendTaskMailMultipleUsers(userMails, tsk);
+									if(userMails!=null&&userMails.size()>0) {
+										serviceDocMail.sendTaskMailMultipleUsers(userMails, tsk);
+									}
+									
 								} else {
 									// TODO 如果代理人不为空，就执行代理
 									if (!Strings.isEmpty(user.getDelegateUser())
