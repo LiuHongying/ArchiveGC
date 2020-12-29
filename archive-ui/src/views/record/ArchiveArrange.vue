@@ -162,7 +162,7 @@
       </el-dialog>
     <template v-slot:main="{layout}">
       <div :style="{position:'relative',height: layout.height-startHeight+45+'px'}">
-        <split-pane split="vertical" @resize="onHorizontalSplitResize" :min-percent='1' :default-percent='leftPercent'>
+        <split-pane split="vertical" @resize="onHorizontalSplitResize" :min-percent='20' :default-percent='leftPercent'>
           <template slot="paneL">
             <el-container :style="{height:asideHeight+'px',width:asideWidth,overflow:'auto'}">
               <el-tree
@@ -512,7 +512,7 @@ export default {
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
-      topbarHeight: 35,
+      topbarHeight: 125,
       // 底部除列表高度
       bottomHeight: 25,
       isExpand: false,
