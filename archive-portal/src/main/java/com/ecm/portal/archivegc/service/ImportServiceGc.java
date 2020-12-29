@@ -662,11 +662,7 @@ public class ImportServiceGc extends EcmService {
 		} else {
 			EcmDocument doc = new EcmDocument();
 			doc.setTypeName(typeName);
-			if (ImportServiceGc.importDocFolderId == null || "".equals(ImportServiceGc.importDocFolderId)) {
-//				ImportService.importDocFolderId = folderService.getObjectByPath(token, "/移交文档").getId();
-				ImportServiceGc.importDocFolderId = folderPathService.getFolderId(token, doc.getAttributes(), "3");
-			}
-			doc.setFolderId(ImportServiceGc.importDocFolderId);
+
 			EcmContent content = null;
 			if (itemStream != null) {
 				content = new EcmContent();
@@ -689,6 +685,13 @@ public class ImportServiceGc extends EcmService {
 				setValues(doc.getAttributes(), attrNames, row, start, end, sameValues, sameFields);
 			}
 			setDefaultValues(documentService.getSession(token), doc.getAttributes());
+			
+			if (ImportServiceGc.importDocFolderId == null || "".equals(ImportServiceGc.importDocFolderId)) {
+//				ImportService.importDocFolderId = folderService.getObjectByPath(token, "/移交文档").getId();
+				ImportServiceGc.importDocFolderId = folderPathService.getFolderId(token, doc.getAttributes(), "3");
+			}
+			doc.setFolderId(ImportServiceGc.importDocFolderId);
+			
 //			doc.getAttributes().put("C_BATCH_CODE", batchName);
 			// 继承属性加载
 			
