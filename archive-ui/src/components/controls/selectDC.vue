@@ -541,12 +541,15 @@ export default {
       _self.tableLoading = true;
       var key = _self.sqlStringFilter(_self.inputkey);
       if(_self.inputkey!=""&&_self.inputkey!=undefined){
-        key = "CODING LIKE '%"+key+"%' and "
+        key = "CODING LIKE '%"+key+"%'"
       }
-      if(_self.conditionDC==""||_self.conditionDC==undefined){
-        _self.conditionDC="C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+_self.conditionFile
+      if(this.ShowFileType){
+        if(_self.conditionDC==""||_self.conditionDC==undefined){
+          _self.conditionDC=" and C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+_self.conditionFile
+        }
+        key +=_self.conditionDC
       }
-      key +=_self.conditionDC
+      
       if(_self.condition==""||_self.condition==undefined){
         _self.condition="IS_RELEASED=1 "
       }
@@ -577,12 +580,15 @@ export default {
       let _self = this;
       var key = _self.sqlStringFilter(_self.inputkey);
       if(_self.inputkey!=""&&_self.inputkey!=undefined){
-        key = "CODING LIKE '%"+key+"%' and "
+        key = "CODING LIKE '%"+key+"%'"
       }
-      if(_self.conditionDC==""||_self.conditionDC==undefined){
-        _self.conditionDC="C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+_self.conditionFile
+      if(this.ShowFileType){
+        if(_self.conditionDC==""||_self.conditionDC==undefined){
+          _self.conditionDC=" and C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+_self.conditionFile
+        }
+        key +=_self.conditionDC
       }
-      key +=_self.conditionDC
+      
       if(_self.condition==""||_self.condition==undefined){
         _self.condition="IS_RELEASED=1 "
       }
