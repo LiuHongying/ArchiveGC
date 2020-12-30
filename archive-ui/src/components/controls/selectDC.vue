@@ -372,7 +372,7 @@ export default {
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
     axios
-      .post("/admin/getArchivesFolder", 0)
+      .post("/admin/getFoldersByPath", _self.folderPath)
       .then(function (response) {
         _self.dataList = response.data.data;
         _self.loadGridInfo(_self.defaultData);
@@ -387,7 +387,8 @@ export default {
   props: {
     conditionFile: {type:String,default:""},//文件判断
     ShowFileType:{type:Boolean,default:false},//选择文件类型（所有&到期）
-    condition:{type:String ,default:""}
+    condition:{type:String ,default:""},
+    folderPath:{typr:String,default:"/档案库"}
   },
   methods: {
     changeType:function(){
