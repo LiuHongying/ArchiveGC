@@ -56,7 +56,7 @@
             <el-button type="primary" v-on:click="searchItem">{{$t('application.SearchData')}}</el-button>
           </el-form-item>
         </el-form>
-        <selectDC @selectchange="fileSelect"  :conditionFile="searchFileCondition"></selectDC>
+        <selectDC @selectchange="fileSelect"  :conditionFile="searchFileCondition" folderPath="/档案库/工程设计"></selectDC>
         <div slot="footer" class="dialog-footer">
             <el-button @click="saveFileToWorkflow" :loading="butt">{{$t('application.save')}}</el-button>
             <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
