@@ -321,6 +321,26 @@ public class ArchiveDcController extends ControllerAbstract{
 		}
 	
 	}
+	@RequestMapping(value = "/dc/upgradeDesign", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> upgradeDesign(@RequestBody String argStr) throws Exception{
+		Map<String, Object> mp = new HashMap<String, Object>();
+		List<String> idList= JSONUtils.stringToArray(argStr);
+		for(String id : idList) {
+			EcmDocument document= documentService.getObjectById(getToken(), id);
+			if(document.getAttributeValue("C_FROM_CODING")==null) {
+				continue;
+			}
+			String volumeCode= document.getAttributeValue("C_FROM_CODING").toString();
+			List<EcmDocument> archiveList= documentService.getObjects(getToken(), " TYPE_NAME='设计文件案卷 '  and C_FROM_CODING='"+volumeCode+"'");
+			if(archiveList==null||archiveList.size()==0) {
+				continue;
+			}
+		}
+		
+		return null;
+	}
+	
 	@RequestMapping(value = "/dc/updateData", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateData(@RequestBody String argStr) throws Exception{
