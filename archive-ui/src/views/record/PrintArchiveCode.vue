@@ -17,14 +17,14 @@
           </el-select>
           
       </div> -->
-      <div style="display:inline-block;position: absolute;left:210px;">
+     <div style="display:inline-block;position: absolute;left:500px;">
         <button @click="printCode" v-print="'#print'">打印</button>
       </div>
-      <div id='print' ref='print' :style="'position: absolute; top:130px;'">
+      <div id='print' ref='print' :style="'position: absolute; top:0px;'">
         <div v-for="(item,keys) in getArchiveObjs()" :key="'divk'+keys" 
-        :style="'width:'+divWidth+';height:'+divHeight+';text-align:center;margin:'+divMargin+';line-height:'+divHeight+';'">
+        :style="'width:'+divWidth+';height:'+divHeight+';text-align:center;margin:'+divMargin+';line-height:'+divHeight+';font-size:'+fontSize+';'">
           <!-- <img :id="'barcode'+keys" :key="'itmk'+keys" /> -->
-          档 号 {{item.CODING}}
+          档 号 &nbsp; {{item.C_ARCHIVE_CODING}}
         </div>
         <!-- <div v-if="isQRCode"  ref='qrCodeUrl2'></div> -->
   　　</div>
@@ -73,9 +73,10 @@ export default {
     isQRCode:{type:Boolean,default:false},
     isBarCode:{type:Boolean,default:false},
     archiveObjects:{type:Array,default:() => []},
-    divWidth:{type:String,default:'200px'},
-    divHeight:{type:String,default:'50px'},
-    divMargin:{type:String,default:'10px'},
+    divWidth:{type:String,default:'90mm'},
+    divHeight:{type:String,default:'10mm'},
+    divMargin:{type:String,default:'4px'},
+    fontSize:{type:String,default:'18px'},
   },
   methods: {
       getConfigParam(keyName) {
@@ -83,9 +84,9 @@ export default {
         axios
           .post("/dc/getJsonParamMap", keyName)
           .then(function(response) {
-            _self.divWidth = response.data.data.divWidth;
-            _self.divHeight = response.data.data.divHeight;
-            _self.divMargin = response.data.data.divMargin;
+            //_self.divWidth = response.data.data.divWidth;
+           // _self.divHeight = response.data.data.divHeight;
+            //_self.divMargin = response.data.data.divMargin;
           })
           .catch(function(error) {
             console.log(error);

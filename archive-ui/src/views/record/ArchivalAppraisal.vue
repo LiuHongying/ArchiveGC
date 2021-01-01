@@ -22,48 +22,14 @@
         </div>
       </el-dialog>
       <!-- 相关文件创建文档选择-->
-      <el-dialog title="选择文档" :visible.sync="propertyrela" width="80%" :close-on-click-modal="false" :before-close="handleClose()"> 
-        <DataLayout>
-          <template v-slot:header>
-            <el-row>
-              <el-col :span="24">
-                <el-select v-model="ArchivalType" @change="onSelectChange">
-                  <el-option label="所有类目" value="all"></el-option>
-                  <el-option v-for="item in options" :key="item[valueField]" v-bind="item"></el-option>
-                </el-select>
-                <el-input style="width:200px" v-model="DCinputValueNum" placeholder="请输入编码或标题"></el-input>
-                <el-button type="primary" @click="searchDC()">{{$t('application.SearchData')}}</el-button>
-                <el-select v-model="DCtype" :placeholder="DCtype.value" v-on:change="changeType()">
-                  <el-option
-                    v-for="item in DCoptions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.label"
-                  ></el-option>
-                </el-select>
-                <el-button type="primary" @click="newRelation()">添加</el-button>
-              </el-col>
-            </el-row>  
-            </template>
-          <template v-slot:main>  
-            <DataGrid 
-              ref="chooseFile"
-              key="General"
-              v-bind:dataUrl="dataUrl"
-              v-bind:tableHeight="360"
-              v-bind:condition="condition"
-              v-bind:isshowOption="true" v-bind:isshowSelection ="true"
-              gridViewName="AppraisalFileGrid"
-              :isInitData="false"
-              :optionWidth = "2"
-              :isshowCustom="false"
-              :isEditProperty="true"
-              showOptions="查看内容"
-              :isShowChangeList="false"
-              @selectchange="selectedChooseDC">
-            </DataGrid>
-          </template>
-        </DataLayout>
+      <el-dialog title="选择文档" :visible.sync="propertyrela" width="80%" :close-on-click-modal="false"> 
+        <selectDC @selectchange="selectedChooseDC" :ShowFileType="true" :conditionFile="conditionFile"></selectDC>
+          <div slot="footer" class="dialog-footer">
+        <el-button @click="propertyrela = false">{{
+          $t("application.cancel")
+        }}</el-button>
+        <el-button  @click="newRelation()">确定</el-button>
+      </div>
       </el-dialog>
        <el-dialog
       title="档案鉴定流程"
@@ -171,6 +137,7 @@ import DataGrid from "@/components/DataGrid";
 import DataLayout from "@/components/ecm-data-layout";
 import DataSelect from "@/components/ecm-data-select";
 import AppraisalStartUp from "@/views/workflow/AppraisalStartUp.vue"
+import selectDC from"@/components/controls/selectDC.vue"
 
 export default {
   name: "TC",
@@ -203,32 +170,13 @@ export default {
           label: "已完成",
         },
       ],
-      DCoptions: [
-        {
-          value: "all",
-          label: "所有文档",
-        },
-        {
-          value: "deline",
-          label: "到期文档",
-        },
-      ],
       value:"新建",
       typeName:"专题",
       comment:"",
       propertyVisible:false,   //新建窗口
-      DCinputValueNum:"",
-      DCtype:"所有文档",
       propertyrela:false,
-      ArchivalType:"all",
-      condition:"C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1",
-      dataUrl:"/dc/getDocuments",
       conditionFile:"",
       selectedChooseDCItems:"",
-      options:[],
-      valueField:"",
-      dataTextField:"",
-      allType:"select NAME from ecm_document where TYPE_NAME='配置项' and SUB_TYPE='档案类目'",
       flowVisible:false,
       workflow:{},
       selectedDCItems:[],
@@ -275,6 +223,7 @@ export default {
       }
       _self.$refs.ArchiveAppraisal.condition=key;
       _self.$refs.ArchiveAppraisal.currentPage = 1;
+      _self.$refs.AppraisalFile.itemDataList=[];
       _self.$refs.ArchiveAppraisal.loadGridInfo();
       _self.$refs.ArchiveAppraisal.loadGridData();
     },
@@ -296,20 +245,6 @@ export default {
     },
     changeStatus:function(){
       this.search()
-    },
-    changeType:function(){
-      var nowDate = new Date().getTime();
-      if(this.DCtype=="到期文档"){
-        this.dataUrl="/dc/getDocuments4DC"
-        this.condition="C_INCLUDE_PAPER='是' and IS_RELEASED=1"+this.conditionFile
-      }else{
-        this.dataUrl="/dc/getDocuments"
-        this.condition="C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+this.conditionFile
-      }
-      setTimeout(() => {
-        this.searchDC()
-      }, 10);
-      
     },
     // 保存档案鉴定
     saveItem() {
@@ -396,30 +331,6 @@ export default {
         console.log(error);
       });
     },
-    searchDC(){
-      let _self = this;
-      let key=_self.condition+_self.conditionFile;
-      if(_self.DCinputValueNum!=''&&_self.DCinputValueNum!=undefined){
-        key+=" and (CODING LIKE '%"+_self.DCinputValueNum+"%' OR TITLE LIKE '%"+_self.DCinputValueNum+"%')";
-      }
-      if(_self.ArchivalType!=''&&_self.ArchivalType!=undefined){
-        if(_self.ArchivalType=='all'){
-          key+=" and C_ARC_CLASSIC in ("+_self.allType+")"
-        }else{
-          key+=" and C_ARC_CLASSIC='"+_self.ArchivalType+"'";
-        }
-        
-      }
-      _self.$refs.chooseFile.condition=key;
-      _self.$refs.chooseFile.currentPage = 1;
-      _self.$refs.chooseFile.loadGridInfo()
-      _self.$refs.chooseFile.loadGridData()
-    },
-    //档案类目下拉菜单
-    onSelectChange(val) {
-      this.ArchivalType = val;
-      this.searchDC();
-    },
     beforeAdd(){
       let _self=this
       let ID=''
@@ -442,11 +353,6 @@ export default {
               _self.conditionFile=" and ID NOT IN ("+ID+")"
             }
             _self.propertyrela=true
-            setTimeout(() => {
-               _self.initGridViewOptions()
-              _self.searchDC()
-            }, 10);
-           
           } else {
             console.log(error);
           }
@@ -503,28 +409,6 @@ export default {
         console.log(error);
       });
     },
-    // 获取档案类目列表
-    initGridViewOptions(){
-      let queryObj={}
-      let _self = this;
-      queryObj.queryName = "档案类目";
-      axios.post("/query/getquery", JSON.stringify(queryObj)).then(function(resp){
-        _self.textField = _self.dataTextField.length>0?_self.dataTextField:resp.data.labelField
-        _self.valueField = _self.dataTextField.length>0?_self.dataTextField:resp.data.valueField
-        
-         let getOptions = resp.data.data
-        getOptions.forEach(function(item){
-          _self.options.push({label:item[_self.textField],value:item[_self.valueField]})
-         
-        })
-         console.log(_self.options);
-      }).catch(function(error) {
-        console.log(error);
-      });
-    },
-    handleClose(){
-      let _self = this;
-    },
     getWorkFlow() {
       let _self = this;
       if(_self.selectedThItems==''||_self.selectedThItems==undefined){
@@ -561,7 +445,8 @@ export default {
     DataGrid: DataGrid,
     DataLayout: DataLayout,
     DataSelect: DataSelect,
-    AppraisalStartUp:AppraisalStartUp
+    AppraisalStartUp:AppraisalStartUp,
+    selectDC:selectDC
   },
 };
 </script>

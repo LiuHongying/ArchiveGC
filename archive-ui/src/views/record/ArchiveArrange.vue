@@ -47,7 +47,7 @@
       :visible="printRidgeVisible"
       @close="printRidgeVisible=false"
     >
-      <div style="height:900px;">
+      <div style="height:600px;">
         <PrintRidge ref="printRidge"></PrintRidge>
       </div>
     </el-dialog>
@@ -57,7 +57,7 @@
       :visible="printBarCodeVisible"
       @close="printBarCodeVisible=false"
     >
-      <div style="height:900px;">
+      <div style="height:600px;">
         <PrintBarCode ref="printBarCode" :archiveObjects="selectedItems" :isBarCode="true"></PrintBarCode>
       </div>
     </el-dialog>
@@ -68,7 +68,7 @@
       :visible="printPdf417Visible"
       @close="printPdf417Visible=false"
     >
-      <div style="height:900px;">
+      <div style="height:600px;">
         <PrintPdf417 ref="printPdf417" :archiveObjects="selectedItems" :isBarCode="true"></PrintPdf417>
       </div>
     </el-dialog>
@@ -79,7 +79,7 @@
       :visible="printArchiveCodeVisible"
       @close="printArchiveCodeVisible=false"
     >
-      <div style="height:900px;">
+      <div style="height:600px;">
         <PrintArchiveCode ref="printArchiveCode" :archiveObjects="selectedItems" :isBarCode="true"></PrintArchiveCode>
       </div>
     </el-dialog>
@@ -153,9 +153,16 @@
         <el-button @click="folderDialogVisible = false">{{$t('application.cancel')}}</el-button>
       </div>
     </el-dialog>
+    <el-dialog :title="$t('message.Batch')+' '+$t('application.Import')+$t('application.document')" :visible.sync="batchDialogVisible" width="80%" >
+        <BatchImport ref="BatchImport" tmpPath="/系统配置/导入模板" :deliveryId="currentFolder.id" relationName="FolderId"  
+        @onImported="onBatchImported" width="100%" importUrl="/import/batchImportFolder"></BatchImport>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="batchDialogVisible=false" size="medium">{{$t('application.close')}}</el-button>
+         </div>
+      </el-dialog>
     <template v-slot:main="{layout}">
       <div :style="{position:'relative',height: layout.height-startHeight+45+'px'}">
-        <split-pane split="vertical" @resize="onHorizontalSplitResize" :min-percent='1' :default-percent='leftPercent'>
+        <split-pane split="vertical" @resize="onHorizontalSplitResize" :min-percent='10' :default-percent='leftPercent'>
           <template slot="paneL">
             <el-container :style="{height:asideHeight+'px',width:asideWidth,overflow:'auto'}">
               <el-tree
@@ -172,7 +179,7 @@
           </template>
           <template slot="paneR">
             <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
-              <split-pane v-on:resize="onSplitResize" :min-percent='20' :default-percent='topPercent' split="horizontal">
+              <split-pane v-on:resize="onSplitResize" :default-percent='topPercent' split="horizontal">
                 <template slot="paneL">
                   <el-form inline="true">
                   <el-row>
@@ -202,6 +209,27 @@
                         <TypeSelectComment @afterSelecteType="newArchiveItem"></TypeSelectComment>
                       </el-form-item>
                       <el-form-item>
+                        <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-upload2"
+                        @onImported="onBatchImported"
+                        @click="batchDialogVisible=true"
+                        title="批量导入"
+                      >批量导入</el-button>
+                      </el-form-item>
+                      <el-form-item>
+                      <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        title="挂载文件"
+                        icon="el-icon-upload2"
+                        @click="beforeMount(selectedItems);uploadUrl='/dc/mountFile'"
+                      >挂载文件</el-button>
+                      </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="warning"
                         plain
@@ -225,7 +253,7 @@
                         size="small"
                         icon="el-icon-s-order"
                         @click="takeNumbers"
-                        :title="文档取号"
+                        title="文档取号"
                       >文档取号</el-button>
                       </el-form-item>
                       <el-form-item>
@@ -239,16 +267,7 @@
                         :title="$t('application.fetchInformation')"
                       >{{$t('application.fetchInformation')}}</el-button>
                       </el-form-item>
-                      <el-form-item>
-                      <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        title="挂载文件"
-                        icon="el-icon-upload2"
-                        @click="beforeMount(selectedItems);uploadUrl='/dc/mountFile'"
-                      >挂载文件</el-button>
-                      </el-form-item>
+                      
                       <el-form-item>
                       <!-- <el-button
                         type="primary"
@@ -294,7 +313,7 @@
                         icon="el-icon-printer"
                         @click="beforePrint(selectRow,'ArrangeInnerGridPrint','卷内目录')"
                         title="打印卷内目录"
-                      >打印卷内目录</el-button>
+                      >卷内目录</el-button>
                       </el-form-item>
                       <el-form-item>
                       <el-button
@@ -336,8 +355,8 @@
                         title="完成质检"
                       >完成质检</el-button>
                       </el-form-item>
-                      <el-form-item>
-                      <el-button v-if="currentFolder.folderPath.indexOf('科技与信息')>0"
+                      <el-form-item v-if="currentFolder.folderPath.indexOf('科技与信息')>0">
+                      <el-button 
                         type="primary"
                         plain
                         :loading="releaseLoading"
@@ -355,8 +374,8 @@
                         size="small"
                         icon="el-icon-right"
                         @click="penddingStorage"
-                        title="提库交入"
-                      >提库交入</el-button>
+                        title="提交入库"
+                      >提交入库</el-button>
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -401,6 +420,7 @@
                       title="挂载文件"
                       @click="beforeMount(selectedInnerItems);uploadUrl='/dc/mountFile'"
                     >挂载文件</el-button>
+                    <!--
                     <el-button
                       type="primary"
                       plain
@@ -408,7 +428,7 @@
                       :title="$t('application.viewRedition')"
                       @click="beforeMount(selectedInnerItems);uploadUrl='/dc/addRendition'"
                     >格式副本</el-button>
-
+                    -->
                     <el-button type="primary" plain size="small" title="上移" @click="onMoveUp()">上移</el-button>
                     <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
                   </el-row>
@@ -460,6 +480,8 @@ import PreparationTablePrint from "@/views/record/PreparationTablePrint.vue"
 import PrintBarCode from "@/views/record/PrintBarCode.vue"
 import PrintArchiveCode from "@/views/record/PrintArchiveCode.vue"
 import PrintPdf417 from "@/views/record/PrintPdf417.vue"
+import BatchImport from "@/components/controls/ImportDocument";
+
 export default {
   name: "ArchiveArrange",
   components: {
@@ -475,22 +497,22 @@ export default {
     PrintArchiveCode:PrintArchiveCode,
     //Prints:Prints
     DataLayout:DataLayout,
-    PrintPdf417:PrintPdf417
-
+    PrintPdf417:PrintPdf417,
+    BatchImport:BatchImport
   },
   data() {
     return {
-      leftStorageName: 'ProjectViewerWidth',
+      leftStorageName: 'ArchiveArrangeWidth',
       leftPercent: 20,
 
       // 本地存储高度名称
-      topStorageName: 'ProjectViewerHeight',
+      topStorageName: 'ArchiveArrangeHeight',
       // 非split pan 控制区域高度
       startHeight: 135,
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
-      topbarHeight: 35,
+      topbarHeight: 125,
       // 底部除列表高度
       bottomHeight: 25,
       isExpand: false,
@@ -589,6 +611,7 @@ export default {
       printArchiveCodeVisible:false,
       printPdf417Visible:false,
       isFile:true,
+      batchDialogVisible: false
     };
   },
   
@@ -926,7 +949,7 @@ export default {
       let _self = this;
       if(val=='文件'){
         _self.isFile=false;
-        _self.topPercent=95;
+        _self.topPercent=99;
         // _self.$refs.mainDataGrid.tableHeight=(window.innerHeight-_self.startHeight);
       }else{
         _self.isFile=true;
@@ -1227,7 +1250,9 @@ export default {
       
       
     },
-    
+    onBatchImported(){
+      this.handleNodeClick(this.currentFolder);
+    },
     // 文件夹节点点击事件
     handleNodeClick(indata) {
       let _self = this;
@@ -1687,7 +1712,7 @@ export default {
       let i;
       for (i in tab) {
         if (
-          (tab[i]["CODING"] == undefined || tab[i]["CODING"] == "")) {
+          (tab[i]["C_ARCHIVE_CODING"] == undefined || tab[i]["C_ARCHIVE_CODING"] == "")) {
           _self.$message("所数据中中有未取号的数据，请先对其进行取号！");
           return;
         }

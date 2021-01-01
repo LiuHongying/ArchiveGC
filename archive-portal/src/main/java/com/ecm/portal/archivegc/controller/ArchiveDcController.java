@@ -387,8 +387,8 @@ public class ArchiveDcController extends ControllerAbstract{
 				String boxId=list.get(i);
 				EcmDocument doc = null;
 				doc = documentService.getObjectById(getToken(), boxId);
-				
-				if(doc.getCoding()==null||"".equals(doc.getCoding())) {
+				String archiveCoding = (String)doc.getAttributeValue("C_ARCHIVE_CODING");
+				if(archiveCoding==null||"".equals(archiveCoding)) {
 					mp.put("code", ActionContext.FAILURE);
 					mp.put("message", "请先取号！");
 					return mp;
@@ -396,7 +396,7 @@ public class ArchiveDcController extends ControllerAbstract{
 
 					String sqlSumPage="select sum(C_PAGE_COUNT) as pageCount from ecm_document "
 							+ "where id in(select child_id from ecm_relation where parent_id='"+boxId+"' "
-									+ " and name='irel_children' and (DESCRIPTION!='复用' or DESCRIPTION is null))";
+									+ " and name='irel_children'";
 					List<Map<String, Object>> pages= documentService.getMapList(getToken(),sqlSumPage);
 					if(pages!=null&&pages.size()>0&&pages.get(0)!=null) {
 						doc.addAttribute("C_PAGE_COUNT", pages.get(0).get("pageCount"));
@@ -455,7 +455,28 @@ public class ArchiveDcController extends ControllerAbstract{
 		String msg;
 		try {
 			String relationName=args.get("relationName")==null?"":args.get("relationName").toString();
-			msg = importService.importExcel(getToken(),args.get("id").toString(),relationName,excel, files);
+			msg = importService.importExcel(getToken(),args.get("id").toString(),relationName,excel, files,0);
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("data", msg);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("data", e.getMessage());
+		}
+		
+		return mp;
+	}
+	
+	@RequestMapping(value = "/import/batchImportFolder", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> batchImportFolder(@RequestParam("metaData")String metaData,@RequestParam("excel") MultipartFile excel, @RequestParam("files") MultipartFile[] files) throws AccessDeniedException{
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		String msg;
+		try {
+			String relationName=args.get("relationName")==null?"":args.get("relationName").toString();
+			msg = importService.importExcel(getToken(),args.get("id").toString(),relationName,excel, files,1);
 			mp.put("code", ActionContext.SUCESS);
 			mp.put("data", msg);
 		} catch (Exception e) {
@@ -685,7 +706,9 @@ public class ArchiveDcController extends ControllerAbstract{
 		}
 		return mp;
 	}
-	
+	/*
+	 * 档案鉴定单子表文件限制
+	 */
 	@RequestMapping(value = "/dc/checkArchiveFile", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> checkArchiveFile() throws Exception {
@@ -725,7 +748,48 @@ public class ArchiveDcController extends ControllerAbstract{
 		}
 		return mp;
 	}
-	
+	/*
+	 * 档案鉴定单子表文件限制
+	 */
+	@RequestMapping(value = "/dc/checkDestructionFile", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> checkDestructionFile() throws Exception {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			String cond="TYPE_NAME='档案销毁单' and IS_RELEASED=1 and(STATUS='新建' or STATUS='流程中')";
+			List<Map<String, Object>>  relist = documentService.getObjectMap(getToken(), cond);
+			String id="";
+			if(relist != null && relist.size() > 0) {
+				for(Map<String,Object> map:relist) {
+					String condition = "select * from ecm_relation where PARENT_ID='"+map.get("ID").toString()+"'";
+					List<Map<String, Object>>  list = relationService.getMapList(getToken(), condition);
+//							getObjectMap(getToken(), condition);
+//					List<Map<String,Object>> list =documentService.getObjectMap(getToken(), cond);
+					if(list != null && list.size() > 0) {
+						for(Map<String,Object> re:list) {
+							id += "'";
+							id+=re.get("CHILD_ID").toString();
+							id+="',";
+						}
+					}else {
+						id+="";
+						
+					}
+				}
+				if(id.length()>0) {
+					id = id.substring(0,id.length() - 1);
+				}
+				
+			}
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("ID",id);
+			return mp;
+		} catch (Exception ex) {
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", ex.getMessage());
+		}
+		return mp;
+	}
 	/**
 	 * 档案鉴定子表删除文档
 	 * @param argStr

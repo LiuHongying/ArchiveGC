@@ -74,14 +74,15 @@ public class ImportServiceGc extends EcmService {
 	 * 批次导入
 	 * 
 	 * @param token
-	 * @param deliveryId   移交单编号
+	 * @param id   移交单ID或文件夹ID
 	 * @param excelSrcFile Excel文件
 	 * @param files        电子文件
+	 * @param idType id 类型：0，移交单，1，文件夹
 	 * @return 导入日志
 	 * @throws Exception
 	 */
-	public String importExcel(String token, String deliveryId, String relationName, MultipartFile excelSrcFile,
-			MultipartFile[] files) throws Exception {
+	public String importExcel(String token, String id, String relationName, MultipartFile excelSrcFile,
+			MultipartFile[] files,int idType) throws Exception {
 		StringBuilder sb = new StringBuilder();
 		int sucessCount = 0;
 		int failedCount = 0;
@@ -241,12 +242,12 @@ public class ImportServiceGc extends EcmService {
 
 							parentId = newDocument(token, parentType, ufile.fileName,null /*ufile.itemStream*/, sheet.getRow(i), fileList,
 									attrNames, null, null, number, 1, childStartIndex - 1, sameValues,
-									sameFields);
+									sameFields,id,idType);
 							if(parentId != null) {
 								sucessCount ++;
 								// 将案卷添加至移交单
-								if(!StringUtils.isEmpty(deliveryId)) {
-									newRelation(token, deliveryId,relationName, parentId, i,null);
+								if(!StringUtils.isEmpty(id) && idType==0) {
+									newRelation(token, id,relationName, parentId, i,null);
 								}
 							}else {
 								failedCount ++;
@@ -288,7 +289,7 @@ public class ImportServiceGc extends EcmService {
 									}
 									tempId = newDocument(token, childType, ufile.getFileName(), ufile.getItemStream(), sheet.getRow(i),
 											fileList, attrNames, parentId, relationName, number, childStartIndex,
-											sheet.getRow(i).getLastCellNum(), sameValues, null);
+											sheet.getRow(i).getLastCellNum(), sameValues, null,id,idType);
 									if(tempId != null) {
 										sucessCount ++;
 									}else {
@@ -421,7 +422,7 @@ public class ImportServiceGc extends EcmService {
 								try {
 									tempId = newDocument(token, parentType, deskFileName, itemStream, sheet.getRow(i),
 											fileList, attrNames, null, relationName, number, 1,
-											sheet.getRow(i).getLastCellNum(), null, null);
+											sheet.getRow(i).getLastCellNum(), null, null,id,idType);
 									if (hasRendition) {
 										String rendFileName = getCellValue(sheet.getRow(i).getCell(1));
 										if (!StringUtils.isEmpty(rendFileName)) {
@@ -463,9 +464,9 @@ public class ImportServiceGc extends EcmService {
 										}else {
 											failedCount ++;
 										}
-										// 添加子文件关联关系
-										if(!StringUtils.isEmpty(deliveryId)) {
-											newRelation(token, deliveryId,relationName, tempId, i,null);
+										// 添加与移交单关联关系
+										if(!StringUtils.isEmpty(id) && idType ==0) {
+											newRelation(token, id,relationName, tempId, i,null);
 										}
 									}
 								} finally {
@@ -622,7 +623,7 @@ public class ImportServiceGc extends EcmService {
 	 */
 	private String newDocument(String token, String typeName, String deskFileName, FileInputStream itemStream, Row row,
 			Map<String, Long> fileList, Map<Integer, String> attrNames, String parentId, String relationName,
-			String batchName, int start, int end, Map<String, Object> sameValues, String sameFields) throws Exception {
+			String batchName, int start, int end, Map<String, Object> sameValues, String sameFields,String id, int idType) throws Exception {
 
 		int index = 1;
 		String docId = null;
@@ -637,29 +638,8 @@ public class ImportServiceGc extends EcmService {
 
 			}
 		}
-		boolean isReuse = false;
 		String desc = null;
-		try {
-			isReuse = row.getCell(getColumnIndex(attrNames, "DESIGN_REUSE", start, end)).getStringCellValue()
-					.equals("复用");
-		} catch (Exception ex) {
-
-		}
-		// 复用处理
-		if (isReuse) {
-			String coding = row.getCell(getColumnIndex(attrNames, "CODING", start, end)).getStringCellValue();
-			String revision = row.getCell(getColumnIndex(attrNames, "REVISION", start, end)).getStringCellValue();
-			String cond = " TYPE_NAME='图纸文件' and CODING='" + coding + "' and REVISION='" + revision + "'";// and
-																											// STATUS='利用'
-			List<Map<String, Object>> docList = documentService.getObjectsByConditon(token, "GeneralGrid", null,
-					new Pager(), cond, null);
-			if (docList.size() > 0) {
-				docId = docList.get(0).get("ID").toString();
-				desc = "复用";
-			} else {
-				throw new Exception("复用文件不存在，编码：" + coding + ",版本：" + revision);
-			}
-		} else {
+		
 			EcmDocument doc = new EcmDocument();
 			doc.setTypeName(typeName);
 
@@ -685,13 +665,18 @@ public class ImportServiceGc extends EcmService {
 				setValues(doc.getAttributes(), attrNames, row, start, end, sameValues, sameFields);
 			}
 			setDefaultValues(documentService.getSession(token), doc.getAttributes());
-			
-			if (ImportServiceGc.importDocFolderId == null || "".equals(ImportServiceGc.importDocFolderId)) {
-//				ImportService.importDocFolderId = folderService.getObjectByPath(token, "/移交文档").getId();
-				ImportServiceGc.importDocFolderId = folderPathService.getFolderId(token, doc.getAttributes(), "3");
+			if(idType == 0) {
+				if (ImportServiceGc.importDocFolderId == null || "".equals(ImportServiceGc.importDocFolderId)) {
+					ImportServiceGc.importDocFolderId = folderPathService.getFolderId(token, doc.getAttributes(), "3");
+				}
+				doc.setFolderId(ImportServiceGc.importDocFolderId);
+			}else {
+				doc.setFolderId(id);
+				doc.setStatus("整编");
 			}
-			doc.setFolderId(ImportServiceGc.importDocFolderId);
-			
+			if (parentId != null && docId != null) {
+				doc.addAttribute("IS_CHILD", 1);
+			}
 //			doc.getAttributes().put("C_BATCH_CODE", batchName);
 			// 继承属性加载
 			
@@ -699,7 +684,7 @@ public class ImportServiceGc extends EcmService {
 			requiredFieldValidate(token,doc.getAttributes());
 			
 			docId = documentService.newObject(token, doc, content);
-		}
+
 		// 子对象添加关系
 		if (parentId != null && docId != null) {
 			newRelation(token, parentId, relationName, docId, index, desc);
