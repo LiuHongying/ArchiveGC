@@ -22,23 +22,7 @@
             <el-button type="primary" v-on:click="searchItem">{{$t('application.SearchData')}}</el-button>
           </el-form-item>
         </el-form>
-        <DataGrid
-          ref="searchDoc"
-          key="searchDoc"
-          data-url="/dc/getDocuments"
-          :tableHeight="tableHeight"
-          :isshowOption="true"
-          :isshowSelection="true"
-          :condition="searchFileCondition"
-          gridViewName="DocumentViolationGrid"
-          :optionWidth="1"
-          :isShowMoreOption="false"
-          :isshowCustom="false"
-          :isEditProperty="false"
-          :isShowChangeList="false"
-          :isshowicon="false"
-          @selectchange="fileSelect"
-        ></DataGrid>
+        <selectDC @selectchange="fileSelect"  :conditionFile="searchFileCondition"></selectDC>
         <div slot="footer" class="dialog-footer">
             <el-button @click="saveFileToWorkflow" :loading="butt">{{$t('application.save')}}</el-button>
             <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
@@ -105,6 +89,7 @@ import DataSelect from "@/components/ecm-data-select";
 import DataLayout from "@/components/ecm-data-layout";
 import AttachmentFile from "@/views/dc/AttachmentFile.vue";
 import MountFile from '@/components/MountFile.vue';
+import selectDC from"@/components/controls/selectDC.vue"
 export default {
   components: {
     ShowProperty: ShowProperty,
@@ -114,7 +99,8 @@ export default {
     RejectButton: RejectButton,
     DataLayout: DataLayout,
     AttachmentFile: AttachmentFile,
-    MountFile:MountFile
+    MountFile:MountFile,
+    selectDC:selectDC
   },
    model: {
      prop:"files",

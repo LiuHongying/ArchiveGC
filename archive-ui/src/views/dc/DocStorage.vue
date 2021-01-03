@@ -1,5 +1,113 @@
 <template>
-  <div>
+  <DataLayout>
+    <template v-slot:header>
+      <!-- 创建附件 -->
+      <el-dialog :title="$t('application.Import')" :visible.sync="importdialogVisible" width="70%" :close-on-click-modal="false">
+          <el-form size="mini" :label-width="formLabelWidth" v-loading='uploading'>
+              <div style="height:200px;overflow-y:scroll; overflow-x:scroll;">
+              <el-upload
+                  :limit="100"
+                  :file-list="fileList"
+                  action
+                  :on-change="handleChange"
+                  :auto-upload="false"
+                  :multiple="true"
+              >
+                  <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
+              </el-upload>
+              </div>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+              <el-button @click="importdialogVisible = false">{{$t('application.cancel')}}</el-button>
+              <el-button type="primary" @click="uploadData()">{{$t('application.start')+$t('application.Import')}}</el-button>
+          </div>
+      </el-dialog>
+      <el-dialog
+      :title="uploadType == 0 ? '更新主文件' : '更新格式副本'"
+      :visible.sync="udialogVisible"
+      v-loading="uploading"
+    >
+      <el-form label-position="right" label-width="120px">
+        <el-form-item :label="$t('message.file')" :label-width="formLabelWidth">
+          <el-upload
+            :limit="1"
+            :file-list="newFileList"
+            action
+            :on-change="handleFileChange"
+            :auto-upload="false"
+            :multiple="false"
+          >
+            <el-button slot="trigger" size="small" type="primary">{{
+              $t("application.selectFile")
+            }}</el-button>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="udialogVisible = false">{{
+          $t("application.cancel")
+        }}</el-button>
+        <el-button type="primary" @click="updateNewFile()">{{
+          $t("application.ok")
+        }}</el-button>
+      </div>
+    </el-dialog>
+      <el-dialog
+      :title="$t('route.movepos')"
+      :visible.sync="moveDialogVisible"
+      @close="moveDialogVisible = false"
+    >
+      <el-form>
+        <el-form-item
+          :label="$t('route.currentid')"
+          :label-width="formLabelWidth"
+          >{{ getSelectedIds() }}</el-form-item
+        >
+        <el-form-item
+          :label="$t('route.desfolderid')"
+          :label-width="formLabelWidth"
+        >
+          <FolderSelector parentId="eeb9d742cdef4e42b43796b6ac56b5ac"
+            v-model="targetFolderId"
+            v-bind:inputValue="targetFolderId"
+          ></FolderSelector>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleMoveItem()">{{
+          $t("application.ok")
+        }}</el-button>
+        <el-button @click="moveDialogVisible = false">{{
+          $t("application.cancel")
+        }}</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog :title="$t('message.Batch')+' '+$t('application.Import')+$t('application.document')" :visible.sync="batchDialogVisible" width="80%" >
+        <BatchImport ref="BatchImport" tmpPath="/系统配置/导入模板/文件导入模板" :deliveryId="currentFolder.id" relationName="FolderId"  
+        @onImported="onBatchImported" width="100%" importUrl="/import/batchSystemImport"></BatchImport>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="batchDialogVisible=false" size="medium">{{$t('application.close')}}</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog title="新建文件" :visible.sync="createDocVisible"
+      @close="createDocVisible=false"
+      width="90%"
+      style="width:100%"
+       :close-on-click-modal="false"
+        v-dialogDrag
+      >
+        <CreateCommonFile ref="createCommonFile" :typeName="typeName" 
+        :folderId="currentFolder.id"
+        @afterSave="afterSave()"></CreateCommonFile>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="saveDoc">保存</el-button>
+          <el-button @click="createDocVisible = false">{{
+            $t("application.cancel")
+          }}</el-button>
+      </div>
+      </el-dialog>
+
     <el-dialog
       title="文档借阅"
       :visible.sync="borrowVisible"
@@ -100,42 +208,40 @@
         >
       </div>
     </el-dialog>
+    </template>
 
-    <div :style="{ position: 'relative', height: asideHeight + 'px' }">
-      <split-pane
-        split="vertical"
-        @resize="resize"
-        min-percent="10"
-        :default-percent="15"
-      >
-        <template slot="paneL">
-          <el-breadcrumb style="padding-top: 10px; padding-bottom: 10px">
-            <el-breadcrumb-item class="title16">
-              <i class="el-icon-receiving"></i>
-              &nbsp; {{ $t("route.docStorage") }}
-            </el-breadcrumb-item>
-          </el-breadcrumb>
+    <template v-slot:main="{layout}">
+      <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
+        <split-pane v-on:resize="onSplitResize" :min-percent='15' :default-percent='topPercent' split="vertical">
+          <template slot="paneL">
+            <el-breadcrumb style="padding-top: 10px; padding-bottom: 10px">
+              <el-breadcrumb-item class="title16">
+                <i class="el-icon-receiving"></i>
+                &nbsp; {{ $t("route.docStorage") }}
+              </el-breadcrumb-item>
+            </el-breadcrumb>
 
-          <el-container
-            :style="{
-              height: treeHeight + 'px',
-              width: asideWidth,
-              overflow: 'auto',
-            }"
-          >
-            <el-tree
-              style="width: 100%"
-              :props="defaultProps"
-              :data="dataList"
-              node-key="id"
-              :render-content="renderContent"
-              default-expand-all
-              highlight-current
-              @node-click="handleNodeClick"
-            ></el-tree>
-          </el-container>
-        </template>
+            <!-- <el-container
+              :style="{
+                height: treeHeight + 'px',
+                width: asideWidth,
+                overflow: 'auto',
+              }"
+            > -->
+              <el-tree
+                style="width: 100%"
+                :props="defaultProps"
+                :data="dataList"
+                node-key="id"
+                :render-content="renderContent"
+                default-expand-all
+                highlight-current
+                @node-click="handleNodeClick"
+              ></el-tree>
+          <!-- </el-container> -->
+          </template>
         <template slot="paneR">
+          <el-row>
           <el-form :inline="true">
             <el-form-item>
               <el-input
@@ -167,7 +273,7 @@
                 >
               </template>
             </el-form-item>
-            <el-form-item>
+            <!-- <el-form-item>
               <el-button
                 type="primary"
                 plain
@@ -176,12 +282,50 @@
                 @click="addToShopingCart()"
                 >{{ $t("application.addToShopingCart") }}</el-button
               >
+            </el-form-item> -->
+            <el-form-item>
+              <el-button type="primary" icon="el-icon-upload2" @click="batchDialogVisible=true">批量导入</el-button>
             </el-form-item>
             <el-form-item>
+              <el-button type="primary" plain size="medium" icon="el-icon-plus" @click="beforeCreateFile">新建文件</el-button>
+            </el-form-item>
+            <!-- <el-form-item>
               <el-button type="primary" plain size="medium" icon="el-icon-right" @click="getWorkFlow">发起流程</el-button>
+            </el-form-item> -->
+            <el-form-item>
+              <el-button icon="el-icon-delete"
+                  type="warning"
+                  @click="
+                    onDeleleItem(selectedItemList, [$refs.mainDataGrid])
+                  "
+                  >{{ $t("application.delete") }}</el-button
+                >
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
+              <el-button type="primary" @click.native="exportData" icon="el-icon-download">{{$t("application.ExportExcel")}}</el-button>
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                type="primary"
+                icon="el-icon-top-right"
+                @click="moveItem()"
+                >{{ $t("application.move") }}</el-button>
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                type="primary"
+                icon="el-icon-upload2"
+                @click="showUpdateFile(0)"
+                >{{ $t("application.update") }}</el-button
+              >
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                type="primary"
+                icon="el-icon-upload2"
+                @click="showUpdateFile(1)"
+                >{{ $t("application.transcript") }}</el-button
+              >
             </el-form-item>
             <el-form-item>
               <template v-if="isFileAdmin">
@@ -196,150 +340,36 @@
                 >
               </template>
             </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="beforeUploadFile('/dc/addAttachment')">添加附件</el-button>
+            </el-form-item>
           </el-form>
-          <el-row>
-            <el-table
-              :height="tableHeight"
-              :data="itemDataList"
-              border
-              v-loading="tableLoading"
-              @selection-change="selectChange"
-              @sort-change="sortchange"
-              style="width: 100%"
-              @header-dragend="onHeaderDragend"
-              fit
-            >
-              <el-table-column
-                type="selection"
-                @selection-change="selectChange"
-                width="50"
-              ></el-table-column>
-              <el-table-column :label="$t('field.indexNumber')" width="70">
-                <template slot-scope="scope">
-                  <span>{{
-                    (currentPage - 1) * pageSize + scope.$index + 1
-                  }}</span>
-                </template>
-              </el-table-column>
-              <el-table-column width="40">
-                <template slot-scope="scope">
-                  <img
-                    v-if="scope.row.TYPE_NAME == '图册'"
-                    :src="'./static/img/drawing.gif'"
-                    :title="scope.row.TYPE_NAME"
-                    border="0"
-                  />
-                  <img
-                    v-else-if="scope.row.TYPE_NAME == '卷盒'"
-                    :src="'./static/img/box.gif'"
-                    :title="scope.row.TYPE_NAME"
-                    border="0"
-                  />
-                  <img
-                    v-else-if="
-                      scope.row.FORMAT_NAME == null ||
-                      scope.row.FORMAT_NAME == ''
-                    "
-                    :src="'./static/img/format/f_undefined_16.gif'"
-                    title="无电子文件"
-                    border="0"
-                  />
-                  <img
-                    v-else
-                    :src="
-                      './static/img/format/f_' +
-                      scope.row.FORMAT_NAME +
-                      '_16.gif'
-                    "
-                    :title="scope.row.FORMAT_NAME"
-                    border="0"
-                  />
-                </template> </el-table-column
-              >>
-              <div v-for="(citem, idx) in gridList" :key="idx">
-                <div v-if="citem.visibleType == 1">
-                  <el-table-column
-                    v-if="(citem.width + '').indexOf('%') > 0"
-                    :label="citem.label"
-                    :prop="citem.attrName"
-                    :min-width="citem.width"
-                    :sortable="citem.allowOrderby"
-                  >
-                    <template slot-scope="scope">
-                      <div v-if="citem.attrName.indexOf('DATE') > 0">
-                        <span>{{ dateFormat(scope.row[citem.attrName]) }}</span>
-                      </div>
-                      <div v-else>
-                        <span @click="rowClick(scope.row)">{{
-                          scope.row[citem.attrName]
-                        }}</span>
-                      </div>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    v-else
-                    :label="citem.label"
-                    :prop="citem.attrName"
-                    :width="citem.width"
-                    :sortable="citem.allowOrderby"
-                  >
-                    <template slot-scope="scope">
-                      <div v-if="citem.attrName.indexOf('DATE') > 0">
-                        <span>{{ dateFormat(scope.row[citem.attrName]) }}</span>
-                      </div>
-                      <div v-else>
-                        <span @click="rowClick(scope.row)">{{
-                          scope.row[citem.attrName]
-                        }}</span>
-                      </div>
-                    </template>
-                  </el-table-column>
-                </div>
-              </div>
-              <el-table-column align="left" width="140">
-                <template slot="header">
-                  <el-button
-                    icon="el-icon-s-grid"
-                    size="small"
-                    @click="dialogFormShow"
-                    title="选择展示字段"
-                  ></el-button>
-                </template>
-                <template slot-scope="scope">
-                  <el-button
-                    type="primary"
-                    plain
-                    size="small"
-                    :title="$t('application.viewContent')"
-                    icon="el-icon-picture-outline"
-                    @click="showItemContent(scope.row)"
-                  ></el-button>
-                  <el-button
-                    type="primary"
-                    plain
-                    size="small"
-                    :title="$t('application.property')"
-                    icon="el-icon-info"
-                    @click="showItemProperty(scope.row)"
-                  ></el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-            <el-pagination
-              background
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-              :current-page="currentPage"
-              :page-sizes="[10, 20, 50, 100, 200]"
-              :page-size="pageSize"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="itemCount"
-            ></el-pagination>
+          </el-row>
+          <el-row :style="'height:'+layout.height-startHeight+80">
+            <DataGrid
+                ref="mainDataGrid"
+                key="main"
+                dataUrl="/dc/getDocuments"
+                v-bind:tableHeight="(layout.height-startHeight-75)"
+                v-bind:isshowOption="true" v-bind:isshowSelection ="true"
+                :gridViewName="gridViewName"
+                :optionWidth = "2"
+                :condition="condition"
+                :isshowCustom="false"
+                :isEditProperty="true"
+                :folderId="currentFolder.id"
+                showOptions="查看内容"
+                :isShowChangeList="false"
+                :isInitData="false"
+                @rowclick="rowClick"
+                @selectchange="selectChange"
+            ></DataGrid>
           </el-row>
         </template>
-      </split-pane>
-    </div>
-  </div>
+        </split-pane>
+      </div>
+    </template>
+  </DataLayout>
 </template>
 <script>
 import ShowProperty from "@/components/ShowProperty";
@@ -349,6 +379,11 @@ import StartupWorkflow from "@/views/workflow/BorrowStartUp.vue";
 import BorrowFile from "@/views/workflow/BorrowFile.vue";
 import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue"
 import ExcelUtil from "@/utils/excel.js";
+import DataGrid from "@/components/DataGrid";
+import DataLayout from '@/components/ecm-data-layout'
+import CreateCommonFile from "@/views/npc/CreateCommonFile"
+import BatchImport from "@/components/controls/ImportDocument";
+import FolderSelector from "@/components/controls/FolderSelector";
 export default {
   components: {
     ShowProperty: ShowProperty,
@@ -357,9 +392,23 @@ export default {
     StartupWorkflow: StartupWorkflow,
     BorrowStartUp: BorrowStartUp,
     ExcelUtil: ExcelUtil,
+    DataGrid:DataGrid,
+    DataLayout:DataLayout,
+    CreateCommonFile:CreateCommonFile,
+    BatchImport:BatchImport,
+    FolderSelector:FolderSelector
   },
   data() {
     return {
+      // 非split pan 控制区域高度
+      startHeight: 130,
+      // 顶部百分比*100
+      topPercent: 15,
+      // 顶部除列表高度
+      topbarHeight: 35,
+      // 底部除列表高度
+      bottomHeight: 120,
+      buttLoading:false,
       currentuser: {
         user: {},
         roles: [],
@@ -393,6 +442,7 @@ export default {
       inputkey: "",
       currentPage: 1,
       selectedItemId: "",
+      selectedItems:[],
       defaultProps: {
         children: "children",
         label: "name",
@@ -415,10 +465,25 @@ export default {
         result: "在线浏览",
         message: "",
       },
-
+      newFileList: [],
+      fileList:[],
       workflow: {},
       gridViewTrans: "",
       idTrans: "",
+      gridViewName:"CommonFileGrid",
+      createDocVisible:false,
+      typeName:"",
+      batchDialogVisible:false,
+      moveDialogVisible:false,
+      targetFolderId:"",
+      isMoveFolder: false,
+      uploadFile: null,
+      uploadType: 0, //0：主格式，1：格式副本
+      udialogVisible: false,
+      uploading: false,
+      importdialogVisible:false,
+      uploadUrl:"",
+      condition:""
     };
   },
   created() {
@@ -456,6 +521,249 @@ export default {
     _self.loadGridInfo(_self.defaultData);
   },
   methods: {
+    getFormData() {
+            let _self = this;
+            let formdata = new FormData();
+            var data = {};
+            data["parentDocId"] = _self.selectedItems[0].ID;//_self.selectedInnerItems[0].ID;//_self.selectedFileId;
+            data["relationName"]='附件';
+            data["TYPE_NAME"]='附件';
+            formdata.append("metaData", JSON.stringify(data));
+            _self.fileList.forEach(function(file) {
+                //console.log(file.name);
+                formdata.append("uploadFile", file.raw, file.name);
+            });
+            return formdata;
+            },
+    //上传文件
+    uploadData() {
+        let _self = this;
+        let formdata = _self.getFormData();
+        console.log("UploadData getData");
+        console.log(formdata);
+        _self.uploading=true;
+        _self
+            .axios({
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8"
+            },
+            datatype: "json",
+            method: "post",
+            data: formdata,
+            url: _self.uploadUrl
+            })
+            .then(function(response) {
+            _self.importdialogVisible = false;
+            // _self.refreshData();
+            _self.uploading=false;
+            // _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
+            _self.$message({
+                    showClose: true,
+                    message: _self.$t('application.Import')+_self.$t('message.success'),
+                    duration: 2000,
+                    type: 'success'
+                });
+            })
+            .catch(function(error) {
+            _self.uploading=false;
+            console.log(error);
+            });
+        },
+    beforeUploadFile(uploadpath){
+        let _self=this;
+        if(_self.selectedItems==undefined||_self.selectedItems.length==0){
+            // _self.$message('请选择一条文件数据');
+            _self.$message({
+                    showClose: true,
+                    message: _self.$t('message.PleaseSelectOneFile'),
+                    duration: 2000,
+                    type: "warning"
+                });
+            return;
+        }
+        _self.uploadUrl=uploadpath;
+        _self.fileList=[];
+        _self.importdialogVisible=true;
+            
+      },
+    handleFileChange(file, fileList) {
+      this.uploadFile = file;
+    },
+    handleChange(file, fileList) {
+        this.fileList = fileList;
+    },
+    updateNewFile() {
+      let _self = this;
+      if (_self.selectedItems && _self.selectedItems.length > 0) {
+        if (_self.uploadType == 0) {
+          _self.uploadPrimry();
+        } else {
+          _self.uploadRendition();
+        }
+      }
+    },
+    uploadPrimry() {
+      let _self = this;
+      _self.uploading = true;
+      let formdata = new FormData();
+      formdata.append("id", _self.selectedItems[0].ID);
+      if (_self.uploadFile != "") {
+        formdata.append("uploadFile", _self.uploadFile.raw);
+      }
+      axios
+        .post("/dc/updatePrimaryContent", formdata, {
+          "Content-Type": "multipart/form-data",
+        })
+        .then(function (response) {
+          _self.udialogVisible = false;
+          _self.loadGridData(_self.currentFolder);
+          _self.$message("更新成功!");
+          _self.uploading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.uploading = false;
+        });
+    },
+    uploadRendition() {
+      let _self = this;
+      _self.uploading = true;
+      let formdata = new FormData();
+      var data = {};
+      data["ID"] = _self.selectedItems[0].ID; //_self.selectedInnerItems[0].ID;//_self.selectedFileId;
+      formdata.append("metaData", JSON.stringify(data));
+
+      if (_self.uploadFile != "") {
+        formdata.append("uploadFile", _self.uploadFile.raw);
+      }
+      axios
+        .post("/dc/addRendition", formdata, {
+          "Content-Type": "multipart/form-data",
+        })
+        .then(function (response) {
+          _self.udialogVisible = false;
+          _self.$message("更新成功!");
+          _self.uploading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.uploading = false;
+        });
+    },
+    showUpdateFile(indata) {
+      if (this.selectedItems && this.selectedItems.length > 0) {
+        this.uploadFile = [];
+        this.newFileList=[];
+        this.uploadType = indata;
+        this.udialogVisible = true;
+      }else{
+        this.$message({
+            showClose: true,
+            message: "请选择一条要修改的数据",
+            duration: 2000,
+            type: "error",
+          });
+      }
+    },
+    moveItem() {
+      this.isMoveFolder = false;
+      if(!this.selectedItems&&this.selectedItems.length==0){
+        this.$message({
+            showClose: true,
+            message: "请选择一条或多条要移动的数据",
+            duration: 2000,
+            type: "error",
+          });
+        return;
+      }
+      if (this.selectedItems && this.selectedItems.length > 0) {
+        this.moveDialogVisible = true;
+      }
+    },
+    getSelectedIds() {
+      if (this.isMoveFolder) {
+        return this.currentFolder.id;
+      } else {
+        var str = "";
+        this.selectedItems.forEach(function (val) {
+          str += val.ID + ";";
+        });
+        return str;
+      }
+    },
+    handleMoveItem() {
+      if (this.isMoveFolder) {
+        this.handleMoveFolder();
+      } else {
+        this.handleMoveDocument();
+      }
+    },
+    handleMoveFolder() {
+      let _self = this;
+      if (
+        _self.targetFolderId == _self.currentFolder.id ||
+        _self.targetFolderId == _self.currentFolder.parentId
+      ) {
+        _self.$message("目标文件夹不能更当前文件夹相同!");
+        return;
+      }
+      var fld = _self.currentFolder;
+      fld.parentId = _self.targetFolderId;
+      axios
+        .post("/admin/updateFolder", JSON.stringify(fld))
+        .then(function (response) {
+          _self.$message(_self.$t("message.saveSuccess"));
+          _self.moveDialogVisible = false;
+          _self.loading = false;
+          _self.refreshFolderData();
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+    handleMoveDocument() {
+      let _self = this;
+      _self.loading = true;
+      var m = new Map();
+      m.set("ids", _self.getSelectedIds());
+      m.set("folderId", _self.targetFolderId);
+      axios
+        .post("/dc/moveDocument", JSON.stringify(m))
+        .then(function (response) {
+          if (response.data.code == 1) {
+            _self.$message("目录移动成功。");
+            _self.$refs.mainDataGrid.loadGridData();
+          } else {
+            _self.$message("目录移动失败。<br>" + response.data.message);
+          }
+          _self.moveDialogVisible = false;
+          _self.loading = false;
+          
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.loading = false;
+        });
+    },
+    beforeCreateFile(){
+      this.createDocVisible=true;
+      this.$nextTick(()=>{
+        this.$refs.createCommonFile.refreshInfo();
+      })
+    },
+
+    saveDoc(){
+      this.$refs.createCommonFile.saveOrStartup(false);
+      
+    },
+    onBatchImported(){
+      this.$refs.mainDataGrid.loadGridData();
+    },
+    afterSave(){
+      this.createDocVisible = false;
+      this.$refs.mainDataGrid.loadGridData();
+      
+    },
     getWorkFlow() {
       let _self = this;
 
@@ -476,10 +784,12 @@ export default {
       
     },
 
-    resize() {
-      //console.log('resize')
-      this.asideWidth = "100%";
-    },
+    onSplitResize(topPercent){
+            // 顶部百分比*100
+            this.topPercent = topPercent
+            this.setStorageNumber(this.topStorageName, topPercent)
+            //console.log(JSON.stringify(topPercent))
+        },
     // 加载表格样式
     initGridInfo() {
       let _self = this;
@@ -506,13 +816,7 @@ export default {
     },
     rowClick(row) {
       this.currentId = row.ID;
-      if (row.TYPE_NAME == "卷盒" || row.TYPE_NAME == "图册") {
-        this.itemDialogVisible = true;
-        let _self = this;
-        setTimeout(() => {
-          _self.$refs.innerItemViewer.loadGridInfo();
-        }, 10);
-      }
+      
     },
     renderContent: function (h, { node, data, store }) {
       if (data.extended) {
@@ -549,6 +853,8 @@ export default {
       _self.disable = false;
       _self.exportAble = true;
       _self.currentFolder = indata;
+      _self.gridViewName=indata.gridView;
+      _self.typeName=indata.typeName;
       if (indata.extended == false) {
         _self.loading = true;
         axios
@@ -564,12 +870,15 @@ export default {
             _self.loading = false;
           });
       }
-      _self.loadGridInfo(indata);
-      if (_self.showBox) {
-        _self.loadAllGridData(indata);
-      } else {
-        _self.loadGridData(indata);
-      }
+      this.$nextTick(()=>{
+        _self.$refs.mainDataGrid.loadGridData();
+      });
+      // _self.loadGridInfo(indata);
+      // if (_self.showBox) {
+      //   _self.loadAllGridData(indata);
+      // } else {
+      //   _self.loadGridData(indata);
+      // }
     },
     showOrHiden(b) {
       this.shopingCartDialogVisible = b;
@@ -651,12 +960,9 @@ export default {
         });
     },
     selectChange(selection) {
-      this.selectedItemList = [];
-      if (selection.length > 0) {
-        for (var i = 0; i < selection.length; i++) {
-          this.selectedItemList.push(selection[i]);
-        }
-      }
+      this.selectedItems=selection;
+      this.selectedItemList = selection;
+     
     },
     //展示勾选弹框
     dialogFormShow() {
@@ -707,12 +1013,12 @@ export default {
     //搜索
     searchItem() {
       let _self = this;
-      _self.loadGridInfo(_self.currentFolder);
-      if (_self.showBox) {
-        _self.loadAllGridData(_self.currentFolder);
-      } else {
-        _self.loadGridData(_self.currentFolder);
-      }
+      let key = _self.inputkey;
+      let c=" CODING like '%"+key+"%' or NAME like '%"+key+"%' or C_FROM_CODING like '%"+key+"%'";
+      _self.condition=c;
+      _self.$nextTick(()=>{
+        _self.$refs.mainDataGrid.loadGridData();
+      })
     },
     //借阅
     borrowItem() {

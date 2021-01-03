@@ -80,16 +80,19 @@ public class ThematicController extends ControllerAbstract {
 	
 	@RequestMapping(value = "/Thematic/newDcRelation", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> newDcRelation(String metaData) throws Exception {
+	public Map<String, Object> newDcRelation(String metaData,String ID) throws Exception {
 		Map<String, Object> mp = new HashMap<String, Object>();
 		Map<String, Object> args = JSONUtils.stringToMap(metaData);
-		EcmRelation relation=new EcmRelation();
-		relation.setParentId(args.get("parent_id").toString());
-		relation.setChildId(args.get("child_id").toString());
-		relation.setName("专题");
-		String id=relationService.newObject(getToken(), relation);
+		List<String> list = JSONUtils.stringToArray(ID);
+		String parentId=args.get("parentID").toString();
+		for (String id : list) {
+			EcmRelation relation=new EcmRelation();
+			relation.setParentId(parentId);
+			relation.setChildId(id);
+			relation.setName("专题");
+			String ids=relationService.newObject(getToken(), relation);
+		}
 		mp.put("code", ActionContext.SUCESS);
-		mp.put("id", id);
 		return mp;
 	}
 	@RequestMapping(value = "/Thematic/DelDcRelation", method = RequestMethod.POST)

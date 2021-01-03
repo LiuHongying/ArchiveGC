@@ -22,36 +22,14 @@
         </div>
       </el-dialog>
       <!-- 相关文件创建文档选择-->
-      <el-dialog title="选择文档" :visible.sync="propertyrela" width="80%" :close-on-click-modal="false" :before-close="handleClose"> 
-        <DataLayout>
-          <template v-slot:header>
-            <el-form>
-            <el-form-item>
-              <el-input style="width:200px" v-model="DCinputValueNum" placeholder="请输入编码或标题"></el-input>
-              <el-button type="primary" @click="searchDC()">{{$t('application.SearchData')}}</el-button>
-            </el-form-item> 
-            </el-form>  
-            </template>
-          <template v-slot:main>  
-            <DataGrid 
-              ref="chooseDrawing"
-              key="General"
-              dataUrl="/dc/getDocuments"
-              v-bind:tableHeight="360"
-              condition="IS_RELEASED=1"
-              v-bind:isshowOption="true" v-bind:isshowSelection ="false"
-              gridViewName="GeneralGrid"
-              :optionWidth = "2"
-              :isshowCustom="false"
-              :isEditProperty="false"
-              showOptions="查看内容"
-              :isShowChangeList="false">
-              <template slot="customMoreOption" slot-scope="scope">
-              <el-button type="primary" @click="DCChoose(scope.data.row)" size="mini">{{$t('application.select')}}</el-button>
-              </template>
-            </DataGrid>
-          </template>
-        </DataLayout>
+      <el-dialog title="选择文档" :visible.sync="propertyrela" width="80%" :close-on-click-modal="false" :before-close="handleClose">
+        <selectDC @selectchange="selectDCChange" condition="IS_RELEASED=1"></selectDC>
+          <div slot="footer" class="dialog-footer">
+        <el-button @click="propertyrela = false">{{
+          $t("application.cancel")
+        }}</el-button>
+        <el-button  @click="DCChoose()">确定</el-button>
+      </div>
       </el-dialog>
       <el-form :inline="true" @submit.native.prevent>
         <el-form-item>
@@ -163,6 +141,7 @@ import ShowProperty from "@/components/ShowProperty";
 import DataGrid from "@/components/DataGrid";
 import DataLayout from "@/components/ecm-data-layout";
 import MountFile from '@/components/MountFile.vue';
+import selectDC from"@/components/controls/selectDC.vue"
 
 export default {
   name: "TC",
@@ -340,15 +319,19 @@ export default {
       _self.$refs.chooseDrawing.loadGridInfo()
       _self.$refs.chooseDrawing.loadGridData()
     },
-    DCChoose(row){
-        let ID = row.ID
+    DCChoose(){
         let _self = this;
         var m = new Map();
-        m.set("relationName","专题")
-        m.set("parent_id",_self.parentID)
-        m.set("child_id",ID)
+        m.set("parentID",_self.parentID)
         let formdata = new FormData();
         formdata.append("metaData", JSON.stringify(m));
+        var a = [];
+        let tab=_self.selectedDCItems;
+        var i;
+        for (i in tab) {a
+          a.push(tab[i]["ID"]);
+        }
+        formdata.append("ID", JSON.stringify(a));
         axios
           .post("/Thematic/newDcRelation", formdata, {
             "Content-Type": "multipart/form-data",
@@ -362,8 +345,9 @@ export default {
                 duration: 2000,
                 type: "success",
               });
-              _self.propertyVisible = false;
-              _self.$refs.ThematicGrid.loadGridData();
+              _self.propertyrela=false
+              _self.$refs.Drawing.loadGridData();
+              _self.$refs.Drawing.itemDataList=[];
             } else {
               _self.$message({
                 showClose: true,
@@ -423,8 +407,9 @@ export default {
             duration: 2000,
             type: "success",
           });
-          _self.propertyVisible = false;
+          _self.propertyrela=false
           _self.$refs.Drawing.loadGridData();
+          _self.$refs.Drawing.itemDataList=[];
         } else {
           _self.$message({
             showClose: true,
@@ -446,6 +431,7 @@ export default {
     DataGrid: DataGrid,
     DataLayout: DataLayout,
     MountFile:MountFile,
+    selectDC:selectDC
   },
 };
 </script>

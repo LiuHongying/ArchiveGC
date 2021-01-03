@@ -372,7 +372,7 @@ export default {
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
     axios
-      .post("/admin/getArchivesFolder", 0)
+      .post("/admin/getFoldersByPath", _self.folderPath)
       .then(function (response) {
         _self.dataList = response.data.data;
         _self.loadGridInfo(_self.defaultData);
@@ -387,7 +387,8 @@ export default {
   props: {
     conditionFile: {type:String,default:""},//文件判断
     ShowFileType:{type:Boolean,default:false},//选择文件类型（所有&到期）
-    condition:{type:String ,default:""}
+    condition:{type:String ,default:""},
+    folderPath:{typr:String,default:"/档案库"}
   },
   methods: {
     changeType:function(){
@@ -541,16 +542,25 @@ export default {
       _self.tableLoading = true;
       var key = _self.sqlStringFilter(_self.inputkey);
       if(_self.inputkey!=""&&_self.inputkey!=undefined){
-        key = "CODING LIKE '%"+key+"%' and "
+        key = "CODING LIKE '%"+key+"%' "
       }
-      if(_self.conditionDC==""||_self.conditionDC==undefined){
-        _self.conditionDC="C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+_self.conditionFile
+      if(this.ShowFileType){
+        if(key!=''&&key!=undefined){
+          key+=" and "
+        }
+        if(_self.conditionDC==""||_self.conditionDC==undefined){
+          _self.conditionDC="C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+_self.conditionFile
+        }
+        key +=_self.conditionDC
       }
-      key +=_self.conditionDC
+      
       if(_self.condition==""||_self.condition==undefined){
         _self.condition="IS_RELEASED=1 "
       }
-      key =key+" and C_ITEM_TYPE <>'案卷' AND "+_self.condition
+      if(key!=''&&key!=undefined){
+        key+=" and "
+      }
+      key =key+"C_ITEM_TYPE <>'案卷' AND "+_self.condition
       
       var m = new Map();
       _self.gridViewTrans = indata.gridView;
@@ -577,16 +587,25 @@ export default {
       let _self = this;
       var key = _self.sqlStringFilter(_self.inputkey);
       if(_self.inputkey!=""&&_self.inputkey!=undefined){
-        key = "CODING LIKE '%"+key+"%' and "
+        key = "CODING LIKE '%"+key+"%' "
       }
-      if(_self.conditionDC==""||_self.conditionDC==undefined){
-        _self.conditionDC="C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+_self.conditionFile
+      if(this.ShowFileType){
+        if(key!=''&&key!=undefined){
+          key+=" and "
+        }
+        if(_self.conditionDC==""||_self.conditionDC==undefined){
+          _self.conditionDC="C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+_self.conditionFile
+        }
+        key +=_self.conditionDC
       }
-      key +=_self.conditionDC
+      
       if(_self.condition==""||_self.condition==undefined){
         _self.condition="IS_RELEASED=1 "
       }
-      key =key+" and "+_self.condition
+      if(key!=''&&key!=undefined){
+        key+=" and "
+      }
+      key =key+_self.condition
       var m = new Map();
       m.set("gridName", indata.gridView);
       m.set("folderId", indata.id);

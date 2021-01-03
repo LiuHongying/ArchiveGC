@@ -56,23 +56,7 @@
             <el-button type="primary" v-on:click="searchItem">{{$t('application.SearchData')}}</el-button>
           </el-form-item>
         </el-form>
-        <DataGrid
-          ref="searchDoc"
-          key="searchDoc"
-          data-url="/dc/getDocuments"
-          v-bind:tableHeight="tableHeight"
-          v-bind:isshowOption="true"
-          v-bind:isshowSelection="true"
-          :condition="searchFileCondition"
-          gridViewName="DesignCancelGrid"
-          :optionWidth="1"
-          :isShowMoreOption="false"
-          :isshowCustom="false"
-          :isEditProperty="false"
-          :isShowChangeList="false"
-          :isshowicon="false"
-          @selectchange="fileSelect"
-        ></DataGrid>
+        <selectDC @selectchange="fileSelect"  :conditionFile="searchFileCondition" folderPath="/档案库/工程设计"></selectDC>
         <div slot="footer" class="dialog-footer">
             <el-button @click="saveFileToWorkflow" :loading="butt">{{$t('application.save')}}</el-button>
             <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
@@ -165,6 +149,7 @@ import ExcelUtil from "@/utils/excel.js";
 import DataSelect from "@/components/ecm-data-select";
 import DataLayout from "@/components/ecm-data-layout";
 import AttachmentFile from "@/views/dc/AttachmentFile.vue";
+import selectDC from"@/components/controls/selectDC.vue"
 export default {
   components: {
     ShowProperty: ShowProperty,
@@ -173,7 +158,8 @@ export default {
     DataSelect: DataSelect,
     RejectButton: RejectButton,
     DataLayout: DataLayout,
-    AttachmentFile: AttachmentFile
+    AttachmentFile: AttachmentFile,
+    selectDC:selectDC
   },
    model: {
      prop:"files",
@@ -395,10 +381,19 @@ export default {
     },
     saveFileToWorkflow(){
         let _self=this;
-        this.checkCreateUnit()
-        if(this.sameCreate==false){
-        this.$message("请选择相同编制单位的文件！")
-        return
+        
+        if(this.files.length>0||this.selectedFiles.length>1){
+          if(this.files.length>0){
+            this.createUnit = this.files[0].C_CREATE_UNIT
+          }
+          if(this.files.length==0&&this.selectedFiles.length>1){
+            this.createUnit = this.selectedFiles[0].C_CREATE_UNIT
+          }
+          this.checkCreateUnit()
+          if(this.sameCreate==false){
+          this.$message("请选择相同编制单位的文件！")
+          return
+          }
         }
         if(_self.$refs.fileList.itemDataList==null){
             _self.$refs.fileList.itemDataList=_self.selectedFiles;
