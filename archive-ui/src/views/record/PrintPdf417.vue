@@ -21,28 +21,32 @@
         <button @click="printCode" v-print="'#print'">打印</button>
       </div>
       <div id='print' ref='print' :style="'position: absolute; top:0px;'">
-        <div v-for="(item,keys) in getArchiveObjs()" :key="'divk'+keys">
+        <div v-for="(item,keys) in getArchiveObjs()" :key="'divk'+keys" style="width:400px">
           <el-row>
-            <el-col :span="20" style="color: #000000;text-align: left;font-size:14px;padding:2px;">{{item.TYPE_NAME}}</el-col>
-            <el-col :span="4" style="color: #000000;text-align: left;font-size:14px;padding:2px;"></el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:2px;">{{item.TYPE_NAME}}</el-col>
+            <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:2px;">案卷</el-col>
+            <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:2px;">复制件</el-col>
           </el-row>
           <el-row>
-            <el-col :span="24" style="color: #000000;text-align: left;font-size:24px;padding:2px;">{{item.CODING}}&nbsp;111111</el-col>
+            <el-col :span="24" style="color: #000000;text-align: left;font-size:32px;padding:2px;">{{item.CODING}}&nbsp;111111</el-col>
           </el-row>
           <el-row>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:14px;padding:2px;">密级：{{item.C_SECURITY_LEVEL}}</el-col>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:14px;padding:2px;">版本：{{item.REVISION}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:2px;">密级：{{item.C_SECURITY_LEVEL}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:2px;">版本：{{item.REVISION}}</el-col>
           </el-row>
           <el-row>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:14px;padding:2px;">保管期限：{{item.C_RETENTION}}</el-col>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:14px;padding:2px;">工程号：{{item.C_PROJECT_NUM}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:2px;">保管期限：{{item.C_RETENTION}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:2px;">工程号：{{item.C_PROJECT_NUM}}</el-col>
           </el-row>
           <el-row>
-            <el-col :span="24" style="color: #000000;text-align: left;font-size:14px;padding:2px;">归档日期：{{dateFormat(item.C_ARCHIVE_DATE)}}</el-col>
+            <el-col :span="24" style="color: #000000;text-align: left;font-size:18px;padding:2px;">归档日期：{{dateFormat(item.C_ARCHIVE_DATE)}}</el-col>
           </el-row>
-          <el-row style="padding-bottom:10px;">
-            <el-col :span="12" style="color: #000000;font-size:40px;padding-top:10px;">{{item.C_STORE_CODING}}</el-col>
-            <el-col :span="12"><canvas :ref="'canvas'+keys" :style="'display:'+noneStr"></canvas><img :ref="'image'+keys" /></el-col>
+          <el-row style="padding-bottom:5px;">
+            <el-col :span="10" style="color: #000000;font-size:46px;padding-top:10px;">
+              <el-row style="color: #000000;text-align: left;font-size:18px;padding:2px;"> </el-row>
+              <el-row>{{item.C_STORE_CODING}}</el-row>
+            </el-col>
+            <el-col :span="14"><canvas :ref="'canvas'+keys" :style="'display:'+noneStr"></canvas><img :ref="'image'+keys" /></el-col>
           </el-row>
         </div>
         <!-- <div v-if="isQRCode"  ref='qrCodeUrl2'></div> -->
@@ -94,7 +98,7 @@ export default {
     isQRCode:{type:Boolean,default:false},
     isBarCode:{type:Boolean,default:false},
     archiveObjects:{type:Array,default:() => []},
-    divWidth:{type:String,default:'200px'},
+    divWidth:{type:String,default:'400px'},
     divHeight:{type:String,default:'50px'},
     divMargin:{type:String,default:'10px'},
   },
@@ -173,8 +177,8 @@ export default {
         let barcode = this.PDF417.getBarcodeArray();
 
         // block sizes (width and height) in pixels
-        let bw = 1;
-        let bh = 1;
+        let bw = 2;
+        let bh = 2;
 
         // create canvas element based on number of columns and rows in barcode
         
