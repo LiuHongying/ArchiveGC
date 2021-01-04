@@ -44,9 +44,6 @@
           }}</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="propertyVisible = true">添加库号</el-button>
-        </el-form-item>
-        <el-form-item>
           <el-button type="primary" @click="handOver()">入库</el-button>
         </el-form-item>
         <el-form-item>
