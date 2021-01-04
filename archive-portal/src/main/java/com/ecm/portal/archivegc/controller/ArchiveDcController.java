@@ -358,6 +358,11 @@ public class ArchiveDcController extends ControllerAbstract{
 				EcmDocument doc=new EcmDocument();
 				doc.setAttributes(args);
 				documentService.updateObject(getToken(), doc,null);
+				String actionName = doc.getStatus();
+				if(actionName != null) {
+					actionName = actionName.replace("已", "");
+					documentService.newAudit(getToken(), "Portal", actionName, doc.getId(), null, null);
+				}
 			}
 			mp.put("code", ActionContext.SUCESS);
 			mp.put("msg", "修改成功");

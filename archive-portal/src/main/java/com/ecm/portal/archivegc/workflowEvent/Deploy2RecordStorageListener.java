@@ -22,6 +22,11 @@ import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
 import com.ecm.icore.service.IEcmSession;
 import com.ecm.portal.archivegc.utils.EcmSessionFactory;
+/**
+ * 文档提交流程，发布到整编库
+ * @author Atos
+ *
+ */
 @Component(value="deploy2RecordStorage")
 public class Deploy2RecordStorageListener implements JavaDelegate {
 	private Logger log=LoggerFactory.getLogger(this.getClass());
