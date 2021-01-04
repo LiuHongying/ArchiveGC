@@ -1029,7 +1029,7 @@ export default {
     // 加载表格数据
     loadGridData(indata) {
       let _self = this;
-      var key = _self.inputkey;
+      var key = _self.sqlStringFilter(_self.inputkey);
       if (key != "") {
         key = "CODING like '%" + key + "%' or NAME like '%" + key + "%'";
       }
