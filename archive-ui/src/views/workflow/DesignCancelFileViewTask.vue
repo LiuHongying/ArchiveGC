@@ -127,11 +127,6 @@
                           <el-button type="warning" @click="removeRelation">{{ $t("application.delete") }}</el-button>
                         </el-form-item>
                       </template>
-                      <template v-if="isShowReject">
-                        <el-form-item>
-                          <el-button type="primary" @click="pendNot">{{ $t("application.pendNot") }}</el-button>
-                        </el-form-item>
-                      </template>
                     </el-form>
                   </el-col>
                 </el-row>
@@ -158,10 +153,6 @@
                   @selectchange="archiveSelect"
                   @dbclick="showVolumesFile"
                 >
-                  <template slot="sequee" slot-scope="scope">
-                      <span :style="(scope.data.row['C_REJECT_COMMENT']!=null
-                      &&scope.data.row['C_REJECT_COMMENT']!='')?{'background':'red'}:''">{{(scope.currentPage-1) * scope.pageSize+ scope.data.$index+1}}</span>
-                  </template>
                 </DataGrid>
               </el-tab-pane>
             </el-tabs>
