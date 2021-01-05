@@ -272,7 +272,7 @@
                     </template>
                     <template slot="paneR">
                       <el-row>
-                        <span style="float:left;text-align:left;">文件列表</span>
+                        <span style="float:left;text-align:left;padding:5px;">文件列表</span>
                         <!-- <el-button type="primary" plain size="small" title="自动组卷"  @click="autoPaper()">自动组卷</el-button> -->
                         <el-button
                           type="primary"
@@ -315,7 +315,7 @@
                             v-bind:columnList="innerGridList"
                             v-bind:itemCount="innerCount"
                             v-bind:loading="uploadFileLoding"
-                            gridViewName="DrawingGrid"
+                            gridViewName="ArrangeInnerGrid"
                             showOptions="查看内容"
                             :optionWidth = "2"
                             :isShowChangeList="false"
