@@ -375,7 +375,7 @@ export default {
         this.$message("请选择角色!");
         return;
       }
-      if(roleNames && roleNames.indexOf(this.selectedRole.name)>-1){
+      if(roleNames && (";"+roleNames+";").indexOf(";"+this.selectedRole.name+";")>-1){
         this.$message("角色不能包含自身!");
         return;
       }
