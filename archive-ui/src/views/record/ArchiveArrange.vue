@@ -256,6 +256,18 @@
                         title="文档取号"
                       >文档取号</el-button>
                       </el-form-item>
+                      <el-form-item v-if="isFile==false">
+                      <el-button
+                        type="primary"
+                        plain
+                        :loading="getNumLoading"
+                        size="small"
+                        icon="el-icon-top"
+                        @click="upgradeDesign"
+                        title="设计文件升版"
+                      >升版</el-button>
+                      </el-form-item>
+                      
                       <el-form-item>
                       <el-button
                         type="primary"
@@ -1622,6 +1634,64 @@ export default {
           .catch(function(error) {
             console.log(error);
           });
+    },
+    //升版设计文件
+    upgradeDesign(){
+      let _self=this;
+      let flag=true;
+       _self.selectedItems.forEach((e)=>{
+         if(e.typeName!='设计文件'){
+           flag=false;
+           return;
+         }
+       });
+       if(!flag){
+         _self.$message({
+              showClose: true,
+              message: "所选文件中包含非设计文件数据",
+              duration: 2000,
+              type: "warning"
+            });
+         return;
+       }
+      let ids=new Array();
+      _self.selectedItems.forEach((e)=>{
+        ids.push(e.ID);
+      })
+      _self
+          .axios({
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8"
+            },
+            datatype: "json",
+            method: "post",
+            data: JSON.stringify(ids),
+            url: "/dc/upgradeDesign"
+          })
+          .then(function(response) {
+            // _self.$message(_self.$t("message.saveSuccess"));
+            if(response.data.code==1){
+                _self.$message({
+                  showClose: true,
+                  message: "设计文件升级成功",
+                  duration: 2000,
+                  type: "success"
+                });
+                _self.searchItem();
+            }else{
+              _self.$message({
+                  showClose: true,
+                  message: "设计文件升级失败",
+                  duration: 2000,
+                  type: "error"
+                });
+            }
+            
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+
     },
     moveToPreFilling(){
       let _self=this;
