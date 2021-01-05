@@ -135,7 +135,7 @@ export default {
     // 加载表格数据
     loadGridData() {
       let _self = this;
-      var key = _self.inputKey;
+      var key = _self.sqlStringFilter(_self.inputKey);
       if (key != "" && key != undefined) {
         key = "CODING like '%" + key + "%' or NAME like '%" + key + "%'";
       }else{

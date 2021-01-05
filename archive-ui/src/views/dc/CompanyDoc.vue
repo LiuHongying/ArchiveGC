@@ -616,7 +616,7 @@ export default {
       m.set("folderId", indata.id);
       m.set("condition", key);
       m.set("pageSize", _self.pageSize);
-      m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
+      m.set("pageIndex", _self.currentPage - 1);
       m.set("orderBy", "MODIFIED_DATE desc");
       axios
         .post("/dc/getExceptBoxDocuments", JSON.stringify(m))
@@ -638,7 +638,7 @@ export default {
       m.set("folderId", indata.id);
       m.set("condition", key);
       m.set("pageSize", _self.pageSize);
-      m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
+      m.set("pageIndex", _self.currentPage - 1);
       m.set("orderBy", "MODIFIED_DATE desc");
       axios
         .post("/dc/getContainBoxDocuments", JSON.stringify(m))
@@ -1001,7 +1001,7 @@ export default {
         folderId: _self.currentFolder.id,
         orderBy: "MODIFIED_DATE desc",
         pageSize: _self.pageSize,
-        pageIndex: (_self.currentPage - 1) * _self.pageSize,
+        pageIndex: _self.currentPage - 1,
         lang: "zh-cn",
       };
       console.log(params);
