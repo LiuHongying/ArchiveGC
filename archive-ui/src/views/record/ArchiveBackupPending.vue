@@ -19,13 +19,17 @@
         
         <el-row>
             <el-col>
-                <DataGrid ref="orderGrid" key="main" v-bind:itemDataList="itemDataList"
-                      v-bind:columnList="gridList" @pagesizechange="pageSizeChange"
-                      @pagechange="pageChange" v-bind:itemCount="itemCount"
+                <DataGrid ref="orderGrid" key="main" 
                       v-bind:tableHeight="rightTableHeight" :isshowOption="true"
-                      @rowclick="onRowClick"
                       :loading="orderLoading"
-                      @refreshdatagrid="loadGridData"></DataGrid>
+                      :isshowicon="false"
+                      :optionWidth = "1"
+                      :isShowChangeList="false"
+                      :isShowMoreOption="false"
+                      condition="STATUS='制作中'"
+                      gridViewName="ArchiveBackup"
+                      dataUrl="/dc/getDocuments"
+                     ></DataGrid>
             </el-col>
 
         </el-row>
@@ -62,53 +66,18 @@ export default {
               director:"",
               condition:""
             },
-             rightTableHeight: window.innerHeight - 90
+             rightTableHeight: window.innerHeight - 130
         }
        
     },
     mounted(){
-        this.loadGridInfo();
+        //this.loadGridInfo();
         this.loadGridData();
     },
     components:{
         DataGrid:DataGrid
     },
     methods:{
-      onRowClick(row){
-        let _self=this;
-        _self.archiveBackupVisible=true
-        setTimeout(()=>{
-          _self.loadChildGridInfo();
-          _self.loadChildGridData(row);
-        },10);
-        
-      },
-       
-        pageSizeChange(val){
-            this.pageSize = val;
-            localStorage.setItem("docPageSize",val);
-            _self.loadGridData();
-        },
-        childPageSizeChange(val){
-            this.childPageSize = val;
-            localStorage.setItem("docPageSize",val);
-            this.loadChildGridData(this.selectedRow);
-        },
-        
-        
-        // 分页 当前页改变
-        pageChange(val) {
-            this.currentPage = val;
-            this.loadGridData();
-            //console.log('handleCurrentChange', val);
-        },
-        // 分页 当前页改变
-        childPageChange(val) {
-            this.childCurrentPage = val;
-            this.loadChildGridData(this.selectedRow);
-            //console.log('handleCurrentChange', val);
-        },
-        // 加载借阅单表格数据
         loadGridData() {
           let _self = this;
           _self.orderLoading=true;
@@ -141,76 +110,6 @@ export default {
               _self.orderLoading = false;
             });
         },
-        
-            // 加载表格样式
-        loadGridInfo() {
-          let _self = this;
-          _self.orderLoading = true;
-          var m = new Map();
-          m.set("gridName", "ArchiveBackup");
-          m.set("lang", _self.getLang());
-          axios.post("/dc/getGridViewInfo",JSON.stringify(m))
-            .then(function(response) {
-              _self.gridList = response.data.data;
-              
-              _self.orderLoading = false;
-            })
-            .catch(function(error) {
-              console.log(error);
-              _self.orderLoading = false;
-            });
-        },
-         // 加载表格样式
-        loadChildGridInfo() {
-          let _self = this;
-          var m = new Map();
-          m.set("gridName", "ArchiveBackupRecord");
-          m.set("lang", _self.getLang());
-          axios.post("/dc/getGridViewInfo",JSON.stringify(m))
-            .then(function(response) {
-              _self.childColumnList = response.data.data;
-              
-            })
-            .catch(function(error) {
-              console.log(error);
-              _self.orderLoading = false;
-            });
-        },
-        
-        loadChildGridData(row){
-          let _self = this;
-          _self.orderLoading=true;
-          var key0 = "";
-          if (key0 != "") {
-            key0 = " (coding like '%" + key0 + "%' or C_DRAFTER like '%" + key0 + "%')  ";
-          }else{
-              key0=" C_BATCH_CODE='"+row.CODING+"' "
-          }
-        
-          var m = new Map();
-          m.set("gridName", "ArchiveBackupRecord");
-          // m.set('folderId',indata.id);
-          m.set("condition", key0);
-          
-          m.set("pageSize", _self.childPageSize);
-          m.set("pageIndex", (_self.childCurrentPage - 1) * _self.childPageSize);
-          m.set("orderBy", "");
-          // console.log('pagesize:', _self.pageSize);
-          axios.post("/dc/getBorrowOrder",JSON.stringify(m))
-            .then(function(response) {
-              _self.childDataList = response.data.data;
-              _self.childItemCount = response.data.pager.total;
-              //console.log(JSON.stringify(response.data.datalist));
-              _self.orderLoading = false;
-            })
-            .catch(function(error) {
-              console.log(error);
-              _self.orderLoading = false;
-            });
-        }
-
-
-
         }
 
 };
