@@ -44,14 +44,14 @@
               <el-form-item>
                 <el-radio
                   style="margin-right: 5px"
-                  v-model="radio"
+                  v-model="radioValue"
                   label="案卷"
                   @change="changeRadio"
                   >案卷</el-radio
                 >
                 <el-radio
                   style="margin-left: 5px"
-                  v-model="radio"
+                  v-model="radioValue"
                   label="文件"
                   @change="changeRadio"
                   >文件</el-radio
@@ -113,18 +113,14 @@
                   >
                   </DataGrid>
                 </template>
-                <template slot="paneR" v-if="isFile">
-                  <el-row>
-                    <span style="float: left; text-align: left; padding: 5px"
-                      >文件</span
-                    >
-                  </el-row>
+                <template slot="paneR">
                   <el-row>
                     <el-col>
                       <DataGrid
                         ref="relevantFileDataGrid"
                         key="relevantFile"
                         v-bind="tables.relevantFileDataGrid"
+                        v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
                       >
                       </DataGrid>
                     </el-col>
@@ -157,16 +153,16 @@ export default {
 
       leftPercent: 20,
       // 本地存储高度名称
-      leftStorageName: "ArchiveHandOverLeftHeight",
-      topStorageName: "ArchiveHandOverTopHeight",
+      leftStorageName: "PreArchiveftHeight",
+      topStorageName: "PreArchiveTopHeight",
       // 非split pan 控制区域高度
       startHeight: 135,
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
-      topbarHeight: 35,
+      topbarHeight: 45,
       // 底部除列表高度
-      bottomHeight: 25,
+      bottomHeight: 35,
 
       rightTableHeight: (window.innerHeight - 150) / 2,
       asideHeight: window.innerHeight - 95,
@@ -178,7 +174,7 @@ export default {
         label: "name",
       },
 
-      radio: "案卷",
+      radioValue: "案卷",
       isFile: true,
 
       dataList: [],
@@ -268,6 +264,7 @@ export default {
       var key = _self.inputkey;
       var m = new Map();
       _self.gridViewTrans = indata.gridView;
+      _self.judgement = " and C_ITEM_TYPE = '"+_self.radioValue+"'"
       _self.idTrans = indata.id;
       m.set("gridName", indata.gridView);
       m.set("folderId", indata.id);
@@ -389,20 +386,11 @@ export default {
     },
 
     changeRadio(val) {
+      
       let _self = this;
-      if (val == "文件") {
-        _self.judgement += " and C_ITEM_TYPE = '文件' ";
-        _self.isFile = false;
-        _self.topPercent = 95;
-        // _self.$refs.mainDataGrid.tableHeight=(window.innerHeight-_self.startHeight);
-      } else {
-        _self.isFile = true;
-        _self.topPercent = 65;
-        _self.judgement += " and C_ITEM_TYPE = '案卷' ";
-      }
-
+      _self.radioValue = val;
       _self.loadGridData(_self.currentFolder);
-      _self.judgement = "";
+    
     },
 
     exportData() {

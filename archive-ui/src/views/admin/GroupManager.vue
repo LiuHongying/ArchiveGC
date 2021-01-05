@@ -182,13 +182,20 @@
       <el-main>
         <el-row>
           <el-col :span="4">
-            <el-tree
-              :props="defaultProps"
-              :data="deptList"
-              node-key="id"
-              lazy
-              @node-click="handleNodeClick"
-            ></el-tree>
+            <el-container
+              :style="{
+                height: treeHeight + 'px',
+                overflow: 'auto',
+              }"
+            >
+              <el-tree
+                :props="defaultProps"
+                :data="deptList"
+                node-key="id"
+                lazy
+                @node-click="handleNodeClick"
+              ></el-tree>
+            </el-container>
           </el-col>
           <el-col :span="20">
             <el-table :data="dataList" border :height="tableHeight" style="width: 100%">
@@ -265,7 +272,8 @@ export default {
     return {
       dataList: [],
       dataListFull: [],
-      tableHeight: window.innerHeight - 135,
+      tableHeight: window.innerHeight - 145,
+      treeHeight: window.innerHeight - 145,
       inputkey: "",
       loading: false,
       dialogVisible: false,
