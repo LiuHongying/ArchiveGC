@@ -101,6 +101,19 @@ public class RecordProcessController extends ControllerAbstract {
 			
 			EcmDocument parentDoc= documentService.getObjectById(getToken(), fileId);
 			
+			String typeName= parentDoc.getTypeName();
+			if("设计文件".equals(typeName)) {
+				String coding= parentDoc.getAttributeValue("CODING").toString();
+				String condition=" coding='"+coding+"' and IS_CURRENT=1";
+				List<EcmDocument> currentObjs= documentService.getObjects(getToken(), condition);
+				if(currentObjs!=null&&currentObjs.size()>0) {
+					EcmDocument currentObj= currentObjs.get(0);
+					currentObj.setCurrent(false);
+					documentService.updateObject(getToken(), currentObj);
+					parentDoc.setCurrent(true);
+//					documentService.updateObject(getToken(), parentDoc);
+				}
+			}
 			String parentSecurityLevel= parentDoc.getSecurityLevel();
 			if(parentSecurityLevel==null||"".equals(parentSecurityLevel)) {
 				parentSecurityLevel="内部公开";
@@ -116,7 +129,7 @@ public class RecordProcessController extends ControllerAbstract {
 			parentDoc.addAttribute("ACL_NAME", parentAclName);
 			
 			documentService.updateObject(getToken(), parentDoc, null);
-			
+			documentService.newAudit(getToken(), "Portal", "入库", parentDoc.getId(), null, null);
 			String sql1="select child_id from ecm_relation where parent_id='"+fileId+"' "+ " and name='irel_children'";
 			List<Map<String,Object>> childrenIds= documentService.getMapList(getToken(), sql1);
 			
@@ -137,6 +150,7 @@ public class RecordProcessController extends ControllerAbstract {
 				childDoc.addAttribute("IS_RELEASED", "1");
 				childDoc.addAttribute("ACL_NAME", childAclName);
 				documentService.updateObject(getToken(), childDoc, null);
+				
 			}
 			
 		}

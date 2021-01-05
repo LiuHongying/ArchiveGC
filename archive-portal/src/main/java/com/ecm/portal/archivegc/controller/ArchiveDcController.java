@@ -321,6 +321,12 @@ public class ArchiveDcController extends ControllerAbstract{
 		}
 	
 	}
+	/**
+	 * 升版设计文件
+	 * @param argStr
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/dc/upgradeDesign", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> upgradeDesign(@RequestBody String argStr) throws Exception{
@@ -332,13 +338,29 @@ public class ArchiveDcController extends ControllerAbstract{
 				continue;
 			}
 			String volumeCode= document.getAttributeValue("C_FROM_CODING").toString();
-			List<EcmDocument> archiveList= documentService.getObjects(getToken(), " TYPE_NAME='设计文件案卷 '  and C_FROM_CODING='"+volumeCode+"'");
-			if(archiveList==null||archiveList.size()==0) {
+			List<Map<String,Object>> volumeList= documentService.getMapList(getToken(),"select * from ecm_document where  TYPE_NAME='设计文件案卷 '  and C_FROM_CODING='"+volumeCode+"'");//.getObjects(getToken(), " TYPE_NAME='设计文件案卷 '  and C_FROM_CODING='"+volumeCode+"'");
+			if(volumeList==null||volumeList.size()==0) {
 				continue;
 			}
+			Map<String,Object> volume= volumeList.get(0);
+			Object archiveCodeObj= volume.get("C_ARCHIVE_CODING");//档号
+			Object storeCodeObj=volume.get("C_STORE_CODING");//库号
+			if(archiveCodeObj!=null) {
+				document.addAttribute("C_ARCHIVE_CODING", archiveCodeObj.toString());
+			}
+			if(storeCodeObj!=null) {
+				document.addAttribute("C_STORE_CODING", storeCodeObj.toString());
+			}
+			documentService.updateObject(getToken(), document);
+			EcmRelation relation =new EcmRelation();
+			relation.setParentId(volume.get("ID").toString());
+			relation.setChildId(id);
+			relation.setName("irel_children");
+			String ids=relationService.newObject(getToken(), relation);
 		}
-		
-		return null;
+		mp.put("msg", "成功");
+		mp.put("code", ActionContext.SUCESS);
+		return mp;
 	}
 	
 	@RequestMapping(value = "/dc/updateData", method = RequestMethod.POST)
@@ -383,50 +405,18 @@ public class ArchiveDcController extends ControllerAbstract{
 		List<String> list = JSONUtils.stringToArray(argStr);
 		Map<String, Object> mp = new HashMap<String, Object>();
 		try {
+			String token=getToken();
 			for(int i=0;list!=null&&i<list.size();i++) {
 				String boxId=list.get(i);
 				EcmDocument doc = null;
-				doc = documentService.getObjectById(getToken(), boxId);
+				doc = documentService.getObjectById(token, boxId);
 				String archiveCoding = (String)doc.getAttributeValue("C_ARCHIVE_CODING");
 				if(archiveCoding==null||"".equals(archiveCoding)) {
 					mp.put("code", ActionContext.FAILURE);
 					mp.put("message", "请先取号！");
 					return mp;
-				}else {
-
-					String sqlSumPage="select sum(C_PAGE_COUNT) as pageCount from ecm_document "
-							+ "where id in(select child_id from ecm_relation where parent_id='"+boxId+"' "
-									+ " and name='irel_children'";
-					List<Map<String, Object>> pages= documentService.getMapList(getToken(),sqlSumPage);
-					if(pages!=null&&pages.size()>0&&pages.get(0)!=null) {
-						doc.addAttribute("C_PAGE_COUNT", pages.get(0).get("pageCount"));
-					}else {
-						doc.addAttribute("C_PAGE_COUNT", "0");
-					}
-					
-//					String minDocDate=ChildrenObjAction.getMinDocDate(getToken(), boxId, "C_DRAFT_DATE",documentService);
-//					if(minDocDate!=null) {
-//						doc.addAttribute("C_DRAFT_DATE", minDocDate);
-//					}
-//					String maxDocDate=ChildrenObjAction.getMaxDocDate(getToken(), boxId, "C_DRAFT_DATE",documentService);
-//					if(maxDocDate!=null) {
-//						doc.addAttribute("C_END_DATE", maxDocDate);
-//					}
-					
-					String maxRetention= ChildrenObjAction.getRetention(getToken(), boxId, documentService);
-					if(maxRetention!=null) {
-						doc.addAttribute("C_RETENTION", maxRetention);
-					}else {
-						doc.addAttribute("C_RETENTION", "10年");
-					}
-					String maxSecurity=ChildrenObjAction.getVolumeMaxSecurity(getToken(), boxId, documentService);
-					if(maxSecurity==null) {
-						doc.addAttribute("C_SECURITY_LEVEL", "内部公开");
-					}else {
-						doc.addAttribute("C_SECURITY_LEVEL", maxSecurity);
-					}
-					documentService.updateObject(getToken(), doc, null);
 				}
+				fetchInfo(token,doc);
 				
 				//////////////////////////////////////////////
 			}
@@ -443,10 +433,47 @@ public class ArchiveDcController extends ControllerAbstract{
 		}
 		mp.put("code", ActionContext.SUCESS);
 		return mp;
-		
-	
-		
 	}
+	
+	public void fetchInfo(String token,EcmDocument doc) throws NoPermissionException, AccessDeniedException, EcmException{
+		Map<String, Object> mp = new HashMap<String, Object>();
+
+
+		String sqlSumPage="select sum(C_PAGE_COUNT) as pageCount from ecm_document "
+				+ "where id in(select child_id from ecm_relation where parent_id='"+doc.getId()+"' "
+						+ " and name='irel_children'";
+		List<Map<String, Object>> pages= documentService.getMapList(token,sqlSumPage);
+		if(pages!=null&&pages.size()>0&&pages.get(0)!=null) {
+			doc.addAttribute("C_PAGE_COUNT", pages.get(0).get("pageCount"));
+		}else {
+			doc.addAttribute("C_PAGE_COUNT", "0");
+		}
+		
+//		String minDocDate=ChildrenObjAction.getMinDocDate(getToken(), boxId, "C_DRAFT_DATE",documentService);
+//		if(minDocDate!=null) {
+//			doc.addAttribute("C_DRAFT_DATE", minDocDate);
+//		}
+//		String maxDocDate=ChildrenObjAction.getMaxDocDate(getToken(), boxId, "C_DRAFT_DATE",documentService);
+//		if(maxDocDate!=null) {
+//			doc.addAttribute("C_END_DATE", maxDocDate);
+//		}
+		
+		String maxRetention= ChildrenObjAction.getRetention(token, doc.getId(), documentService);
+		if(maxRetention!=null) {
+			doc.addAttribute("C_RETENTION", maxRetention);
+		}else {
+			doc.addAttribute("C_RETENTION", "10年");
+		}
+		String maxSecurity=ChildrenObjAction.getVolumeMaxSecurity(token, doc.getId(), documentService);
+		if(maxSecurity==null) {
+			doc.addAttribute("C_SECURITY_LEVEL", "内部公开");
+		}else {
+			doc.addAttribute("C_SECURITY_LEVEL", maxSecurity);
+		}
+		documentService.updateObject(token, doc, null);
+	
+	}
+	
 	@RequestMapping(value = "/import/batchImport", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> batchImport(@RequestParam("metaData")String metaData,@RequestParam("excel") MultipartFile excel, @RequestParam("files") MultipartFile[] files) throws AccessDeniedException{
@@ -507,6 +534,16 @@ public class ArchiveDcController extends ControllerAbstract{
 			try {
 //				String id=obj.get("ID").toString();
 				EcmDocument doc= documentService.getObjectById(getToken(), id);
+				if("设计文件".equals(doc.getTypeName())) {
+					String sql="select parent_id from ecm_relation where child_id='"+id+"' and name='irel_children'";
+					List<Map<String,Object>> pdata= documentService.getMapList(getToken(), sql);
+					if(pdata!=null&&pdata.size()>0) {
+						String parentId= pdata.get(0).get("parent_id").toString();
+						EcmDocument archiveObj= documentService.getObjectById(getToken(), parentId);
+						fetchInfo(getToken(), archiveObj);
+					}
+					
+				}
 				doc.setStatus("待入库");
 				
 				String folderId= folderPathService.getFolderId(getToken(), doc.getAttributes(), "3");
