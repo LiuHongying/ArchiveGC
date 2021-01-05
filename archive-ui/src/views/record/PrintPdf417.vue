@@ -23,25 +23,25 @@
       <div id='print' ref='print' :style="'position: absolute; top:0px;'">
         <div v-for="(item,keys) in getArchiveObjs()" :key="'divk'+keys" style="width:400px">
           <el-row>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:2px;">{{item.TYPE_NAME}}</el-col>
-            <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:2px;">案卷</el-col>
-            <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:2px;">复制件</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{item.TYPE_NAME}}</el-col>
+            <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:4px;">案卷</el-col>
+            <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:4px;">复制件</el-col>
           </el-row>
           <el-row>
-            <el-col :span="24" style="color: #000000;text-align: left;font-size:32px;padding:2px;">{{item.CODING}}&nbsp;111111</el-col>
+            <el-col :span="24" style="color: #000000;text-align: left;font-size:32px;padding:4px;">{{item.CODING}}&nbsp;111111</el-col>
           </el-row>
           <el-row>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:2px;">密级：{{item.C_SECURITY_LEVEL}}</el-col>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:2px;">版本：{{item.REVISION}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">密级：{{item.C_SECURITY_LEVEL}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">版本：{{item.REVISION}}</el-col>
           </el-row>
           <el-row>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:2px;">保管期限：{{item.C_RETENTION}}</el-col>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:2px;">工程号：{{item.C_PROJECT_NUM}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">保管期限：{{item.C_RETENTION}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">工程号：{{item.C_PROJECT_NUM}}</el-col>
           </el-row>
           <el-row>
-            <el-col :span="24" style="color: #000000;text-align: left;font-size:18px;padding:2px;">归档日期：{{dateFormat(item.C_ARCHIVE_DATE)}}</el-col>
+            <el-col :span="24" style="color: #000000;text-align: left;font-size:18px;padding:4px;">归档日期：{{dateFormat(item.C_ARCHIVE_DATE)}}</el-col>
           </el-row>
-          <el-row style="padding-bottom:5px;">
+          <el-row style="padding-bottom:15px;">
             <el-col :span="10" style="color: #000000;font-size:46px;padding-top:10px;">
               <el-row style="color: #000000;text-align: left;font-size:18px;padding:2px;"> </el-row>
               <el-row>{{item.C_STORE_CODING}}</el-row>
@@ -125,7 +125,7 @@ export default {
         
         for(let i=0;i<objs.length;i++){
           let obj=objs[i];
-          _self.generate(obj["CODING"],_self.$refs['canvas'+i][0]);
+          _self.generate(obj["C_ARCHIVE_CODING"],_self.$refs['canvas'+i][0]);
         }
         
       },
