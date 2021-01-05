@@ -342,10 +342,8 @@ export default {
 
     checkCreateUnit(){
       let crUnit = null
-      this.createUnit = null
       this.sameCreate = true      //指示器清空
     for(let tab in this.selectedFiles){
-
       if(this.selectedFiles[tab].C_CREATE_UNIT==undefined){
         this.createUnit = "未定义"
         crUnit = "未定义"
@@ -378,6 +376,7 @@ export default {
     },
     fileSelect(val){
         this.selectedFiles=val;
+        console.log(val)
     },
     saveFileToWorkflow(){
         let _self=this;
