@@ -814,8 +814,8 @@ export default {
       // }
       _self.loadInnerGridInfo();
       var m = new Map();
-      // m.set("gridName", "DeliveryInnerGrid");
-      m.set("gridName","DrawingGrid");
+      m.set("gridName", "DeliveryInnerGrid");
+      // m.set("gridName","DrawingGrid");
       m.set("condition", "");
       if (_self.selectRow) {
         _self.archiveId = _self.selectRow.ID;
@@ -1298,7 +1298,7 @@ export default {
       m.set("condition", key);
       m.set("id", _self.selectedOneTransfer.ID);
       m.set("pageSize", _self.pageSize);
-      m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
+      m.set("pageIndex", self.currentPage - 1);
       m.set("orderBy", "");
       // console.log('pagesize:', _self.pageSize);
       _self
@@ -1371,7 +1371,7 @@ export default {
       }
       m.set("id", _self.archiveId);
       m.set("pageSize", _self.innerPageSize);
-      m.set("pageIndex", (_self.innerCurrentPage - 1) * _self.innerPageSize);
+      m.set("pageIndex", _self.innerCurrentPage - 1);
       m.set("orderBy", "");
       // console.log('pagesize:', _self.pageSize);
       _self
