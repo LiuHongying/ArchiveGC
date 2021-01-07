@@ -214,7 +214,6 @@ export default {
   },
   mounted() {
     this.getGUID()
-    this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
     initTable(){

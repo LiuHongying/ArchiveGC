@@ -169,7 +169,7 @@
                         // console.log(JSON.stringify(m));
                         if(_self.$refs.ShowProperty.myItemId=='')
                         {
-                            axios.post("/dc/createWorkflowFormData",formdata,{
+                            axios.post("/dc/createWorkflowFormData4Appraisal",formdata,{
                                 'Content-Type': 'multipart/form-data'
                             })
                             .then(function(response) {
