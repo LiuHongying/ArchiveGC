@@ -82,6 +82,10 @@
             <el-col :span="2">
               <el-button  type="success" @click="showItemContent(formId)">查看主件</el-button>
             </el-col>
+            <!--
+             <el-col :span="2">
+              <el-button  type="success" @click="showItemContentEdit(formId)">在线编辑</el-button>
+            </el-col>-->
             <el-col :span="2" v-if="allowEdit">
               <MountFile  
                   :selectedItem="[{'ID':formId}]"
@@ -372,6 +376,23 @@ export default {
         
       },
     
+// 在线编辑
+    showItemContentEdit(id) {
+        if(!id){
+            return;
+        }
+      let condition = id;
+      let href = this.$router.resolve({
+        path: "/viewdocEdit",
+        query: {
+          id: condition,
+          //token: sessionStorage.getItem('access-token')
+        },
+      });
+      //console.log(href);
+      window.open(href.href, "_blank");
+    },
+
     handleChangeAttach(file, fileList) {
       this.fileAttachList = fileList;
       //console.log(file);

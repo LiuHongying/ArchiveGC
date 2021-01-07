@@ -110,6 +110,17 @@ const router = new Router({
       ]
     },
     {
+      meta: {
+        requireAuth: true,
+        permit: 3
+      },
+      path: "/viewdocEdit",
+      name: "viewdocEdit",
+      component: () =>
+        import(/* webpackChunkName: "home1" */ "@/views/dc/ViewDocEdit.vue"),
+        
+    },
+    {
       path: "/login",
       name: "login",
       component: () => import(/* webpackChunkName: "Login" */ "@/views/login")
