@@ -139,7 +139,6 @@ export default {
     };
   },
   mounted() {
-    this.getTypeNamesByMainList("DCTypeSubContractor");
     this.searchItem()
   },
   methods: {

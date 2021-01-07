@@ -294,5 +294,15 @@ path: '/workflow/ViolationViewReadOnly',
 name: 'ViolationViewReadOnly',
 component: () => import('@/views/workflow/ViolationViewReadOnly.vue')
 },
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'DestoryViewUpdate'
+},
+path: '/workflow/DestoryViewUpdate',
+name: 'DestoryViewUpdate',
+component: () => import('@/views/workflow/DestoryViewUpdate.vue')
+},
+
     ]
   }
