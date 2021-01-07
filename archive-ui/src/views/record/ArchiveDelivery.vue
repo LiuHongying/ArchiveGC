@@ -822,7 +822,8 @@ export default {
       }
       m.set("id", _self.archiveId);
       m.set("pageSize", _self.pageSize);
-      m.set("pageIndex", (_self.innerCurrentPage - 1) * _self.innerPageSize);
+      //console.log('innerCurrentPage:', _self.innerCurrentPage);
+      m.set("pageIndex", _self.innerCurrentPage - 1);
       m.set("orderBy", "");
       // console.log('pagesize:', _self.pageSize);
       axios
@@ -1044,8 +1045,8 @@ export default {
       let _self = this;
       _self.loading = true;
       var m = new Map();
-      // m.set("gridName", "DeliveryInnerGrid");
-      m.set("gridName","DrawingGrid");
+      m.set("gridName", "DeliveryInnerGrid");
+      // m.set("gridName","DrawingGrid");
       m.set("lang", _self.currentLanguage);
       _self
         .axios({
@@ -1298,7 +1299,7 @@ export default {
       m.set("condition", key);
       m.set("id", _self.selectedOneTransfer.ID);
       m.set("pageSize", _self.pageSize);
-      m.set("pageIndex", self.currentPage - 1);
+      m.set("pageIndex", _self.currentPage - 1);
       m.set("orderBy", "");
       // console.log('pagesize:', _self.pageSize);
       _self
