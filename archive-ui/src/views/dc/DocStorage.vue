@@ -343,6 +343,9 @@
             <el-form-item>
                 <el-button type="primary" @click="beforeUploadFile('/dc/addAttachment')">添加附件</el-button>
             </el-form-item>
+            <el-form-item>
+                <ACLManagement  :ids="selectIds">授权</ACLManagement>
+            </el-form-item>
           </el-form>
           </el-row>
           <el-row :style="'height:'+layout.height-startHeight+80">
@@ -384,6 +387,7 @@ import DataLayout from '@/components/ecm-data-layout'
 import CreateCommonFile from "@/views/npc/CreateCommonFile"
 import BatchImport from "@/components/controls/ImportDocument";
 import FolderSelector from "@/components/controls/FolderSelector";
+import ACLManagement from "@/components/ACLManagement";
 export default {
   components: {
     ShowProperty: ShowProperty,
@@ -396,7 +400,8 @@ export default {
     DataLayout:DataLayout,
     CreateCommonFile:CreateCommonFile,
     BatchImport:BatchImport,
-    FolderSelector:FolderSelector
+    FolderSelector:FolderSelector,
+    ACLManagement:ACLManagement
   },
   data() {
     return {
@@ -483,7 +488,8 @@ export default {
       uploading: false,
       importdialogVisible:false,
       uploadUrl:"",
-      condition:""
+      condition:"",
+      selectIds:[]
     };
   },
   created() {
@@ -962,6 +968,10 @@ export default {
     selectChange(selection) {
       this.selectedItems=selection;
       this.selectedItemList = selection;
+      let _self=this;
+      selection.forEach((e)=>{
+        _self.selectIds.push(e.ID)
+      })
      
     },
     //展示勾选弹框

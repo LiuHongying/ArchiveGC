@@ -219,7 +219,6 @@ export default {
       }
   },
   mounted() {
-    debugger
       console.log(this.vdata);
       if(this.needAllUser){
         this.getApprovalAllUserList();
