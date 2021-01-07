@@ -41,6 +41,7 @@ import com.ecm.core.entity.EcmRelation;
 import com.ecm.core.entity.LoginUser;
 import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.exception.EcmException;
+import com.ecm.core.exception.NoPermissionException;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.ExcSynDetailService;
 import com.ecm.core.service.FolderPathService;
@@ -356,6 +357,47 @@ public class DocController  extends ControllerAbstract  {
 		mp.put("code", 0);
 		return mp;
 	}
+	
+	@RequestMapping(value = "modifty", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> modify(String metaData) throws AccessDeniedException, NoPermissionException, EcmException {
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		Map<String,Object> mp = new HashMap<String,Object>();
+		String modifyType = args.get("modifyType").toString();
+		String attr = args.get("attr").toString();
+		String idsStr = args.get("ids").toString();
+		String res = args.get("modifyResult").toString();
+		List<String> idsList = JSONUtils.stringToArray(idsStr);
+		for(int i = 0;i < idsList.size();i++) {
+			String id = idsList.get(i);
+ 			EcmDocument temp = documentService.getObjectById(getToken(), id);
+			Map<String,Object> tempAttr = temp.getAttributes();
+			if(modifyType.equals("加前缀")) {
+				String Attribute=tempAttr.get(attr).toString();			//取出要修改的字段
+				StringBuilder tempString = new StringBuilder(Attribute);	
+				tempString.insert(0,res);
+				String result = tempString.toString();
+				tempAttr.put(attr,result);
+				documentService.updateObject(getToken(), tempAttr);
+			}
+			if(modifyType.equals("加后缀")) {
+				String Attribute=tempAttr.get(attr).toString();			//取出要修改的字段
+				StringBuilder tempString = new StringBuilder(Attribute);
+				tempString.append(res);
+				String result = tempString.toString();
+				tempAttr.put(attr,result);
+				documentService.updateObject(getToken(), tempAttr);
+			}
+			if(modifyType.equals("全部替换")) {
+			 tempAttr.put(attr,res);
+			 documentService.updateObject(getToken(), tempAttr);
+			}
+		}
+		mp.put("code", 1);
+		return mp;
+	}
+	
+	
 	
 	@RequestMapping(value = "addAttachment4Copy", method = RequestMethod.POST)
 	@ResponseBody

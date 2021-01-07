@@ -229,7 +229,6 @@ export default {
     };
   },
   mounted() {
-    this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
         checkCondition(){    

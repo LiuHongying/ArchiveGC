@@ -342,7 +342,6 @@
 import ShowProperty from "@/components/ShowProperty";
 import InnerItemViewer from "./InnerItemViewer.vue";
 import BorrwoForm from "@/components/form/Borrow";
-import StartupWorkflow from "@/views/workflow/BorrowStartUp.vue";
 import BorrowFile from "@/views/workflow/BorrowFile.vue";
 import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue"
 import ExcelUtil from "@/utils/excel.js";
@@ -351,7 +350,6 @@ export default {
     ShowProperty: ShowProperty,
     InnerItemViewer: InnerItemViewer,
     BorrwoForm: BorrwoForm,
-    StartupWorkflow: StartupWorkflow,
     BorrowStartUp: BorrowStartUp,
     ExcelUtil: ExcelUtil,
   },

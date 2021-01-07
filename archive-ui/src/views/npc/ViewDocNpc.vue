@@ -82,6 +82,10 @@
             <el-col :span="2">
               <el-button  type="success" @click="showItemContent(formId)">查看主件</el-button>
             </el-col>
+            <!--
+             <el-col :span="2">
+              <el-button  type="success" @click="showItemContentEdit(formId)">在线编辑</el-button>
+            </el-col>-->
             <el-col :span="2" v-if="allowEdit">
               <MountFile  
                   :selectedItem="[{'ID':formId}]"
@@ -140,13 +144,16 @@
             key="cindex"
           >
        <el-row>
-            <el-form>
+         <el-form ref="taskForm" :model="taskForm">
             <div v-for="(approver,index)  in approvalUserList" :key="'approver_'+index">
                 <!-- <label>{{'approver_'+index}}</label> -->
-                <el-form-item :label="approver.activityName"  :label-width="formLabelWidth" style="float:left">
+                <el-form-item :label="approver.activityName.split(':')[0]"
+                :rules="[{required:validateValue(approver.activityName),message:$t('application.requiredInput'),trigger:['blur', 'change']}]"
+                :label-width="formLabelWidth" style="float:left"
+                :prop="approver.performerPolicy">
                 <UserSelectInput v-if="isTodoTask"
                     v-model="taskForm[approver.performerPolicy]"
-                    v-bind:inputValue="vdata[approver.performerPolicy]"
+                    v-bind:inputValue="taskForm[approver.performerPolicy]"
                     v-bind:roleName="approver.roleName"
                 ></UserSelectInput>
                 <div style="width:80px;" v-else>{{vdata[approver.performerPolicy]}}</div>
@@ -189,6 +196,7 @@ export default {
       importSubVisible:false,
       uploadUrl:"",
       selectedAttachment:[],
+      resultData:{},
     };
   },
   model: {
@@ -219,7 +227,6 @@ export default {
       }
   },
   mounted() {
-    debugger
       console.log(this.vdata);
       if(this.needAllUser){
         this.getApprovalAllUserList();
@@ -239,39 +246,60 @@ export default {
   },
   methods: {
     attachmentDocSelect(val){
-            this.selectedAttachment=val;
-        },
+      this.selectedAttachment=val;
+    },
+    validateValue(itemData){
+      if(itemData.split(':')[1]=='true'){
+        return true;
+      }
+      return false;
+    },
+    validateApprover1(){
+      let result=false;
+       this.$refs.taskForm.validate((valid) => {
+         
+          if (valid) {
+            result=true;
+            return true;
+          } else {
+            console.log('error submit!!');
+            result=false
+            return false;
+          }
+        });
+        return result;
+    },
     beforeUploadSubFile(uploadpath){
-            let _self=this;
-            if(_self.formId==undefined||_self.formId==""){
-                // _self.$message('请选择一条文件数据');
-                _self.$message({
-                        showClose: true,
-                        message:  _self.$t('message.pleaseSelectOneDesigndoc'),
-                        duration: 2000,
-                        type: "warning"
-                    });
-                return;
-            }
-            _self.uploadUrl=uploadpath;
-            _self.fileAttachList=[];
-            _self.importSubVisible=true;
-            
-        },
-        getSubFormData() {
-            let _self = this;
-            let formdata = new FormData();
-            var data = {};
-            data["parentDocId"] = _self.formId;//_self.selectedInnerItems[0].ID;//_self.selectedFileId;
-            data["relationName"]='附件';
-            data["TYPE_NAME"]='附件';
-            formdata.append("metaData", JSON.stringify(data));
-            _self.fileAttachList.forEach(function(file) {
-                //console.log(file.name);
-                formdata.append("uploadFile", file.raw, file.name);
-            });
-            return formdata;
-        },
+        let _self=this;
+        if(_self.formId==undefined||_self.formId==""){
+            // _self.$message('请选择一条文件数据');
+            _self.$message({
+                    showClose: true,
+                    message:  _self.$t('message.pleaseSelectOneDesigndoc'),
+                    duration: 2000,
+                    type: "warning"
+                });
+            return;
+        }
+        _self.uploadUrl=uploadpath;
+        _self.fileAttachList=[];
+        _self.importSubVisible=true;
+        
+    },
+    getSubFormData() {
+        let _self = this;
+        let formdata = new FormData();
+        var data = {};
+        data["parentDocId"] = _self.formId;//_self.selectedInnerItems[0].ID;//_self.selectedFileId;
+        data["relationName"]='附件';
+        data["TYPE_NAME"]='附件';
+        formdata.append("metaData", JSON.stringify(data));
+        _self.fileAttachList.forEach(function(file) {
+            //console.log(file.name);
+            formdata.append("uploadFile", file.raw, file.name);
+        });
+        return formdata;
+    },
     //上传文件
         uploadDataSub() {
             let _self = this;
@@ -326,6 +354,7 @@ export default {
       sendData() {
         let _self=this;
           let formData= _self.$refs.ShowProperty.getFormData();
+          _self.$refs.taskForm.model=_self.taskForm;
           let jsonStr= formData.get('metaData');
           let m= JSON.parse(jsonStr);
            for(let key in _self.taskForm){
@@ -334,8 +363,18 @@ export default {
               p.push(_self.taskForm[key]);
               m.push(p);
           }
-          this.$emit("click", new Map(m));
+          let x= _self.validateApprover1();
+            if(!x){
+              _self.$emit("click", null);
+              // _self.resultData=null;
+            }else{
+              _self.$emit("click", new Map(m));
+              // _self.resultData=new Map(m);
+            }
+          
+         
       },
+      
       saveData(isStartupWorkflow){
           let _self=this;
           let formData= _self.$refs.ShowProperty.getFormData();
@@ -372,6 +411,23 @@ export default {
         
       },
     
+// 在线编辑
+    showItemContentEdit(id) {
+        if(!id){
+            return;
+        }
+      let condition = id;
+      let href = this.$router.resolve({
+        path: "/viewdocEdit",
+        query: {
+          id: condition,
+          //token: sessionStorage.getItem('access-token')
+        },
+      });
+      //console.log(href);
+      window.open(href.href, "_blank");
+    },
+
     handleChangeAttach(file, fileList) {
       this.fileAttachList = fileList;
       //console.log(file);
@@ -402,10 +458,17 @@ export default {
       var m = new Map();
       m.set("processDefinitionId", _self.processDefinitionId);
       m.set("activityName", _self.activityName);
+      ///workflow/getApprovalUserList
       axios
-        .post("/workflow/getApprovalUserList", JSON.stringify(m))
+        .post("/workflow/getApprovalUserListVisible", JSON.stringify(m))
         .then(function(response) {
          _self.approvalUserList = response.data.data;
+         let v={};
+        _self.approvalUserList.forEach((e)=>{
+          v[e.performerPolicy]=_self.vdata[e.performerPolicy];
+        });
+        let arr=JSON.parse(JSON.stringify(v));
+        _self.taskForm=arr;
         });
      
     },

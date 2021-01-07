@@ -313,7 +313,7 @@
                             formdata.append("uploadFile",_self.$refs.ShowProperty.file.raw);
                         }
                         // console.log(JSON.stringify(m));
-                        if(_self.$refs.ShowProperty.myItemId=='')
+                        if(_self.$refs.ShowProperty.myItemId!='')
                         {
                             axios.post("/dc/createWorkflowFormData",formdata,{
                                 'Content-Type': 'multipart/form-data'
