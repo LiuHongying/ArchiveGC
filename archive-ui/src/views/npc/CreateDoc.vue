@@ -30,6 +30,7 @@
               width="95%"
               typeName="图纸文件审批单"
               :showUploadFile="false"
+              :extendAllTab="false"
               v-bind:itemId="selectedItemId"
             ></ShowProperty>
           </el-col>
@@ -98,15 +99,17 @@
             key="cindex"
           >
             <el-row>
-              <el-form>
+              <el-form ref="taskForm" :model="taskForm">
                 <div
                   v-for="(approver, index) in approvalUserList"
                   :key="'approver_' + index"
                 >
                   <!-- <label>{{'approver_'+index}}</label> -->
                   <el-form-item
-                    :label="approver.activityName"
+                    :label="approver.activityName.split(':')[0]"
+                    :rules="[{required:validateValue(approver.activityName),message:$t('application.requiredInput'),trigger:['blur','change']}]"
                     :label-width="formLabelWidth"
+                    :prop="approver.performerPolicy"
                     style="float:left"
                   >
                     <UserSelectInput
@@ -172,6 +175,12 @@ export default {
     UserSelectInput: UserSelectInput
   },
   methods: {
+    validateValue(itemData){
+      if(itemData.split(':')[1]=='true'){
+        return true;
+      }
+      return false;
+    },
     // 查看内容
     showItemContent(indata) {
       if (!indata.id) {
@@ -189,11 +198,32 @@ export default {
       window.open(href.href, "_blank");
     },
     beforRemoveAttach() {
-        debugger
        this.reload();
+    },
+    
+    validateApprover(){
+      let result=false;
+       this.$refs.taskForm.validate((valid) => {
+          if (valid) {
+            result=true;
+            return true;
+          } else {
+            console.log('error submit!!');
+            result=false
+            return false;
+          }
+        });
+        return result;
     },
     saveOrStartup(isStartup) {
       let _self = this;
+      if(!_self.$refs.ShowProperty.validFormValue()){
+        return;
+      }
+      let x= _self.validateApprover();
+      if(!x){
+        return;
+      }
       _self.butt=true;
       _self.loading = true;
       let formData = _self.$refs.ShowProperty.getFormData();
@@ -298,12 +328,17 @@ export default {
     getApprovalUserList() {
       let _self = this;
       var m = new Map();
-      m.set("processDefinitionName", "图纸文件审批流程");
+      // m.set("processDefinitionName", "图纸文件审批流程");
+      ///workflow/getApprovalAllUserList
+      
+      m.set("processName", "图纸文件审批流程");
+      m.set("activityName", "start");
       axios
-        .post("/workflow/getApprovalAllUserList", JSON.stringify(m))
+        .post("/workflow/getApprovalUserListVisible", JSON.stringify(m))
         .then(function(response) {
           if (response.data.code == 1) {
-            _self.approvalUserList = response.data.data;
+           _self.approvalUserList = response.data.data;
+            
           } else {
             _self.$message({
               showClose: true,
