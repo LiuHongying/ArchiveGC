@@ -21,12 +21,18 @@
         </el-row>
         <el-row>
             <el-col>
-                <DataGrid ref="orderGrid" key="main" v-bind:itemDataList="itemDataList"
-                      v-bind:columnList="gridList" @pagesizechange="pageSizeChange"
-                      @pagechange="pageChange" v-bind:itemCount="itemCount"
+                <DataGrid ref="orderGrid" key="main" 
                       v-bind:tableHeight="rightTableHeight" :isshowOption="true"
                       :loading="orderLoading"
-                       @selectchange="orderSelectChange" @refreshdatagrid="loadGridData"></DataGrid>
+                      gridViewName="ArchiveBackup"
+                      :isshowicon="false"
+                      :optionWidth = "1"
+                      :isShowChangeList="false"
+                      :isShowMoreOption="false"
+                      condition="STATUS='新建'"
+                      dataUrl="/dc/getDocuments"
+                       @selectchange="selectItemChange"
+                      ></DataGrid>
             </el-col>
 
         </el-row>
@@ -60,12 +66,11 @@ export default {
               director:"",
               condition:""
             },
-             rightTableHeight: window.innerHeight-130
+             rightTableHeight: window.innerHeight-170
         }
        
     },
     mounted(){
-        this.loadGridInfo();
         this.loadGridData();
     },
     components:{
@@ -73,21 +78,6 @@ export default {
         ArchiveBackupCreate:ArchiveBackupCreate
     },
     methods:{
-       onCreate(){
-         let _self=this;
-         _self.archiveBackupVisible=true;
-         setTimeout(()=>{
-           _self.$refs.archiveBackupCreate.loadFormInfo();
-         });
-       },
-        pageSizeChange(val){
-            this.pageSize = val;
-            localStorage.setItem("docPageSize",val);
-            _self.loadGridData();
-        },
-        orderSelectChange(val){
-          this.selectedOrder = val;
-        },
         // 删除文档事件
         onDeleleFileItem() {
           let _self = this;
@@ -120,7 +110,9 @@ export default {
               // });
             });
         },
-        
+        selectItemChange(val) {
+          this.selectedOrder = val;
+        },
         // 删除文档
         deleleFileItem() {
           let _self = this;
@@ -248,7 +240,7 @@ export default {
         formdata.append("uploadFile",_self.$refs.archiveBackupCreate.file.raw);
       }
       // console.log(JSON.stringify(m));
-      if(_self.$refs.archiveBackupCreate.myItemId=='')
+      if(_self.$refs.archiveBackupCreate.myItemId=='' || _self.$refs.archiveBackupCreate.myItemId==null)
       {
         _self.axios({
           headers: {
@@ -363,12 +355,6 @@ export default {
       _self.loadGridData();
       
     },
-        // 分页 当前页改变
-        pageChange(val) {
-            this.currentPage = val;
-            this.loadGridData();
-            //console.log('handleCurrentChange', val);
-        },
         // 加载借阅单表格数据
         loadGridData() {
           let _self = this;
@@ -379,48 +365,11 @@ export default {
           }else{
               key0=" STATUS='新建' "
           }
-        
-          var m = new Map();
-          m.set("gridName", "ArchiveBackup");
-          // m.set('folderId',indata.id);
-          m.set("condition", key0);
-          
-          m.set("pageSize", _self.pageSize);
-          m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
-          m.set("orderBy", "");
-          // console.log('pagesize:', _self.pageSize);
-          axios.post("/dc/getBorrowOrder",JSON.stringify(m))
-            .then(function(response) {
-              _self.itemDataList = response.data.data;
-              _self.itemDataListFull = response.data.data;
-              _self.itemCount = response.data.pager.total;
-              //console.log(JSON.stringify(response.data.datalist));
-              _self.orderLoading = false;
-            })
-            .catch(function(error) {
-              console.log(error);
-              _self.orderLoading = false;
-            });
+          _self.$refs.orderGrid.condition = key0;
+          _self.$refs.orderGrid.currentPage = 1;
+          _self.$refs.orderGrid.loadGridInfo();
+          _self.$refs.orderGrid.loadGridData();
         },
-        
-            // 加载表格样式
-        loadGridInfo() {
-          let _self = this;
-          _self.orderLoading = true;
-          var m = new Map();
-          m.set("gridName", "ArchiveBackup");
-          m.set("lang", _self.getLang());
-          axios.post("/dc/getGridViewInfo",JSON.stringify(m))
-            .then(function(response) {
-              _self.gridList = response.data.data;
-              _self.rightTableHeight = "100%";
-              _self.orderLoading = false;
-            })
-            .catch(function(error) {
-              console.log(error);
-              _self.orderLoading = false;
-            });
-        }
 
         }
 

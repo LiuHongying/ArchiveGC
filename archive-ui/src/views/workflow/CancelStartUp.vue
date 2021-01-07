@@ -128,10 +128,6 @@
                     this.$refs.ShowProperty.loadFormInfo();
                 },
                 startUpWorkflow(workflow){
-                  if(this.accept!="接受"){
-                      this.$message("请接受档案利用承诺书!")
-                      return
-                  }
                    let _self = this;
                     _self.butt=true;
                     if(!this.$refs.ShowProperty.validFormValue()){
