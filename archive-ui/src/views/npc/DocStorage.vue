@@ -1051,6 +1051,12 @@ export default {
         return str;
       }
     },
+    moveFolder() {
+      if (this.currentFolder) {
+        this.isMoveFolder = true;
+        this.moveDialogVisible = true;
+      }
+    },
     handleMoveItem() {
       if (this.isMoveFolder) {
         this.handleMoveFolder();
