@@ -1,5 +1,33 @@
 <template>
   <DataLayout>
+
+      <el-dialog :visible.sync="modifyVisible" style="width:80%">
+        <el-row style="padding:15px">
+        <span>选择修改字段</span>
+        <el-select v-model="resChoice" @change="onModifyChange" >
+          <div v-for="item in objectSrc">
+              <el-option :label="item.label" :value="item.id"></el-option>
+          </div>
+          </el-select>
+        </el-row>
+        <el-row style="padding:15px">
+        <span>选择操作类型</span>
+        <el-select v-model="Choice" @change="changeType">
+          <div v-for="items in modifyOption">
+              <el-option :label="items" :value="items"></el-option>
+          </div>
+          </el-select>
+        </el-row>
+        <el-row style="padding:15px">
+          <span>输入修改内容</span>
+          <el-input style="width:220px" v-model="ChoiceInput"></el-input>
+        </el-row>
+        <el-row style="padding:15px;padding-left:200px">
+          <el-button @click="submitModify" type='primary' style="padding-left:200px">提交修改</el-button>
+        </el-row>
+
+    </el-dialog>
+
     <el-dialog :visible.sync="printsVisible">
       <PrintPage ref="printPage" v-bind:archiveId="this.archiveId"></PrintPage>
     </el-dialog>
@@ -256,18 +284,6 @@
                         title="文档取号"
                       >文档取号</el-button>
                       </el-form-item>
-                      <el-form-item v-if="isFile==false">
-                      <el-button
-                        type="primary"
-                        plain
-                        :loading="getNumLoading"
-                        size="small"
-                        icon="el-icon-top"
-                        @click="upgradeDesign"
-                        title="设计文件升版"
-                      >升版</el-button>
-                      </el-form-item>
-                      
                       <el-form-item>
                       <el-button
                         type="primary"
@@ -367,7 +383,7 @@
                         title="完成质检"
                       >完成质检</el-button>
                       </el-form-item>
-                      <el-form-item v-if="currentFolder.folderPath.indexOf('科技与信息')>0">
+                      <el-form-item v-if="currentFolder && currentFolder.folderPath && currentFolder.folderPath.indexOf('科技与信息')>0">
                       <el-button 
                         type="primary"
                         plain
@@ -379,18 +395,33 @@
                       >提交预归档库</el-button>
                       </el-form-item>
                       <el-form-item>
-                      <el-button
-                        type="primary"
+                        <el-button
+                          type="primary"
+                          plain
+                          :loading="releaseLoading"
+                          size="small"
+                          icon="el-icon-right"
+                          @click="penddingStorage"
+                          title="提交入库"
+                        >提交入库</el-button>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-button
+                          type="primary"
+                          size="small"
+                          plain
+                          @click="beforeModify()"
+                        >修改</el-button>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-button type="primary"
                         plain
-                        :loading="releaseLoading"
                         size="small"
-                        icon="el-icon-right"
-                        @click="penddingStorage"
-                        title="提交入库"
-                      >提交入库</el-button>
+                        @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
                       </el-form-item>
                     </el-col>
                   </el-row>
+                  </el-form>
                   <el-row>
                     <el-col :span="24">
                       <DataGrid
@@ -412,7 +443,7 @@
                       ></DataGrid>
                     </el-col>
                   </el-row>
-                  </el-form>
+                  
                 </template>
                 <template slot="paneR" v-if="isFile">
                   <el-row>
@@ -421,7 +452,7 @@
                     <!-- <el-button type="primary" plain size="small"  @click="childrenTypeSelectVisible=true">{{$t('application.createDocument')}}</el-button>
                             <el-button type="primary" plain size="small" :title="$t('application.addReuseFile')"  @click="reuseVisible=true">{{$t('application.addReuseFile')}}</el-button>
                             
-                            <el-button type="primary" plain size="small" title="删除"  @click="onDeleleFileItem()">{{$t('application.delete')}}</el-button>
+                            
                             <el-button type="primary" plain size="small" title="挂载文件"  @click="importdialogVisible=true;uploadUrl='/dc/mountFile'">挂载文件</el-button>
                     <el-button type="primary" plain size="small" :title="$t('application.viewRedition')"  @click="importdialogVisible=true;uploadUrl='/dc/addRendition'">格式副本</el-button>-->
                     <el-button type="primary" plain size="small" @click="beforeCreateFile(selectRow)">著录</el-button>
@@ -432,6 +463,7 @@
                       title="挂载文件"
                       @click="beforeMount(selectedInnerItems);uploadUrl='/dc/mountFile'"
                     >挂载文件</el-button>
+                    
                     <!--
                     <el-button
                       type="primary"
@@ -443,6 +475,13 @@
                     -->
                     <el-button type="primary" plain size="small" title="上移" @click="onMoveUp()">上移</el-button>
                     <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
+                    <el-button type="warning" plain size="small" title="删除"  @click="logicallyDel(selectedInnerItems,function(){
+                          let _self=this;
+                          if(_self.$refs.leftDataGrid){
+                              _self.$refs.leftDataGrid.itemDataList = [];
+                            }
+                          _self.loadGridData(_self.currentFolder);
+                        })">{{$t('application.delete')}}</el-button>
                   </el-row>
                   <el-row>
                     <el-col :span="24">
@@ -493,7 +532,7 @@ import PrintBarCode from "@/views/record/PrintBarCode.vue"
 import PrintArchiveCode from "@/views/record/PrintArchiveCode.vue"
 import PrintPdf417 from "@/views/record/PrintPdf417.vue"
 import BatchImport from "@/components/controls/ImportDocument";
-
+import ExcelUtil from "@/utils/excel.js";
 export default {
   name: "ArchiveArrange",
   components: {
@@ -623,7 +662,20 @@ export default {
       printArchiveCodeVisible:false,
       printPdf417Visible:false,
       isFile:true,
-      batchDialogVisible: false
+      batchDialogVisible: false,
+      res:[],
+      resChoice:'',
+      ChoiceTypeName:'',
+      modifyVisible:false,
+      objectSrc:[],
+      modifyOption:[],
+      Choice:'',
+      ChoiceInput:'',
+      isAdd:false,
+      AddComment:'',
+      isDates:false,
+      newChildDoc: false,
+
     };
   },
   
@@ -637,7 +689,7 @@ export default {
     _self.loading = true;
     let m=new Map();
     m.set("folderConfig","ArchiveCollatedID");
-    m.set("condition"," and((C_ITEM_TYPE='文件' or C_ITEM_TYPE='案卷') and IS_HIDDEN=0 and IS_CHILD=0) ");
+    m.set("condition","  and IS_HIDDEN=0 and IS_CHILD=0 ");
     _self
       .axios({
         headers: {
@@ -662,9 +714,23 @@ export default {
       setTimeout(() => {
         this.topPercent = this.getStorageNumber(this.topStorageName,60)
         this.leftPercent = this.getStorageNumber(this.leftStorageName,20)
-      }, 300);
+      }, 100);
   },
   methods: {
+        exportData() {
+      let _self = this;
+      let params = {
+        URL: "/file/exportFolderPath",
+        gridName: _self.currentFolder.gridView,
+        folderId: _self.currentFolder.id,
+        orderBy: "MODIFIED_DATE desc",
+        pageSize: _self.pageSize,
+        pageIndex: _self.currentPage - 1,
+        lang: "zh-cn",
+      };
+      console.log(params);
+      ExcelUtil.export4Cnpe(params);
+    },
     // 水平分屏事件
     onHorizontalSplitResize(leftPercent){
       // 左边百分比*100
@@ -709,6 +775,7 @@ export default {
           if(code=='1'){
             let data=response.data.data;
             let fileType=data[0].C_TO;
+            _self.newChildDoc = true;
             _self.newArchiveFileItem(fileType,row, response.data.copyInfo);
             //writeAudit(_self.parentId);
           }else{
@@ -1134,19 +1201,96 @@ export default {
     handleChange(file, fileList) {
       this.fileList = fileList;
     },
-    
+    onModifyChange(id){
+      let _self = this
+      _self.objectSrc.forEach(item => {
+        if(item.id==id) {        //找到对应字段了
+        if (item.controlType=='ValueSelect'||item.controlType=='Date'||item.controlType=='Select'){
+          _self.modifyOption=['全部替换']
+          return
+        }else if(item.controlType=='TextBox'||item.controlType=='TextArea'){
+          _self.modifyOption=['加前缀','加后缀','全部替换']
+        }
+      }                 
+      })
+    },
+
+    submitModify(){
+      let ids = []
+      let _self = this
+      let attr=''
+      for(let i=0;i<this.selectedItems.length;i++){
+        ids.push(this.selectedItems[i].ID)
+      }
+      _self.objectSrc.forEach(item => {
+        if(item.id==_self.resChoice) {        //找到对应字段了
+        attr = item.attrName
+        if(item.controlType=='Date'){
+        _self.isDates = true
+        }
+        }                 
+      })
+      var m = new Map();
+      m.set("ids",ids)
+      m.set("modifyType",this.Choice)
+      m.set("attr",attr)
+      if(this.isDates==true){
+        console.log(this.ChoiceInput)
+         var r=this.ChoiceInput.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/); 
+          if(r==null){
+            this.$alert("请输入格式正确的日期\n\r日期格式：yyyy-mm-dd\n\r例    如：2021-01-01\n\r");
+             return false;
+          }
+          var d=new Date(r[1],r[3]-1,r[4]);   
+          var num = (d.getFullYear()==r[1]&&(d.getMonth()+1)==r[3]&&d.getDate()==r[4]);
+          if(num==0){
+           this.$alert("请输入格式正确的日期\n\r日期格式：yyyy-mm-dd\n\r例    如：2021-01-01\n\r");
+          return
+          }
+          
+      }
+      m.set("modifyResult",this.ChoiceInput)
+      let formdata = new FormData();
+      formdata.append("metaData",JSON.stringify(m));
+        axios
+        .post("/exchange/doc/modifty", formdata)
+        .then(function(response) {
+        if(response.data.code==1){
+          _self.$message("修改成功！")
+          _self.modifyVisible=false
+          _self.$refs.mainDataGrid.loadGridData()
+        }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
     getTypeNamesByMainList(keyName) {
       let _self = this;
+      var m = new Map();
+      let j = 0
+      m.set('itemInfo',keyName);//ID 或类型
+      m.set('formName',keyName);
+      m.set('lang',_self.getLang());
       axios
-        .post("/dc/getOneParameterValue", keyName)
+        .post("/dc/getFormClassifications", JSON.stringify(m))
         .then(function(response) {
-          _self.childrenTypes = response.data.data;
+          let sourcedata = response.data.data
+          _self.objectSrc=[]
+          sourcedata.forEach(items =>{
+            items.ecmFormItems.forEach( item => {
+              _self.objectSrc.push(item)
+            })
+          })
         })
         .catch(function(error) {
           console.log(error);
         });
     },
     beforeShowInnerFile(row) {
+      // let keys = Object.keys(row)
+      // console.log(row.TYPE_NAME)
+      // this.getTypeNamesByMainList(row.TYPE_NAME)
       this.innerSelectedOne = [];
       this.showInnerFile(row);
     },
@@ -1217,7 +1361,9 @@ export default {
 
     // 表格行选择
     selectChange(val) {
-      // console.log(JSON.stringify(val));
+      this.ChoiceTypeName=''
+      this.ChoiceTypeName = val[0].TYPE_NAME
+      this.getTypeNamesByMainList(this.ChoiceTypeName)
       this.selectedItems = val;
     },
     // 表格行选择
@@ -1257,10 +1403,19 @@ export default {
       _self.mainParam.condition=key;
       _self.mainParam.folderId=indata.id
       _self.$nextTick(()=>{
-        _self.$refs.mainDataGrid.loadGridData();
+         _self.$refs.mainDataGrid.loadGridData();
+         _self.$refs.leftDataGrid.itemDataList = [];
       });
       
       
+    },
+    beforeModify(){
+      if(this.selectedItems.length==0){
+        this.$message("请选择至少一条文件进行修改！")
+        return
+      }
+      this.modifyVisible = true
+      this.getTypeNamesByMainList(this.ChoiceTypeName)
     },
     onBatchImported(){
       this.handleNodeClick(this.currentFolder);
@@ -1305,6 +1460,7 @@ export default {
     
     newArchiveItem(typeName) {
       let _self = this;
+      _self.newChildDoc = false;
       if (_self.currentFolder.id) {
         _self.selectedItemId = "";
         _self.typeName=typeName;
@@ -1314,6 +1470,7 @@ export default {
             _self.$refs.ShowProperty.myItemId = "";
             _self.dialogName = typeName;
             _self.extendMap=null;
+            _self.$refs.ShowProperty.parentDocId = "";
             _self.$refs.ShowProperty.myTypeName = typeName;
             _self.$refs.ShowProperty.myFolderId = _self.currentFolder.id;
            
@@ -1332,6 +1489,7 @@ export default {
     },
     newArchiveFileItem(typeName, selectedRow, copyInfo) {
       let _self = this;
+      _self.newChildDoc = true;
       if (selectedRow.ID) {
         _self.selectedItemId = "";
         _self.propertyVisible = true;
@@ -1409,7 +1567,9 @@ export default {
       if (_self.$refs.ShowProperty.myTypeName != "") {
         m.set("TYPE_NAME", _self.typeName);
         m.set("folderPath", _self.folderPath);
-        m.set("transferId", _self.parentId);
+        if(_self.newChildDoc){
+          m.set("transferId", _self.parentId);
+        }
         m.set("folderId",_self.currentFolder.id);
         m.set("STATUS","整编");
       }
@@ -1574,6 +1734,63 @@ export default {
           });
       }
     },
+    upgradeDesign(){
+      let _self=this;
+      let flag=true;
+       _self.selectedItems.forEach((e)=>{
+         if(e.typeName!='设计文件'){
+           flag=false;
+           return;
+         }
+       });
+       if(!flag){
+         _self.$message({
+              showClose: true,
+              message: "所选文件中包含非设计文件数据",
+              duration: 2000,
+              type: "warning"
+            });
+         return;
+       }
+      let ids=new Array();
+      _self.selectedItems.forEach((e)=>{
+        ids.push(e.ID);
+      })
+      _self
+          .axios({
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8"
+            },
+            datatype: "json",
+            method: "post",
+            data: JSON.stringify(ids),
+            url: "/dc/upgradeDesign"
+          })
+          .then(function(response) {
+            // _self.$message(_self.$t("message.saveSuccess"));
+            if(response.data.code==1){
+                _self.$message({
+                  showClose: true,
+                  message: "设计文件升级成功",
+                  duration: 2000,
+                  type: "success"
+                });
+                _self.searchItem();
+            }else{
+              _self.$message({
+                  showClose: true,
+                  message: "设计文件升级失败",
+                  duration: 2000,
+                  type: "error"
+                });
+            }
+            
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+
+    },
     //查询文档
     searchItem() {
       this.loadGridData(this.currentFolder);
@@ -1634,64 +1851,6 @@ export default {
           .catch(function(error) {
             console.log(error);
           });
-    },
-    //升版设计文件
-    upgradeDesign(){
-      let _self=this;
-      let flag=true;
-       _self.selectedItems.forEach((e)=>{
-         if(e.typeName!='设计文件'){
-           flag=false;
-           return;
-         }
-       });
-       if(!flag){
-         _self.$message({
-              showClose: true,
-              message: "所选文件中包含非设计文件数据",
-              duration: 2000,
-              type: "warning"
-            });
-         return;
-       }
-      let ids=new Array();
-      _self.selectedItems.forEach((e)=>{
-        ids.push(e.ID);
-      })
-      _self
-          .axios({
-            headers: {
-              "Content-Type": "application/json;charset=UTF-8"
-            },
-            datatype: "json",
-            method: "post",
-            data: JSON.stringify(ids),
-            url: "/dc/upgradeDesign"
-          })
-          .then(function(response) {
-            // _self.$message(_self.$t("message.saveSuccess"));
-            if(response.data.code==1){
-                _self.$message({
-                  showClose: true,
-                  message: "设计文件升级成功",
-                  duration: 2000,
-                  type: "success"
-                });
-                _self.searchItem();
-            }else{
-              _self.$message({
-                  showClose: true,
-                  message: "设计文件升级失败",
-                  duration: 2000,
-                  type: "error"
-                });
-            }
-            
-          })
-          .catch(function(error) {
-            console.log(error);
-          });
-
     },
     moveToPreFilling(){
       let _self=this;

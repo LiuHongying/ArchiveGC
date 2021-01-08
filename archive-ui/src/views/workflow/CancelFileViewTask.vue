@@ -310,7 +310,6 @@ export default {
     };
   },
   mounted() {
-    this.getTypeNamesByMainList("DCTypeSubContractor");
   },
   methods: {
         handleChange(file, fileList) {

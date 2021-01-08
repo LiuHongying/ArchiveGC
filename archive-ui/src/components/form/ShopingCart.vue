@@ -1,6 +1,17 @@
      <template>
   <div>
     <el-dialog
+      title="文档借阅"
+      :visible.sync="borrowVisible"
+      @close="borrowVisible = false"
+      width="90%"
+      style="width: 100%"
+      :close-on-click-modal="false"
+      v-dialogDrag
+    >
+      <div><BorrowStartUp :workflowObj="workflow" :showUploadFile="true" :workflowFileList="selectedItemList" @closedialog="closeDialog"></BorrowStartUp></div>
+    </el-dialog>
+    <el-dialog
       :title="$t('application.borrow')"
       :visible.sync="borrowDialogVisible"
       @close="propertyVisible = false"
@@ -120,10 +131,12 @@
 
 <script type="text/javascript">
 import ShowBorrowForm from "@/components/form/Borrow";
+import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue"
 export default {
   name: "Favorite",
   components: {
     ShowBorrowForm: ShowBorrowForm,
+    BorrowStartUp: BorrowStartUp,
   },
   data() {
     return {
@@ -151,6 +164,9 @@ export default {
         message: "",
       },
       tableHeight: window.innerHeight - 124,
+
+      workflow: {},
+      borrowVisible: false,
     };
   },
   props: {
@@ -163,6 +179,11 @@ export default {
     _self.loadGridView();
   },
   methods: {
+    getWorkFlow() {
+      let _self = this;
+
+      
+    },
     //获取
     openShopingCart() {
       let _self = this;
@@ -295,53 +316,24 @@ _self.$t('message.PleaseSelectOneDraw'),
     //借阅
     borrowItem() {
       let _self = this;
-      var addItemId = [];
-      // var C_ARCHIVE_UNIT="";
-      if (_self.selectedItemList.length > 0) {
-        // for (var i = 0; i < _self.selectedItemList.length; i++) {
-        //   if(i==0){
-        //     C_ARCHIVE_UNIT=_self.selectedItemList[i].C_ARCHIVE_UNIT;
-        //       if(typeof(_self.selectedItemList[i].C_ARCHIVE_UNIT)=="undefined"){
-        //       _self.$message({
-        //         showClose: true,
-        //         message: _self.$t('message.EmptyPlaceOnFile'),
-        //         duration: 5000,
-        //         type: "warning"
-        //       });
-        //       return;
-        //       }
-        //   }else{
-        //     if(C_ARCHIVE_UNIT!=_self.selectedItemList[i].C_ARCHIVE_UNIT){
-        //       _self.$message({
-        //         showClose: true,
-        //         message: _self.$t('message.SameFiledUnit'),
-        //         duration: 5000,
-        //         type: "warning"
-        //       });
-        //       return;
-        //     }
-        //   }
+      
+      var m = new Map();
+      m.set("processDefinitionKey", "文档借阅流程");
 
-        // }
-        this.$emit("startBorrow", _self.selectedItemList);
-      } else {
-        _self.$message({
-          showClose: true,
-          message:_self.$t('message.PleaseSelectOneBorrow'),
-          duration: 5000,
-          type: "warning",
+      axios
+        .post("/dc/getWorkflow", JSON.stringify(m))
+        .then(function (response) {
+          _self.workflow = response.data.data[0];
+          console.log(_self.workflow)
+          _self.borrowVisible = true;
+        })
+        .catch(function (error) {
+          console.log(error);
         });
-        return;
-      }
-      // setTimeout(()=>{
-      //       _self.$router.replace({
-      //       path:'/borrow',
-      //       query: {
-      //         tabledata: _self.selectedItemList,
-      //         // C_ARCHIVE_UNIT:C_ARCHIVE_UNIT
-      //        }
-      //     });
-      //   },10);
+    },
+
+    closeDialog(val) {
+      this.borrowVisible = val;
     },
 
     cleanShopingCart() {

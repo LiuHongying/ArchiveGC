@@ -41,6 +41,8 @@
                 <el-option label="Select" value="Select"></el-option>
                 <el-option label="ValueSelect" value="ValueSelect"></el-option>
                 <el-option label="SQLSelect" value="SQLSelect"></el-option>
+                <el-option label="RoleSelect" value="RoleSelect"></el-option>
+                <!-- <el-option label="ScopeOfKnowledgeSelect" value="ScopeOfKnowledgeSelect"></el-option> -->
                 <el-option label="UserSelect" value="UserSelect"></el-option>
                 <el-option label="Department" value="Department"></el-option>
                 <el-option label="Date" value="Date"></el-option>

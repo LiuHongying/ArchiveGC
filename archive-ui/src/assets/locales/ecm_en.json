@@ -434,6 +434,7 @@
     "usergroupManager":"User&Group Manager",
     "groupManager": "Group Manager",
     "roleManager": "Role Manager",
+    "scopeknowledgeManager":"Scope Knowledge Manager",
     "componentManager": "Component Manager",
     "actionManager": "Action Manager",
     "userManager": "User Manager",
@@ -542,7 +543,8 @@
     "docStorage":"Doc storage",
     "DesignDocCreate":"Create design docs",
     "Drafts":"drafts",
-    "preArchive":"PreArchive"
+    "preArchive":"PreArchive",
+    "knowledgeBase":"knowledgeBase"
 },
 "message": {
     "conditionS":"Select Condition",
