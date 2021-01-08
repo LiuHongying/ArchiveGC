@@ -66,6 +66,16 @@ export const adminRouter =
     meta: {
       requireAuth: true,
       permit: 5,
+      title: 'scopeknowledgeManager'
+    },
+    path: '/managercenter/scopeknowledgeManager',
+    component: () => import('@/views/admin/ScopeKnowledgeManager.vue'),
+    name: '知悉范围管理'
+  },
+  {
+    meta: {
+      requireAuth: true,
+      permit: 5,
       title: 'componentManager'
     },
     path: '/managercenter/componentmanager',

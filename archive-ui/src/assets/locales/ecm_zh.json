@@ -371,6 +371,7 @@
     "archivesCategory":"档案类目",
     "archivesType":"档案类型",
     "replaceFile":"替换件"
+   
 },
 "skin": {
     "Blue": "天空蓝",
@@ -414,6 +415,7 @@
     "usergroupManager":"用户组管理",
     "groupManager": "部门管理",
     "roleManager": "角色管理",
+    "scopeknowledgeManager":"知悉范围管理",
     "componentManager": "组件管理",
     "actionManager": "事件管理",
     "userManager": "用户管理",
