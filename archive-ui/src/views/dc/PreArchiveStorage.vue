@@ -110,6 +110,7 @@
                     :isShowChangeList="false"
                     @selectchange="onSelectChange"
                     @rowclick="onDataGridRowClick"
+                    dataUrl="/dc/getDocuments"
                   >
                   </DataGrid>
                 </template>
@@ -121,6 +122,7 @@
                         key="relevantFile"
                         v-bind="tables.relevantFileDataGrid"
                         v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
+                         dataUrl="/dc/getDocuments"
                       >
                       </DataGrid>
                     </el-col>
@@ -261,25 +263,23 @@ export default {
     loadGridData(indata) {
       let _self = this;
       _self.tableLoading = true;
-      var key = _self.inputkey;
+      var key = " C_ITEM_TYPE = '"+_self.radioValue+"' AND IS_CHILD=0  AND IS_HIDDEN=0 ";
+     
       var m = new Map();
       _self.gridViewTrans = indata.gridView;
-      _self.judgement = " and C_ITEM_TYPE = '"+_self.radioValue+"'"
       _self.idTrans = indata.id;
       m.set("gridName", indata.gridView);
       m.set("folderId", indata.id);
       m.set("condition", key);
-      m.set("judgement", _self.judgement);
       m.set("pageSize", _self.pageSize);
-      m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
-      m.set("orderBy", "MODIFIED_DATE desc");
+      m.set("pageIndex", _self.currentPage - 1);
+      m.set("orderBy", "");
       axios
-        .post("/dc/getContainStorageDocuments", JSON.stringify(m))
+        .post("/dc/getDocuments", JSON.stringify(m))
         .then(function (response) {
           _self.itemDataList = response.data.data;
           _self.itemDataListFull = response.data.data;
           _self.itemCount = response.data.pager.total;
-          _self.tableHeight = window.innerHeight - 170;
           _self.tableLoading = false;
         });
     },
@@ -343,7 +343,8 @@ export default {
 
     search() {
       let _self = this;
-      let key = "STATUS = '预归档' ";
+      let key = " FOLDER_ID='"+_self.currentFolder.id+"' AND C_ITEM_TYPE = '"+_self.radioValue+"' AND IS_CHILD=0  AND IS_HIDDEN=0 ";
+     
       if (_self.inputValueNum != "" && _self.inputValueNum != undefined) {
         key +=
           "and (CODING LIKE '%" +
@@ -371,10 +372,10 @@ export default {
       this.parentID = row.ID;
       var typeChose = row.C_ITEM_TYPE;
       var condition1 =
-        "SELECT CHILD_ID from ecm_relation where NAME='irel_children'and PARENT_ID ='" +
+        "SELECT CHILD_ID from ecm_relation where NAME='irel_children' and PARENT_ID ='" +
         row.ID +
         "'";
-      var key1 = "ID IN (" + condition1 + ") ";
+      var key1 = "ID IN (" + condition1 + ") AND IS_HIDDEN=0";
       this.$refs.relevantFileDataGrid.condition = key1;
       this.$refs.relevantFileDataGrid.gridViewName = "GeneralPre";
       this.$refs.relevantFileDataGrid.loadGridInfo();
