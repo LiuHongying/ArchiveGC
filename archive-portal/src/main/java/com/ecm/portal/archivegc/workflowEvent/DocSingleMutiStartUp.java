@@ -254,7 +254,9 @@ public class DocSingleMutiStartUp implements ExecutionListener, JavaDelegate, Ta
 		Object result = null;
 		if (user.length == 1) {// 只有一个用户或一个用户组
 			if (userService.getObjectByName(ecmSession.getToken(), userName) != null) {
-				result = userName;
+				List<String> userNameList = new ArrayList<String>();
+				userNameList.add(userName);
+				result = userNameList;
 			} else {// 如果是用户组
 				String groupId = groupService.getGroupByName(ecmSession.getToken(), userName).getId();
 				List<EcmUser> userList = groupService.getUsers(ecmSession.getToken(), groupId);

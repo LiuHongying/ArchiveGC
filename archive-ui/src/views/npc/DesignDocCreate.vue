@@ -30,6 +30,7 @@
               width="95%"
               typeName="设计文件审批单"
               :showUploadFile="false"
+              :extendAllTab="false"
               v-bind:itemId="selectedItemId"
             ></ShowProperty>
           </el-col>
@@ -98,15 +99,22 @@
             key="cindex"
           >
             <el-row>
-              <el-form>
+              <el-form ref="taskForm" :model="taskForm">
                 <div
                   v-for="(approver, index) in approvalUserList"
                   :key="'approver_' + index"
                 >
                   <!-- <label>{{'approver_'+index}}</label> -->
-                  <el-form-item
+                  <!-- <el-form-item
                     :label="approver.activityName"
                     :label-width="formLabelWidth"
+                    style="float:left"
+                  > -->
+                  <el-form-item
+                    :label="approver.activityName.split(':')[0]"
+                    :rules="[{required:validateValue(approver.activityName),message:$t('application.requiredInput'),trigger:['blur','change']}]"
+                    :label-width="formLabelWidth"
+                    :prop="approver.performerPolicy"
                     style="float:left"
                   >
                     <UserSelectInput
@@ -172,6 +180,26 @@ export default {
     UserSelectInput: UserSelectInput
   },
   methods: {
+    validateValue(itemData){
+      if(itemData.split(':')[1]=='true'){
+        return true;
+      }
+      return false;
+    },
+     validateApprover(){
+      let result=false;
+       this.$refs.taskForm.validate((valid) => {
+          if (valid) {
+            result=true;
+            return true;
+          } else {
+            console.log('error submit!!');
+            result=false
+            return false;
+          }
+        });
+        return result;
+    },
     // 查看内容
     showItemContent(indata) {
       if (!indata.id) {
@@ -194,6 +222,13 @@ export default {
     },
     saveOrStartup(isStartup) {
       let _self = this;
+      if(!_self.$refs.ShowProperty.validFormValue()){
+        return;
+      }
+      let x= _self.validateApprover();
+      if(!x){
+        return;
+      }
       _self.butt=true;
       _self.loading = true;
       let formData = _self.$refs.ShowProperty.getFormData();
@@ -296,15 +331,21 @@ export default {
       //console.log(file);
       // console.log(fileList);
     },
+
     getApprovalUserList() {
       let _self = this;
       var m = new Map();
-      m.set("processDefinitionName", "设计文件审批流程");
+      // m.set("processDefinitionName", "图纸文件审批流程");
+      ///workflow/getApprovalAllUserList
+      
+      m.set("processName", "设计文件审批流程");
+      m.set("activityName", "start");
       axios
-        .post("/workflow/getApprovalAllUserList", JSON.stringify(m))
+        .post("/workflow/getApprovalUserListVisible", JSON.stringify(m))
         .then(function(response) {
           if (response.data.code == 1) {
-            _self.approvalUserList = response.data.data;
+           _self.approvalUserList = response.data.data;
+            
           } else {
             _self.$message({
               showClose: true,
@@ -315,7 +356,28 @@ export default {
             return;
           }
         });
-    }
+    },
+
+    // getApprovalUserList() {
+    //   let _self = this;
+    //   var m = new Map();
+    //   m.set("processDefinitionName", "设计文件审批流程");
+    //   axios
+    //     .post("/workflow/getApprovalAllUserList", JSON.stringify(m))
+    //     .then(function(response) {
+    //       if (response.data.code == 1) {
+    //         _self.approvalUserList = response.data.data;
+    //       } else {
+    //         _self.$message({
+    //           showClose: true,
+    //           message: response.data.message,
+    //           duration: 2000,
+    //           type: "warning"
+    //         });
+    //         return;
+    //       }
+    //     });
+    // }
   }
 };
 </script>

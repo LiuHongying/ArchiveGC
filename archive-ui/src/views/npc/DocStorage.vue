@@ -1,6 +1,110 @@
 <template>
   <DataLayout>
     <template v-slot:header>
+      <!--文件夹操作-->
+    <el-dialog
+      :title="folderAction"
+      :visible.sync="folderDialogVisible"
+      @close="folderDialogVisible = false"
+      width="80%"
+    >
+      <el-tabs type="border-card">
+        <el-tab-pane :label="$t('route.userInfo')">
+          <el-form :model="folderForm">
+            <el-form-item
+              :label="$t('field.name')"
+              :label-width="formLabelWidth"
+            >
+              <el-input
+                v-model="folderForm.name"
+                auto-complete="off"
+              ></el-input>
+            </el-form-item>
+            <el-form-item
+              :label="$t('field.description')"
+              :label-width="formLabelWidth"
+            >
+              <el-input
+                v-model="folderForm.description"
+                auto-complete="off"
+              ></el-input>
+            </el-form-item>
+            <el-col :span="12" v-show="clientPermission > 3">
+              <el-form-item
+                :label="$t('route.code')"
+                :label-width="formLabelWidth"
+              >
+                <el-input
+                  v-model="folderForm.coding"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12" v-show="clientPermission > 3">
+              <el-form-item
+                v-show="clientPermission > 3"
+                :label="$t('route.fullcode')"
+                :label-width="formLabelWidth"
+              >
+                <el-input
+                  v-model="folderForm.fullCoding"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12" v-show="clientPermission > 4">
+              <el-form-item
+                :label="$t('route.aclname')"
+                :label-width="formLabelWidth"
+              >
+                <el-input
+                  v-model="folderForm.aclName"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12" v-show="clientPermission > 4">
+              <el-form-item
+                :label="$t('route.listname')"
+                :label-width="formLabelWidth"
+              >
+                <el-input
+                  v-model="folderForm.gridView"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24" v-show="clientPermission > 3">
+              <el-form-item
+                :label="$t('route.sort')"
+                :label-width="formLabelWidth"
+              >
+                <el-input
+                  v-model="folderForm.orderIndex"
+                  auto-complete="off"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('route.authmanage')">
+          <FolderAcl
+            ref="FolderAcl"
+            width="100%"
+            v-bind:name="folderForm.aclName"
+            v-bind:folderId="folderForm.id"
+          ></FolderAcl>
+        </el-tab-pane>
+      </el-tabs>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="saveFolder(folderForm)">{{
+          $t("application.ok")
+        }}</el-button>
+        <el-button @click="folderDialogVisible = false">{{
+          $t("application.cancel")
+        }}</el-button>
+      </div>
+    </el-dialog>
       <!-- 创建附件 -->
       <el-dialog :title="$t('application.Import')" :visible.sync="importdialogVisible" width="70%" :close-on-click-modal="false">
           <el-form size="mini" :label-width="formLabelWidth" v-loading='uploading'>
@@ -67,7 +171,7 @@
           :label="$t('route.desfolderid')"
           :label-width="formLabelWidth"
         >
-          <FolderSelector parentId="eeb9d742cdef4e42b43796b6ac56b5ac"
+          <FolderSelector :parentId="pid"
             v-model="targetFolderId"
             v-bind:inputValue="targetFolderId"
           ></FolderSelector>
@@ -212,12 +316,81 @@
 
     <template v-slot:main="{layout}">
       <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
-        <split-pane v-on:resize="onSplitResize" :min-percent='15' :default-percent='topPercent' split="vertical">
+        <split-pane v-on:resize="onSplitResize" :min-percent='20' :default-percent='topPercent' split="vertical">
           <template slot="paneL">
+            <el-row style="padding-top: 10px; padding-bottom: 10px">
+              <el-col style="text-align: left">
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  :content="$t('application.newFolder')"
+                  placement="top"
+                >
+                  <el-button
+                    type="primary"
+                    icon="el-icon-circle-plus"
+                    circle
+                    @click="onNewFolder()"
+                  ></el-button>
+                </el-tooltip>
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  :content="$t('application.edit') + $t('application.folder')"
+                  placement="top"
+                >
+                  <el-button
+                    type="primary"
+                    icon="el-icon-info"
+                    circle
+                    @click="onEditFolder()"
+                  ></el-button>
+                </el-tooltip>
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  :content="$t('application.delete') + $t('application.folder')"
+                  placement="top"
+                >
+                  <el-button
+                    type="danger"
+                    icon="el-icon-delete"
+                    circle
+                    @click="onDeleleFolder()"
+                  ></el-button>
+                </el-tooltip>
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  :content="$t('application.move') + $t('application.folder')"
+                  placement="top"
+                >
+                  <el-button
+                    type="primary"
+                    icon="el-icon-top-right"
+                    circle
+                    @click="moveFolder()"
+                  ></el-button>
+                </el-tooltip>
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  content="授权"
+                  placement="top"
+                >
+                  <ACLManagement style="display: inline-block;margin-left:10px;" 
+                  @grantSuccess="refreshFolderData"
+                  :circle="true" :isFolder="true" 
+                  :ids="[currentFolder.id]"></ACLManagement>
+                </el-tooltip>
+                
+              </el-col>
+            </el-row>
             <el-breadcrumb style="padding-top: 10px; padding-bottom: 10px">
               <el-breadcrumb-item class="title16">
                 <i class="el-icon-receiving"></i>
-                &nbsp; {{ $t("route.docStorage") }}
+                <!-- &nbsp; {{ $t("route.docStorage") }} -->
+                &nbsp;{{$t("route."+$route.meta.title)}}
               </el-breadcrumb-item>
             </el-breadcrumb>
 
@@ -376,7 +549,7 @@
 </template>
 <script>
 import ShowProperty from "@/components/ShowProperty";
-import InnerItemViewer from "./InnerItemViewer.vue";
+import InnerItemViewer from "@/views/dc/InnerItemViewer.vue";
 import BorrwoForm from "@/components/form/Borrow";
 import StartupWorkflow from "@/views/workflow/BorrowStartUp.vue";
 import BorrowFile from "@/views/workflow/BorrowFile.vue";
@@ -388,6 +561,7 @@ import CreateCommonFile from "@/views/npc/CreateCommonFile"
 import BatchImport from "@/components/controls/ImportDocument";
 import FolderSelector from "@/components/controls/FolderSelector";
 import ACLManagement from "@/components/ACLManagement";
+import FolderAcl from "@/components/controls/FolderAcl";
 export default {
   components: {
     ShowProperty: ShowProperty,
@@ -401,14 +575,15 @@ export default {
     CreateCommonFile:CreateCommonFile,
     BatchImport:BatchImport,
     FolderSelector:FolderSelector,
-    ACLManagement:ACLManagement
+    ACLManagement:ACLManagement,
+    FolderAcl: FolderAcl,
   },
   data() {
     return {
       // 非split pan 控制区域高度
       startHeight: 130,
       // 顶部百分比*100
-      topPercent: 15,
+      topPercent: 20,
       // 顶部除列表高度
       topbarHeight: 35,
       // 底部除列表高度
@@ -475,7 +650,7 @@ export default {
       workflow: {},
       gridViewTrans: "",
       idTrans: "",
-      gridViewName:"CommonFileGrid",
+      gridViewName:"GeneralGrid",
       createDocVisible:false,
       typeName:"",
       batchDialogVisible:false,
@@ -489,12 +664,38 @@ export default {
       importdialogVisible:false,
       uploadUrl:"",
       condition:"",
-      selectIds:[]
+      selectIds:[],
+      pid:"",
+      folderAction:"",
+      folderForm: {
+        id: 0,
+        name: "",
+        description: "",
+        parentId: 0,
+        typeName: "Folder",
+        gridView: "",
+        aclName: "",
+      },
+      folderDialogVisible:false,
+      clientPermission: 0,
+      
     };
   },
   created() {
-    var username = sessionStorage.getItem("access-userName");
     let _self = this;
+    var psize = localStorage.getItem("docPageSize");
+    if (psize) {
+      _self.pageSize = parseInt(psize);
+    }
+    _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
+    _self.loading = true;
+    if (_self.currentUser()) {
+      _self.clientPermission = Number(_self.currentUser().clientPermission);
+      _self.systemPermission = Number(_self.currentUser().systemPermission);
+    }
+
+    var username = sessionStorage.getItem("access-userName");
+    
     axios.post("/user/getGroupByUserName", username).then(function (response) {
       var groupList = response.data.data;
       groupList.forEach(function (val, index, arr) {
@@ -513,20 +714,173 @@ export default {
     }
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
-    axios
-      .post("/admin/getFoldersByPath", "/文件库")
-      .then(function (response) {
-        _self.dataList = response.data.data;
-        console.log(JSON.stringify(_self.dataList));
-        _self.loading = false;
-      })
-      .catch(function (error) {
-        console.log(error);
-        _self.loading = false;
-      });
+    
+      axios
+        .post("/dc/getOneParameterValue", _self.$route.meta.title)
+        .then(function(response) {
+          let docPath = response.data.data;
+          axios
+            .post("/admin/getFoldersByPath", docPath[0])
+            .then(function (response) {
+              _self.dataList = response.data.data;
+              console.log(JSON.stringify(_self.dataList));
+              _self.loading = false;
+            })
+            .catch(function (error) {
+              console.log(error);
+              _self.loading = false;
+            });
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+
+      axios
+        .post("/dc/getOneParameterValue", _self.$route.meta.title+"ID")
+        .then(function(response) {
+          let docID = response.data.data;
+          if(docID&&docID.length>0){
+            _self.pid=docID[0];
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    
     _self.loadGridInfo(_self.defaultData);
   },
   methods: {
+    onDeleleFolder() {
+      let _self = this;
+      if (!_self.currentFolder || !_self.currentFolder.id) {
+        _self.$message(_self.$t("message.pleaseSelectFolder"));
+        return;
+      }
+      _self
+        .$confirm(
+          _self.$t("message.deleteInfo"),
+          _self.$t("application.info"),
+          {
+            confirmButtonText: _self.$t("application.ok"),
+            cancelButtonText: _self.$t("application.cancel"),
+            type: "warning",
+          }
+        )
+        .then(() => {
+          _self.delFolder();
+        })
+        .catch(() => {
+          // this.$message({
+          //   type: 'info',
+          //   message: '已取消删除'
+          // });
+        });
+    },
+    // 删除文件夹
+    delFolder() {
+      let _self = this;
+      axios
+        .post("/admin/deleteFolder", JSON.stringify(_self.currentFolder))
+        .then(function (response) {
+          if (response.data.code == 1) {
+            _self.$message(_self.$t("message.deleteSuccess"));
+            _self.refreshFolderData();
+          } else {
+            _self.$message(response.data.msg);
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+    // 新建文件夹事件
+    onNewFolder() {
+      if (!this.currentFolder || !this.currentFolder.id) {
+        this.$message(this.$t("message.cannotCreateRoot"));
+        return;
+      }
+      this.folderAction = this.$t("application.newFolder");
+      this.folderForm = {
+        id: null,
+        name: "",
+        description: "",
+        parentId: this.currentFolder.id,
+        typeName: this.currentFolder.typeName,
+        gridView: this.currentFolder.gridView,
+        aclName: this.currentFolder.aclName,
+      };
+      this.folderDialogVisible = true;
+    },
+    // 新建文件夹
+    newFolder(indata) {
+      let _self = this;
+      axios
+        .post("/admin/newFolder", JSON.stringify(indata))
+        .then(function (response) {
+          _self.folderDialogVisible = false;
+          _self.currentFolder.children = [];
+          _self.currentFolder.extended = false;
+          //_self.refreshFolderData();
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+    //刷新文件夹数据
+    refreshFolderData() {
+      let _self = this;
+      _self.loading = true;
+      axios
+        .post("/admin/getFolder", _self.pid)
+        .then(function (response) {
+          _self.dataList = response.data.data;
+          //console.log(_self.dataList);
+          _self.loading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.loading = false;
+        });
+    },
+    // 保存文件夹
+    saveFolder(indata) {
+      let _self = this;
+      if (_self.folderAction == _self.$t("application.newFolder")) {
+        _self.newFolder(indata);
+      } else {
+        axios
+          .post("/admin/updateFolder", JSON.stringify(indata))
+          .then(function (response) {
+            _self.$message(_self.$t("message.saveSuccess"));
+            _self.folderDialogVisible = false;
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      }
+    },
+    // 编辑文件夹事件
+    onEditFolder() {
+      if (!this.currentFolder || !this.currentFolder.id) {
+        this.$message(this.$t("message.pleaseSelectFolder"));
+        return;
+      }
+      this.folderAction =
+        this.$t("application.edit") + this.$t("application.folder");
+      this.folderForm = this.currentFolder;
+      this.folderDialogVisible = true;
+      this.$nextTick(()=>{
+        this.$refs.FolderAcl.name = this.currentFolder.aclName;
+        this.$refs.FolderAcl.folderId = this.currentFolder.id;
+        this.$refs.FolderAcl.loadAcl();
+        
+      });
+      // if (this.$refs.FolderAcl) {
+      //   this.$refs.FolderAcl.name = currentFolder.name;
+      //   this.$refs.FolderAcl.folderId = currentFolder.id;
+      //   this.$refs.FolderAcl.loadAcl();
+      // }
+    },
     getFormData() {
             let _self = this;
             let formdata = new FormData();

@@ -241,6 +241,7 @@ import DestoryStartUp from "@/views/workflow/DestoryStartUp.vue"
 import DestoryViewReadOnly from "@/views/workflow/DestoryViewReadOnly.vue"
 import ViolationStartUp from "@/views/workflow/ViolationStartUp.vue"
 import ViolationViewReadOnly from "@/views/workflow/ViolationViewReadOnly.vue"
+import DestoryViewUpdate from "@/views/workflow/DestoryViewUpdate.vue"
 
 export default {
   name: "TodoTask",
@@ -269,7 +270,8 @@ export default {
     DestoryStartUp:DestoryStartUp,
     DestoryViewReadOnly:DestoryViewReadOnly,
     ViolationStartUp:ViolationStartUp,
-    ViolationViewReadOnly:ViolationViewReadOnly
+    ViolationViewReadOnly:ViolationViewReadOnly,
+    DestoryViewUpdate:DestoryViewUpdate
 
   },
   data() {

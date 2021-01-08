@@ -25,6 +25,8 @@
                           </div>
                       </el-select>
                     <UserSelectInput v-else-if="item.controlType=='UserSelect'" v-model="item.defaultValue" v-bind:inputValue="item.defaultValue" v-bind:roleName="item.queryName" v-bind:isRepeat="item.isRepeat"></UserSelectInput>
+                    <RoleSelect v-else-if="item.controlType=='RoleSelect'" v-model="item.defaultValue" v-bind:inputValue="item.defaultValue" v-bind:roleName="item.queryName" v-bind:isRepeat="item.isRepeat"></RoleSelect>
+                    
               </el-form-item>
             </el-col>
           </template>
@@ -55,6 +57,7 @@
 
 <script type="text/javascript">
 import UserSelectInput from '@/components/controls/UserSelectInput'
+import RoleSelectInput from '@/components/controls/RoleSelectInput'
 import AddCondition from '@/views/record/AddCondition'
 import MultiInput from '@/components/ecm-multi-input'
 
@@ -62,6 +65,7 @@ export default {
   name: "ShowProperty",
   components: {
     UserSelectInput : UserSelectInput,
+    RoleSelectInput:RoleSelectInput,
     AddCondition : AddCondition,
     MultiInput : MultiInput
   },
@@ -358,13 +362,14 @@ export default {
       if(_self.myItemId != null && _self.myItemId!='')
       {
         m.set('ID',_self.myItemId);
+      }else{
+        if(_self.myFolderId!="" && _self.myFolderId != null){
+          m.set('FOLDER_ID',_self.myFolderId);
+        }
       }
       if(_self.myTypeName!='' && _self.myTypeName != null)
       {
         m.set('TYPE_NAME',_self.myTypeName);
-        if(_self.myFolderId!="" && _self.myFolderId != null){
-          m.set('FOLDER_ID',_self.myFolderId);
-        }
       }
       let formdata = new FormData();
       formdata.append("metaData",JSON.stringify(m));
@@ -410,16 +415,17 @@ export default {
           }
         }
       }
-      if(_self.myItemId!='')
+      if(_self.myItemId !=null && _self.myItemId!='')
       {
         m.set('ID',_self.myItemId);
+      }else{
+        if(_self.myFolderId != null && _self.myFolderId != ""){
+          m.set('FOLDER_ID',_self.myFolderId);
+        }
       }
       if(_self.myTypeName!=null && _self.myTypeName!='')
       {
         m.set('TYPE_NAME',_self.myTypeName);
-        if(_self.myFolderId != null && _self.myFolderId != ""){
-          m.set('FOLDER_ID',_self.myFolderId);
-        }
       }
       let formdata = new FormData();
       formdata.append("metaData",JSON.stringify(m));

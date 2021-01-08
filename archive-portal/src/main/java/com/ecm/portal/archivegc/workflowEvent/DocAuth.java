@@ -243,6 +243,9 @@ public class DocAuth implements JavaDelegate {
 					}else if("下载".equals(varMap.get("SUB_TYPE").toString())) {
 						permit=PermissionContext.ObjectPermission.DOWNLOAD;
 					}
+					else if("打印".equals(varMap.get("SUB_TYPE").toString())) {
+						permit=PermissionContext.ObjectPermission.DOWNLOAD;;
+					}
 					for (int i = 0; i < childList.size(); i++) {
 						EcmDocument docObj = documentService.getObjectById(ecmSession.getToken(),
 								childList.get(i).get("CHILD_ID").toString());
