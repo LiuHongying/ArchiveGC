@@ -383,7 +383,7 @@
                         title="完成质检"
                       >完成质检</el-button>
                       </el-form-item>
-                      <el-form-item v-if="currentFolder.folderPath.indexOf('科技与信息')>0">
+                      <el-form-item v-if="currentFolder && currentFolder.folderPath && currentFolder.folderPath.indexOf('科技与信息')>0">
                       <el-button 
                         type="primary"
                         plain
@@ -680,7 +680,7 @@ export default {
     _self.loading = true;
     let m=new Map();
     m.set("folderConfig","ArchiveCollatedID");
-    m.set("condition"," and((C_ITEM_TYPE='文件' or C_ITEM_TYPE='案卷') and IS_HIDDEN=0 and IS_CHILD=0) ");
+    m.set("condition","  and IS_HIDDEN=0 and IS_CHILD=0 ");
     _self
       .axios({
         headers: {
@@ -705,7 +705,7 @@ export default {
       setTimeout(() => {
         this.topPercent = this.getStorageNumber(this.topStorageName,60)
         this.leftPercent = this.getStorageNumber(this.leftStorageName,20)
-      }, 300);
+      }, 100);
   },
   methods: {
         exportData() {

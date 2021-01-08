@@ -446,7 +446,7 @@ public class ArchiveDcController extends ControllerAbstract{
 
 		String sqlSumPage="select sum(C_PAGE_COUNT) as pageCount from ecm_document "
 				+ "where id in(select child_id from ecm_relation where parent_id='"+doc.getId()+"' "
-						+ " and name='irel_children'";
+						+ " and name='irel_children')";
 		List<Map<String, Object>> pages= documentService.getMapList(token,sqlSumPage);
 		if(pages!=null&&pages.size()>0&&pages.get(0)!=null) {
 			doc.addAttribute("C_PAGE_COUNT", pages.get(0).get("pageCount"));
