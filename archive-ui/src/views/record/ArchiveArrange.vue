@@ -1460,6 +1460,7 @@ export default {
     
     newArchiveItem(typeName) {
       let _self = this;
+      _self.newChildDoc = false;
       if (_self.currentFolder.id) {
         _self.selectedItemId = "";
         _self.typeName=typeName;
@@ -1469,6 +1470,7 @@ export default {
             _self.$refs.ShowProperty.myItemId = "";
             _self.dialogName = typeName;
             _self.extendMap=null;
+            _self.$refs.ShowProperty.parentDocId = "";
             _self.$refs.ShowProperty.myTypeName = typeName;
             _self.$refs.ShowProperty.myFolderId = _self.currentFolder.id;
            
@@ -1487,6 +1489,7 @@ export default {
     },
     newArchiveFileItem(typeName, selectedRow, copyInfo) {
       let _self = this;
+      _self.newChildDoc = true;
       if (selectedRow.ID) {
         _self.selectedItemId = "";
         _self.propertyVisible = true;
@@ -1564,7 +1567,9 @@ export default {
       if (_self.$refs.ShowProperty.myTypeName != "") {
         m.set("TYPE_NAME", _self.typeName);
         m.set("folderPath", _self.folderPath);
-        m.set("transferId", _self.parentId);
+        if(_self.newChildDoc){
+          m.set("transferId", _self.parentId);
+        }
         m.set("folderId",_self.currentFolder.id);
         m.set("STATUS","整编");
       }
