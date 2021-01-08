@@ -452,7 +452,7 @@
                     <!-- <el-button type="primary" plain size="small"  @click="childrenTypeSelectVisible=true">{{$t('application.createDocument')}}</el-button>
                             <el-button type="primary" plain size="small" :title="$t('application.addReuseFile')"  @click="reuseVisible=true">{{$t('application.addReuseFile')}}</el-button>
                             
-                            <el-button type="primary" plain size="small" title="删除"  @click="onDeleleFileItem()">{{$t('application.delete')}}</el-button>
+                            
                             <el-button type="primary" plain size="small" title="挂载文件"  @click="importdialogVisible=true;uploadUrl='/dc/mountFile'">挂载文件</el-button>
                     <el-button type="primary" plain size="small" :title="$t('application.viewRedition')"  @click="importdialogVisible=true;uploadUrl='/dc/addRendition'">格式副本</el-button>-->
                     <el-button type="primary" plain size="small" @click="beforeCreateFile(selectRow)">著录</el-button>
@@ -463,6 +463,7 @@
                       title="挂载文件"
                       @click="beforeMount(selectedInnerItems);uploadUrl='/dc/mountFile'"
                     >挂载文件</el-button>
+                    
                     <!--
                     <el-button
                       type="primary"
@@ -474,6 +475,13 @@
                     -->
                     <el-button type="primary" plain size="small" title="上移" @click="onMoveUp()">上移</el-button>
                     <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
+                    <el-button type="warning" plain size="small" title="删除"  @click="logicallyDel(selectedInnerItems,function(){
+                          let _self=this;
+                          if(_self.$refs.leftDataGrid){
+                              _self.$refs.leftDataGrid.itemDataList = [];
+                            }
+                          _self.loadGridData(_self.currentFolder);
+                        })">{{$t('application.delete')}}</el-button>
                   </el-row>
                   <el-row>
                     <el-col :span="24">
@@ -665,7 +673,8 @@ export default {
       ChoiceInput:'',
       isAdd:false,
       AddComment:'',
-      isDates:false
+      isDates:false,
+      newChildDoc: false,
 
     };
   },
@@ -766,6 +775,7 @@ export default {
           if(code=='1'){
             let data=response.data.data;
             let fileType=data[0].C_TO;
+            _self.newChildDoc = true;
             _self.newArchiveFileItem(fileType,row, response.data.copyInfo);
             //writeAudit(_self.parentId);
           }else{
@@ -1393,7 +1403,8 @@ export default {
       _self.mainParam.condition=key;
       _self.mainParam.folderId=indata.id
       _self.$nextTick(()=>{
-        _self.$refs.mainDataGrid.loadGridData();
+         _self.$refs.mainDataGrid.loadGridData();
+         _self.$refs.leftDataGrid.itemDataList = [];
       });
       
       
