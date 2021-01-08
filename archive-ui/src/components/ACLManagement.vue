@@ -121,8 +121,12 @@
         <el-button @click="aclManagementVisible = false">{{$t('application.cancel')}}</el-button>
       </div>
     </el-dialog>
-    <el-button icon="el-icon-info" type="primary" @click="aclManagementVisible=true">
-      <slot>授权</slot>
+    <el-button icon="el-icon-user" type="primary" 
+        :plain="plain" 
+        :round="round" 
+        :circle="circle"
+        @click="aclManagementVisible=true">
+      <slot></slot>
     </el-button>
   </div>
 </template>
@@ -176,7 +180,10 @@ export default {
         return new Array();
       }
     },
-    isFolder:{type:Boolean,default:false}
+    isFolder:{type:Boolean,default:false},
+    circle:{type:Boolean,default:false},
+    round:{type:Boolean,default:false},
+    plain:{type:Boolean,default:false},
   },
   mounted() {
     this.initCheckBoxData();
@@ -189,8 +196,8 @@ export default {
             "是否同时修改文件夹内所有对象",
             _self.$t("application.info"),
             {
-                confirmButtonText: _self.$t("application.ok"),
-                cancelButtonText: _self.$t("application.cancel"),
+                confirmButtonText: "是",
+                cancelButtonText: "否",
                 type: "warning"
             }
             )
@@ -281,7 +288,7 @@ export default {
                         showClose: true,
                         message: "授权成功",
                         duration: 2000,
-                        type: "Success",
+                        type: "success",
                         });
                         _self.aclManagementVisible=false;
                         _self.$emit("grantSuccess");

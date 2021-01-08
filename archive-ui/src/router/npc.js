@@ -29,4 +29,14 @@ export const npcRouter =  [
         name: '草稿箱',
         component: () => import('@/views/npc/Drafts.vue')
     },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:"knowledgeBase"
+        },
+        path: '/npc/knowledgeBase',
+        name: '知识库',
+        component: () => import('@/views/npc/DocStorage.vue')
+    },
 ]

@@ -552,7 +552,8 @@
     "docStorage":"文件库",
     "DesignDocCreate":"设计文件创建",
     "Drafts":"草稿箱",
-    "preArchive":"预归档库"
+    "preArchive":"预归档库",
+    "knowledgeBase":"知识库"
 },
 "message": {
     "conditionS":"条件选择",

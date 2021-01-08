@@ -25,6 +25,8 @@
                           </div>
                       </el-select>
                     <UserSelectInput v-else-if="item.controlType=='UserSelect'" v-model="item.defaultValue" v-bind:inputValue="item.defaultValue" v-bind:roleName="item.queryName" v-bind:isRepeat="item.isRepeat"></UserSelectInput>
+                    <RoleSelect v-else-if="item.controlType=='RoleSelect'" v-model="item.defaultValue" v-bind:inputValue="item.defaultValue" v-bind:roleName="item.queryName" v-bind:isRepeat="item.isRepeat"></RoleSelect>
+                    
               </el-form-item>
             </el-col>
           </template>
@@ -55,6 +57,7 @@
 
 <script type="text/javascript">
 import UserSelectInput from '@/components/controls/UserSelectInput'
+import RoleSelectInput from '@/components/controls/RoleSelectInput'
 import AddCondition from '@/views/record/AddCondition'
 import MultiInput from '@/components/ecm-multi-input'
 
@@ -62,6 +65,7 @@ export default {
   name: "ShowProperty",
   components: {
     UserSelectInput : UserSelectInput,
+    RoleSelectInput:RoleSelectInput,
     AddCondition : AddCondition,
     MultiInput : MultiInput
   },
