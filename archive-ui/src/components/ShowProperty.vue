@@ -358,13 +358,14 @@ export default {
       if(_self.myItemId != null && _self.myItemId!='')
       {
         m.set('ID',_self.myItemId);
+      }else{
+        if(_self.myFolderId!="" && _self.myFolderId != null){
+          m.set('FOLDER_ID',_self.myFolderId);
+        }
       }
       if(_self.myTypeName!='' && _self.myTypeName != null)
       {
         m.set('TYPE_NAME',_self.myTypeName);
-        if(_self.myFolderId!="" && _self.myFolderId != null){
-          m.set('FOLDER_ID',_self.myFolderId);
-        }
       }
       let formdata = new FormData();
       formdata.append("metaData",JSON.stringify(m));
@@ -410,16 +411,17 @@ export default {
           }
         }
       }
-      if(_self.myItemId!='')
+      if(_self.myItemId !=null && _self.myItemId!='')
       {
         m.set('ID',_self.myItemId);
+      }else{
+        if(_self.myFolderId != null && _self.myFolderId != ""){
+          m.set('FOLDER_ID',_self.myFolderId);
+        }
       }
       if(_self.myTypeName!=null && _self.myTypeName!='')
       {
         m.set('TYPE_NAME',_self.myTypeName);
-        if(_self.myFolderId != null && _self.myFolderId != ""){
-          m.set('FOLDER_ID',_self.myFolderId);
-        }
       }
       let formdata = new FormData();
       formdata.append("metaData",JSON.stringify(m));
