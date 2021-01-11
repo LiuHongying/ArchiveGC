@@ -299,8 +299,9 @@ public class DocSingleStartUp4Borrow implements ExecutionListener, JavaDelegate,
 			ecmObject.setStatus("流程中");
 			documentService.updateObject(ecmSession.getToken(), ecmObject,null);
 			varMap.put("assigneeListA",
-					getApprover(ecmSession, ecmObject.getAttributes().get("C_REVIEWER2").toString()));	//C_REVIEWER1小组
-			arg0.setTransientVariables(varMap);
+					getApprover(ecmSession, ecmObject.getAttributes().get("C_REVIEWER2").toString()));	//C_REVIEWER2小组
+			arg0.setVariables(varMap);
+//			arg0.setTransientVariables(varMap);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
