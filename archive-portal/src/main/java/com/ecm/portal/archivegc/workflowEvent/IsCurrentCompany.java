@@ -47,8 +47,7 @@ public class IsCurrentCompany implements JavaDelegate{
 			String creator = form.getCreator();			//表单创建人
 			String sqlCreate="select * from ecm_user where Name = '" + creator + "'";
 			List<Map<String,Object>> createRes = documentService.getMapList(ecmSession.getToken(), sqlCreate);
-			String creatorGroup = "数字化信息部";
-			//String creatorGroup = createRes.get(0).get("GROUP_NAME").toString();	//表单创建人所属部门
+			String creatorGroup = createRes.get(0).get("GROUP_NAME").toString();	//表单创建人所属部门
 			
 			String sql = "select distinct * from ecm_document where id in(select CHILD_ID from ecm_relation where parent_id = '"+formId+"')";
 			List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);
@@ -59,10 +58,11 @@ public class IsCurrentCompany implements JavaDelegate{
 				}
 				if(mp.get("C_CREATE_UNIT")!=null){
 				String department = mp.get("C_CREATE_UNIT").toString();
-				if(department.equals(creatorGroup)) {		//要是自己部门的文件就先设置为true
+				String toDepartment = mp.get("C_ARCHIVE_UNIT").toString();
+				if(department.equals(creatorGroup)||department.equals(toDepartment)) {		//要是自己部门的文件就先设置为true
 					execution.setVariable("IS_CURRENT_COMPANY", "是");
 				}
-				if(!department.equals(creatorGroup)) {		//只要遇到一次不是自己部门的文件，就直接设为false，后跳出循环
+				if(!department.equals(creatorGroup)||!department.equals(toDepartment)) {		//只要遇到一次不是自己部门的文件，就直接设为false，后跳出循环
 					execution.setVariable("IS_CURRENT_COMPANY", "否");
 					break;
 				}

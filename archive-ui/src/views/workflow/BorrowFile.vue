@@ -232,10 +232,10 @@ export default {
             this.createUnit = this.selectedFiles[0].C_CREATE_UNIT
           }
           this.checkCreateUnit()
-          if(this.sameCreate==false){
-          this.$message("请选择相同编制单位的文件！")
-          return
-          }
+          // if(this.sameCreate==false){
+          // this.$message("请选择相同编制单位的文件！")
+          // return
+          // }
         }
         
         if(_self.$refs.fileList.itemDataList==null){
