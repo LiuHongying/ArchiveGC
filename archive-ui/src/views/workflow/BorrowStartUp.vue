@@ -15,7 +15,7 @@
         <UserSelectInput :roleName='departmentLeader' v-model="reviewer1" v-bind:inputValue="reviewer1" ></UserSelectInput>
         </el-form-item>
         <el-form-item label="文件形成单位/部门领导:" label-width="170px">
-        <UserSelectInput :roleName='departmentLeader' v-model="reviewer2" v-bind:inputValue="reviewer2" ></UserSelectInput>
+        <UserSelectInput :roleName='departmentLeader' v-model="reviewer2" v-bind:inputValue="reviewer2" :isRepeat="true"></UserSelectInput>
         </el-form-item>
         <el-form-item label="公司主管领导:" label-width="130px">
         <UserSelectInput :roleName='companyLeader' v-model="reviewer3" v-bind:inputValue="reviewer3" ></UserSelectInput>                
@@ -116,7 +116,8 @@
       borrowType:'',
       flag: false,
       dialogVisible:false,
-      isLimited:true
+      isLimited:true,
+      isCurrentCompany:false
                 }
             },
             props:{
@@ -126,6 +127,7 @@
             },
             mounted(){
                 // this.getWorkflows();
+                console.log(this.currentUser().department)
             },
             methods:{
             getBorrowType(){            //获取当前借阅类型
@@ -140,6 +142,12 @@
             checkLevel(){
                 this.getBorrowType()
                 let _self = this
+                _self.isCurrentCompany=true
+                  this.workflowFileList.forEach(element => {
+                        if(element.C_CREATE_UNIT!=_self.currentUser().department&&element.C_ARCHIVE_UNIT!=_self.currentUser().department){
+                        _self.isCurrentCompany=false       //找到了，借阅文件不是当前部门的，需要形成部门领导
+                        }
+                    })
                 if(this.borrowType=='查阅'){                //默认都要验证选人，查阅的时候先默认不选人，然后判断密级
                     this.isLimited=false//无限制，可立即发起
                     this.workflowFileList.forEach(element => {
@@ -147,10 +155,8 @@
                             _self.isLimited=true       //找到了，借阅文件包含商密，将在下一步进行判断
                         }
                     })
-                }             
+                } 
             },
-
-
             getTypeResult(){
                  let _self = this
                  _self.$refs.workflowFile.setSubTypeCondition(false)
@@ -176,7 +182,7 @@
                 },
                 startUpWorkflow(workflow){
                 this.checkLevel()                                   //在这里获取当前文件安全等级
-                console.log(this.isLimited)
+                console.log(this.isCurrentCompany)
                   if(this.accept!="接受"){
                       this.$message("请接受档案利用承诺书!")
                       return
@@ -188,8 +194,8 @@
                       this.$message("请完成借阅单必填项！本部门领导为必填项!")
                       return
                     }
-                   if(this.$refs.workflowFile.sameDepartMent == false&&this.isLimited==true){                     //查阅&普通借阅提醒
-                   if(this.reviewer2==''){
+                   if(this.isLimited==true){                     //查阅&普通借阅提醒
+                   if(this.reviewer2=='' && this.isCurrentCompany==false){
                     this.$message("请完成借阅单必填项！形成部门领导为必填项!")
                       return                }
                    }
@@ -216,6 +222,7 @@
                             return
                         }
                         }
+                    _self.getReviewers()
                     var c;
                     for(c in _self.$refs.ShowProperty.dataList)
                     {
@@ -267,9 +274,9 @@
                             _self.butt=false;
                             return;
                         }
-                        m.set("C_REVIEWER1",_self.reviewer1)
-                        m.set("C_REVIEWER2",_self.reviewer2)
-                        m.set("C_REVIEWER3",_self.reviewer3)
+                        // m.set("C_REVIEWER1",_self.reviewer1)
+                        // m.set("C_REVIEWER2",_self.reviewer2)
+                        // m.set("C_REVIEWER3",_self.reviewer3)
                         let formdata = new FormData();
                         formdata.append("metaData",JSON.stringify(m));
                         if(_self.$refs.ShowProperty.file!="")
@@ -490,7 +497,23 @@
                     });
                 
                 },
-                
+                getReviewers(){
+                    let _self = this
+                    let ecmFormItems = this.$refs.ShowProperty.dataList[0].ecmFormItems
+                    ecmFormItems.forEach(element => {
+                        if(element.attrName=="C_REVIEWER1"){
+                            element.defaultValue=_self.reviewer1
+                        }
+                        if(element.attrName=="C_REVIEWER2"){
+                            element.defaultValue=_self.reviewer2
+                        }
+                        if(element.attrName=="C_REVIEWER3"){
+                            element.defaultValue=_self.reviewer3
+                        }
+                    });
+                    //this.$refs.ShowProperty.dataList[0].ecmFormItems[6].defaultValue = val
+                    console.log(this.$refs.ShowProperty.dataList[0].ecmFormItems)
+                },
                 // 保存结果事件
                 onSaved(indata) {
                     let _self=this;
