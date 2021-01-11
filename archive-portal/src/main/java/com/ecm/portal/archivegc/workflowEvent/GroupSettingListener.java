@@ -12,7 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import com.ecm.core.entity.EcmDocument;
+import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.exception.EcmException;
+import com.ecm.core.exception.NoPermissionException;
 import com.ecm.core.service.AuthService;
 import com.ecm.core.service.DocumentService;
 import com.ecm.icore.service.IEcmSession;
@@ -62,6 +65,16 @@ public class GroupSettingListener implements ExecutionListener {
 					//其他档案管理员
 					execution.setVariable(columnName,"其他档案管理员");
 					break;
+				}
+				EcmDocument ecmObject = documentService.getObjectById(session.getToken(), formId);
+				ecmObject.addAttribute(columnName, execution.getVariable(columnName));
+				try {
+					documentService.updateObject(session.getToken(), ecmObject,null);
+				} catch (AccessDeniedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NoPermissionException e) {
+					e.printStackTrace();
 				}
 			}
 		} catch (EcmException e) {
