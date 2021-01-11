@@ -22,6 +22,17 @@
       <ShowBorrowForm ref="ShowBorrowForm" width="100%" v-bind:borrowForm="borrowForm"></ShowBorrowForm>
     </el-dialog>
 
+    <div slot="footer" class="dialog-footer" style="padding-top:10px">
+      <router-link ref="borrowRouteLink" to="/borroworder"></router-link>
+      <!-- <el-button  v-if="formId!=''" @click="addToFormFromShopingCart()" style="float:left">添加到表单</el-button> -->
+      <!-- <div v-if="formId==''"> -->
+        <div v-if="showFooter == true">
+        <el-button @click="cleanShopingCart()">清空</el-button>
+        <el-button @click="removeShopingCart()">移除所选</el-button>
+        <!-- <el-button @click="showDrawingItem()">调晒</el-button> -->
+        <el-button @click="borrowItem()">借阅</el-button>
+      </div>
+    </div>
     <el-form :model="shopingCartForm" style="width:100%">
       <el-row style="width:100%">
         <div v-if="1==1">
@@ -108,23 +119,20 @@
                 </template>
               </el-table-column>
             </el-table>
+            <el-pagination
+              background
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="currentPage"
+              :page-sizes="[10, 20, 50, 100, 200]"
+              :page-size="pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="itemCount"
+            ></el-pagination>
           </el-col>
         </div>
       </el-row>
     </el-form>
-
-    <div slot="footer" class="dialog-footer" style="padding-top:10px">
-      <router-link ref="borrowRouteLink" to="/borroworder"></router-link>
-      <!-- <el-button  v-if="formId!=''" @click="addToFormFromShopingCart()" style="float:left">添加到表单</el-button> -->
-      <!-- <div v-if="formId==''"> -->
-        <div v-if="showFooter == true">
-        <el-button @click="cleanShopingCart()">清空</el-button>
-        <el-button @click="removeShopingCart()">移除所选</el-button>
-        <!-- <el-button @click="showDrawingItem()">调晒</el-button> -->
-        <el-button @click="borrowItem()">借阅</el-button>
-      </div>
-    </div>
-    <router-view></router-view>
   </div>
 </template>
 
@@ -167,12 +175,22 @@ export default {
 
       workflow: {},
       borrowVisible: false,
+      currentPage: 1,
+      pageSize: 20,
     };
   },
   props: {
     formId: { type: String, default: "" },
     excludeRows: { type: Array, default: () => [] },
     showFooter: { type: Boolean, default: true }
+  },
+  mounted() {
+    let _self = this;
+
+    var psize = localStorage.getItem("docPageSize");
+    if (psize) {
+      _self.pageSize = parseInt(psize);
+    }
   },
   created() {
     let _self = this;
@@ -190,8 +208,8 @@ export default {
       var m = new Map();
       _self.loadingTodoData = true;
       m.set("condition", "TYPE_NAME='收藏夹'");
-      m.set("pageSize", 7);
-      m.set("pageIndex", 0);
+      m.set("pageSize", _self.pageSize);
+      m.set("pageIndex", _self.currentPage - 1);
       m.set("userId", sessionStorage.getItem("access-userName"));
       //let i=0;
       axios
@@ -207,6 +225,7 @@ export default {
             return goodData;
           });
           _self.totalCount = response.data.totalCount;
+          _self.itemCount = response.data.pager.total;
           _self.loadingTodoData = false;
         })
         .catch(function (error) {
@@ -465,6 +484,29 @@ _self.$t('message.PleaseSelectOneDraw'),
       });
       //console.log(href);
       window.open(href.href, "_blank");
+    },
+    //分页 页数改变
+    handleSizeChange(val) {
+      let _self = this;
+      this.pageSize = val;
+      localStorage.setItem("docPageSize", val);
+      _self.loadGridInfo(this.currentFolder);
+      if (_self.showBox) {
+        _self.loadAllGridData(this.currentFolder);
+      } else {
+        _self.loadGridData(this.currentFolder);
+      }
+    },
+    // 分页 当前页改变
+    handleCurrentChange(val) {
+      let _self = this;
+      this.currentPage = val;
+      _self.loadGridInfo(this.currentFolder);
+      if (_self.showBox) {
+        _self.loadAllGridData(this.currentFolder);
+      } else {
+        _self.loadGridData(this.currentFolder);
+      }
     },
   },
 };
