@@ -46,7 +46,7 @@ public class DocDestory implements JavaDelegate {
 				String id = mp.get("CHILD_ID").toString();		//当前遍历文件id
 				EcmDocument doc = documentService.getObjectById(ecmSession.getToken(), id);		//先找到对应文件
 				Map<String,Object> docMap = doc.getAttributes(); 
-				docMap.put("ACL_NAME","acl_destory");
+				//docMap.put("ACL_NAME","acl_destory");
 				docMap.put("STATUS", "已销毁");
 				docMap.put("IS_RELEASED",0);
 				documentService.updateObject(ecmSession.getToken(), docMap);		//先把当前文件的状态改了
@@ -59,7 +59,7 @@ public class DocDestory implements JavaDelegate {
 						String attachId = attMp.get("CHILD_ID").toString();
 						EcmDocument AJ = documentService.getObjectById(ecmSession.getToken(), attachId);
 						Map<String,Object> AJmap = AJ.getAttributes();
-						AJmap.put("ACL_NAME","acl_destory");
+						//AJmap.put("ACL_NAME","acl_destory");
 						AJmap.put("STATUS", "已销毁");
 						AJmap.put("IS_RELEASED",0);
 						documentService.updateObject(ecmSession.getToken(), AJmap);		//更新案卷内关联文件的属性
