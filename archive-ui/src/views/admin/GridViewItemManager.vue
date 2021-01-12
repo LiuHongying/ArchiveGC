@@ -300,7 +300,7 @@ export default {
       this.form.name = "";
       this.form.description = "";
       this.form.value = "";
-      this.form.visibleType= "4";
+      this.form.visibleType= "1";
       this.allowOrderby = false;
       this.dialogVisible = true;
     },
