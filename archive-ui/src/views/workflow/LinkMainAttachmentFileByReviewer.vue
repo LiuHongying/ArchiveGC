@@ -100,7 +100,7 @@
                             condition=" and a.name = 'irel_children' "
                             :optionWidth = "2"
                             :isshowCustom="false"
-                            :isEditProperty="false"
+                            :isEditProperty="true"
                             showOptions="查看内容,查看属性"
                             :isShowPropertyButton="false"
                             :isShowChangeList="false"
