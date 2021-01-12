@@ -124,6 +124,16 @@
               overflow: 'auto',
             }"
           >
+          <el-header>
+          <el-input
+            style="width: 150px"
+            v-model="inputValueNum"
+            placeholder='请输入文件夹名称'
+            @keyup.enter.native="search()"
+          ></el-input>
+          <el-button type="primary" @click="search()">{{$t("application.SearchData")}}</el-button>
+          </el-header>
+          
             <el-tree
               style="width: 100%"
               :props="defaultProps"
@@ -414,6 +424,7 @@ export default {
       workflow: {},
       gridViewTrans: "",
       idTrans: "",
+      inputValueNum:"",
     };
   },
   created() {
@@ -437,20 +448,44 @@ export default {
     }
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
-    axios
-      .post("/admin/getArchivesFolder", 0)
-      .then(function (response) {
-        _self.dataList = response.data.data;
-        _self.loadGridInfo(_self.defaultData);
-        _self.loading = false;
-      })
-      .catch(function (error) {
-        console.log(error);
-        _self.loading = false;
-      });
+    _self.search();
     
   },
   methods: {
+    search(){
+      let _self = this;
+      if(_self.inputValueNum!=''&&_self.inputValueNum!=undefined){
+        var m = new Map();
+        m.set("NAME", _self.inputValueNum);
+        m.set("parentPath","/档案库")
+        axios
+        .post("/admin/searchFolder",JSON.stringify(m))
+        .then(function (response) {
+          _self.dataList = response.data.data;
+          _self.loadGridInfo(_self.defaultData);
+          _self.loading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.loading = false;
+        });
+      }
+      else{
+        axios
+        .post("/admin/getArchivesFolder", 0)
+        .then(function (response) {
+          _self.dataList = response.data.data;
+          _self.loadGridInfo(_self.defaultData);
+          _self.loading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.loading = false;
+        });
+      }
+      
+    
+    },
     getWorkFlow() {
       let _self = this;
 
