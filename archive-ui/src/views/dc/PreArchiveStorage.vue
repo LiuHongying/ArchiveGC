@@ -14,6 +14,15 @@
             overflow: 'auto',
           }"
         >
+        <el-header>
+          <el-input
+            style="width: 150px"
+            v-model="inputFolder"
+            placeholder='请输入文件夹名称'
+            @keyup.enter.native="searchFolder()"
+          ></el-input>
+          <el-button type="primary" @click="searchFolder()">{{$t("application.SearchData")}}</el-button>
+          </el-header>
           <el-tree
             :props="defaultProps"
             :data="dataList"
@@ -201,6 +210,7 @@ export default {
       tabs: {
         activeNum: "",
       },
+      inputFolder:"",
     };
   },
 
@@ -220,21 +230,42 @@ export default {
     }
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
-    axios
-      .post("/admin/getPreArchivesFolder", 0)
-      .then(function (response) {
-        _self.dataList = response.data.data;
-        _self.loading = false;
-        _self.$refs.mainDataGrid.loadGridInfo(_self.defaultData);
-        _self.$refs.mainDataGrid.loadGridData(_self.defaultData);
-      })
-      .catch(function (error) {
-        console.log(error);
-        _self.loading = false;
-      });
+    _self.searchFolder();
   },
 
   methods: {
+    searchFolder(){
+      let _self = this
+      if(_self.inputFolder!=''&&_self.inputFolder!=undefined){
+        var m = new Map();
+        m.set("NAME", _self.inputFolder);
+        m.set("parentPath","/预归档库")
+        axios
+        .post("/admin/searchFolder",JSON.stringify(m))
+        .then(function (response) {
+          _self.dataList = response.data.data;
+          _self.loadGridInfo(_self.defaultData);
+          _self.loading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.loading = false;
+        });
+      }
+      else{
+        axios
+        .post("/admin/getPreArchivesFolder", 0)
+        .then(function (response) {
+          _self.dataList = response.data.data;
+          _self.loadGridInfo(_self.defaultData);
+          _self.loading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.loading = false;
+        });
+      }
+    },
     // 加载表格样式
     loadGridInfo(indata) {
       let _self = this;
