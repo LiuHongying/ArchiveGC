@@ -232,6 +232,7 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 				audit.setAssignee(taskUserIds);
 				audit.setProcessInstanceId(task.getProcessInstanceId());
 				audit.setTaskId(task.getId());
+				
 				ecmAuditWorkitemMapper.insert(audit);
 		} else if ("complete".equals(task.getEventName())) {
 			if (task.getVariable("processInstanceID") == null) {

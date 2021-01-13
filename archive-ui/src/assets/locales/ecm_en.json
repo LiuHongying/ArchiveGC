@@ -544,7 +544,8 @@
     "DesignDocCreate":"Create design docs",
     "Drafts":"drafts",
     "preArchive":"PreArchive",
-    "knowledgeBase":"knowledgeBase"
+    "knowledgeBase":"knowledgeBase",
+    "effectiveDocuments":"Effective Documents"
 },
 "message": {
     "conditionS":"Select Condition",
