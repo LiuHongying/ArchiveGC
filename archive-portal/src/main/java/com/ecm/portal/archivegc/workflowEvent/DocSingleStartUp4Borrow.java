@@ -46,9 +46,9 @@ import com.ecm.flowable.service.CustomWorkflowService;
 import com.ecm.icore.service.IEcmSession;
 import com.ecm.portal.service.ServiceDocMail;
 
-@Component(value = "commonExecutorListener")
-public class CommonListener implements ExecutionListener, JavaDelegate, TaskListener {
-	private Expression isSendEmail;
+@Component(value = "DocSingleStartUp4Borrow")
+public class DocSingleStartUp4Borrow implements ExecutionListener, JavaDelegate, TaskListener {
+	private Expression isSendEmail; 
 	/**
 	 * 
 	 */
@@ -79,7 +79,6 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 	private EcmAuditWorkitemMapper ecmAuditWorkitemMapper;
 	@Autowired
 	private TaskService taskService;
-
 	/**
 	 * 监听 for executionListener
 	 */
@@ -96,13 +95,14 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 		try {
 			ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
 			loadProcessBusinessLogicToVariable(ecmSession, execution);
-			/********************** 发送邮件 *************************************/
-
+			/**********************发送邮件*************************************/
+			
 //			  String isSendEmai= execution.getVariable("isSendEmail", String.class);
 //			  if(isSendEmai!=null&&!"".equals(isSendEmai)) {
 //			  if(Boolean.parseBoolean(isSendEmai)) {
 //			  sendMailOfProcessEnd(ecmSession,execution); } }
-
+			 
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -112,6 +112,8 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 		}
 		System.out.println("DelegateExecution_notify");
 	}
+
+
 
 	/**
 	 * JavaDelegate 方法 for serviceTask
@@ -133,96 +135,72 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 	public void notify(DelegateTask task) throws FlowableException {
 		if ("create".equals(task.getEventName())) {
 			/////////////////////// 任务到达发送邮件//////////////
-
+			
 			String assignee = task.getAssignee();// ecm_user.Name
 
 			IEcmSession ecmSession = null;
 			String workflowSpecialUserName = env.getProperty("ecm.username");
-			String taskUserIds = "";
 			try {
 				ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
-				taskUserIds = task.getAssignee();
-
-				/******************************* 发送邮件 ****************************/
-
-				String sendMail = isSendEmail != null ? isSendEmail.getValue(task).toString() : null;
-				if (sendMail != null && !"".equals(sendMail)) {
-					if (Boolean.parseBoolean(sendMail)) {
+				loadProcessBusinessLogicToVariable(ecmSession, task);
+				String taskUserIds = task.getAssignee();
+				/**********************发送邮件*************************************/
+				
+				
+				String sendMail= isSendEmail!=null?isSendEmail.getValue(task).toString():null;
+				if(sendMail!=null&&!"".equals(sendMail)) {
+					if(Boolean.parseBoolean(sendMail)) {
 						if (task.getAssignee() != null) {// 普通任务
-							List<String> userMails = new ArrayList<>();
-							if (task.getAssignee().contains(";")) {
-								List<String> userNames = Arrays.asList(task.getAssignee().split(";"));
-								for (String userName : userNames) {
-									EcmUser user = userService.getObjectByName(ecmSession.getToken(), userName);
-									if (user.getEmail() != null && !"".equals(user.getEmail())) {
-										userMails.add(user.getEmail());
-									}
-								}
-								Task tsk = taskService.createTaskQuery().taskId(task.getId()).singleResult();
-								if(userMails!=null&&userMails.size()>0) {
-									serviceDocMail.sendTaskMailMultipleUsers(userMails, tsk);
-								}
-								
-							} else {
-								EcmUser user = userService.getObjectByName(ecmSession.getToken(), assignee);
-								if (user == null) {
-									List<EcmUser> users = groupService.getAllUserByGroupName(ecmSession.getToken(),assignee);
-									for (int n = 0; users != null && n < users.size(); n++) {
-										EcmUser u = users.get(n);
-										String email = u.getEmail();
-										if (email != null && !"".equals(email)) {
-											userMails.add(email);
-										}
-									}
-									Task tsk = taskService.createTaskQuery().taskId(task.getId()).singleResult();
-									if(userMails!=null&&userMails.size()>0) {
-										serviceDocMail.sendTaskMailMultipleUsers(userMails, tsk);
-									}
-									
-								} else {
-									// TODO 如果代理人不为空，就执行代理
-									if (!Strings.isEmpty(user.getDelegateUser())
-											&& DateUtils.compareDate(new Date(), user.getDelegateStart()) >= 0
-											&& DateUtils.compareDate(new Date(), user.getDelegateEnd()) < 0) {
-										customWorkflowService.delegateTask(task.getId(), user.getDelegateUser());
-										;
-									}
-									String email = user.getEmail();
+							EcmUser user = userService.getObjectByName(ecmSession.getToken(), assignee);
+							if(user==null) {
+								List<EcmUser> users= groupService.getAllUserByGroupName(ecmSession.getToken(), assignee);
+								for(int n=0;users!=null&&n<users.size();n++) {
+									EcmUser u= users.get(n);
+									String email = u.getEmail();
 									if (email != null && !"".equals(email)) {
-										Task tsk = taskService.createTaskQuery().taskId(task.getId()).singleResult();
-										serviceDocMail.sendTaskMail(email, tsk);
+										Task tsk= taskService.createTaskQuery().taskId(task.getId()).singleResult();
+										serviceDocMail.sendTaskMail(email,tsk);
+										
 									}
+								}
+							}else {
+								// TODO 如果代理人不为空，就执行代理
+								if (!Strings.isEmpty(user.getDelegateUser())
+										&& DateUtils.compareDate(new Date(), user.getDelegateStart()) >= 0
+										&& DateUtils.compareDate(new Date(), user.getDelegateEnd()) < 0) {
+									customWorkflowService.delegateTask(task.getId(), user.getDelegateUser());
+									;
+								}
+								String email = user.getEmail();
+								if (email != null && !"".equals(email)) {
+									Task tsk= taskService.createTaskQuery().taskId(task.getId()).singleResult();
+									serviceDocMail.sendTaskMail(email,tsk);
+									
 								}
 							}
+							
+							
 						} else {// 候选用户
 							Set<IdentityLink> candidates = task.getCandidates();
 							taskUserIds = "";
+							
 							for (Iterator iterator = candidates.iterator(); iterator.hasNext();) {
 								IdentityLink identityLink = (IdentityLink) iterator.next();
-								EcmUser user = userService.getObjectByName(ecmSession.getToken(),
-										identityLink.getUserId());
+								EcmUser user = userService.getObjectByName(ecmSession.getToken(), identityLink.getUserId());
 								String email = user.getEmail();
 								if (email != null && !"".equals(email)) {
 									// serviceDocMail.sendTaskMail(email);
-									Task tsk = taskService.createTaskQuery().taskId(task.getId()).singleResult();
-									serviceDocMail.sendTaskMail(email, tsk);
+									Task tsk= taskService.createTaskQuery().taskId(task.getId()).singleResult();
+									serviceDocMail.sendTaskMail(email,tsk);
 								}
 								taskUserIds = identityLink.getUserId() + ";" + taskUserIds;
 							}
-
+							
 						}
 					}
 				}
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					if (ecmSession != null) {
-						authService.logout(workflowSpecialUserName);
-					}
-				}
-				/*****************************发送邮件END*****************************/
-				
-				// 创建流程日志
+				/**********************发送邮件END*************************************************/
+				//创建流程日志
 				EcmAuditWorkitem audit = new EcmAuditWorkitem();
 				audit.createId();
 				audit.setCreateTime(task.getCreateTime());
@@ -232,12 +210,21 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 				audit.setAssignee(taskUserIds);
 				audit.setProcessInstanceId(task.getProcessInstanceId());
 				audit.setTaskId(task.getId());
-				
 				ecmAuditWorkitemMapper.insert(audit);
+				
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if (ecmSession != null) {
+					authService.logout(workflowSpecialUserName);
+				}
+			}
 		} else if ("complete".equals(task.getEventName())) {
 			if (task.getVariable("processInstanceID") == null) {
 				task.setVariable("processInstanceID", task.getProcessInstanceId());
 				task.setVariable("processName", task.getProcessDefinitionId().split(":")[0]);
+				
 			}
 			IEcmSession ecmSession = null;
 			String workflowSpecialUserName = env.getProperty("ecm.username");
@@ -267,7 +254,9 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 		Object result = null;
 		if (user.length == 1) {// 只有一个用户或一个用户组
 			if (userService.getObjectByName(ecmSession.getToken(), userName) != null) {
-				result = userName;
+				List<String> userNameList = new ArrayList<String>();
+				userNameList.add(userName);
+				result = userNameList;
 			} else {// 如果是用户组
 				String groupId = groupService.getGroupByName(ecmSession.getToken(), userName).getId();
 				List<EcmUser> userList = groupService.getUsers(ecmSession.getToken(), groupId);
@@ -299,7 +288,7 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 			}
 		}
 		return multiInstanceRootExecution;
-	}
+	} 
 
 	private Map<String, Object> loadProcessBusinessLogicToVariable(IEcmSession ecmSession,
 			org.flowable.variable.api.delegate.VariableScope arg0) {
@@ -308,13 +297,16 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 		try {
 			EcmDocument ecmObject = documentService.getObjectById(ecmSession.getToken(), formId);
 			ecmObject.setStatus("流程中");
-			documentService.updateObject(ecmSession.getToken(), ecmObject, null);
+			documentService.updateObject(ecmSession.getToken(), ecmObject,null);
+			varMap.put("assigneeListA",
+					getApprover(ecmSession, ecmObject.getAttributes().get("C_REVIEWER2").toString()));	//C_REVIEWER2小组
+			arg0.setVariable("assigneeListA", getApprover(ecmSession, ecmObject.getAttributes().get("C_REVIEWER2").toString()));
+			arg0.setTransientVariables(varMap);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return varMap;
 	}
-
 	/**
 	 * @param execution
 	 */
@@ -331,12 +323,11 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 			}
 		}
 	}
-
 	/**
 	 * @param execution
 	 * @param ecmSession
 	 */
-	private void sendMailOfProcessEnd(IEcmSession ecmSession, DelegateExecution execution) {
+	private void sendMailOfProcessEnd(IEcmSession ecmSession,DelegateExecution execution) {
 		// 流程结束发送邮件
 		if ("endevent1".equals(execution.getCurrentActivityId())) {
 			HistoricProcessInstance hi = historyService.createHistoricProcessInstanceQuery()
@@ -351,3 +342,4 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 	}
 
 }
+

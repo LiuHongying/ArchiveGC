@@ -242,7 +242,7 @@ import DestoryViewReadOnly from "@/views/workflow/DestoryViewReadOnly.vue"
 import ViolationStartUp from "@/views/workflow/ViolationStartUp.vue"
 import ViolationViewReadOnly from "@/views/workflow/ViolationViewReadOnly.vue"
 import DestoryViewUpdate from "@/views/workflow/DestoryViewUpdate.vue"
-
+import BorrowViewPrint from "@/views/workflow/BorrowViewPrint.vue"
 export default {
   name: "TodoTask",
   permit: 1,
@@ -271,7 +271,8 @@ export default {
     DestoryViewReadOnly:DestoryViewReadOnly,
     ViolationStartUp:ViolationStartUp,
     ViolationViewReadOnly:ViolationViewReadOnly,
-    DestoryViewUpdate:DestoryViewUpdate
+    DestoryViewUpdate:DestoryViewUpdate,
+    BorrowViewPrint:BorrowViewPrint
 
   },
   data() {

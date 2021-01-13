@@ -2,7 +2,7 @@
   <DataLayout>
     <template v-slot:header>
       <el-dialog
-        title="添加库号"
+        title="添加库位号"
         :visible.sync="propertyVisible"
         @close="propertyVisible = false"
         width="30%"
@@ -10,18 +10,16 @@
         v-dialogDrag
       >
         <el-form>
-          <!--
           <el-form-item>
             <el-input
               style="width: 90%"
-              v-model="DCinputValueNum"
-              placeholder="请输入自定义库号"
+              v-model="locationCoding"
+              placeholder="请输入库位号"
             >
             </el-input>
           </el-form-item>
-          -->
           <el-form-item>
-            <el-button type="primary" @click="addStoreNum()">{{
+            <el-button type="primary" @click="updateLocationCoding()">{{
               $t("application.ok")
             }}</el-button>
             <el-button @click="propertyVisible = false">{{
@@ -42,6 +40,9 @@
           <el-button type="primary" @click="search()">{{
             $t("application.SearchData")
           }}</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="propertyVisible=true">添加库位号</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handOver()">入库</el-button>
@@ -147,7 +148,7 @@ export default {
       inputValueNum: "",
       selectedItems: [],
       propertyVisible: false,
-      DCinputValueNum: "",
+      locationCoding: "",
     };
   },
   props: {},
@@ -189,20 +190,32 @@ export default {
       _self.$refs.mainDataGrid.currentPage = 1;
       _self.$refs.mainDataGrid.loadGridInfo();
       _self.$refs.mainDataGrid.loadGridData();
+      _self.$refs.subtabGrid.itemDataList = [];
     },
 
-    addStoreNum() {
+    updateLocationCoding() {
       let _self = this;
       if (_self.selectedItems.length == 0) {
-        let msg = "请选择档案信息";
+        let msg = "请勾选文档！";
         _self.$message({
           showClose: true,
           message: msg,
-          duration: 2000,
+          duration: 5000,
           type: "warning",
         });
         return;
       }
+      if (-self.locationCoding==null || _self.locationCoding.length == 0) {
+        let msg = "请输入库位号！";
+        _self.$message({
+          showClose: true,
+          message: msg,
+          duration: 5000,
+          type: "warning",
+        });
+        return;
+      }
+
 
       var id = [];
 
@@ -210,10 +223,9 @@ export default {
       for (i in _self.selectedItems) {
         id.push(_self.selectedItems[i]["ID"]);
       }
-
       let mp = new Map();
       mp.set("ids", id);
-
+      mp.set("locationCoding", _self.locationCoding);
       axios
         .post("/record/createStorageNum", JSON.stringify(mp), {
           headers: {
@@ -221,8 +233,17 @@ export default {
           },
         })
         .then(function (response) {
-          _self.search();
+          
           let code = response.data.code;
+          if(code == "1"){
+             _self.$message({
+              showClose: true,
+              message: "操作成功！",
+              duration: 2000,
+              type: "success",
+            });
+            _self.search();
+          }
         });
 
       _self.propertyVisible = false;

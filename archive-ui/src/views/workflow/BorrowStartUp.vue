@@ -15,7 +15,7 @@
         <UserSelectInput :roleName='departmentLeader' v-model="reviewer1" v-bind:inputValue="reviewer1" ></UserSelectInput>
         </el-form-item>
         <el-form-item label="文件形成单位/部门领导:" label-width="170px">
-        <UserSelectInput :roleName='departmentLeader' v-model="reviewer2" v-bind:inputValue="reviewer2" ></UserSelectInput>
+        <UserSelectInput :roleName='departmentLeader' v-model="reviewer2" v-bind:inputValue="reviewer2" :isRepeat="true"></UserSelectInput>
         </el-form-item>
         <el-form-item label="公司主管领导:" label-width="130px">
         <UserSelectInput :roleName='companyLeader' v-model="reviewer3" v-bind:inputValue="reviewer3" ></UserSelectInput>                
@@ -44,11 +44,15 @@
 
                 根据《中华人民共和国档案法》以及中国核电工程有限公司（以下简称“公司”）档案利用工作有关规定，作为公司员工，本人对档案利用作以下承诺：</br>
                 一、自觉遵守国家档案法律、法规及公司的档案利用规章制度；</br>
-                二、所借阅档案不得做任何涂改、抽取、替换或添加信息；</br>
-                三、所借阅档案应妥善保管、不得损坏、丢失，已装订成册的不得拆散；</br>
-                四、所借阅档案不得扩大知悉范围，不得拍照、复制或转借他人；</br>
-                五、所借阅档案应在规定时间内归还；</br>
-                六、本《承诺书》未尽事宜按国家有关法律法规和公司规定执行。</span>
+                二、借阅档案时本人签字确认。特殊原因代签的，代签人承担同等责任；</br>
+                三、借阅者不得扩大知悉范围，不得拍照、复制或转借他人；</br>
+                四、借阅者不得做任何涂改、抽取、替换或添加信息；</br>
+                五、借阅者应妥善保管。不得损坏、丢失，已装订成册的不得拆散；</br>
+                六、借阅者应在规定时间内归还，超期应办理续借手续；</br>
+                七、所借阅档案损坏或丢失应按公司规定赔偿。</br>
+                本人已仔细阅读上述“档案利用承诺书”，并承诺履行相应义务，且愿意承担因个人行为导致档案破坏、信息泄露的法律责任。
+                
+                </span>
 
                 </el-dialog>
         </el-main>
@@ -116,7 +120,8 @@
       borrowType:'',
       flag: false,
       dialogVisible:false,
-      isLimited:true
+      isLimited:true,
+      isCurrentCompany:false
                 }
             },
             props:{
@@ -126,6 +131,7 @@
             },
             mounted(){
                 // this.getWorkflows();
+                console.log(this.currentUser().department)
             },
             methods:{
             getBorrowType(){            //获取当前借阅类型
@@ -140,6 +146,12 @@
             checkLevel(){
                 this.getBorrowType()
                 let _self = this
+                _self.isCurrentCompany=true
+                  this.workflowFileList.forEach(element => {
+                        if(element.C_CREATE_UNIT!=_self.currentUser().department&&element.C_ARCHIVE_UNIT!=_self.currentUser().department){
+                        _self.isCurrentCompany=false       //找到了，借阅文件不是当前部门的，需要形成部门领导
+                        }
+                    })
                 if(this.borrowType=='查阅'){                //默认都要验证选人，查阅的时候先默认不选人，然后判断密级
                     this.isLimited=false//无限制，可立即发起
                     this.workflowFileList.forEach(element => {
@@ -147,10 +159,8 @@
                             _self.isLimited=true       //找到了，借阅文件包含商密，将在下一步进行判断
                         }
                     })
-                }             
+                } 
             },
-
-
             getTypeResult(){
                  let _self = this
                  _self.$refs.workflowFile.setSubTypeCondition(false)
@@ -176,7 +186,7 @@
                 },
                 startUpWorkflow(workflow){
                 this.checkLevel()                                   //在这里获取当前文件安全等级
-                console.log(this.isLimited)
+                console.log(this.isCurrentCompany)
                   if(this.accept!="接受"){
                       this.$message("请接受档案利用承诺书!")
                       return
@@ -188,8 +198,8 @@
                       this.$message("请完成借阅单必填项！本部门领导为必填项!")
                       return
                     }
-                   if(this.$refs.workflowFile.sameDepartMent == false&&this.isLimited==true){                     //查阅&普通借阅提醒
-                   if(this.reviewer2==''){
+                   if(this.isLimited==true){                     //查阅&普通借阅提醒
+                   if(this.reviewer2=='' && this.isCurrentCompany==false){
                     this.$message("请完成借阅单必填项！形成部门领导为必填项!")
                       return                }
                    }
@@ -216,6 +226,7 @@
                             return
                         }
                         }
+                    _self.getReviewers()
                     var c;
                     for(c in _self.$refs.ShowProperty.dataList)
                     {
@@ -267,9 +278,9 @@
                             _self.butt=false;
                             return;
                         }
-                        m.set("C_REVIEWER1",_self.reviewer1)
-                        m.set("C_REVIEWER2",_self.reviewer2)
-                        m.set("C_REVIEWER3",_self.reviewer3)
+                        // m.set("C_REVIEWER1",_self.reviewer1)
+                        // m.set("C_REVIEWER2",_self.reviewer2)
+                        // m.set("C_REVIEWER3",_self.reviewer3)
                         let formdata = new FormData();
                         formdata.append("metaData",JSON.stringify(m));
                         if(_self.$refs.ShowProperty.file!="")
@@ -490,7 +501,23 @@
                     });
                 
                 },
-                
+                getReviewers(){
+                    let _self = this
+                    let ecmFormItems = this.$refs.ShowProperty.dataList[0].ecmFormItems
+                    ecmFormItems.forEach(element => {
+                        if(element.attrName=="C_REVIEWER1"){
+                            element.defaultValue=_self.reviewer1
+                        }
+                        if(element.attrName=="C_REVIEWER2"){
+                            element.defaultValue=_self.reviewer2
+                        }
+                        if(element.attrName=="C_REVIEWER3"){
+                            element.defaultValue=_self.reviewer3
+                        }
+                    });
+                    //this.$refs.ShowProperty.dataList[0].ecmFormItems[6].defaultValue = val
+                    console.log(this.$refs.ShowProperty.dataList[0].ecmFormItems)
+                },
                 // 保存结果事件
                 onSaved(indata) {
                     let _self=this;

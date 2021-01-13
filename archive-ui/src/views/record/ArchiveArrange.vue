@@ -419,6 +419,9 @@
                         size="small"
                         @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
                       </el-form-item>
+                      <el-form-item>
+                      <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
+                      </el-form-item>
                     </el-col>
                   </el-row>
                   </el-form>
@@ -522,7 +525,7 @@ import TypeSelectComment from "@/views/record/TypeSelectComment.vue";
 import DataLayout from '@/components/ecm-data-layout'
 
 import "url-search-params-polyfill";
-
+import AddCondition from '@/views/record/AddCondition'
 import PrintPage from "@/views/record/PrintPage";
 // import PrintVolumes from "@/views/record/PrintVolumes";
 import PrintVolumes from "@/views/record/PrintVolumes4Archive";
@@ -549,7 +552,8 @@ export default {
     //Prints:Prints
     DataLayout:DataLayout,
     PrintPdf417:PrintPdf417,
-    BatchImport:BatchImport
+    BatchImport:BatchImport,
+    AddCondition:AddCondition
   },
   data() {
     return {
@@ -675,7 +679,8 @@ export default {
       AddComment:'',
       isDates:false,
       newChildDoc: false,
-
+      hiddenInput:"hidden",
+      AddConds:''
     };
   },
   
@@ -1400,6 +1405,9 @@ export default {
       if(_self.archiveStatus!=''){
           key=key+" and status='"+_self.archiveStatus+"'";
         }
+      if(_self.AddConds!=''){
+        key = key + " and "+_self.AddConds
+      }
       _self.mainParam.condition=key;
       _self.mainParam.folderId=indata.id
       _self.$nextTick(()=>{
@@ -1793,6 +1801,7 @@ export default {
     },
     //查询文档
     searchItem() {
+      console.log(this.mainParam.condition)
       this.loadGridData(this.currentFolder);
       //  this. loadPageInfo(this.currentFolder);
     },

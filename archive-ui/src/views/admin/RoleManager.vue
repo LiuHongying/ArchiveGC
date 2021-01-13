@@ -325,7 +325,7 @@ export default {
         m.set("userId", indata.id);
         m.set("deptId", _self.selectedItemId);
         axios
-          .post("/admin/addToGroup", JSON.stringify(m))
+          .post("/admin/addToRole", JSON.stringify(m))
           .then(function(response) {
             _self.refreshUserData();
             _self.$message("添加用户成功!");

@@ -1,25 +1,15 @@
 <template>
   <DataLayout>
     <template v-slot:header>
-      <el-dialog
-        :title="$t('application.pendNot')"
-        :visible.sync="pendNotVisible"
-        @close="pendNotVisible = false"
-        :append-to-body="true"
-        width="60%"
-        :close-on-click-modal="false"
-        v-dialogDrag
-      >
-        <el-col :span="24">
-        <el-form label-position="right" :model="pendForm" @submit.native.prevent>
-          <el-input type="textarea" :rows="6" v-model="pendForm.rejectComment" autocomplete="off"></el-input>
-        </el-form>
-        </el-col>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="saveRejectComment" :loading="butt">{{$t('application.save')}}</el-button>
-          <el-button @click="pendNotVisible = false">{{$t('application.cancel')}}</el-button>
-        </div>
-      </el-dialog>
+    <el-dialog :visible.sync="printVolumesVisible" width="80%"
+    modal-append-to-body="false"
+    :append-to-body="true" 
+    >
+      <PrintVolumes
+        ref="printVolumes"
+      ></PrintVolumes>
+    </el-dialog>
+
       <el-dialog
         :title="$t('application.AddFile')"
         :visible.sync="propertyVisible"
@@ -113,6 +103,15 @@
       <div :style="{position:'relative'}">
             <el-tabs value="t01" >
               <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01" >
+              <el-row v-if="isShowPrint"> 
+                <el-button
+                        type="primary"
+                        size="small"
+                        icon="el-icon-printer"
+                        @click="beforePrint(selectedArchives,'BorrowPrintGrid','打印清单')"
+                        title="打印清单"
+                >打印清单</el-button>
+              </el-row>
                 <el-row v-if="allowEdit||isShowReject">
                   <el-col :span="24" style="text-align: left">
                     <el-form :inline="true" :model="filters" @submit.native.prevent>
@@ -126,11 +125,6 @@
                         <el-form-item>
                           <el-button type="warning" @click="removeRelation">{{ $t("application.delete") }}</el-button>
                         </el-form-item>
-                      </template>
-                      <template v-if="isShowReject">
-                        <!-- <el-form-item>
-                          <el-button type="primary" @click="pendNot">{{ $t("application.pendNot") }}</el-button>
-                        </el-form-item> -->
                       </template>
                     </el-form>
                   </el-col>
@@ -158,10 +152,6 @@
                   @selectchange="archiveSelect"
                   @dbclick="showVolumesFile"
                 >
-                  <template slot="sequee" slot-scope="scope">
-                      <span :style="(scope.data.row['C_REJECT_COMMENT']!=null
-                      &&scope.data.row['C_REJECT_COMMENT']!='')?{'background':'red'}:''">{{(scope.currentPage-1) * scope.pageSize+ scope.data.$index+1}}</span>
-                  </template>
                 </DataGrid>
               </el-tab-pane>
             </el-tabs>
@@ -180,6 +170,7 @@ import ExcelUtil from "@/utils/excel.js";
 import DataSelect from "@/components/ecm-data-select";
 import DataLayout from "@/components/ecm-data-layout";
 import AttachmentFile from "@/views/dc/AttachmentFile.vue";
+import PrintVolumes from "@/views/record/Print4Borrow";
 export default {
   components: {
     ShowProperty: ShowProperty,
@@ -188,18 +179,19 @@ export default {
     DataSelect: DataSelect,
     RejectButton: RejectButton,
     DataLayout: DataLayout,
-    AttachmentFile: AttachmentFile
+    AttachmentFile: AttachmentFile,
+    PrintVolumes:PrintVolumes
   },
   model: {
     event: "change"
   },
   props: {
     allowEdit: { type: Boolean, default: true },
-    isShowPage: { type: Boolean, default: true },
+    isShowPage: { type: Boolean, default: false },
     parentId: { type: String, default: "" },
     processDefinitionId: { type: String, default: "" },
     activityName: { type: String, default: "" },
-    isShowReject: { type: Boolean, default: false }
+    isShowPrint: { type: Boolean, default:false },
   },
   data() {
     return {
@@ -231,17 +223,49 @@ export default {
       butt: false,
       searchFileCondition: "",
       selectedArchives: [],
-      archiveId: "", //案卷ID
+      archiveId: "123", //案卷ID
       volumesFileVisible: false,
       pendNotVisible:false,
-      tableHeight:427
+      tableHeight:427,
+      printVolumesVisible:false
     };
   },
   mounted() {
   },
   methods: {
+    beforePrint(selectedRow,gridName,vtitle){
+      let _self=this;
+      let ids =[]
+      for(let i = 0;i < _self.selectedArchives.length;i++){
+        ids[i] = _self.selectedArchives[i].ID
+      }
+      //console.log(_self.selectedArchives[0].ID)
+      if(_self.selectedArchives.length==0){
+        // _self.$message('请选择一条数据进行打印');
+        _self.$message({
+                showClose: true,
+                message: '请选择一条数据进行打印!',
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      _self.printVolumesVisible = true;
+
+      setTimeout(()=>{
+        _self.$refs.printVolumes.dialogQrcodeVisible = false
+        _self.$refs.printVolumes.getArchiveObj(ids,
+        gridName,
+        vtitle); 
+      },10);
+
+      _self.printGridName=gridName;
+      _self.printObjId=selectedRow.ID;
+    },
+
+
     
-            checkCondition(){    
+  checkCondition(){    
      let _self = this
      let cond = this.searchFileCondition
      let ids =  _self.$refs.fileList.itemDataList
@@ -335,6 +359,7 @@ export default {
     },
     archiveSelect(val) {
       this.selectedArchives = val;
+      console.log(this.selectedArchives)
     },
     pendNot() {
       let _self = this;

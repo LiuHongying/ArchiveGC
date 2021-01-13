@@ -28,7 +28,7 @@
             <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:4px;">复制件</el-col>
           </el-row>
           <el-row>
-            <el-col :span="24" style="color: #000000;text-align: left;font-size:32px;padding:4px;">{{item.CODING}}&nbsp;111111</el-col>
+            <el-col :span="24" style="color: #000000;text-align: left;font-size:28px;padding:4px;">{{item.CODING}}&nbsp;</el-col>
           </el-row>
           <el-row>
             <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">密级：{{item.C_SECURITY_LEVEL}}</el-col>
