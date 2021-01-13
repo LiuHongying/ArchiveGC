@@ -9,6 +9,11 @@
       </el-input>
       <el-button @click="rejectSub()">{{$t('application.ok')}}</el-button>
     </el-dialog>
+    <el-dialog title="四性检查" :visible.sync="Check4Visible" width="80%" @close="Check4Visible=false">
+      <div height="200">
+        <Check4 :checkData="selectedDCItems" @close="Check4Visible = false"></Check4>
+      </div>
+    </el-dialog>
     <template v-slot:main="{ layout }">
       <div :style="{position:'relative',height: layout.height-startHeight+45+'px'}">
         <split-pane split="vertical" @resize="onHorizontalSplitResize" :min-percent='1' :default-percent='leftPercent'>
@@ -62,6 +67,9 @@
                 <el-form-item>
                     <el-button type="warning" @click="beforeRejectDC()">驳回</el-button>
                 </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="beforeCheck()">四性检查</el-button>
+                </el-form-item>
               </el-form>
             </el-row>
             <el-row>
@@ -92,6 +100,7 @@ import ShowProperty from "@/components/ShowProperty";
 import DataGrid from "@/components/DataGrid";
 import DataLayout from "@/components/ecm-data-layout";
 import RejectButton from "@/components/RejectButton";
+import Check4 from "@/views/record/Check4.vue"
 
 export default {
   name: "TC",
@@ -133,6 +142,7 @@ export default {
       rejectVisible:false,
       condition:"",
       condition1:"",
+      Check4Visible:false,
     };
   },
   mounted() {
@@ -422,6 +432,21 @@ export default {
           
         })
     },
+    beforeCheck(){
+      let _self = this;
+      if(_self.selectedDCItems.length==0){
+        _self.$message({
+                showClose: true,
+                message:"请选择一条移交单",
+                duration: 2000,
+                type: 'warning' 
+            });
+            return
+      }
+      else{
+        _self.Check4Visible=true
+      }
+    }
   },
   props: {},
   components: {
@@ -429,6 +454,7 @@ export default {
     DataLayout: DataLayout,
     RejectButton:RejectButton,
     ShowProperty: ShowProperty,
+    Check4:Check4,
   },
 };
 </script>

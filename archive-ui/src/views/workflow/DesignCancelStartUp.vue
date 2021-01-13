@@ -78,6 +78,17 @@
                         _self.butt=false;
                         return;
                     }
+                    if(this.workflowFileList.length==0){
+                    this.$message({
+                        showClose: true,
+                        message: "请选择流程文件再发起流程！",
+                        duration: 2000,
+                        type: "warning",
+                        })
+                    this.butt=false
+                    return
+                }
+
                     _self.butt=true
                     var m = new Map();
                     let fileIds=new Array();

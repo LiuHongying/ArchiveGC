@@ -1,14 +1,10 @@
 <template>
   <div>
     <el-container>
-      <el-header>
+      <!--<el-header>
         <el-row>
           <el-col :span="24" class="topbar-button">
-            <el-select v-model="classic" placeholder="选择档案分类">
-                <div v-for="item in classicData" :key="item.NAME">
-                  <el-option :label="item.NAME" :key="item.NAME" :value="item.NAME"></el-option>
-                </div>
-              </el-select>
+            
             <el-date-picker
               style="width:14em"
               type="date"
@@ -23,38 +19,32 @@
               value-format="yyyy-MM-dd"
               placeholder="结束时间"
             ></el-date-picker>
-            <el-button type="primary" plain  @click="startCheck">开始检查</el-button>
+            <el-button type="primary" plain  @click="refreshData" v-loading="buttloading">开始检查</el-button>
             &nbsp;
-            <el-button type="primary" plain  @click="exortExcel">{{$t('application.ExportExcel')}}</el-button>
-            <!--
+           <!-- <el-button type="primary" plain  @click="exortExcel">{{$t('application.ExportExcel')}}</el-button>
             <el-button type="primary" @click="searchAll">所有数据</el-button>
-            -->
+            
           </el-col>
         </el-row>
-      </el-header>
+      </el-header>-->
       <el-main>
-        <el-table id="outTable" :data="checkData" v-loading="loading">
-          <el-table-column type="index" width="50">
+        <el-table id="outTable" :data="checkData" v-loading="loading" height="500px">
+          <el-table-column type="index" width="50" >
           </el-table-column>
           <el-table-column
-              prop="coding"
+              prop="CODING"
               label="编码"
-              width="200">
+              width="150">
             </el-table-column>
             <el-table-column
-              prop="revision"
+              prop="REVISION"
               label="版本"
               width="100">
             </el-table-column>
             <el-table-column
-              prop="archiveCoding"
-              label="档案号"
-              width="200">
-            </el-table-column>
-            <el-table-column
-              prop="title"
+              prop="TITLE"
               label="标题"
-              width="220">
+              width="180">
             </el-table-column>
           <el-table-column label="真实性">
             <el-table-column
@@ -112,6 +102,10 @@
           <el-table-column label="总体结果" prop="totalResult"></el-table-column>
           </el-table>
       </el-main>
+      <el-footer>
+      <el-button type="primary" @click="refreshData" :disabled="buttloading==-1?true:false">开始检查</el-button>
+      <el-button type="primary" @click="closePage()">{{$t('application.cancel')}}</el-button>
+      </el-footer>
     </el-container>
   </div>
 </template>
@@ -123,8 +117,9 @@ import XLSX from 'xlsx'
 export default {
   data() {
     return { 
+    buttloading:0,
     loading:false,
-    checkData:[],
+    // checkData:[],
     classicData: [],
     classic: "",
     firstTime:'',
@@ -153,6 +148,9 @@ export default {
     _self.endTime = year+"-"+month+"-"+day
     //_self.refreshData();
   },
+  props:{
+    checkData:{type:Array,default:[]}
+  },
   methods: {
     loadClassic() {
       let _self = this;
@@ -178,48 +176,42 @@ export default {
     refreshData() {
       let _self = this;
       _self.loading = true
-      var m = new Map();
-      m.set("startDate",_self.firstTime)
-      m.set("endDate",_self.endTime)
-      m.set("classic",_self.classic)
-      axios.post('/record/getCheck4Data',JSON.stringify(m))
+      _self.buttloading=-1
+      var m = [];
+      let tab = _self.checkData;
+      var i;
+      for (i in tab) {
+        m.push(tab[i]["ID"]);
+      }
+      axios
+      .post("/record/getCheck4Data",JSON.stringify(m),{
+        headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+        }
+      })
       .then(function(response) {
-        _self.checkData = response.data.data
-        _self.loading = false;
-          _self.$message({
-          showClose: true,
-          message: '已查找数据',
-          type: 'success',
-          duration:2000
-        });
+        let code = response.data.code;
+        if (code == 1) {
+          _self.checkData = response.data.data
+          _self.loading = false;
+          _self.buttloading=0;
+            _self.$message({
+            showClose: true,
+            message: '检查结束',
+            type: 'success',
+            duration:2000
+          });
+        }
       })
       .catch(function(error) {
         console.log(error);
       });
     },
-    startCheck(){
-      let _self = this
-      if(_self.firstTime==''||_self.firstTime==null){
-        this.$message({
-          showClose: true,
-          message: '请选择起始时间',
-          type: 'warning',
-          duration:1000
-        });
-        return
-      }else if(_self.endTime==''||_self.endTime==null){
-        this.$message({
-          showClose: true,
-          message: '请选择终止时间',
-          type: 'warning',
-          duration:1000
-        });
-        return
-      }else{
-        _self.findType = 'search'
-        _self.refreshData();
-      }}
-  }
+    closePage(pv){
+        this.$emit("close");
+        this.buttloading=0;
+    },
+  },
 };
 </script>
 
