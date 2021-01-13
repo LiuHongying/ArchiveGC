@@ -155,7 +155,7 @@
                 if(this.borrowType=='查阅'){                //默认都要验证选人，查阅的时候先默认不选人，然后判断密级
                     this.isLimited=false//无限制，可立即发起
                     this.workflowFileList.forEach(element => {
-                        if(element.C_SECURITY_LEVEL=='受限'||element.C_SECURITY_LEVEL=='普通商密'){
+                        if(element.C_SECURITY_LEVEL!='非密'||element.C_SECURITY_LEVEL!='内部公开'){
                             _self.isLimited=true       //找到了，借阅文件包含商密，将在下一步进行判断
                         }
                     })
