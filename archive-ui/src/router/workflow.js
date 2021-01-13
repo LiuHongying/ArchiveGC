@@ -303,6 +303,14 @@ path: '/workflow/DestoryViewUpdate',
 name: 'DestoryViewUpdate',
 component: () => import('@/views/workflow/DestoryViewUpdate.vue')
 },
-
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'BorrowViewPrint'
+},
+path: '/workflow/BorrowViewPrint',
+name: 'BorrowViewPrint',
+component: () => import('@/views/workflow/BorrowViewPrint.vue')
+},
     ]
   }

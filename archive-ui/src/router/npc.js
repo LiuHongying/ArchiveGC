@@ -39,4 +39,14 @@ export const npcRouter =  [
         name: '知识库',
         component: () => import('@/views/npc/DocStorage.vue')
     },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:"effectiveDocuments"
+        },
+        path: '/npc/CreateWithTemplate',
+        name: '文件创建',
+        component: () => import('@/views/npc/CreateWithTemp.vue')
+    },
 ]

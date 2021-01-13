@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ecm.common.util.JSONUtils;
 import com.ecm.core.ActionContext;
 import com.ecm.core.cache.manager.CacheManagerOper;
+import com.ecm.core.dao.EcmFolderMapper;
 import com.ecm.core.entity.EcmDefType;
 import com.ecm.core.entity.EcmDocument;
 import com.ecm.core.entity.EcmFolder;
@@ -254,6 +255,32 @@ public class ArchiveDcController extends ControllerAbstract{
 		mp.put("code", ActionContext.SUCESS);
 		return mp;
 	}
+	
+	@RequestMapping(value = "/dc/getAllSelectedDc", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> getAllSelectedDc(@RequestBody String argStr) {
+		Map<String, Object> args = JSONUtils.stringToMap(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		String idsStr = args.get("ids").toString();
+		List<String> idsList=JSONUtils.stringToArray(idsStr);
+		String ids= String.join("','", idsList.toArray(new String[idsList.size()]));
+		try {
+			String sql = "select * from ecm_document where  id in('"+ids+"')";
+			List<Map<String, Object>>  list = documentService.getMapList(getToken(), sql);
+			mp.put("data", list);
+			mp.put("code", ActionContext.SUCESS);
+		}
+		catch(Exception ex) {
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", ex.getMessage());
+		}
+		return mp;
+	
+	}
+	
+	
+	
+	
 	
 	@RequestMapping(value = "/dc/countDocuments", method = RequestMethod.POST)
 	@ResponseBody
@@ -756,12 +783,14 @@ public class ArchiveDcController extends ControllerAbstract{
 				long nowData=new Date().getTime();
 				Date date = sdf.parse(obj.get("C_DRAFT_DATE").toString());
 				long a = date.getTime();
-				if(obj.get("C_RETENTION").toString().equals("10年")) {
+				if(obj.get("C_RETENTION").toString().equals("10年")||obj.get("C_RETENTION").toString().equals("短期")) {
 					if(nowData-(10*12*24*60*60*1000)>a) {
 						res.add(obj);
 //						res.add(obj);
 					}
-				}else if(obj.get("C_RETENTION").toString().equals("30年")) {
+				}else if(obj.get("C_RETENTION").toString().equals("30年")||
+						obj.get("C_RETENTION").toString().equals("30")||
+						obj.get("C_RETENTION").toString().equals("长期")) {
 					if(nowData-(30*12*24*60*60*1000)>a) {
 						res.add(obj);
 //						res.add(obj);
@@ -926,6 +955,23 @@ public class ArchiveDcController extends ControllerAbstract{
 			documentService.updateObject(getToken(), temp, null);
 		}
 		mp.put("code", ActionContext.SUCESS);
+		return mp;
+	}
+	
+	@Autowired
+	private EcmFolderMapper ecmFolderMapper;
+	@ResponseBody
+	@RequestMapping(value="/admin/searchFolder", method = RequestMethod.POST)
+	public Map<String, Object> searchFolder(@RequestBody String argStr) {
+		Map<String, Object> args = JSONUtils.stringToMap(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		String NAME = args.get("NAME").toString();
+		String parentPath = args.get("parentPath").toString();
+		List<EcmFolder> list = null;
+		String cond = "NAME like '%"+NAME+"%' and FOLDER_PATH like '%"+parentPath+"%' ";
+		list = ecmFolderMapper.selectByCondition(cond);
+		mp.put("code", ActionContext.SUCESS);
+		mp.put("data", list);
 		return mp;
 	}
 }
