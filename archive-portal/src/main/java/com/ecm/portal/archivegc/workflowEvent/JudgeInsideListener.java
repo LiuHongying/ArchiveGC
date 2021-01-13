@@ -50,7 +50,7 @@ public class JudgeInsideListener implements JavaDelegate{
 			List<Map<String,Object>> Res = documentService.getMapList(ecmSession.getToken(), sql);
 			for(Map<String,Object> mp : Res) {
 			String level = mp.get("C_SECURITY_LEVEL").toString();
-			if((level.equals("普通商密")||level.equals("受限"))&&varMap.get("SUB_TYPE").toString().equals("查阅")) {
+			if((!level.equals("非密")||!level.equals("内部公开"))&&varMap.get("SUB_TYPE").toString().equals("查阅")) {
 				execution.setVariable("isOK", "否");				//有任意子文件不满足条件，跳出
 				break;
 			}
