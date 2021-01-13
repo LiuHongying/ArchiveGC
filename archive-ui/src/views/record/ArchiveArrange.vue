@@ -680,7 +680,8 @@ export default {
       isDates:false,
       newChildDoc: false,
       hiddenInput:"hidden",
-      AddConds:''
+      AddConds:'',
+      volumeInArchiveGridName:""
     };
   },
   
@@ -925,7 +926,6 @@ export default {
     },
 
     beforePrint(selectedRow,gridName,vtitle){
-      debugger
       let _self=this;
       if(selectedRow.ID==undefined){
         // _self.$message('请选择一条数据进行打印');
@@ -940,10 +940,45 @@ export default {
       _self.printVolumesVisible = true;
 
       setTimeout(()=>{
-        _self.$refs.printVolumes.dialogQrcodeVisible = false
-        _self.$refs.printVolumes.getArchiveObj(selectedRow.ID,
-        gridName,
-        vtitle); 
+
+        _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: selectedRow.TYPE_NAME,
+          url: "/dc/getPrintArchiveGrid"
+        })
+        .then(function(response) {
+          
+          if(response.data.code=='1'){
+            let printGridName=response.data.data.attributes.C_TO;
+            _self.$refs.printVolumes.dialogQrcodeVisible = false
+            _self.$refs.printVolumes.getArchiveObj(selectedRow.ID,
+            printGridName,
+            vtitle); 
+          }else{
+            _self.$message({
+              showClose: true,
+              message: response.data.message,
+              duration: 5000,
+              type: "error"
+            });
+          }
+        })
+        .catch(function(error) {
+         
+          _self.$message({
+            showClose: true,
+            message: "操作失败",
+            duration: 5000,
+            type: "error"
+          });
+          console.log(error);
+        });
+
+        
       },10);
 
       _self.printGridName=gridName;

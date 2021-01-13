@@ -944,4 +944,26 @@ public class ArchiveDcController extends ControllerAbstract{
 		mp.put("data", list);
 		return mp;
 	}
+	/**
+	 * 获取
+	 * @param argStr
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/dc/getPrintArchiveGrid", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> getPrintArchiveGrid(@RequestBody String argStr) throws Exception {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		List<EcmDocument> results= documentService.getObjectsAllColumn(getToken(), " TYPE_NAME='卷内列表配置' and C_FROM='"+argStr+"'");
+		if(results!=null&&results.size()>0) {
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("data", results.get(0));
+		}else {
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", "请先配置“卷内列表”配置项！");
+		}
+		
+		return mp;
+	}
+	
 }
