@@ -228,6 +228,32 @@ public class ArchiveDcController extends ControllerAbstract{
 		return mp;
 	}
 	
+	@RequestMapping(value = "/dc/getAllSelectedDc", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> getAllSelectedDc(@RequestBody String argStr) {
+		Map<String, Object> args = JSONUtils.stringToMap(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		String idsStr = args.get("ids").toString();
+		List<String> idsList=JSONUtils.stringToArray(idsStr);
+		String ids= String.join("','", idsList.toArray(new String[idsList.size()]));
+		try {
+			String sql = "select * from ecm_document where  id in('"+ids+"')";
+			List<Map<String, Object>>  list = documentService.getMapList(getToken(), sql);
+			mp.put("data", list);
+			mp.put("code", ActionContext.SUCESS);
+		}
+		catch(Exception ex) {
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", ex.getMessage());
+		}
+		return mp;
+	
+	}
+	
+	
+	
+	
+	
 	@RequestMapping(value = "/dc/countDocuments", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> countDocuments(@RequestBody String metadata) throws Exception {
