@@ -555,7 +555,8 @@
     "DesignDocCreate":"设计文件创建",
     "Drafts":"草稿箱",
     "preArchive":"预归档库",
-    "knowledgeBase":"知识库"
+    "knowledgeBase":"知识库",
+    "effectiveDocuments":"生效文件"
 },
 "message": {
     "conditionS":"条件选择",
