@@ -186,11 +186,19 @@
                 },
                 startUpWorkflow(workflow){
                 this.checkLevel()                                   //在这里获取当前文件安全等级
-                console.log(this.isCurrentCompany)
                   if(this.accept!="接受"){
                       this.$message("请接受档案利用承诺书!")
                       return
                   }
+                if(this.workflowFileList.length==0){
+                    this.$message({
+                        showClose: true,
+                        message: "请选择流程文件再发起流程！",
+                        duration: 2000,
+                        type: "warning",
+                        })
+                    return
+                }
                 if(this.borrowType=='查阅'&&this.isLimited==true&&this.reviewer1==''){       //查阅提醒
                     this.$message("查阅文件包含涉密和限制文件，请选择本部门领导!")
                 }
