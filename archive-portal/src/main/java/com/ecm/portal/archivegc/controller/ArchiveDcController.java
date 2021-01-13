@@ -755,12 +755,14 @@ public class ArchiveDcController extends ControllerAbstract{
 				long nowData=new Date().getTime();
 				Date date = sdf.parse(obj.get("C_DRAFT_DATE").toString());
 				long a = date.getTime();
-				if(obj.get("C_RETENTION").toString().equals("10年")) {
+				if(obj.get("C_RETENTION").toString().equals("10年")||obj.get("C_RETENTION").toString().equals("短期")) {
 					if(nowData-(10*12*24*60*60*1000)>a) {
 						res.add(obj);
 //						res.add(obj);
 					}
-				}else if(obj.get("C_RETENTION").toString().equals("30年")) {
+				}else if(obj.get("C_RETENTION").toString().equals("30年")||
+						obj.get("C_RETENTION").toString().equals("30")||
+						obj.get("C_RETENTION").toString().equals("长期")) {
 					if(nowData-(30*12*24*60*60*1000)>a) {
 						res.add(obj);
 //						res.add(obj);
