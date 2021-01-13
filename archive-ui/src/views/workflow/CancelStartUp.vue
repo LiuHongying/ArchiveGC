@@ -142,6 +142,16 @@
                         fileIds.push(_self.workflowFileList[n].ID);
                     }
                     m.set("childFileId",fileIds);
+                if(this.workflowFileList.length==0){
+                    this.$message({
+                        showClose: true,
+                        message: "请选择流程文件再发起流程！",
+                        duration: 2000,
+                        type: "warning",
+                        })
+                    this.butt=false
+                    return
+                }
                     if(this.isCreated==false){
                         this.$message({
                         showClose: true,
