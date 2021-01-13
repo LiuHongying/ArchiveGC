@@ -143,6 +143,16 @@
                     this.$message("请完成借阅单必填项！形成部门领导为必填项!")
                       return                }
                    }
+                if(this.workflowFileList.length==0){
+                    this.$message({
+                        showClose: true,
+                        message: "请选择流程文件再发起流程！",
+                        duration: 2000,
+                        type: "warning",
+                        })
+                    this.butt=false
+                    return
+                }
                    let _self = this;
                     _self.butt=true;
                     if(!this.$refs.ShowProperty.validFormValue()){

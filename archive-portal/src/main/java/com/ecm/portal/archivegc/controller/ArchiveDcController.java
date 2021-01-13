@@ -122,7 +122,7 @@ public class ArchiveDcController extends ControllerAbstract{
 				EcmDocument doc = documentService.getObjectById(getToken(), obj);
 				if(doc != null) {
 					condition=" TYPE_NAME='案卷文件配置' and C_FROM='"+doc.getTypeName()+"'";
-					AttrCopyCfgEntity en = customCacheService.getAttrCopyCfg(getToken(), doc.getTypeName());
+					AttrCopyCfgEntity en = customCacheService.getAttrCopyCfg(getToken(), doc.getTypeName(),false);
 					if(en != null) {
 						Map<String, Object> valmp = new HashMap<String, Object>();
 						for(String attr: en.getAttrNames().keySet()) {
@@ -146,6 +146,34 @@ public class ArchiveDcController extends ControllerAbstract{
 		return mp;
 		
 	}
+	
+	@RequestMapping(value = "/dc/getDocConfig", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> getDocConfig(@RequestBody String argStr) throws Exception {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Map<String, Object> args = JSONUtils.stringToMap(argStr);
+		String obj = (String) args.get("id");
+		if (obj != null) {
+			if (obj.length() > 30) {
+				EcmDocument doc = documentService.getObjectById(getToken(), obj);
+				if (doc != null) {
+					AttrCopyCfgEntity en = customCacheService.getAttrCopyCfg(getToken(), doc.getTypeName(), true);
+					if (en != null) {
+						Map<String, Object> valmp = new HashMap<String, Object>();
+						for (String attr : en.getAttrNames().keySet()) {
+							valmp.put(attr, doc.getAttributeValue(en.getAttrNames().get(attr)));
+						}
+						mp.put("copyInfo", valmp);
+						mp.put("code", ActionContext.SUCESS);
+					} else {
+						mp.put("code", ActionContext.FAILURE);
+					}
+				}
+			}
+		}
+		return mp;
+	}
+	
 	/**
 	 * 保存驳回原因
 	 * @param argStr
@@ -227,6 +255,32 @@ public class ArchiveDcController extends ControllerAbstract{
 		mp.put("code", ActionContext.SUCESS);
 		return mp;
 	}
+	
+	@RequestMapping(value = "/dc/getAllSelectedDc", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> getAllSelectedDc(@RequestBody String argStr) {
+		Map<String, Object> args = JSONUtils.stringToMap(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		String idsStr = args.get("ids").toString();
+		List<String> idsList=JSONUtils.stringToArray(idsStr);
+		String ids= String.join("','", idsList.toArray(new String[idsList.size()]));
+		try {
+			String sql = "select * from ecm_document where  id in('"+ids+"')";
+			List<Map<String, Object>>  list = documentService.getMapList(getToken(), sql);
+			mp.put("data", list);
+			mp.put("code", ActionContext.SUCESS);
+		}
+		catch(Exception ex) {
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", ex.getMessage());
+		}
+		return mp;
+	
+	}
+	
+	
+	
+	
 	
 	@RequestMapping(value = "/dc/countDocuments", method = RequestMethod.POST)
 	@ResponseBody
@@ -729,12 +783,14 @@ public class ArchiveDcController extends ControllerAbstract{
 				long nowData=new Date().getTime();
 				Date date = sdf.parse(obj.get("C_DRAFT_DATE").toString());
 				long a = date.getTime();
-				if(obj.get("C_RETENTION").toString().equals("10年")) {
+				if(obj.get("C_RETENTION").toString().equals("10年")||obj.get("C_RETENTION").toString().equals("短期")) {
 					if(nowData-(10*12*24*60*60*1000)>a) {
 						res.add(obj);
 //						res.add(obj);
 					}
-				}else if(obj.get("C_RETENTION").toString().equals("30年")) {
+				}else if(obj.get("C_RETENTION").toString().equals("30年")||
+						obj.get("C_RETENTION").toString().equals("30")||
+						obj.get("C_RETENTION").toString().equals("长期")) {
 					if(nowData-(30*12*24*60*60*1000)>a) {
 						res.add(obj);
 //						res.add(obj);
@@ -918,4 +974,26 @@ public class ArchiveDcController extends ControllerAbstract{
 		mp.put("data", list);
 		return mp;
 	}
+	/**
+	 * 获取
+	 * @param argStr
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/dc/getPrintArchiveGrid", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> getPrintArchiveGrid(@RequestBody String argStr) throws Exception {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		List<EcmDocument> results= documentService.getObjectsAllColumn(getToken(), " TYPE_NAME='卷内列表配置' and C_FROM='"+argStr+"'");
+		if(results!=null&&results.size()>0) {
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("data", results.get(0));
+		}else {
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", "请先配置“卷内列表”配置项！");
+		}
+		
+		return mp;
+	}
+	
 }

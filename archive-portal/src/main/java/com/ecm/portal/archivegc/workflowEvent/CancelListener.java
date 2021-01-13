@@ -55,7 +55,7 @@ public class CancelListener implements JavaDelegate {
 				String id = mp.get("CHILD_ID").toString();
 				EcmDocument child = documentService.getObjectById(ecmSession.getToken(), id);
 				Map<String,Object> childAttr = child.getAttributes();
-				childAttr.put("STATUS", "已作废");
+				childAttr.put("STATUS", "作废");
 				childAttr.put("TITLE","(作废)"+child.getTitle());
 				Date now = new Date();
 				String dateStr = df.format(now);

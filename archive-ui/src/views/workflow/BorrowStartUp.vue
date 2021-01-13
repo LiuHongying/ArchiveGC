@@ -155,7 +155,7 @@
                 if(this.borrowType=='查阅'){                //默认都要验证选人，查阅的时候先默认不选人，然后判断密级
                     this.isLimited=false//无限制，可立即发起
                     this.workflowFileList.forEach(element => {
-                        if(element.C_SECURITY_LEVEL=='受限'||element.C_SECURITY_LEVEL=='普通商密'){
+                        if(element.C_SECURITY_LEVEL!='非密'||element.C_SECURITY_LEVEL!='内部公开'){
                             _self.isLimited=true       //找到了，借阅文件包含商密，将在下一步进行判断
                         }
                     })
@@ -186,11 +186,19 @@
                 },
                 startUpWorkflow(workflow){
                 this.checkLevel()                                   //在这里获取当前文件安全等级
-                console.log(this.isCurrentCompany)
                   if(this.accept!="接受"){
                       this.$message("请接受档案利用承诺书!")
                       return
                   }
+                if(this.workflowFileList.length==0){
+                    this.$message({
+                        showClose: true,
+                        message: "请选择流程文件再发起流程！",
+                        duration: 2000,
+                        type: "warning",
+                        })
+                    return
+                }
                 if(this.borrowType=='查阅'&&this.isLimited==true&&this.reviewer1==''){       //查阅提醒
                     this.$message("查阅文件包含涉密和限制文件，请选择本部门领导!")
                 }
