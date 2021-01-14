@@ -2,7 +2,27 @@
   <DataLayout>
     <template v-slot:header>
       <el-dialog
-        title="添加库号"
+        title="退回备注"
+        :visible.sync="pendNotVisible"
+        @close="pendNotVisible = false"
+        :append-to-body="true"
+        width="60%"
+        :close-on-click-modal="false"
+        v-dialogDrag
+      >
+        <el-col :span="24">
+          <el-form label-position="right" :model="pendForm" @submit.native.prevent>
+            <el-input type="textarea" :rows="6" v-model="pendForm.rejectComment" autocomplete="off"></el-input>
+          </el-form>
+        </el-col>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="saveRejectComment" :loading="butt">{{$t('application.save')}}</el-button>
+          <el-button @click="pendNotVisible = false">{{$t('application.cancel')}}</el-button>
+        </div>
+      </el-dialog>
+      
+      <el-dialog
+        title="添加库位号"
         :visible.sync="propertyVisible"
         @close="propertyVisible = false"
         width="30%"
@@ -10,18 +30,16 @@
         v-dialogDrag
       >
         <el-form>
-          <!--
           <el-form-item>
             <el-input
               style="width: 90%"
-              v-model="DCinputValueNum"
-              placeholder="请输入自定义库号"
+              v-model="locationCoding"
+              placeholder="请输入库位号"
             >
             </el-input>
           </el-form-item>
-          -->
           <el-form-item>
-            <el-button type="primary" @click="addStoreNum()">{{
+            <el-button type="primary" @click="updateLocationCoding()">{{
               $t("application.ok")
             }}</el-button>
             <el-button @click="propertyVisible = false">{{
@@ -44,7 +62,13 @@
           }}</el-button>
         </el-form-item>
         <el-form-item>
+          <el-button type="primary" @click="propertyVisible=true">添加库位号</el-button>
+        </el-form-item>
+        <el-form-item>
           <el-button type="primary" @click="handOver()">入库</el-button>
+        </el-form-item>
+        <el-form-item>
+        <el-button type="primary" @click="pendNot">退回</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click.native="exportData">{{
@@ -130,7 +154,9 @@ export default {
       topbarHeight: 35,
       // 底部除列表高度
       bottomHeight: 40,
-
+      pendForm: {
+        rejectComment: ""
+      },
       tables: {
         main: {
           gridViewName: "ArchiveHandOverGrid",
@@ -147,7 +173,8 @@ export default {
       inputValueNum: "",
       selectedItems: [],
       propertyVisible: false,
-      DCinputValueNum: "",
+      locationCoding: "",
+      pendNotVisible:false
     };
   },
   props: {},
@@ -160,6 +187,71 @@ export default {
     }, 300);
   },
   methods: {
+    pendNot() {
+      let _self = this;
+      if (_self.selectedItems.length == 0) {
+        _self.$message({
+          showClose: true,
+          message: _self.$t("message.PleaseSelectOneOrMoreData"),
+          duration: 2000,
+          type: "error"
+        });
+        return;
+      }
+      _self.pendNotVisible = true;
+    },
+      saveRejectComment() {
+      let _self = this;
+      if (_self.pendForm.rejectComment == "") {
+        _self.$message({
+          showClose: true,
+          message: _self.$t("message.PleaseInputData"),
+          duration: 2000,
+          type: "error"
+        });
+        return;
+      }
+      let ids = new Array();
+      _self.selectedItems.forEach(function(e) {
+        ids.push(e.ID);
+      });
+
+      let m = new Map();
+      m.set("ids", ids);
+      m.set("comment", _self.pendForm.rejectComment);
+      let formdata = new FormData();
+      formdata.append("metaData", JSON.stringify(m));
+      axios
+        .post("/exchange/doc/Reject", formdata) ///dc/getSelectList
+        .then(function(response) {
+          if (response.data.code == 1) {
+            _self.$message({
+              showClose: true,
+              message: _self.$t("message.saveSuccess"),
+              duration: 2000,
+              type: "success"
+            });
+            _self.pendNotVisible = false;
+            _self.$refs.mainDataGrid.loadGridData();
+          } else {
+            _self.$message({
+              showClose: true,
+              message: _self.$t("message.saveFailured"),
+              duration: 2000,
+              type: "error"
+            });
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+          _self.$message({
+            showClose: true,
+            message: _self.$t("message.saveFailured"),
+            duration: 2000,
+            type: "error"
+          });
+        });
+    },
     onSplitResize(topPercent) {
       // 顶部百分比*100
       this.topPercent = topPercent;
@@ -189,20 +281,32 @@ export default {
       _self.$refs.mainDataGrid.currentPage = 1;
       _self.$refs.mainDataGrid.loadGridInfo();
       _self.$refs.mainDataGrid.loadGridData();
+      _self.$refs.subtabGrid.itemDataList = [];
     },
 
-    addStoreNum() {
+    updateLocationCoding() {
       let _self = this;
       if (_self.selectedItems.length == 0) {
-        let msg = "请选择档案信息";
+        let msg = "请勾选文档！";
         _self.$message({
           showClose: true,
           message: msg,
-          duration: 2000,
+          duration: 5000,
           type: "warning",
         });
         return;
       }
+      if (-self.locationCoding==null || _self.locationCoding.length == 0) {
+        let msg = "请输入库位号！";
+        _self.$message({
+          showClose: true,
+          message: msg,
+          duration: 5000,
+          type: "warning",
+        });
+        return;
+      }
+
 
       var id = [];
 
@@ -210,10 +314,9 @@ export default {
       for (i in _self.selectedItems) {
         id.push(_self.selectedItems[i]["ID"]);
       }
-
       let mp = new Map();
       mp.set("ids", id);
-
+      mp.set("locationCoding", _self.locationCoding);
       axios
         .post("/record/createStorageNum", JSON.stringify(mp), {
           headers: {
@@ -221,8 +324,17 @@ export default {
           },
         })
         .then(function (response) {
-          _self.search();
+          
           let code = response.data.code;
+          if(code == "1"){
+             _self.$message({
+              showClose: true,
+              message: "操作成功！",
+              duration: 2000,
+              type: "success",
+            });
+            _self.search();
+          }
         });
 
       _self.propertyVisible = false;

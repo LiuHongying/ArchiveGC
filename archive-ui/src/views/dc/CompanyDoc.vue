@@ -124,6 +124,16 @@
               overflow: 'auto',
             }"
           >
+          <el-header>
+          <el-input
+            style="width: 150px"
+            v-model="inputValueNum"
+            placeholder='请输入文件夹名称'
+            @keyup.enter.native="search()"
+          ></el-input>
+          <el-button type="primary" @click="search()">{{$t("application.SearchData")}}</el-button>
+          </el-header>
+          
             <el-tree
               style="width: 100%"
               :props="defaultProps"
@@ -183,6 +193,9 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
+            </el-form-item>
+            <el-form-item>
+                <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
             </el-form-item>
             <el-form-item>
             
@@ -339,6 +352,7 @@
   </div>
 </template>
 <script>
+import AddCondition from '@/views/record/AddCondition'
 import ShowProperty from "@/components/ShowProperty";
 import InnerItemViewer from "./InnerItemViewer.vue";
 import BorrwoForm from "@/components/form/Borrow";
@@ -352,6 +366,7 @@ export default {
     BorrwoForm: BorrwoForm,
     BorrowStartUp: BorrowStartUp,
     ExcelUtil: ExcelUtil,
+    AddCondition:AddCondition
   },
   data() {
     return {
@@ -364,6 +379,7 @@ export default {
         dialogFormVisible: false,
         isIndeterminate: false,
       },
+      AddConds:'',
       innerTableHeight: window.innerHeight - 360,
       tableHeight: window.innerHeight - 170,
       asideHeight: window.innerHeight - 100,
@@ -372,6 +388,7 @@ export default {
       currentLanguage: "zh-cn",
       propertyVisible: false,
       borrowVisible: false,
+      hiddenInput:"hidden",
       loading: false,
       tableLoading: false,
       currentFolder: [],
@@ -414,6 +431,7 @@ export default {
       workflow: {},
       gridViewTrans: "",
       idTrans: "",
+      inputValueNum:"",
     };
   },
   created() {
@@ -437,20 +455,44 @@ export default {
     }
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
-    axios
-      .post("/admin/getArchivesFolder", 0)
-      .then(function (response) {
-        _self.dataList = response.data.data;
-        _self.loadGridInfo(_self.defaultData);
-        _self.loading = false;
-      })
-      .catch(function (error) {
-        console.log(error);
-        _self.loading = false;
-      });
+    _self.search();
     
   },
   methods: {
+    search(){
+      let _self = this;
+      if(_self.inputValueNum!=''&&_self.inputValueNum!=undefined){
+        var m = new Map();
+        m.set("NAME", _self.inputValueNum);
+        m.set("parentPath","/档案库")
+        axios
+        .post("/admin/searchFolder",JSON.stringify(m))
+        .then(function (response) {
+          _self.dataList = response.data.data;
+          _self.loadGridInfo(_self.defaultData);
+          _self.loading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.loading = false;
+        });
+      }
+      else{
+        axios
+        .post("/admin/getArchivesFolder", 0)
+        .then(function (response) {
+          _self.dataList = response.data.data;
+          _self.loadGridInfo(_self.defaultData);
+          _self.loading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.loading = false;
+        });
+      }
+      
+    
+    },
     getWorkFlow() {
       let _self = this;
 
@@ -606,8 +648,14 @@ export default {
     loadGridData(indata) {
       let _self = this;
       _self.tableLoading = true;
-      var key = _self.sqlStringFilter(_self.inputkey);
+      var key =''
       var m = new Map();
+      if(_self.inputkey!=''){
+        key = "(TITLE like '%"+_self.inputkey+"%' or CODING like '%"+_self.inputkey+"%'"+")"
+      }
+      if(_self.AddConds!=''){
+        key +=" and "+_self.AddConds
+      }
       _self.gridViewTrans = indata.gridView;
       _self.idTrans = indata.id;
       m.set("gridName", indata.gridView);
@@ -616,8 +664,9 @@ export default {
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", _self.currentPage - 1);
       m.set("orderBy", "MODIFIED_DATE desc");
+      console.log(m)
       axios
-        .post("/dc/getExceptBoxDocuments", JSON.stringify(m))
+        .post("/exchange/doc/getExceptBoxDocuments", JSON.stringify(m))
         .then(function (response) {
           _self.itemDataList = response.data.data;
           _self.itemDataListFull = response.data.data;

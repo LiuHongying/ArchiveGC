@@ -52,6 +52,7 @@ public class RecordProcessController extends ControllerAbstract {
 	public Map<String, Object> createStorageNum(@RequestBody String argStr) throws Exception {		
 		Map<String,Object> params= JSONUtils.stringToMap(argStr);
 		String ID= params.get("ids").toString();
+		String locationCoding= params.get("locationCoding").toString().replace("'", "");
 		List<String> listID = JSONUtils.stringToArray(ID);
 		
 		String strID =  "'" + listID.get(0) + "'";
@@ -60,28 +61,8 @@ public class RecordProcessController extends ControllerAbstract {
 			strID += listID.get(i);
 			strID += "'";
 		}
-		
-		String sqlSearchStore = "select * from ecm_document ed where ID in ("+ strID +") order by C_ARCHIVE_DATE, C_DRAFT_DATE desc";
-		List<Map<String, Object>> store = documentService.getMapList(getToken(), sqlSearchStore);
-		
-		for(int i = 0; i<store.size(); i++) {
-			String storeID = (String) store.get(i).get("ID");
-			String typeNameStore = (String) store.get(i).get("TYPE_NAME");
-			
-			EcmDocument doc = documentService.getObjectById(getToken(), storeID);
-			
-			String archiveDate = (String) doc.getAttributes().get("C_STORE_CODING");
-			
-			if (StringUtils.isEmpty(archiveDate)) {
-				String sqlSearchComment = "select ITEM_CONTENT, C_ORDER_INDEX from ecm_document ed where C_COMMENT like '%"+ typeNameStore +"%'";
-				List<Map<String, Object>> docType = documentService.getMapList(getToken(), sqlSearchComment);
-				int orderIndex = (docType.get(i).get("C_ORDER_INDEX") != null)?(int)docType.get(i).get("C_ORDER_INDEX")+1:1;
-				
-				doc.addAttribute("C_STORE_CODING", orderIndex);
-				documentService.updateObject(getToken(), doc, null);
-			}
-		}
-		
+		String sql = "update ecm_document set C_LOCATION='"+locationCoding+"' where ID in ("+ strID +")";
+		documentService.executeSQL(getToken(), sql);
 		Map<String, Object> mp = new HashMap<String, Object>();
 		mp.put("code", ActionContext.SUCESS);
 		return mp;

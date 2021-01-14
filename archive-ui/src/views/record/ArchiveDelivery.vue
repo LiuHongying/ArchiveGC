@@ -187,6 +187,12 @@
         >{{$t('application.newVolume')}}</el-button> -->
         <el-button
           type="primary"
+          plain
+          size="small"
+          icon="el-icon-copy-document"
+          @click="fileAttrsCopy(1)">复制著录</el-button>
+        <el-button
+          type="primary"
            plain
             size="small"
           icon="el-icon-edit"
@@ -274,6 +280,11 @@
                       <el-row>
                         <span style="float:left;text-align:left;padding:5px;">文件列表</span>
                         <!-- <el-button type="primary" plain size="small" title="自动组卷"  @click="autoPaper()">自动组卷</el-button> -->
+                        <el-button
+                          type="primary"
+                          plain
+                          size="small"
+                          @click="fileAttrsCopy(2)">复制著录</el-button>
                         <el-button
                           type="primary"
                           plain
@@ -552,6 +563,51 @@ export default {
       }
       _self.reuseVisible=true;
     },
+    //著录主文件（移交单里的主文件，包含案卷或普通文件）
+    beforeCreateLevel1File(row,parentId){
+      let _self=this;
+      if(_self.selectRow.ID==undefined){
+         _self.$message({
+                showClose: true,
+                message: '请选择一条移交单下的一级文件！',
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      _self.parentId = parentId
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: {id:row.ID},
+          url: "/dc/getDocConfig"
+        }).then(function(response){
+          let code=response.data.code;
+          if(code=='1'){
+            let fileType = row.TYPE_NAME
+            _self.newArchiveItem(fileType,row,response.data.copyInfo);
+          }else{
+            _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          }
+        }).catch(function(error) {
+          // _self.$message("添加失败！");
+          _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          console.log(error);
+        });
+    },
     //著录文件
     beforeCreateFile(row){
       let _self=this;
@@ -781,6 +837,110 @@ export default {
     dialogFormShow() {
       this.columnsInfo.dialogFormVisible = true;
     },
+    // Matthew change on 2021年1月12日14:16:42
+    // 新增卷盒复制卷盒属性，文件复制文件属性功能
+    // 判断规则：
+    // 案卷著录   如果没有选中案卷，点击著录文件：按照原来的著录过程进行著录。
+    // 案卷著录   如果选中了案卷，点击著录文件：将选中的案卷或文件，进行属性复制，弹出弹框，进行著录。
+    // 文件著录   如果选中了文件，不能进行文件的著录。
+    // 文件著录   如果选中了案卷，没有选中文件：按照原来的著录过程进行著录，即继承案卷的属性。
+    // 文件著录   如果选中了案卷，选中了文件：按照文件的属性，继承属性进行著录。
+    // copyType判断是主按钮的点击 1，还是子按钮的点击2
+    fileAttrsCopy(copyType){
+      let _self = this;
+      if(_self.selectedOneTransfer.ID==undefined){
+        _self.$message({
+                showClose: true,
+                message: _self.$t("message.pleaseSelectOneTransfer"),
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      _self.parentId=_self.selectedOneTransfer.ID;
+      var flag = 0
+      //主文件没选，子文件没选
+      if(_self.selectRow.ID==undefined&&_self.selectedFileItem.ID==undefined){
+        flag = 1;
+      }
+      //主文件选了，子文件没选
+      if(_self.selectRow.ID!=undefined&&_self.selectedFileItem.ID==undefined){
+        //主文件选的是案卷
+        if(_self.selectRow.C_ITEM_TYPE == '案卷'){
+          if(copyType == 1){
+            //flag=2,案卷复制案卷
+            flag = 2;
+          }else{
+            //flag=3,按照原来的方法，子文件参考父的属性，进行复制
+            flag = 3;
+          }
+        }
+        //主文件勾选的是普通文件
+        else{
+          if(copyType == 1){
+            //flag=4,主文件复制主文件
+            flag = 4;
+          }else{
+            //flag=5,文件不可以著录子文件！
+            flag = 5;
+          }
+        }
+      }
+      //主文件选了，子文件也选了
+      if(_self.selectRow.ID!=undefined&&_self.selectedFileItem.ID!=undefined){
+        if(copyType == 1){
+            //flag=6,主文件复制主文件
+            flag = 6;
+          }else{
+            //flag=7,子文件复制子文件！
+            flag = 7;
+          }
+
+      }
+      switch(flag){
+        case 1 :
+          _self.typeSelectVisible=true;
+          break;
+        case 2 :
+          _self.beforeCreateLevel1File(_self.selectRow,_self.selectedOneTransfer.ID);
+          console.log("案卷复制案卷");
+          //todo 案卷复制案卷
+          break;
+        case 3 :
+          _self.beforeCreateFile(_self.selectRow);
+          console.log("按照原来的方法，子文件参考父的属性，进行复制");
+          //todo 按照原来的方法，子文件参考父的属性，进行复制
+          break;
+        case 4 :
+          _self.beforeCreateLevel1File(_self.selectRow,_self.selectedOneTransfer.ID);
+          console.log("主文件复制主文件");
+          //todo 主文件复制主文件
+          break;
+        case 5 :
+          _self.$message({
+                showClose: true,
+                message: '非案卷文件不可以著录子文件！',
+                duration: 2000,
+                type: "warning"
+              });
+          console.log("按照原来的方法，不能著录文件！！");
+          //todo 按照原来的方法，反正文件不能著录文件！！
+          break;
+        case 6 :
+          _self.beforeCreateLevel1File(_self.selectRow,_self.selectedOneTransfer.ID);
+          console.log('案卷复制案卷,主文件复制主文件')
+          //todo 案卷复制案卷,主文件复制主文件
+          break;
+        case 7 :
+          _self.beforeCreateLevel1File(_self.selectedFileItem,_self.selectRow.ID);
+          console.log('子文件复制子文件')
+          //todo 子文件复制子文件
+          break;
+        default:
+          console.log('(*￣︶￣)')
+      }
+    },
+
     selectOneFile(row) {
       this.selectedFileItem=row;
       // let _self = this;

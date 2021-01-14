@@ -753,7 +753,12 @@ export default {
     onDeleleFolder() {
       let _self = this;
       if (!_self.currentFolder || !_self.currentFolder.id) {
-        _self.$message(_self.$t("message.pleaseSelectFolder"));
+        _self.$message({
+                showClose: true,
+                message:_self.$t("message.pleaseSelectFolder"),
+                duration: 2000,
+                type: 'waring'
+            });
         return;
       }
       _self
@@ -783,10 +788,20 @@ export default {
         .post("/admin/deleteFolder", JSON.stringify(_self.currentFolder))
         .then(function (response) {
           if (response.data.code == 1) {
-            _self.$message(_self.$t("message.deleteSuccess"));
+            _self.$message({
+                showClose: true,
+                message:_self.$t("message.deleteSuccess"),
+                duration: 2000,
+                type: 'success'
+            });
             _self.refreshFolderData();
           } else {
-            _self.$message(response.data.msg);
+            _self.$message({
+                showClose: true,
+                message:response.data.msg,
+                duration: 2000,
+                type: 'error'
+            });
           }
         })
         .catch(function (error) {
@@ -796,7 +811,13 @@ export default {
     // 新建文件夹事件
     onNewFolder() {
       if (!this.currentFolder || !this.currentFolder.id) {
-        this.$message(this.$t("message.cannotCreateRoot"));
+        let _self=this;
+        _self.$message({
+              showClose: true,
+              message:_self.$t("message.cannotCreateRoot"),
+              duration: 2000,
+              type: 'warning'
+          });
         return;
       }
       this.folderAction = this.$t("application.newFolder");
@@ -851,7 +872,12 @@ export default {
         axios
           .post("/admin/updateFolder", JSON.stringify(indata))
           .then(function (response) {
-            _self.$message(_self.$t("message.saveSuccess"));
+            _self.$message({
+                        showClose: true,
+                        message:_self.$t("message.saveSuccess"),
+                        duration: 2000,
+                        type: 'success'
+                    });
             _self.folderDialogVisible = false;
           })
           .catch(function (error) {
@@ -861,8 +887,15 @@ export default {
     },
     // 编辑文件夹事件
     onEditFolder() {
+      let _self=this;
       if (!this.currentFolder || !this.currentFolder.id) {
-        this.$message(this.$t("message.pleaseSelectFolder"));
+        
+        _self.$message({
+                        showClose: true,
+                        message:_self.$t("message.pleaseSelectFolder"),
+                        duration: 2000,
+                        type: 'warning'
+                    });
         return;
       }
       this.folderAction =
@@ -977,7 +1010,12 @@ export default {
         .then(function (response) {
           _self.udialogVisible = false;
           _self.loadGridData(_self.currentFolder);
-          _self.$message("更新成功!");
+          _self.$message({
+                showClose: true,
+                message:"更新成功!",
+                duration: 2000,
+                type: 'success'
+            });
           _self.uploading = false;
         })
         .catch(function (error) {
@@ -1002,7 +1040,12 @@ export default {
         })
         .then(function (response) {
           _self.udialogVisible = false;
-          _self.$message("更新成功!");
+          _self.$message({
+                showClose: true,
+                message:"更新成功!",
+                duration: 2000,
+                type: 'success'
+            });
           _self.uploading = false;
         })
         .catch(function (error) {
@@ -1051,6 +1094,12 @@ export default {
         return str;
       }
     },
+    moveFolder() {
+      if (this.currentFolder) {
+        this.isMoveFolder = true;
+        this.moveDialogVisible = true;
+      }
+    },
     handleMoveItem() {
       if (this.isMoveFolder) {
         this.handleMoveFolder();
@@ -1064,7 +1113,12 @@ export default {
         _self.targetFolderId == _self.currentFolder.id ||
         _self.targetFolderId == _self.currentFolder.parentId
       ) {
-        _self.$message("目标文件夹不能更当前文件夹相同!");
+        _self.$message({
+                showClose: true,
+                message:"目标文件夹不能更当前文件夹相同!",
+                duration: 2000,
+                type: 'warning'
+            });
         return;
       }
       var fld = _self.currentFolder;
@@ -1072,7 +1126,12 @@ export default {
       axios
         .post("/admin/updateFolder", JSON.stringify(fld))
         .then(function (response) {
-          _self.$message(_self.$t("message.saveSuccess"));
+          _self.$message({
+                showClose: true,
+                message:_self.$t("message.saveSuccess"),
+                duration: 2000,
+                type: 'success'
+            });
           _self.moveDialogVisible = false;
           _self.loading = false;
           _self.refreshFolderData();
@@ -1091,10 +1150,20 @@ export default {
         .post("/dc/moveDocument", JSON.stringify(m))
         .then(function (response) {
           if (response.data.code == 1) {
-            _self.$message("目录移动成功。");
+            _self.$message({
+                showClose: true,
+                message:"目录移动成功。",
+                duration: 2000,
+                type: 'success'
+            });
             _self.$refs.mainDataGrid.loadGridData();
           } else {
-            _self.$message("目录移动失败。<br>" + response.data.message);
+            _self.$message({
+                showClose: true,
+                message:"目录移动失败。<br>" + response.data.message,
+                duration: 2000,
+                type: 'error'
+            });
           }
           _self.moveDialogVisible = false;
           _self.loading = false;
@@ -1518,6 +1587,7 @@ export default {
           showClose: true,
           message: "请勾选待销毁文件!",
           duration: 2000,
+          type:"warning"
         });
       }
     },
@@ -1563,6 +1633,7 @@ export default {
           showClose: true,
           message: "请勾选待添加文件!",
           duration: 2000,
+          type:"warning"
         });
       }
     },

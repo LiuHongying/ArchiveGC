@@ -138,9 +138,10 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 
 			IEcmSession ecmSession = null;
 			String workflowSpecialUserName = env.getProperty("ecm.username");
+			String taskUserIds = "";
 			try {
 				ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
-				String taskUserIds = task.getAssignee();
+				taskUserIds = task.getAssignee();
 
 				/******************************* 发送邮件 ****************************/
 
@@ -212,7 +213,13 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 						}
 					}
 				}
-				
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					if (ecmSession != null) {
+						authService.logout(workflowSpecialUserName);
+					}
+				}
 				/*****************************发送邮件END*****************************/
 				
 				// 创建流程日志
@@ -225,15 +232,8 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 				audit.setAssignee(taskUserIds);
 				audit.setProcessInstanceId(task.getProcessInstanceId());
 				audit.setTaskId(task.getId());
+				
 				ecmAuditWorkitemMapper.insert(audit);
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				if (ecmSession != null) {
-					authService.logout(workflowSpecialUserName);
-				}
-			}
 		} else if ("complete".equals(task.getEventName())) {
 			if (task.getVariable("processInstanceID") == null) {
 				task.setVariable("processInstanceID", task.getProcessInstanceId());

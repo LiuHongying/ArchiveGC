@@ -109,16 +109,26 @@ export const recordRouter =  [
         name: '档案专题',
         component: () => import('@/views/record/ShowThematic.vue')
     },
-		{
-			meta: {
-				requireAuth: true,
-				permit: 1,
-				title:'storageManager'
-			},
-			path: '/record/StorageRoom',
-			component: () => import('@/views/record/StorageRoom.vue'),
-			name: '库房管理'
-		},
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:'storageManager'
+        },
+        path: '/record/StorageRoom',
+        component: () => import('@/views/record/StorageRoom.vue'),
+        name: '库房管理'
+    },
+    {
+        meta: {
+          requireAuth: true,
+          permit: 1,
+          title: '我的借阅'
+        },
+        path: '/record/myborrow',
+        name: '我的借阅',
+        component: () => import('@/views/record/myborrow.vue'),
+      },
     {
         meta: {
             requireAuth: true,

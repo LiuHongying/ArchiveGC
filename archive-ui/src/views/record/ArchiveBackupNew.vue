@@ -78,6 +78,13 @@ export default {
         ArchiveBackupCreate:ArchiveBackupCreate
     },
     methods:{
+      onCreate(){
+         let _self=this;
+         _self.archiveBackupVisible=true;
+         setTimeout(()=>{
+           _self.$refs.archiveBackupCreate.loadFormInfo();
+         });
+       },
         // 删除文档事件
         onDeleleFileItem() {
           let _self = this;

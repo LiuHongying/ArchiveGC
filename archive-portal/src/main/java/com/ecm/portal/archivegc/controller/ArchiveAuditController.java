@@ -123,17 +123,18 @@ public class ArchiveAuditController extends ControllerAbstract {
 						parents.append("'"+(String)map.get("parent_id")+"',");
 					}
 					parents.deleteCharAt(parents.length()-1);
-					parents.append(") and message =''");
+					parents.append(") ");
 					parents.append(" and user_name = ");
 					parents.append("'"+currentUser.getUserName()+"'");
+					parents.append(" and action_name = 'ecm_download'");
 					//嗯哼，auditService没有实现getMapList方法， 尴尬，用documentService吧
 					auditlist = documentService.getMapList(getToken(), parents.toString());
 					//如果已经下载过则返回false，不可以显示下载
 					//如果还没有下载过，则返回true，可以显示下载
-					if (auditlist.size()>0) {
+					if (auditlist.size()<relationlist.size()) {
 						mp.put("downloadPermit", true);
 					}else {
-						mp.put("downloadPermit", true);
+						mp.put("downloadPermit", false);
 					}
 					mp.put("code", ActionContext.SUCESS);
 				}else {

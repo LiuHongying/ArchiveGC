@@ -91,8 +91,8 @@
     </el-dialog>
 
     <el-dialog
-      title="打印条码"
-      width="43%"
+      title=""
+      width="50%"
       :visible="printPdf417Visible"
       @close="printPdf417Visible=false"
     >
@@ -234,9 +234,15 @@
                     </el-col>
                     <el-col :span="18" style="padding-left:10px;">
                       <el-form-item>
-                        <TypeSelectComment @afterSelecteType="newArchiveItem"></TypeSelectComment>
+                        <TypeSelectComment ref="TypeSelectComment" @afterSelecteType="newArchiveItem"></TypeSelectComment>
                       </el-form-item>
                       <el-form-item>
+                        <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-copy-document"
+                        @click="fileAttrsCopy(1)">复制著录</el-button>
                         <el-button
                         type="primary"
                         plain
@@ -295,9 +301,9 @@
                         :title="$t('application.fetchInformation')"
                       >{{$t('application.fetchInformation')}}</el-button>
                       </el-form-item>
-                      
+                       <!--
                       <el-form-item>
-                      <!-- <el-button
+                      <el-button
                         type="primary"
                         plain
                         size="small"
@@ -313,7 +319,7 @@
                         @click="beforePrintBarCode(selectedItems,'打印条码')"
                         title="打印条码"
                       ></el-button>
-                      -->
+                      
                       <el-button
                         type="primary"
                         plain
@@ -322,14 +328,16 @@
                         @click="beforePrintArchiveCode(selectedItems,'打印档号')"
                         title="打印档号"
                       >打印档号</el-button>
+                     
                       </el-form-item>
+                       -->
                       <el-form-item>
                       <el-button
                         type="primary"
                         plain
                         size="small"
                         icon="el-icon-printer"
-                        @click="beforePrintPdf417(selectedItems,'打印档号')"
+                        @click="beforePrintPdf417(selectedItems)"
                         title="打印条码"
                       >打印条码</el-button>
                       </el-form-item>
@@ -419,6 +427,9 @@
                         size="small"
                         @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
                       </el-form-item>
+                      <el-form-item>
+                      <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
+                      </el-form-item>
                     </el-col>
                   </el-row>
                   </el-form>
@@ -456,6 +467,11 @@
                             <el-button type="primary" plain size="small" title="挂载文件"  @click="importdialogVisible=true;uploadUrl='/dc/mountFile'">挂载文件</el-button>
                     <el-button type="primary" plain size="small" :title="$t('application.viewRedition')"  @click="importdialogVisible=true;uploadUrl='/dc/addRendition'">格式副本</el-button>-->
                     <el-button type="primary" plain size="small" @click="beforeCreateFile(selectRow)">著录</el-button>
+                    <el-button
+                    type="primary"
+                    plain
+                    size="small"
+                    @click="fileAttrsCopy(2)">复制著录</el-button>
                     <el-button
                       type="primary"
                       plain
@@ -522,7 +538,7 @@ import TypeSelectComment from "@/views/record/TypeSelectComment.vue";
 import DataLayout from '@/components/ecm-data-layout'
 
 import "url-search-params-polyfill";
-
+import AddCondition from '@/views/record/AddCondition'
 import PrintPage from "@/views/record/PrintPage";
 // import PrintVolumes from "@/views/record/PrintVolumes";
 import PrintVolumes from "@/views/record/PrintVolumes4Archive";
@@ -549,7 +565,8 @@ export default {
     //Prints:Prints
     DataLayout:DataLayout,
     PrintPdf417:PrintPdf417,
-    BatchImport:BatchImport
+    BatchImport:BatchImport,
+    AddCondition:AddCondition
   },
   data() {
     return {
@@ -675,7 +692,9 @@ export default {
       AddComment:'',
       isDates:false,
       newChildDoc: false,
-
+      hiddenInput:"hidden",
+      AddConds:'',
+      volumeInArchiveGridName:""
     };
   },
   
@@ -717,7 +736,97 @@ export default {
       }, 100);
   },
   methods: {
-        exportData() {
+    fileAttrsCopy(copyType){
+      let _self = this;
+      if(_self.currentFolder.id==undefined){
+        _self.$message({
+                showClose: true,
+                message: "请在文件夹下进行操作",
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      var flag = 0;
+      if(_self.selectRow.ID==undefined&&_self.innerSelectedOne.ID==undefined){
+        flag = 1;
+      }
+      //主文件选了，子文件没选
+      if(_self.selectRow.ID!=undefined&&_self.innerSelectedOne.ID==undefined){
+        //主文件选的是案卷
+        if(_self.selectRow.C_ITEM_TYPE == '案卷'){
+          if(copyType == 1){
+            //flag=2,案卷复制案卷
+            flag = 2;
+          }else{
+            //flag=3,按照原来的方法，子文件参考父的属性，进行复制
+            flag = 3;
+          }
+        }
+        //主文件勾选的是普通文件
+        else{
+          if(copyType == 1){
+            //flag=4,主文件复制主文件
+            flag = 4;
+          }else{
+            //flag=5,文件不可以著录子文件！
+            flag = 5;
+          }
+        }
+      }
+      if(_self.selectRow.ID!=undefined&&_self.innerSelectedOne.ID!=undefined){
+        if(copyType == 1){
+            //flag=6,主文件复制主文件
+            flag = 6;
+          }else{
+            //flag=7,子文件复制子文件！
+            flag = 7;
+          }
+      }
+      switch(flag){
+        case 1 :
+          _self.$refs.TypeSelectComment.showdialog();
+          break;
+        case 2 :
+          _self.copyFile(_self.selectRow);
+          //console.log("案卷复制案卷");
+          //todo 案卷复制案卷
+          break;
+        case 3 :
+          _self.beforeCreateFile(_self.selectRow);
+          console.log("按照原来的方法，子文件参考父的属性，进行复制");
+          //todo 按照原来的方法，子文件参考父的属性，进行复制
+          break;
+        case 4 :
+          _self.copyFile(_self.selectRow);
+          console.log("主文件复制主文件");
+          //todo 主文件复制主文件
+          break;
+        case 5 :
+          _self.$message({
+                showClose: true,
+                message: '非案卷文件不可以著录子文件！',
+                duration: 2000,
+                type: "warning"
+              });
+          console.log("按照原来的方法，不能著录文件！！");
+          //todo 按照原来的方法，反正文件不能著录文件！！
+          break;
+        case 6 :
+          _self.copyFile(_self.selectRow);
+          console.log('案卷复制案卷,主文件复制主文件')
+          //todo 案卷复制案卷,主文件复制主文件
+          break;
+        case 7 :
+          _self.beforeCreateLevel1File(_self.innerSelectedOne,_self.selectRow.ID);
+          console.log('子文件复制子文件')
+          //todo 子文件复制子文件
+          break;
+        default:
+          console.log('(*￣︶￣)')
+      }
+    },
+    exportData() {
       let _self = this;
       let params = {
         URL: "/file/exportFolderPath",
@@ -744,6 +853,130 @@ export default {
       this.topPercent = topPercent
       this.setStorageNumber(this.topStorageName, topPercent)
       //console.log(JSON.stringify(topPercent))
+    },
+    copyArchiveItem(typeName,copyInfo) {
+      let _self = this;
+      _self.newChildDoc = false;
+      if (_self.currentFolder.id) {
+        _self.selectedItemId = "";
+        _self.typeName=typeName;
+        _self.propertyVisible = true;
+        setTimeout(() => {
+          if (_self.$refs.ShowProperty) {
+            _self.$refs.ShowProperty.myItemId = "";
+            _self.dialogName = typeName;
+            _self.extendMap=null;
+            _self.$refs.ShowProperty.parentDocId = "";
+            _self.$refs.ShowProperty.myTypeName = typeName;
+            _self.$refs.ShowProperty.myFolderId = _self.currentFolder.id;
+		   if(copyInfo){
+			  let mp = new Map();
+			  for (const key in copyInfo) {
+				  mp.set(key, key);
+			  }
+			  _self.$refs.ShowProperty.setMainSubRelation(mp);
+			  _self.$refs.ShowProperty.setMainObject(copyInfo);
+			}
+            _self.$refs.ShowProperty.loadFormInfo();
+          }
+        }, 10);
+      } else {
+        // _self.$message(_self.$t("message.pleaseSelectFolder"));
+        _self.$message({
+          showClose: true,
+          message: _self.$t("message.pleaseSelectFolder"),
+          duration: 2000,
+          type: "warning"
+        });
+      }
+    },
+    //复制著录方法
+    beforeCreateLevel1File(row,parentId){
+      let _self=this;
+      if(_self.selectRow.ID==undefined){
+         _self.$message({
+                showClose: true,
+                message: '请选择一条主文件！',
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      _self.parentId = parentId
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: {id:row.ID},
+          url: "/dc/getDocConfig"
+        }).then(function(response){
+          let code=response.data.code;
+          if(code=='1'){
+            let fileType = row.TYPE_NAME
+            _self.newArchiveFileItem(fileType,row,response.data.copyInfo);
+          }else{
+            _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          }
+        }).catch(function(error) {
+          // _self.$message("添加失败！");
+          _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          console.log(error);
+        });
+    },
+    copyFile(row){
+      let _self=this;
+      if(_self.selectRow.ID==undefined){
+         _self.$message({
+                showClose: true,
+                message: '请选择一条主文件！',
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: {id:row.ID},
+          url: "/dc/getDocConfig"
+        }).then(function(response){
+          let code=response.data.code;
+          if(code=='1'){
+            let fileType = row.TYPE_NAME
+            _self.copyArchiveItem(fileType,response.data.copyInfo);
+          }else{
+            _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          }
+        }).catch(function(error) {
+          // _self.$message("添加失败！");
+          _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          console.log(error);
+        });
     },
     //著录文件
     beforeCreateFile(row){
@@ -797,8 +1030,6 @@ export default {
               });
           console.log(error);
         });
-      
-
     },
 
     writeAudit(docId){
@@ -849,7 +1080,7 @@ export default {
       }
       _self.printPdf417Visible = true;
       setTimeout(() => {
-        _self.$refs.printPdf417.refresh(selectedRows, 1);
+        _self.$refs.printPdf417.loadData(selectedRows);
       }, 10);
     },
     ///打印条码
@@ -920,7 +1151,6 @@ export default {
     },
 
     beforePrint(selectedRow,gridName,vtitle){
-      debugger
       let _self=this;
       if(selectedRow.ID==undefined){
         // _self.$message('请选择一条数据进行打印');
@@ -935,10 +1165,43 @@ export default {
       _self.printVolumesVisible = true;
 
       setTimeout(()=>{
-        _self.$refs.printVolumes.dialogQrcodeVisible = false
-        _self.$refs.printVolumes.getArchiveObj(selectedRow.ID,
-        gridName,
-        vtitle); 
+
+        _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: selectedRow.TYPE_NAME,
+          url: "/dc/getPrintArchiveGrid"
+        })
+        .then(function(response) {
+          
+          if(response.data.code=='1'){
+            let printGridName=response.data.data.attributes.C_TO;
+            _self.$refs.printVolumes.dialogQrcodeVisible = false
+            _self.$refs.printVolumes.getArchiveObj(selectedRow.ID,
+            printGridName,
+            vtitle); 
+          }else{
+            _self.$refs.printVolumes.dialogQrcodeVisible = false
+            _self.$refs.printVolumes.getArchiveObj(selectedRow.ID,
+            gridName,
+            vtitle); 
+          }
+        })
+        .catch(function(error) {
+         
+          _self.$message({
+            showClose: true,
+            message: "操作失败",
+            duration: 5000,
+            type: "error"
+          });
+          console.log(error);
+        });
+
+        
       },10);
 
       _self.printGridName=gridName;
@@ -1400,6 +1663,9 @@ export default {
       if(_self.archiveStatus!=''){
           key=key+" and status='"+_self.archiveStatus+"'";
         }
+      if(_self.AddConds!=''){
+        key = key + " and "+_self.AddConds
+      }
       _self.mainParam.condition=key;
       _self.mainParam.folderId=indata.id
       _self.$nextTick(()=>{
@@ -1793,6 +2059,7 @@ export default {
     },
     //查询文档
     searchItem() {
+      console.log(this.mainParam.condition)
       this.loadGridData(this.currentFolder);
       //  this. loadPageInfo(this.currentFolder);
     },

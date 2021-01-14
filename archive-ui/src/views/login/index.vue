@@ -49,27 +49,48 @@ export default {
     }
   },
   created() {
-    var integrityurl = window.location.href;
-    //是否包含ticket
+    var query = window.location.href;
     let _self = this;
-    if(integrityurl.indexOf("ticket")>-1){
-      _self.isSSO = true;
-      //var thirdPartyInterface = "http://10.100.3.168/sso/proxyValidate";
-      var thirdPartyInterface = "http://127.0.0.1:8089/sso/proxyValidate";
-      var m = new Map();
-      var ticket = integrityurl.substring(integrityurl.lastIndexOf("ticket")+7)
-      m.set("ticket",ticket);
-      m.set("service",thirdPartyInterface)
-      axios.post(thirdPartyInterface,JSON.stringify(m)).then(function(response){
-        if(response!=null){
-          var userName = response.data
-          console.log(userName)
-          _self.autoLogin(userName);
+    if(query.indexOf("?")>-1){
+      var queryParam = query.substring(query.indexOf("?")+1);
+      try {
+          if(queryParam.indexOf("loginName")>-1&&queryParam.indexOf("sign")>-1&&queryParam.indexOf("encrySign")>-1){
+          _self.isSSO = true;
+          queryParam = decodeURI(queryParam)
+          var params = queryParam.split("&");
+          var paramMap =  new Map();
+          params.forEach(function(value,index){
+            paramMap.set(value.split("=")[0],value.split("=")[1]);
+          });
+          _self.autoLogin(paramMap);
         }
-      })
-    }else{
-      console.log("外部登录")
+      } catch (error) {
+        console.log(error)
+        _self.isSSO = false;
+        _self.$message(_self.$t("message.SSOloginFailured"));
+      }
     }
+    // var integrityurl = window.location.href;
+    // //是否包含ticket
+    // let _self = this;
+    // if(integrityurl.indexOf("ticket")>-1){
+    //   _self.isSSO = true;
+    //   //var thirdPartyInterface = "http://10.100.3.168/sso/proxyValidate";
+    //   var thirdPartyInterface = "http://127.0.0.1:8089/sso/proxyValidate";
+    //   var m = new Map();
+    //   var ticket = integrityurl.substring(integrityurl.lastIndexOf("ticket")+7)
+    //   m.set("ticket",ticket);
+    //   m.set("service",thirdPartyInterface)
+    //   axios.post(thirdPartyInterface,JSON.stringify(m)).then(function(response){
+    //     if(response!=null){
+    //       var userName = response.data
+    //       console.log(userName)
+    //       _self.autoLogin(userName);
+    //     }
+    //   })
+    // }else{
+    //   console.log("外部登录")
+    // }
   },
   mounted() {},
   computed: {
@@ -77,14 +98,15 @@ export default {
   },
   props: [],
   methods: {
-    autoLogin(userName) {
+    autoLogin(userParamMap) {
       let _self = this;
       var tocomp = _self.$route.query.redirect;
       if (!tocomp) {
         tocomp = "/";
       }
+      console.log(userParamMap)
       axios
-        .post("/archive/userLogin", JSON.stringify(userName))
+        .post("/archive/userLogin", JSON.stringify(userParamMap))
         .then(function(response) {
           //console.log(response.data);
           if (response.data.code == 1) {
@@ -108,7 +130,7 @@ export default {
           }
           else{
             _self.isSSO = false;
-            _self.$message(_self.$t("message.SSOloginFailured"));
+            _self.$message(response.data.msg);
           }
         })
         .catch(function(error) {
