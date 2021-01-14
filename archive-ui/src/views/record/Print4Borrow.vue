@@ -60,6 +60,10 @@
            <div class="table-tr" style="height:30px;text-align: center;">  
               {{volumeTitle}}
           </div> 
+        <el-row>
+          <span>{{formType}}</span>
+          <span style="margin:30px">{{formCoding}} </span>
+        </el-row>
           <!--<div class="table-tr">  
               <div class="table-td">  
                   <div class="sub-table">
@@ -212,7 +216,9 @@ export default {
       currentLanguage: "zh-cn",
       gridList:[],
       volumeTitle:"",
-      showSingle:false
+      showSingle:false,
+      formType:"",
+      formCoding:""
     };
   },
   mounted() {
@@ -233,6 +239,10 @@ export default {
   methods: {
 
       // 加载表格样式
+    getTypes(type,coding){
+      this.formType = type
+      this.formCoding = coding
+    },
     loadGridInfo(gridName) 
     {
       let _self = this;

@@ -35,6 +35,15 @@
         <el-form-item>
           <el-button type="primary" @click="submit('主表')">出库</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            size="small"
+            icon="el-icon-printer"
+            @click="beforePrint(selectedArchives,'FormDcGrid','打印清单')"
+            title="打印清单"
+            >打印清单</el-button>
+        </el-form-item>
       </el-form>
     </template>
     <template v-slot:main="{ layout }">
@@ -135,6 +144,15 @@
                 </DataGrid>
               </el-tab-pane>
             </el-tabs>
+    <el-dialog :visible.sync="printVolumesVisible" width="80%"
+    modal-append-to-body="false"
+    :append-to-body="true" 
+    >
+      <PrintVolumes
+        ref="printVolumes"
+      ></PrintVolumes>
+    </el-dialog>
+
           </template>
         </split-pane>
       </div>
@@ -144,6 +162,7 @@
 <script type="text/javascript">
 import DataGrid from "@/components/DataGrid";
 import DataLayout from "@/components/ecm-data-layout";
+import PrintVolumes from "@/views/record/Print4Borrow";
 export default {
   name: "TC",
   data() {
@@ -170,12 +189,54 @@ export default {
       inputdced:"",
       selectedDCItems: [],//文档
       selectedItems:[],//出入库
+      selectedArchives:[],
+      printVolumesVisible:false,
+      formType:"",
+      formCoding:""
     };
   },
   mounted() {
     this.search();
   },
   methods: {
+    beforePrint(selectedRow,gridName,vtitle){
+      let _self=this;
+      let ids =[]
+      //console.log(this.activeName)
+      if(this.activeName=='ArchivePendingOut'){
+        this.selectedArchives = this.$refs.PendingGrid.itemDataList
+        vtitle = "待入库清单"
+      }
+      else if(this.activeName=='ArchivePending'){
+        this.selectedArchives = this.$refs.PendedGrid.itemDataList    
+        vtitle = "已入库清单"
+      }
+      for(let i = 0;i < _self.selectedArchives.length;i++){
+        ids[i] = _self.selectedArchives[i].ID
+      }
+      //console.log(_self.selectedArchives[0].ID)
+      if(_self.selectedArchives.length==0){
+        // _self.$message('请选择一条数据进行打印');
+        _self.$message({
+                showClose: true,
+                message: '请选择一条数据进行打印!',
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      console.log(this.$refs.PrintVolumes)
+      _self.printVolumesVisible = true;
+
+      setTimeout(()=>{
+        _self.$refs.printVolumes.dialogQrcodeVisible = false
+        _self.$refs.printVolumes.getTypes(_self.formType,_self.formCoding)
+        _self.$refs.printVolumes.getArchiveObj(ids, gridName,vtitle); 
+      },10);
+
+      _self.printGridName=gridName;
+      _self.printObjId=selectedRow.ID;
+    },
     // 上下分屏事件
     onSplitResize(topPercent){
       // 顶部百分比*100
@@ -186,6 +247,8 @@ export default {
     //单击行
     onDataGridRowClick: function (row) {
       this.parentId=row.ID
+      this.formCoding ="单号:"+row.CODING
+      this.formType ="表单类型:"+row.TYPE_NAME
       var condition1 =
         "SELECT CHILD_ID from ecm_relation where PARENT_ID ='" +row.ID +"'";
       var key1 = "ID IN (" + condition1 + ") AND STATUS='待出库'";
@@ -383,6 +446,7 @@ export default {
   components: {
     DataGrid: DataGrid,
     DataLayout: DataLayout,
+    PrintVolumes:PrintVolumes
   },
 };
 </script>
