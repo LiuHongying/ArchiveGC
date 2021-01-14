@@ -277,7 +277,35 @@ public class ArchiveDcController extends ControllerAbstract{
 		return mp;
 	
 	}
-	
+	@RequestMapping(value = "/dc/checkdc", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
+	@ResponseBody
+	public Map<String, Object> checkDocuments(@RequestBody String argStr) {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		List<String> parentid = new ArrayList<String>();
+		try {
+			Map<String, Object> args = JSONUtils.stringToMap(argStr);
+			String con = args.get("condition").toString();
+			String childID = args.get("childID").toString();
+			List<Map<String, Object>> list = documentService.getObjectMap(getToken(), con);
+			for(Map<String,Object> lis:list) {
+				String sql = "select * from ecm_relation where CHILD_ID = '"+childID+"' and PARENT_ID = '"+lis.get("ID").toString()+"'";
+				try {
+					List<Map<String, Object>> result = relationService.getMapList(getToken(), sql);
+					if(result.size()>0) {
+						parentid.add(lis.get("ID").toString());
+					}
+				} catch (EcmException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			mp.put("parentID", parentid);
+			mp.put("code", ActionContext.SUCESS);
+		} catch (AccessDeniedException e) {
+			mp.put("code", ActionContext.TIME_OUT);
+		}
+		return mp;
+	}
 	
 	
 	
