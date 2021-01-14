@@ -961,12 +961,10 @@ export default {
             printGridName,
             vtitle); 
           }else{
-            _self.$message({
-              showClose: true,
-              message: response.data.message,
-              duration: 5000,
-              type: "error"
-            });
+            _self.$refs.printVolumes.dialogQrcodeVisible = false
+            _self.$refs.printVolumes.getArchiveObj(selectedRow.ID,
+            gridName,
+            vtitle); 
           }
         })
         .catch(function(error) {

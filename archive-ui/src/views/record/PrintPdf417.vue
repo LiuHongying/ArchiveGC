@@ -51,9 +51,9 @@
             <el-col :span="24" style="color: #000000;text-align: left;font-size:18px;padding:4px;">归档日期：{{item.archiveDate}}</el-col>
           </el-row>
           <el-row style="padding-bottom:15px;">
-            <el-col :span="10" style="color: #000000;font-size:46px;padding-top:10px;">
+            <el-col :span="10" style="padding-top:10px;">
               <el-row style="color: #000000;text-align: left;font-size:18px;padding:2px;">{{item.volString}}</el-row>
-              <el-row>{{item.storeCoding}}</el-row>
+              <el-row style="color: #000000;text-align: center;font-size:46px;padding-top:10px;">{{item.storeCoding}}</el-row>
             </el-col>
             <el-col :span="14"><canvas :ref="'canvas'+keys" :style="'display:'+noneStr"></canvas><img :ref="'image'+keys" /></el-col>
           </el-row>
