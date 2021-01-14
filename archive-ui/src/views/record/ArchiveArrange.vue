@@ -91,8 +91,8 @@
     </el-dialog>
 
     <el-dialog
-      title="打印条码"
-      width="43%"
+      title=""
+      width="50%"
       :visible="printPdf417Visible"
       @close="printPdf417Visible=false"
     >
@@ -295,9 +295,9 @@
                         :title="$t('application.fetchInformation')"
                       >{{$t('application.fetchInformation')}}</el-button>
                       </el-form-item>
-                      
+                       <!--
                       <el-form-item>
-                      <!-- <el-button
+                      <el-button
                         type="primary"
                         plain
                         size="small"
@@ -313,7 +313,7 @@
                         @click="beforePrintBarCode(selectedItems,'打印条码')"
                         title="打印条码"
                       ></el-button>
-                      -->
+                      
                       <el-button
                         type="primary"
                         plain
@@ -322,14 +322,16 @@
                         @click="beforePrintArchiveCode(selectedItems,'打印档号')"
                         title="打印档号"
                       >打印档号</el-button>
+                     
                       </el-form-item>
+                       -->
                       <el-form-item>
                       <el-button
                         type="primary"
                         plain
                         size="small"
                         icon="el-icon-printer"
-                        @click="beforePrintPdf417(selectedItems,'打印档号')"
+                        @click="beforePrintPdf417(selectedItems)"
                         title="打印条码"
                       >打印条码</el-button>
                       </el-form-item>
@@ -680,7 +682,8 @@ export default {
       isDates:false,
       newChildDoc: false,
       hiddenInput:"hidden",
-      AddConds:''
+      AddConds:'',
+      volumeInArchiveGridName:""
     };
   },
   
@@ -854,7 +857,7 @@ export default {
       }
       _self.printPdf417Visible = true;
       setTimeout(() => {
-        _self.$refs.printPdf417.refresh(selectedRows, 1);
+        _self.$refs.printPdf417.loadData(selectedRows);
       }, 10);
     },
     ///打印条码
@@ -925,7 +928,6 @@ export default {
     },
 
     beforePrint(selectedRow,gridName,vtitle){
-      debugger
       let _self=this;
       if(selectedRow.ID==undefined){
         // _self.$message('请选择一条数据进行打印');
@@ -940,10 +942,43 @@ export default {
       _self.printVolumesVisible = true;
 
       setTimeout(()=>{
-        _self.$refs.printVolumes.dialogQrcodeVisible = false
-        _self.$refs.printVolumes.getArchiveObj(selectedRow.ID,
-        gridName,
-        vtitle); 
+
+        _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: selectedRow.TYPE_NAME,
+          url: "/dc/getPrintArchiveGrid"
+        })
+        .then(function(response) {
+          
+          if(response.data.code=='1'){
+            let printGridName=response.data.data.attributes.C_TO;
+            _self.$refs.printVolumes.dialogQrcodeVisible = false
+            _self.$refs.printVolumes.getArchiveObj(selectedRow.ID,
+            printGridName,
+            vtitle); 
+          }else{
+            _self.$refs.printVolumes.dialogQrcodeVisible = false
+            _self.$refs.printVolumes.getArchiveObj(selectedRow.ID,
+            gridName,
+            vtitle); 
+          }
+        })
+        .catch(function(error) {
+         
+          _self.$message({
+            showClose: true,
+            message: "操作失败",
+            duration: 5000,
+            type: "error"
+          });
+          console.log(error);
+        });
+
+        
       },10);
 
       _self.printGridName=gridName;
