@@ -1,9 +1,16 @@
 package com.ecm.portal.archivegc.service;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -15,6 +22,7 @@ import com.ecm.common.util.DateUtils;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.EcmService;
 import com.ecm.portal.archivegc.entity.PrintEntity;
+import com.itextpdf.text.pdf.BarcodePDF417;
 
 @Service
 public class PrintService extends EcmService{
@@ -114,6 +122,45 @@ public class PrintService extends EcmService{
 			}
 		}
 		return list;
+	}
+	/**
+	 * 生成PDf417条码
+	 * @param strInfo 二维码信息
+	 * @param encode 字符编码（UTF-8、GBK)，默认UTF-8，
+	 * @param format 图片格式，jpg，png等
+	 * @return 二进制图片数据
+	 * @throws Exception
+	 */
+	public byte[] generatePdf417Image(String strInfo, String encode,
+			String format) throws Exception {
+		if (StringUtils.isEmpty(strInfo)) {
+			throw new Exception("二维条码的文本信息参数不能为空！");
+		}
+		if (StringUtils.isEmpty(encode)) {
+			encode = "UTF-8";
+		}
+
+		BarcodePDF417 barcodePDF417 = new BarcodePDF417();
+
+		barcodePDF417.setText(strInfo.getBytes(encode));
+
+		Image pdfImg = barcodePDF417.createAwtImage(Color.black, Color.white);
+
+		BufferedImage img = new BufferedImage((int) pdfImg.getWidth(null),
+				(int) pdfImg.getHeight(null), BufferedImage.TYPE_INT_RGB);
+		Graphics g = img.getGraphics();
+
+		g.drawImage(pdfImg, 0, 0, Color.white, null);
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+		ImageIO.write(img, format, os);
+
+		byte[] buffs = os.toByteArray();
+
+		os.close();
+
+		return buffs;
 	}
 	
 	private String getDateString(Date dt) {

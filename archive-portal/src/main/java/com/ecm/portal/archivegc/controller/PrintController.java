@@ -1,12 +1,17 @@
 package com.ecm.portal.archivegc.controller;
 
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +52,38 @@ public class PrintController  extends ControllerAbstract  {
 		}
 		mp.put("code", ActionContext.FAILURE);
 		return mp;
+	}
+	
+	@GetMapping("getContentBarcode")
+	@ResponseBody
+	public void  getContentBarcode(HttpServletRequest request,HttpServletResponse response) throws Exception {
+		String str= "";
+		if(request.getAttribute("str")!=null){
+			str = request.getAttribute("str").toString();
+		}
+		else{
+			str = request.getParameter("str");
+		}
+		byte[] buffer = printService.generatePdf417Image(str, null, "png");
+		String id = UUID.randomUUID().toString().replace("-", "");
+		// 清空response
+        response.reset();
+        // 设置response的Header
+        response.setCharacterEncoding("UTF-8");
+        response.addHeader("Content-Disposition", "attachment;filename=" + id + ".png" );
+        response.addHeader("Content-Length", "" + buffer.length);
+        BufferedOutputStream toClient = new BufferedOutputStream(response.getOutputStream());
+        response.setContentType("application/octet-stream");
+        toClient.write(buffer, 0, buffer.length);
+        if(toClient!=null) {
+	        try {
+				toClient.flush();
+				toClient.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	
