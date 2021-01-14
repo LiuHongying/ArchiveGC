@@ -195,6 +195,9 @@
               <el-button type="primary" @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
             </el-form-item>
             <el-form-item>
+                <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
+            </el-form-item>
+            <el-form-item>
             
                 <!-- `checked` 为 true显示卷宗 或 false不显示卷宗 -->
                 <el-checkbox
@@ -349,6 +352,7 @@
   </div>
 </template>
 <script>
+import AddCondition from '@/views/record/AddCondition'
 import ShowProperty from "@/components/ShowProperty";
 import InnerItemViewer from "./InnerItemViewer.vue";
 import BorrwoForm from "@/components/form/Borrow";
@@ -362,6 +366,7 @@ export default {
     BorrwoForm: BorrwoForm,
     BorrowStartUp: BorrowStartUp,
     ExcelUtil: ExcelUtil,
+    AddCondition:AddCondition
   },
   data() {
     return {
@@ -374,6 +379,7 @@ export default {
         dialogFormVisible: false,
         isIndeterminate: false,
       },
+      AddConds:'',
       innerTableHeight: window.innerHeight - 360,
       tableHeight: window.innerHeight - 170,
       asideHeight: window.innerHeight - 100,
@@ -382,6 +388,7 @@ export default {
       currentLanguage: "zh-cn",
       propertyVisible: false,
       borrowVisible: false,
+      hiddenInput:"hidden",
       loading: false,
       tableLoading: false,
       currentFolder: [],
@@ -641,8 +648,14 @@ export default {
     loadGridData(indata) {
       let _self = this;
       _self.tableLoading = true;
-      var key = _self.sqlStringFilter(_self.inputkey);
+      var key =''
       var m = new Map();
+      if(_self.inputkey!=''){
+        key = "(TITLE like '%"+_self.inputkey+"%' or CODING like '%"+_self.inputkey+"%'"+")"
+      }
+      if(_self.AddConds!=''){
+        key +=" and "+_self.AddConds
+      }
       _self.gridViewTrans = indata.gridView;
       _self.idTrans = indata.id;
       m.set("gridName", indata.gridView);
@@ -651,8 +664,9 @@ export default {
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", _self.currentPage - 1);
       m.set("orderBy", "MODIFIED_DATE desc");
+      console.log(m)
       axios
-        .post("/dc/getExceptBoxDocuments", JSON.stringify(m))
+        .post("/exchange/doc/getExceptBoxDocuments", JSON.stringify(m))
         .then(function (response) {
           _self.itemDataList = response.data.data;
           _self.itemDataListFull = response.data.data;

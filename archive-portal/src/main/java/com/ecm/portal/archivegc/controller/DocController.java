@@ -39,6 +39,7 @@ import com.ecm.core.entity.EcmGridView;
 import com.ecm.core.entity.EcmGridViewItem;
 import com.ecm.core.entity.EcmRelation;
 import com.ecm.core.entity.LoginUser;
+import com.ecm.core.entity.Pager;
 import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.exception.EcmException;
 import com.ecm.core.exception.NoPermissionException;
@@ -440,6 +441,52 @@ public class DocController  extends ControllerAbstract  {
 		mp.put("code", 1);
 		return mp;
 	}
+	
+	
+	@RequestMapping(value = "getExceptBoxDocuments", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> getObjectsExceptBox(@RequestBody String argStr) {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			Map<String, Object> args = JSONUtils.stringToMap(argStr);
+			String folderId = (String) args.get("folderId");
+			EcmFolder ecmFolder = folderService.getObjectById(getToken(), folderId);
+			EcmGridView gv = CacheManagerOper.getEcmGridViews().get(args.get("gridName").toString());
+			StringBuffer condition = new StringBuffer(
+					"(" + gv.getCondition() + " and  STATUS<>'作废' AND IS_CURRENT=1 AND IS_RELEASED=1  AND C_ITEM_TYPE <>'案卷') ");
+			int pageSize = Integer.parseInt(args.get("pageSize").toString());
+			int pageIndex = Integer.parseInt(args.get("pageIndex").toString());
+			Pager pager = new Pager();
+			pager.setPageIndex(pageIndex); 
+			pager.setPageSize(pageSize);
+			String newCondition = args.get("condition").toString();
+			if (!EcmStringUtils.isEmpty(newCondition)) {
+				condition.append(" and"+newCondition+ " and FOLDER_ID in (SELECT id from ecm_folder where folder_path like '"
+						+ ecmFolder.getFolderPath() + "%')");
+			}
+			if (EcmStringUtils.isEmpty(newCondition)) {
+				condition.append(" AND FOLDER_ID='").append(folderId.replace("'", "")).append("'");
+				List<Map<String, Object>> list = documentService.getObjectsByConditon(getToken(),
+						args.get("gridName").toString(), null, pager, condition.toString(),
+						args.get("orderBy").toString());
+				mp.put("data", list);
+				mp.put("pager", pager);
+				mp.put("code", ActionContext.SUCESS);
+			} else {
+				
+				List<Map<String, Object>> list = documentService.getObjectsByConditon(getToken(),
+						args.get("gridName").toString(), folderId, pager, condition.toString(),
+						args.get("orderBy").toString());
+				mp.put("data", list);
+				mp.put("pager", pager);
+				mp.put("code", ActionContext.SUCESS);
+			}
+		} catch (AccessDeniedException e) {
+			mp.put("code", ActionContext.TIME_OUT);
+		}
+		return mp;
+	}
+	
 	
 	
 	@RequestMapping(value = "addAttachment4Copy", method = RequestMethod.POST)
