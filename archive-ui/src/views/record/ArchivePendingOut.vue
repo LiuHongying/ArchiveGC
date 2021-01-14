@@ -35,6 +35,15 @@
         <el-form-item>
           <el-button type="primary" @click="submit('主表')">出库</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            size="small"
+            icon="el-icon-printer"
+            @click="beforePrint(selectedArchives,'FormDcGrid','打印清单')"
+            title="打印清单"
+            >打印清单</el-button>
+        </el-form-item>
       </el-form>
     </template>
     <template v-slot:main="{ layout }">
@@ -71,6 +80,7 @@
                       v-model="inputdcing"
                       placeholder='请输入编号'
                       @keyup.enter.native="searchDCing()"
+                      @input="beforeSubmit('')"
                     ></el-input>
                   </el-form-item>
                   <el-form-item>
@@ -134,6 +144,15 @@
                 </DataGrid>
               </el-tab-pane>
             </el-tabs>
+    <el-dialog :visible.sync="printVolumesVisible" width="80%"
+    modal-append-to-body="false"
+    :append-to-body="true" 
+    >
+      <PrintVolumes
+        ref="printVolumes"
+      ></PrintVolumes>
+    </el-dialog>
+
           </template>
         </split-pane>
       </div>
@@ -143,6 +162,7 @@
 <script type="text/javascript">
 import DataGrid from "@/components/DataGrid";
 import DataLayout from "@/components/ecm-data-layout";
+import PrintVolumes from "@/views/record/Print4Borrow";
 export default {
   name: "TC",
   data() {
@@ -169,12 +189,54 @@ export default {
       inputdced:"",
       selectedDCItems: [],//文档
       selectedItems:[],//出入库
+      selectedArchives:[],
+      printVolumesVisible:false,
+      formType:"",
+      formCoding:""
     };
   },
   mounted() {
     this.search();
   },
   methods: {
+    beforePrint(selectedRow,gridName,vtitle){
+      let _self=this;
+      let ids =[]
+      //console.log(this.activeName)
+      if(this.activeName=='ArchivePendingOut'){
+        this.selectedArchives = this.$refs.PendingGrid.itemDataList
+        vtitle = "待出库清单"
+      }
+      else if(this.activeName=='ArchivePending'){
+        this.selectedArchives = this.$refs.PendedGrid.itemDataList    
+        vtitle = "已出库清单"
+      }
+      for(let i = 0;i < _self.selectedArchives.length;i++){
+        ids[i] = _self.selectedArchives[i].ID
+      }
+      //console.log(_self.selectedArchives[0].ID)
+      if(_self.selectedArchives.length==0){
+        // _self.$message('请选择一条数据进行打印');
+        _self.$message({
+                showClose: true,
+                message: '请选择一条数据进行打印!',
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      console.log(this.$refs.PrintVolumes)
+      _self.printVolumesVisible = true;
+
+      setTimeout(()=>{
+        _self.$refs.printVolumes.dialogQrcodeVisible = false
+        _self.$refs.printVolumes.getTypes(_self.formType,_self.formCoding)
+        _self.$refs.printVolumes.getArchiveObj(ids, gridName,vtitle); 
+      },10);
+
+      _self.printGridName=gridName;
+      _self.printObjId=selectedRow.ID;
+    },
     // 上下分屏事件
     onSplitResize(topPercent){
       // 顶部百分比*100
@@ -185,6 +247,8 @@ export default {
     //单击行
     onDataGridRowClick: function (row) {
       this.parentId=row.ID
+      this.formCoding ="单号:"+row.CODING
+      this.formType ="表单类型:"+row.TYPE_NAME
       var condition1 =
         "SELECT CHILD_ID from ecm_relation where PARENT_ID ='" +row.ID +"'";
       var key1 = "ID IN (" + condition1 + ") AND STATUS='待出库'";
@@ -227,7 +291,9 @@ export default {
           });
           return
       }
-      let key = _self.condition1
+      var condition1 =
+        "SELECT CHILD_ID from ecm_relation where PARENT_ID ='" +_self.parentId +"'";
+      var key = "ID IN (" + condition1 + ") AND STATUS='待出库'";
       if(_self.inputdcing!=''&&_self.inputdcing!=undefined){
         key+=" and (CODING LIKE '%"+_self.inputdcing+"%')";
       }
@@ -247,7 +313,9 @@ export default {
           });
           return
       }
-      let key = _self.condition2
+      var condition1 =
+        "SELECT CHILD_ID from ecm_relation where PARENT_ID ='" +_self.parentId +"'";
+      var key = "ID IN (" + condition1 + ") AND STATUS='待入库'";
       if(_self.inputdced!=''&&_self.inputdced!=undefined){
         key+=" and (CODING LIKE '%"+_self.inputdced+"%')";
       }
@@ -296,7 +364,7 @@ export default {
         tab = _self.selectedDCItems;
       }
       var i;
-      for (i in tab) {a
+      for (i in tab) {
         a.push(tab[i]["ID"]);
       }
       formdata.append("ID", JSON.stringify(a));
@@ -314,6 +382,7 @@ export default {
             duration: 2000,
             type: "success",
           });
+          _self.inputdcing=""
           if(type=="主表"){
             _self.search();
             _self.$refs.PendingoutGrid.itemDataList=[];
@@ -338,12 +407,46 @@ export default {
         _self.$message("出库失败");
         console.log(error);
       });
+    },
+    beforeSubmit:function(type){
+      let _self=this
+      let a=_self.inputdcing.split(';')
+      var m = new Map();
+      m.set("condition", "TYPE_NAME IN("+_self.typename+") AND STATUS='待出库'");
+      m.set('childID',a[0]);
+      var parentID
+      axios
+        .post("/dc/checkdc", JSON.stringify(m))
+        .then(function (response) {
+          parentID=response.data.parentID
+          if(parentID!=""&&parentID!=undefined){
+            var i=0;
+            for (i in parentID) {
+              _self.parentId=parentID[i];
+              _self.selectedDCItems=[]
+              _self.selectedDCItems.push({"ID":a[0]})
+              // _self.submit(type)
+              // _self.searchDCing()
+            }
+          }else{
+             _self.$message({
+                showClose: true,
+                message:"此文件不存在",
+                duration: 2000,
+                type: "warning",
+              });
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     }
   },
   props: {},
   components: {
     DataGrid: DataGrid,
     DataLayout: DataLayout,
+    PrintVolumes:PrintVolumes
   },
 };
 </script>

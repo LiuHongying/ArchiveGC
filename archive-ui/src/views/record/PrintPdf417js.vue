@@ -30,7 +30,7 @@
         </el-row>
       </div>
       <div id='print' ref='print' :style="'position: absolute; top:0px;'">
-        <div v-for="(item,keys) in printObjects" :key="'divk'+keys" style="width:400px;padding:4px;">
+        <div v-for="(item,keys) in printObjects" :key="'divk'+keys" style="width:400px">
           <el-row>
             <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{item.typeName}}</el-col>
             <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{item.itemType}}</el-col>
@@ -55,9 +55,7 @@
               <el-row style="color: #000000;text-align: left;font-size:18px;padding:2px;">{{item.volString}}</el-row>
               <el-row style="color: #000000;text-align: center;font-size:46px;padding-top:10px;">{{item.storeCoding}}</el-row>
             </el-col>
-            <el-col :span="14">
-              <img width="100%" :src="_self.axios.defaults.baseURL+'/record/print/getContentBarcode?str='+item.id +';' +item.archiveCoding + ';'+item.coding+';'+item.revision+';'+'&token='+token+'&ticket='+ticket+'_'+keys" border="0" />
-            </el-col>
+            <el-col :span="14"><canvas :ref="'canvas'+keys" :style="'display:'+noneStr"></canvas><img :ref="'image'+keys" /></el-col>
           </el-row>
         </div>
         <!-- <div v-if="isQRCode"  ref='qrCodeUrl2'></div> -->
@@ -95,8 +93,6 @@ export default {
       printTypeListBussiness:["正本","副本","复制件"],
       printTypeList:[],
       printObjects:[],
-      token:"",
-      ticket:100,
     };
   },
   mounted() {
@@ -104,7 +100,7 @@ export default {
     _self.printTypeList = _self.printTypeListGeneral;
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.getConfigParam("PrintArchiveCodeConfig");
-    _self.token = sessionStorage.getItem('access-token');
+    
   },
   props: {
     archiveObjects:{type:Array,default:() => []},
@@ -148,6 +144,17 @@ export default {
         this.printType = val;
         this.getPrintObjects();
       },
+      refresh(){
+        let _self=this;
+        setTimeout(() => {
+          for(let i=0; i < _self.printObjects.length;i++){
+            let obj = _self.printObjects[i];
+            let barcode = obj.id +";" +obj.archiveCoding + ";"+obj.coding+";"+obj.revision+";";//+";"+obj.typeName+";"+obj.printType;
+            _self.generate(barcode,_self.$refs['canvas'+i][0]);
+          }
+        },100);
+        
+      },
 
     getPrintObjects(){
       let _self=this;
@@ -163,7 +170,7 @@ export default {
       _self.axios.post("/record/print/getPrintData", JSON.stringify(m))
         .then(function(response) {
           _self.printObjects = response.data.data;
-          _self.ticket ++;
+          _self.refresh();
           _self.loading = false;
         })
         .catch(function(error) {
@@ -173,10 +180,50 @@ export default {
     },
     printCode(){
       this.noneStr = "none";
+      if(this.printObjects && this.printObjects.length>0){
+        for(var i=0; i<this.printObjects.length; i++){
+          this.$refs["image"+i][0].src = this.$refs['canvas'+i][0].toDataURL();
+        }
+      }
       setTimeout(() => {
       this.$print(this.$refs.print);
     }, 200);
     },
+    
+    generate(content,showCanvas) {
+        this.PDF417.init(content);             
+
+        let barcode = this.PDF417.getBarcodeArray();
+
+        // block sizes (width and height) in pixels
+        let bw = 2;
+        let bh = 2;
+
+        // create canvas element based on number of columns and rows in barcode
+        
+
+        let canvas = showCanvas;
+        canvas.width = bw * barcode['num_cols'];
+        canvas.height = bh * barcode['num_rows'];
+        
+        let ctx = canvas.getContext('2d');                    
+
+        // graph barcode elements
+        let y = 0;
+        // for each row
+        for (let r = 0; r < barcode['num_rows']; ++r) {
+            let x = 0;
+            // for each column
+            for (let c = 0; c < barcode['num_cols']; ++c) {
+                if (barcode['bcode'][r][c] == 1) {                        
+                    ctx.fillRect(x, y, bw, bh);
+                }
+                x += bw;
+            }
+            y += bh;
+        }       
+    }
+    
     
   }
 };
