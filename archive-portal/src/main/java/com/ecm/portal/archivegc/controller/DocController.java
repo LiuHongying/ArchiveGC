@@ -396,7 +396,42 @@ public class DocController  extends ControllerAbstract  {
 		mp.put("code", 1);
 		return mp;
 	}
-	
+	@RequestMapping(value = "Reject", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> reject(String metaData) throws AccessDeniedException, NoPermissionException, EcmException {
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		Map<String,Object> mp = new HashMap<String,Object>();
+		String idsStr = args.get("ids").toString();
+		String comment = args.get("comment").toString();
+		List<String> idsList = JSONUtils.stringToArray(idsStr);
+		for(String id : idsList) {
+		EcmDocument temp1 = documentService.getObjectById(getToken(), id);
+		Map<String,Object> temp1Attr = temp1.getAttributes();
+		temp1Attr.put("C_REJECT_COMMENT", comment);
+		temp1Attr.put("STATUS", "整编");
+		String folderId=folderPathService.getFolderId(getToken(),temp1.getAttributes(), "2");
+		temp1Attr.put("FOLDER_ID", folderId);
+		documentService.updateObject(getToken(), temp1Attr);				//主文件修改完毕，现在开始检查关系文件
+		String AttachSql = "select * from ecm_relation where parent_id = '"+id+"'";
+		List<Map<String,Object>> attachMps = documentService.getMapList(getToken(), AttachSql);
+		if(attachMps.size()!=0) {
+			for(Map<String,Object> attachsID:attachMps) {
+				String idAttach = attachsID.get("CHILD_ID").toString();
+				EcmDocument attachs = documentService.getObjectById(getToken(), idAttach);
+				if(attachs==null){
+				continue;
+				}
+				Map<String,Object> attachAttr = attachs.getAttributes();
+				attachAttr.put("C_REJECT_COMMENT", comment);
+				attachAttr.put("STATUS", "整编");
+				String AttachFolder = folderPathService.getFolderId(getToken(),attachAttr, "2");
+				attachAttr.put("FOLDER_ID", AttachFolder);
+			}
+		}
+		}
+		mp.put("code", 1);
+		return mp;
+	}
 	
 	
 	@RequestMapping(value = "addAttachment4Copy", method = RequestMethod.POST)
