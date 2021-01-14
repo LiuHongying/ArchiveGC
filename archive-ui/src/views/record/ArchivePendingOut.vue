@@ -205,11 +205,11 @@ export default {
       //console.log(this.activeName)
       if(this.activeName=='ArchivePendingOut'){
         this.selectedArchives = this.$refs.PendingGrid.itemDataList
-        vtitle = "待入库清单"
+        vtitle = "待出库清单"
       }
       else if(this.activeName=='ArchivePending'){
         this.selectedArchives = this.$refs.PendedGrid.itemDataList    
-        vtitle = "已入库清单"
+        vtitle = "已出库清单"
       }
       for(let i = 0;i < _self.selectedArchives.length;i++){
         ids[i] = _self.selectedArchives[i].ID
