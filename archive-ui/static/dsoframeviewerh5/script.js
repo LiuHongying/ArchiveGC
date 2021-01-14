@@ -10,10 +10,9 @@ function InitEvent() {
     //alert("请您将IE的文档模式调成IE7标准模式");
     
     //OpenLocalWord() ;
-    let _this=this
-    setTimeout(function()  {
+       setTimeout(function()  {
  
-    _this.OpenLocalWord();
+        this.OpenLocalWord();
  
    }, 500);
 
@@ -29,26 +28,36 @@ function CheckFileOpened() {
 
 //dsoframe(打开)事件
 function OnDocumentOpened(str, obj) {
-    alert("触发了dsoframe的OnDocumentOpened事件！");
-	alert("触发str"+ str  + "    ====   "+"obj: "+ obj);
+   
     isOpened = true;
-
-    //设置打开Word的用户
-    oframe.ActiveDocument.Application.UserName = document.getElementById("tUserName").value;
-
-    //saved属性用来判断文档是否被修改过,文档打开的时候设置成ture,当文档被修改,自动被设置为false,该属性由office提供.
     oframe.ActiveDocument.Saved = true;
+    oframe.ActiveDocument.TrackRevisions = true;
+    oframe.ActiveDocument.ShowRevisions = true;
+    oframe.ActiveDocument.ActiveWindow.View.Type =3; //普通视图=1,大纲视图=2,页面视图=3,打印预览视图=4,主控视图=5,Web视图=6,阅读视图=7
+  //  oframe.ActiveDocument.ActiveWindow.View.Zoom.PageFit = 2; //使页面自动适应用户的可视范围
+    oframe.ActiveDocument.ActiveWindow.View.RevisionsView = 0; // 0最终 1原始
+    
 
-    UnProtectDoc(); //默认解锁文档
-    ToggleTrackRevisions(true); //默认开启修订功能
-    ToggleShowRevisions(false); //默认看到正文清稿
-    oframe.ActiveDocument.ActiveWindow.View.Type = 3; //普通视图=1,大纲视图=2,页面视图=3,打印预览视图=4,主控视图=5,Web视图=6,阅读视图=7
-    oframe.ActiveDocument.ActiveWindow.View.Zoom.PageFit = 2; //使页面自动适应用户的可视范围
-    //oframe.ActiveDocument.ActiveWindow.View.Zoom.Percentage = 100; //使页面按页宽的百分比展示
 
-    //将word的修订视图模式设置为final
-    oframe.ActiveDocument.ActiveWindow.View.ShowRevisionsAndComments = false;
-    oframe.ActiveDocument.ActiveWindow.View.RevisionsView = 1;
+  
+
+
+    // //设置打开Word的用户
+    // oframe.ActiveDocument.Application.UserName = document.getElementById("tUserName").value;
+
+    // //saved属性用来判断文档是否被修改过,文档打开的时候设置成ture,当文档被修改,自动被设置为false,该属性由office提供.
+    // oframe.ActiveDocument.Saved = true;
+
+    // UnProtectDoc(); //默认解锁文档
+    // ToggleTrackRevisions(true); //默认开启修订功能
+    // ToggleShowRevisions(false); //默认看到正文清稿
+    // oframe.ActiveDocument.ActiveWindow.View.Type = 7; //普通视图=1,大纲视图=2,页面视图=3,打印预览视图=4,主控视图=5,Web视图=6,阅读视图=7
+    // oframe.ActiveDocument.ActiveWindow.View.Zoom.PageFit = 2; //使页面自动适应用户的可视范围
+    // //oframe.ActiveDocument.ActiveWindow.View.Zoom.Percentage = 100; //使页面按页宽的百分比展示
+
+    // //将word的修订视图模式设置为final
+    // oframe.ActiveDocument.ActiveWindow.View.ShowRevisionsAndComments = false;
+    // oframe.ActiveDocument.ActiveWindow.View.RevisionsView = 1;
 
     ////屏蔽预览，保存，新建，打开，打印的按钮（貌似并不起作用）
     //oframe.ActiveDocument.CommandBars("Reviewing").Visible = true;
@@ -56,16 +65,17 @@ function OnDocumentOpened(str, obj) {
     //oframe.ActiveDocument.CommandBars("Standard").Controls(2).Visible = false;
     //oframe.ActiveDocument.CommandBars("Standard").Controls(3).Visible = false;
 
-    //有的电脑太卡，部分设置有可能不生效，所以采用延时设置，确保设置生效
-    setTimeout(function () {
-        ToggleShowRevisions(false); //默认看到正文清稿
-        oframe.ActiveDocument.ActiveWindow.View.Zoom.PageFit = 2; //使页面自动适应用户的可视范围
-    }, 1000);
+    // //有的电脑太卡，部分设置有可能不生效，所以采用延时设置，确保设置生效
+    // setTimeout(function () {
+    //     ToggleShowRevisions(false); //默认看到正文清稿
+    //     oframe.ActiveDocument.ActiveWindow.View.Zoom.PageFit = 2; //使页面自动适应用户的可视范围
+    // }, 1000);
+    
 }
 
 //dsoframe(关闭)事件
 function OnDocumentClosed() {
-    alert("触发了dsoframe的OnDocumentClosed事件！");
+    //alert("触发了dsoframe的OnDocumentClosed事件！");
     isOpened = false;
 }
 
@@ -79,8 +89,10 @@ function ToggleMenubar() {
     oframe.Activate();
 }
 function ToggleToolbars() {
-    if (!CheckFileOpened()) return;
-    oframe.Toolbars = !oframe.Toolbars;
+  //  if (!CheckFileOpened()) return;
+   oframe.Toolbars = !oframe.Toolbars;
+   
+   //oframe.Toolbars=false;
     oframe.Activate();
 }
 
@@ -382,7 +394,14 @@ function PadLeft(str, len) {
  //打开服务器文件到本地
 function OpenLocalWord() {
     var urlSrc = GetQueryValue('file');
+    
+
+   // alert("urlSrc="+urlSrc)
     oframe.Open(urlSrc+ "&random=" + Math.random(), true, "Word.Document");
+   //oframe.SetMenuDisplay(0);
+   // ToggleTitlebar();
+   // ToggleMenubar();
+  // ToggleToolbars();//IE报错 隐藏菜单
 
 }
 
@@ -397,7 +416,6 @@ function OpenLocalWord() {
     if (oframe.HttpInit()) {
         oframe.HttpAddPostString("id", curId);
         oframe.HttpAddPostCurrFile("file", "");
-        alert(rootPath + "/zisecm/dc/newDocumentSaveDso");
         var savedId = oframe.HttpPost(rootPath + "/zisecm/dc/newDocumentSaveDso");
         if(savedId!=""){
             alert("上传成功");

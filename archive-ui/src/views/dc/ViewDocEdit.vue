@@ -46,9 +46,7 @@
              </div>
            </template>
            <template v-else>
-             <PdfViewer v-if="viewerType==1" v-bind:id="doc.id" v-bind:format="doc.format"></PdfViewer>
-         
-             <DSOframerHtml5 v-else-if="viewerType==222" v-bind:id="doc.id" v-bind:format="doc.format"></DSOframerHtml5>
+             <DSOframerHtml5 v-if="viewerType==222"  v-bind:id="doc.id" v-bind:format="doc.format"></DSOframerHtml5>
             <div v-else-if="doc.contentSize==0" style="padding-top:40px;">
                 {{$t('application.noE-File')}}
             </div>

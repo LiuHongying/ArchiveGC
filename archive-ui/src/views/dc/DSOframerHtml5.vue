@@ -43,17 +43,6 @@ export default {
      //let getfileUrl =  _self.axios.defaults.baseURL+"/dc/getContent?id="+_self.id+"&token="+sessionStorage.getItem('access-token');
     let getfileUrl =  _self.axios.defaults.baseURL+"/dc/getContent?id="+_self.id+"&token="+sessionStorage.getItem('access-token')+"&format="+_self.format;
      _self.dsoUrl="./static/dsoframeviewerh5/dsoframe.html?file="+encodeURIComponent(getfileUrl)+"&."+_self.format;
-      // axios.post('/dc/getOneParameterValue',key)
-      //   .then(function(response) {
-         
-      //     let url = response.data.data[0].replace("{0}",_self.id).replace("{1}",_self.format);
-      //     _self.dsoUrl = url;
-      //      console.log(url);
-      //   })
-      //   .catch(function(error) {
-      //     console.log(error);
-      //     _self.loading = false;
-      //   });
     },
     writeAudit(docId){
       var m = new Map();
