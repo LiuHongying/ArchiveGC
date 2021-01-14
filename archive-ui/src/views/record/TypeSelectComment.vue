@@ -45,7 +45,7 @@
       plain
       size="small"
       icon="el-icon-edit"
-      @click="typeSelectVisible=true"
+      @click="showdialog"
     >
       <slot>{{$t('application.newDocument')}}</slot>
     </el-button>
@@ -70,6 +70,9 @@ export default {
     this.getClassicNames("ClassicNames");
   },
   methods: {
+    showdialog(){
+      this.typeSelectVisible=true
+    },
     getTypeNameByClassic(keyName) {
       let _self = this;
       _self.selectedTypeName = "";
