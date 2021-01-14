@@ -399,6 +399,10 @@ public class DocController  extends ControllerAbstract  {
 	@RequestMapping(value = "Reject", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> reject(String metaData) throws AccessDeniedException, NoPermissionException, EcmException {
+		LoginUser userObj=null;
+		Date now = new Date();
+		userObj=this.getSession().getCurrentUser();
+		String currentUser=userObj.getUserName();
 		Map<String, Object> args = JSONUtils.stringToMap(metaData);
 		Map<String,Object> mp = new HashMap<String,Object>();
 		String idsStr = args.get("ids").toString();
@@ -408,6 +412,8 @@ public class DocController  extends ControllerAbstract  {
 		EcmDocument temp1 = documentService.getObjectById(getToken(), id);
 		Map<String,Object> temp1Attr = temp1.getAttributes();
 		temp1Attr.put("C_REJECT_COMMENT", comment);
+		temp1Attr.put("C_REJECTOR", currentUser);
+		temp1Attr.put("C_REJECT_DATE", now);
 		temp1Attr.put("STATUS", "整编");
 		String folderId=folderPathService.getFolderId(getToken(),temp1.getAttributes(), "2");
 		temp1Attr.put("FOLDER_ID", folderId);
@@ -424,6 +430,8 @@ public class DocController  extends ControllerAbstract  {
 				Map<String,Object> attachAttr = attachs.getAttributes();
 				attachAttr.put("C_REJECT_COMMENT", comment);
 				attachAttr.put("STATUS", "整编");
+				attachAttr.put("C_REJECT_DATE", now);
+				attachAttr.put("C_REJECTOR", currentUser);
 				String AttachFolder = folderPathService.getFolderId(getToken(),attachAttr, "2");
 				attachAttr.put("FOLDER_ID", AttachFolder);
 			}
