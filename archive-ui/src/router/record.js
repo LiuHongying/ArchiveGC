@@ -123,7 +123,7 @@ export const recordRouter =  [
         meta: {
           requireAuth: true,
           permit: 1,
-          title: 'myWorkflow'
+          title: '我的借阅'
         },
         path: '/record/myborrow',
         name: '我的借阅',
