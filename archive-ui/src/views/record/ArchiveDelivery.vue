@@ -189,8 +189,8 @@
           type="primary"
           plain
           size="small"
-          icon="el-icon-edit"
-          @click="fileAttrsCopy(1)">主文件著录</el-button>
+          icon="el-icon-copy-document"
+          @click="fileAttrsCopy(1)">复制著录</el-button>
         <el-button
           type="primary"
            plain
@@ -284,8 +284,7 @@
                           type="primary"
                           plain
                           size="small"
-                          icon="el-icon-edit"
-                          @click="fileAttrsCopy(2)">子文件著录</el-button>
+                          @click="fileAttrsCopy(2)">复制著录</el-button>
                         <el-button
                           type="primary"
                           plain
