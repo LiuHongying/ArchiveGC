@@ -30,7 +30,7 @@
         </el-row>
       </div>
       <div id='print' ref='print' :style="'position: absolute; top:0px;'">
-        <div v-for="(item,keys) in printObjects" :key="'divk'+keys" style="width:400px;padding:4px;">
+        <div v-for="(item,keys) in printObjects" :key="'divk'+keys" :style="'width:'+divWidth+';padding:5px;'">
           <el-row>
             <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{item.typeName}}</el-col>
             <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{item.itemType}}</el-col>

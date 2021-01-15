@@ -82,10 +82,10 @@
             <el-col :span="2">
               <el-button  type="success" @click="showItemContent(formId)">查看主件</el-button>
             </el-col>
-            <!--
+            <!---->
              <el-col :span="2">
               <el-button  type="success" @click="showItemContentEdit(formId)">在线编辑</el-button>
-            </el-col>-->
+            </el-col>
             <el-col :span="2" v-if="allowEdit">
               <MountFile  
                   :selectedItem="[{'ID':formId}]"
@@ -197,6 +197,11 @@ export default {
       uploadUrl:"",
       selectedAttachment:[],
       resultData:{},
+      docObj:null,
+       doc:{
+        id:"",
+        format:"",
+      },
     };
   },
   model: {
@@ -417,15 +422,34 @@ export default {
             return;
         }
       let condition = id;
-      let href = this.$router.resolve({
-        path: "/viewdocEdit",
-        query: {
-          id: condition,
-          //token: sessionStorage.getItem('access-token')
-        },
-      });
-      //console.log(href);
-      window.open(href.href, "_blank");
+      // let href = this.$router.resolve({
+      //   path: "/viewdocEdit",
+      //   query: {
+      //     id: condition,
+      //     //token: sessionStorage.getItem('access-token')
+      //   },
+      // });
+      // //console.log(href);
+      // window.open(href.href, "_blank");
+      debugger
+    let _self = this;
+    this.token = sessionStorage.getItem("access-token");
+    axios.post("/dc/getDocument",id).then(function(response) {
+        _self.docObj=response.data.data;
+        _self.doc.permit = response.data.permit;
+        _self.doc.id=_self.docObj.ID;
+        _self.doc.format=_self.docObj.FORMAT_NAME;
+        let getfileUrl =  _self.axios.defaults.baseURL+"/dc/getContent?id="+_self.doc.id+"&token="+sessionStorage.getItem('access-token')+"&format="+_self.doc.format;
+     
+      var urlStr = "./static/dsoframeviewerh5/dsoframe.html?file="+encodeURIComponent(getfileUrl);
+      var win = window.open("","_blank");
+      win.open(urlStr,"_self");
+      }).catch(function(error) {
+        console.log(error);
+    });
+
+     
+
     },
 
     handleChangeAttach(file, fileList) {

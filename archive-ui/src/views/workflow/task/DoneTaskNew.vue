@@ -170,7 +170,8 @@ import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
 import CancelView from "@/views/workflow/CancelView.vue"
 import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue"
 import CommonViewRelyFolder from "@/views/workflow/CommonViewRelyFolder.vue";
-import ViewDocNpc from "@/views/npc/ViewDocNpc.vue"
+import ViewDocNpc from "@/views/npc/ViewDocNpc.vue";
+import BorrowViewPrint from "@/views/workflow/BorrowViewPrint.vue";
 export default {
   name: "DoneTask",
   permit: 1,
@@ -190,7 +191,8 @@ export default {
     CancelView:CancelView,
     CancelViewReadOnly : CancelViewReadOnly,
     CommonViewRelyFolder : CommonViewRelyFolder,
-    ViewDocNpc:ViewDocNpc
+    ViewDocNpc:ViewDocNpc,
+    BorrowViewPrint:BorrowViewPrint
   },
   data() {
     return {
