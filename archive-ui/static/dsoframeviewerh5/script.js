@@ -76,7 +76,8 @@ function OnDocumentOpened(str, obj) {
 //dsoframe(关闭)事件
 function OnDocumentClosed() {
     //alert("触发了dsoframe的OnDocumentClosed事件！");
-    isOpened = false;
+    //saveToWeb();
+    //isOpened = false;
 }
 
 //菜单操作
@@ -106,6 +107,7 @@ function OpenDoc() {
    // document.all.oframe.Open("http://localhost/1.doc", true);
 }
 function SaveCopyDoc() {
+    alert("ss");
     if (!CheckFileOpened()) return;
     oframe.showdialog(3);
 }
@@ -399,8 +401,8 @@ function OpenLocalWord() {
    // alert("urlSrc="+urlSrc)
     oframe.Open(urlSrc+ "&random=" + Math.random(), true, "Word.Document");
    //oframe.SetMenuDisplay(0);
-   // ToggleTitlebar();
-   // ToggleMenubar();
+   ToggleTitlebar();
+   ToggleMenubar();
   // ToggleToolbars();//IE报错 隐藏菜单
 
 }
@@ -417,7 +419,7 @@ function OpenLocalWord() {
         oframe.HttpAddPostString("id", curId);
         oframe.HttpAddPostCurrFile("file", "");
         var savedId = oframe.HttpPost(rootPath + "/zisecm/dc/newDocumentSaveDso");
-        if(savedId!=""){
+        if(savedId!="0"){
             alert("上传成功");
         }else{
             alert("上传失败");
