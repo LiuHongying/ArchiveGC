@@ -18,7 +18,7 @@
                     </template>
                     <el-select  :name="item.attrName"
                     v-else-if="item.controlType=='Select' || item.controlType=='ValueSelect' || item.controlType=='Department' || item.controlType=='SQLSelect'" 
-                    v-model="item.defaultValue" :placeholder="$t('application.pleaseSelect')+item.label" :disabled="item.readOnly" :multiple="item.isRepeat" style="display:block;"
+                    v-model="item.defaultValue" :placeholder="$t('application.pleaseSelect')" :disabled="item.readOnly" :multiple="item.isRepeat" style="display:block;"
                     @change="((val)=>{onSelectChange(val, item)})" >
                           <div v-for="(name,nameIndex) in item.validValues" :key="nameIndex+'N'">
                             <el-option :label="name" :value="name" :key="nameIndex"></el-option>
