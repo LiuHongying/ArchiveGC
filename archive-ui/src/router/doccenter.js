@@ -72,6 +72,16 @@ export const dcRouter = [
 		{
 			meta: {
 				requireAuth: true,
+				permit: 1,
+				title:'folderViewer'
+			},
+			path: '/dc/folderManage',
+			component: () => import('@/views/dc/FolderManagement.vue'),
+			name: '文件夹管理'
+		},
+		{
+			meta: {
+				requireAuth: true,
 				permit:1
 			},
 			path: '/dc/officedocviewer',
