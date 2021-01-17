@@ -58,6 +58,7 @@
                   :optionWidth = "2"
                   :isshowCustom="false"
                   :isShowMoreOption="false"
+                  :isshowicon="false"
                   :isEditProperty="false"
                   :isShowChangeList="false"
                   @selectchange="selectThChange"
@@ -106,7 +107,7 @@ export default {
       // 顶部除列表高度
       topbarHeight: 35,
       // 底部除列表高度
-      bottomHeight: 120,
+      bottomHeight: 35,
       selectedDCItems: [],//文档
       selectedThItems:[],//专题
       inputValueNum:"",

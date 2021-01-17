@@ -227,6 +227,7 @@ import ViewDocNpc from "@/views/npc/ViewDocNpc.vue";
 import DesignCancelViewReadOnly from "@/views/workflow/DesignCancelViewReadOnly.vue";
 import DestoryViewReadOnly from "@/views/workflow/DestoryViewReadOnly.vue";
 import ViolationViewReadOnly from "@/views/workflow/ViolationViewReadOnly.vue";
+import BorrowViewPrint from "@/views/workflow/BorrowViewPrint.vue";
 export default {
   name: "MyWorkflow",
   permit: 1,
@@ -248,7 +249,8 @@ export default {
     ViewDocNpc:ViewDocNpc,
     DesignCancelViewReadOnly:DesignCancelViewReadOnly,
     DestoryViewReadOnly:DestoryViewReadOnly,
-    ViolationViewReadOnly:ViolationViewReadOnly
+    ViolationViewReadOnly:ViolationViewReadOnly,
+    BorrowViewPrint:BorrowViewPrint
   },
   data() {
     return {

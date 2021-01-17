@@ -6,7 +6,7 @@
       @close="propertyVisible = false"
       width="90%"
     >
-      <ShowProperty ref="ShowProperty" width="100%" v-bind:itemId="selectedItemId" :showTypeName="true"></ShowProperty>
+      <ShowPropertyReadOnly ref="ShowProperty" width="100%" v-bind:itemId="selectedItemId" :showTypeName="true"></ShowPropertyReadOnly>
       <div slot="footer" class="dialog-footer">
         <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
       </div>

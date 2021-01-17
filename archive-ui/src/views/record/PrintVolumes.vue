@@ -159,28 +159,28 @@
           <div class="table" v-if="showSingle">
             <div class="table-tr">
               <!-- <div style='position:absolute;left:120px;width:20%;'> -->
-              <div class="table-td" style="width:140px;">
+              <div class="table-td" style="width:170px;padding:20px 0px 0px 0px">
               移交责任人(签字)：
               </div>
               <!-- <div style="position:absolute;left:280px;border-bottom:1px solid #030002;width:200px;"> -->
-               <div class="table-td" style="border-bottom:1px solid #030002;width:200px;">
+               <div class="table-td" style="border-bottom:1px solid #030002;width:300px;">
                 &nbsp;
               </div>
-              <div class="table-td" style="width:140px;">
+              <div class="table-td" style="width:170px;padding:20px 0px 0px 0px">
                 归档部门领导(签字)：
               </div>
-              <div class="table-td" style="border-bottom:1px solid #030002;width:200px;">
+              <div class="table-td" style="border-bottom:1px solid #030002;width:300px;padding-bottom:10px">
                 &nbsp;
               </div>
             </div>
             <div class="table-tr">
-              <div class="table-td" style="width:100px;">
+              <div class="table-td" style="width:100px;padding:20px 0px 0px 0px">
                 接收人(签字)：
               </div>
               <div class="table-td" style="border-bottom:1px solid #030002;width:200px;">
                 &nbsp;
               </div>
-              <div class="table-td" style="width:90px;">
+              <div class="table-td" style="width:90px;padding:20px 0px 0px 0px">
                 交接日期：
               </div>
               <div class="table-td" style="border-bottom:1px solid #030002;width:200px;">

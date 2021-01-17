@@ -93,7 +93,7 @@ Vue.prototype.getLang = function (){
 if (localStorage.getItem('themeValue')) {
   global.changeTheme(localStorage.getItem('themeValue'))
 } else {
-  global.changeTheme('default')
+  global.changeTheme('Blue')
 }
 Vue.prototype.echarts = echarts
 //动态标题

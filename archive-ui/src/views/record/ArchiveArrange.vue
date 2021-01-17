@@ -38,6 +38,9 @@
         v-bind:currentFolderId="this.currentFolder.id"
       ></PrintVolumes>
     </el-dialog>
+    <el-dialog :visible.sync="PrintCoverpageVisible" width="80%">
+      <PrintCoverpage ref="PrintCoverpage"></PrintCoverpage>
+    </el-dialog>
     <el-dialog :visible.sync="PreparationTablePrintVisible" width="80%"
     @close="PreparationTablePrintVisible=false">
       <PreparationTablePrint
@@ -91,8 +94,8 @@
     </el-dialog>
 
     <el-dialog
-      title="打印条码"
-      width="43%"
+      title=""
+      width="50%"
       :visible="printPdf417Visible"
       @close="printPdf417Visible=false"
     >
@@ -234,9 +237,15 @@
                     </el-col>
                     <el-col :span="18" style="padding-left:10px;">
                       <el-form-item>
-                        <TypeSelectComment @afterSelecteType="newArchiveItem"></TypeSelectComment>
+                        <TypeSelectComment ref="TypeSelectComment" @afterSelecteType="newArchiveItem"></TypeSelectComment>
                       </el-form-item>
                       <el-form-item>
+                        <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        icon="el-icon-copy-document"
+                        @click="fileAttrsCopy(1)">复制著录</el-button>
                         <el-button
                         type="primary"
                         plain
@@ -295,9 +304,9 @@
                         :title="$t('application.fetchInformation')"
                       >{{$t('application.fetchInformation')}}</el-button>
                       </el-form-item>
-                      
+                       <!--
                       <el-form-item>
-                      <!-- <el-button
+                      <el-button
                         type="primary"
                         plain
                         size="small"
@@ -313,7 +322,7 @@
                         @click="beforePrintBarCode(selectedItems,'打印条码')"
                         title="打印条码"
                       ></el-button>
-                      -->
+                      
                       <el-button
                         type="primary"
                         plain
@@ -322,37 +331,51 @@
                         @click="beforePrintArchiveCode(selectedItems,'打印档号')"
                         title="打印档号"
                       >打印档号</el-button>
+                     
                       </el-form-item>
+                       -->
                       <el-form-item>
-                      <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-printer"
-                        @click="beforePrintPdf417(selectedItems,'打印档号')"
-                        title="打印条码"
-                      >打印条码</el-button>
+                        <el-dropdown class="avatar-container right-menu-item" trigger="click">
+                          <div class="avatar-wrapper">
+                            <i class="el-icon-printer"></i>
+                            <span>打印</span>
+                          </div>
+                          <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item divided>
+                              <span @click="beforePrintPdf417(selectedItems)" style="display:block;">
+                                <i class="el-icon-printer"></i>
+                                打印条码
+                              </span>
+                            </el-dropdown-item>
+                            <el-dropdown-item divided>
+                              <span @click="beforePrintArchiveCode(selectedItems,'打印档号')" style="display:block;">
+                                <i class="el-icon-printer"></i>
+                                打印档号
+                              </span>
+                            </el-dropdown-item>
+                             
+                            <el-dropdown-item divided>
+                              <span @click="beforePrintCoverpage(selectedItems)" style="display:block;">
+                                <i class="el-icon-printer"></i>
+                                打印封面
+                              </span>
+                            </el-dropdown-item>
+                            <el-dropdown-item divided>
+                              <span @click="beforePrintInnerDoc(selectedItems,'ArrangeInnerGridPrint')" style="display:block;">
+                                <i class="el-icon-printer"></i>
+                                打印卷内目录
+                              </span>
+                            </el-dropdown-item>
+                            <el-dropdown-item divided>
+                              <span @click="beforePrintPreparationTable(selectedItems)" style="display:block;">
+                                <i class="el-icon-printer"></i>
+                                打印备考表
+                              </span>
+                            </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </el-dropdown>
                       </el-form-item>
-                      <el-form-item>
-                      <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-printer"
-                        @click="beforePrint(selectRow,'ArrangeInnerGridPrint','卷内目录')"
-                        title="打印卷内目录"
-                      >卷内目录</el-button>
-                      </el-form-item>
-                      <el-form-item>
-                      <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-printer"
-                        @click="beforePrintPreparationTable(selectRow,'备考表')"
-                        title="打印备考表"
-                      >打印备考表</el-button>
-                      </el-form-item>
+                      
                       <el-form-item>
                       <el-button
                         type="primary"
@@ -460,6 +483,11 @@
                     <el-button type="primary" plain size="small" :title="$t('application.viewRedition')"  @click="importdialogVisible=true;uploadUrl='/dc/addRendition'">格式副本</el-button>-->
                     <el-button type="primary" plain size="small" @click="beforeCreateFile(selectRow)">著录</el-button>
                     <el-button
+                    type="primary"
+                    plain
+                    size="small"
+                    @click="fileAttrsCopy(2)">复制著录</el-button>
+                    <el-button
                       type="primary"
                       plain
                       size="small"
@@ -533,6 +561,7 @@ import PrintRidge from "@/views/record/PrintRidge";
 import PreparationTablePrint from "@/views/record/PreparationTablePrint.vue"
 import PrintBarCode from "@/views/record/PrintBarCode.vue"
 import PrintArchiveCode from "@/views/record/PrintArchiveCode.vue"
+import PrintCoverpage from "@/views/record/PrintCoverpage.vue"
 import PrintPdf417 from "@/views/record/PrintPdf417.vue"
 import BatchImport from "@/components/controls/ImportDocument";
 import ExcelUtil from "@/utils/excel.js";
@@ -553,7 +582,8 @@ export default {
     DataLayout:DataLayout,
     PrintPdf417:PrintPdf417,
     BatchImport:BatchImport,
-    AddCondition:AddCondition
+    AddCondition:AddCondition,
+    PrintCoverpage:PrintCoverpage
   },
   data() {
     return {
@@ -663,6 +693,7 @@ export default {
       pieceNumVisible:false,//是否显示取批次号dialog
       PreparationTablePrintVisible:false,
       printBarCodeVisible:false,
+      PrintCoverpageVisible:false,
       printArchiveCodeVisible:false,
       printPdf417Visible:false,
       isFile:true,
@@ -723,7 +754,97 @@ export default {
       }, 100);
   },
   methods: {
-        exportData() {
+    fileAttrsCopy(copyType){
+      let _self = this;
+      if(_self.currentFolder.id==undefined){
+        _self.$message({
+                showClose: true,
+                message: "请在文件夹下进行操作",
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      var flag = 0;
+      if(_self.selectRow.ID==undefined&&_self.innerSelectedOne.ID==undefined){
+        flag = 1;
+      }
+      //主文件选了，子文件没选
+      if(_self.selectRow.ID!=undefined&&_self.innerSelectedOne.ID==undefined){
+        //主文件选的是案卷
+        if(_self.selectRow.C_ITEM_TYPE == '案卷'){
+          if(copyType == 1){
+            //flag=2,案卷复制案卷
+            flag = 2;
+          }else{
+            //flag=3,按照原来的方法，子文件参考父的属性，进行复制
+            flag = 3;
+          }
+        }
+        //主文件勾选的是普通文件
+        else{
+          if(copyType == 1){
+            //flag=4,主文件复制主文件
+            flag = 4;
+          }else{
+            //flag=5,文件不可以著录子文件！
+            flag = 5;
+          }
+        }
+      }
+      if(_self.selectRow.ID!=undefined&&_self.innerSelectedOne.ID!=undefined){
+        if(copyType == 1){
+            //flag=6,主文件复制主文件
+            flag = 6;
+          }else{
+            //flag=7,子文件复制子文件！
+            flag = 7;
+          }
+      }
+      switch(flag){
+        case 1 :
+          _self.$refs.TypeSelectComment.showdialog();
+          break;
+        case 2 :
+          _self.copyFile(_self.selectRow);
+          //console.log("案卷复制案卷");
+          //todo 案卷复制案卷
+          break;
+        case 3 :
+          _self.beforeCreateFile(_self.selectRow);
+          console.log("按照原来的方法，子文件参考父的属性，进行复制");
+          //todo 按照原来的方法，子文件参考父的属性，进行复制
+          break;
+        case 4 :
+          _self.copyFile(_self.selectRow);
+          console.log("主文件复制主文件");
+          //todo 主文件复制主文件
+          break;
+        case 5 :
+          _self.$message({
+                showClose: true,
+                message: '非案卷文件不可以著录子文件！',
+                duration: 2000,
+                type: "warning"
+              });
+          console.log("按照原来的方法，不能著录文件！！");
+          //todo 按照原来的方法，反正文件不能著录文件！！
+          break;
+        case 6 :
+          _self.copyFile(_self.selectRow);
+          console.log('案卷复制案卷,主文件复制主文件')
+          //todo 案卷复制案卷,主文件复制主文件
+          break;
+        case 7 :
+          _self.beforeCreateLevel1File(_self.innerSelectedOne,_self.selectRow.ID);
+          console.log('子文件复制子文件')
+          //todo 子文件复制子文件
+          break;
+        default:
+          console.log('(*￣︶￣)')
+      }
+    },
+    exportData() {
       let _self = this;
       let params = {
         URL: "/file/exportFolderPath",
@@ -750,6 +871,130 @@ export default {
       this.topPercent = topPercent
       this.setStorageNumber(this.topStorageName, topPercent)
       //console.log(JSON.stringify(topPercent))
+    },
+    copyArchiveItem(typeName,copyInfo) {
+      let _self = this;
+      _self.newChildDoc = false;
+      if (_self.currentFolder.id) {
+        _self.selectedItemId = "";
+        _self.typeName=typeName;
+        _self.propertyVisible = true;
+        setTimeout(() => {
+          if (_self.$refs.ShowProperty) {
+            _self.$refs.ShowProperty.myItemId = "";
+            _self.dialogName = typeName;
+            _self.extendMap=null;
+            _self.$refs.ShowProperty.parentDocId = "";
+            _self.$refs.ShowProperty.myTypeName = typeName;
+            _self.$refs.ShowProperty.myFolderId = _self.currentFolder.id;
+		   if(copyInfo){
+			  let mp = new Map();
+			  for (const key in copyInfo) {
+				  mp.set(key, key);
+			  }
+			  _self.$refs.ShowProperty.setMainSubRelation(mp);
+			  _self.$refs.ShowProperty.setMainObject(copyInfo);
+			}
+            _self.$refs.ShowProperty.loadFormInfo();
+          }
+        }, 10);
+      } else {
+        // _self.$message(_self.$t("message.pleaseSelectFolder"));
+        _self.$message({
+          showClose: true,
+          message: _self.$t("message.pleaseSelectFolder"),
+          duration: 2000,
+          type: "warning"
+        });
+      }
+    },
+    //复制著录方法
+    beforeCreateLevel1File(row,parentId){
+      let _self=this;
+      if(_self.selectRow.ID==undefined){
+         _self.$message({
+                showClose: true,
+                message: '请选择一条主文件！',
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      _self.parentId = parentId
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: {id:row.ID},
+          url: "/dc/getDocConfig"
+        }).then(function(response){
+          let code=response.data.code;
+          if(code=='1'){
+            let fileType = row.TYPE_NAME
+            _self.newArchiveFileItem(fileType,row,response.data.copyInfo);
+          }else{
+            _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          }
+        }).catch(function(error) {
+          // _self.$message("添加失败！");
+          _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          console.log(error);
+        });
+    },
+    copyFile(row){
+      let _self=this;
+      if(_self.selectRow.ID==undefined){
+         _self.$message({
+                showClose: true,
+                message: '请选择一条主文件！',
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: {id:row.ID},
+          url: "/dc/getDocConfig"
+        }).then(function(response){
+          let code=response.data.code;
+          if(code=='1'){
+            let fileType = row.TYPE_NAME
+            _self.copyArchiveItem(fileType,response.data.copyInfo);
+          }else{
+            _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          }
+        }).catch(function(error) {
+          // _self.$message("添加失败！");
+          _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          console.log(error);
+        });
     },
     //著录文件
     beforeCreateFile(row){
@@ -803,8 +1048,6 @@ export default {
               });
           console.log(error);
         });
-      
-
     },
 
     writeAudit(docId){
@@ -826,7 +1069,7 @@ export default {
         // _self.$message('请选择一条数据进行打印');
         _self.$message({
           showClose: true,
-          message: "请选择一条数据进行打印",
+          message: "请至少选择一条数据进行打印",
           duration: 2000,
           type: "warning"
         });
@@ -840,14 +1083,14 @@ export default {
       }, 10);
 
     },
-
+    //打印二维码
     beforePrintPdf417(selectedRows){
       let _self = this;
       if (selectedRows == undefined||selectedRows.length==0) {
         // _self.$message('请选择一条数据进行打印');
         _self.$message({
           showClose: true,
-          message: "请选择一条数据进行打印",
+          message: "请选择至少一条数据进行打印",
           duration: 2000,
           type: "warning"
         });
@@ -855,7 +1098,7 @@ export default {
       }
       _self.printPdf417Visible = true;
       setTimeout(() => {
-        _self.$refs.printPdf417.refresh(selectedRows, 1);
+        _self.$refs.printPdf417.loadData(selectedRows);
       }, 10);
     },
     ///打印条码
@@ -902,69 +1145,73 @@ export default {
       _self.printGridName = gridName;
       _self.printObjId = selectedRow.ID;
     },
-
-    beforePrintPreparationTable(selectedRow,vtitle){
-      
+    //打印备考表
+    beforePrintPreparationTable(selectedRows){
       let _self=this;
-      if(selectedRow.ID==undefined){
+      if (selectedRows == undefined||selectedRows.length==0) {
         // _self.$message('请选择一条数据进行打印');
         _self.$message({
-                showClose: true,
-                message: '请选择一条数据进行打印!',
-                duration: 2000,
-                type: "warning"
-              });
+          showClose: true,
+          message: "请选择至少一个案卷进行打印",
+          duration: 2000,
+          type: "warning"
+        });
         return;
       }
       _self.PreparationTablePrintVisible = true;
 
       setTimeout(()=>{
-        _self.$refs.PreparationTablePrint.getArchiveObj(selectedRow.ID,
-        vtitle); 
-      },10);
+        _self.$refs.PreparationTablePrint.refreshArchiveObj(selectedRows); 
+      },100);
 
     },
-
-    beforePrint(selectedRow,gridName,vtitle){
+    //打印封面
+    beforePrintCoverpage(selectedRows){
       let _self=this;
-      if(selectedRow.ID==undefined){
+      if (selectedRows == undefined||selectedRows.length==0) {
         // _self.$message('请选择一条数据进行打印');
         _self.$message({
-                showClose: true,
-                message: '请选择一条数据进行打印!',
-                duration: 2000,
-                type: "warning"
-              });
+          showClose: true,
+          message: "请选择至少一个案卷进行打印",
+          duration: 2000,
+          type: "warning"
+        });
+        return;
+      }
+      _self.PrintCoverpageVisible = true;
+
+      setTimeout(()=>{
+        _self.$refs.PrintCoverpage.refreshArchiveObj(selectedRows); 
+      },100);
+
+    },
+    //打印卷内目录
+    beforePrintInnerDoc(selectedRows,gridName){
+      let _self=this;
+      if (selectedRows == undefined||selectedRows.length==0) {
+        // _self.$message('请选择一条数据进行打印');
+        _self.$message({
+          showClose: true,
+          message: "请选择至少一个案卷进行打印",
+          duration: 2000,
+          type: "warning"
+        });
         return;
       }
       _self.printVolumesVisible = true;
-
       setTimeout(()=>{
-
         _self
-        .axios({
-          headers: {
-            "Content-Type": "application/json;charset=UTF-8"
-          },
-          method: "post",
-          data: selectedRow.TYPE_NAME,
-          url: "/dc/getPrintArchiveGrid"
-        })
+        .axios.post("/dc/getPrintArchiveGrid",selectedRows[0].TYPE_NAME)
         .then(function(response) {
-          
           if(response.data.code=='1'){
             let printGridName=response.data.data.attributes.C_TO;
             _self.$refs.printVolumes.dialogQrcodeVisible = false
-            _self.$refs.printVolumes.getArchiveObj(selectedRow.ID,
-            printGridName,
-            vtitle); 
+            _self.$refs.printVolumes.refreshDataGrid(selectedRows,
+            printGridName); 
           }else{
-            _self.$message({
-              showClose: true,
-              message: response.data.message,
-              duration: 5000,
-              type: "error"
-            });
+            _self.$refs.printVolumes.dialogQrcodeVisible = false
+             _self.$refs.printVolumes.refreshDataGrid(selectedRows,
+            gridName); 
           }
         })
         .catch(function(error) {
@@ -979,10 +1226,7 @@ export default {
         });
 
         
-      },10);
-
-      _self.printGridName=gridName;
-      _self.printObjId=selectedRow.ID;
+      },100);
     },
 
     ///上架

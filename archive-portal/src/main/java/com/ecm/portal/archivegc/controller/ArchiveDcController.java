@@ -27,10 +27,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ecm.common.util.FileUtils;
 import com.ecm.common.util.JSONUtils;
 import com.ecm.core.ActionContext;
 import com.ecm.core.cache.manager.CacheManagerOper;
 import com.ecm.core.dao.EcmFolderMapper;
+import com.ecm.core.entity.EcmContent;
 import com.ecm.core.entity.EcmDefType;
 import com.ecm.core.entity.EcmDocument;
 import com.ecm.core.entity.EcmFolder;
@@ -277,7 +279,35 @@ public class ArchiveDcController extends ControllerAbstract{
 		return mp;
 	
 	}
-	
+	@RequestMapping(value = "/dc/checkdc", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
+	@ResponseBody
+	public Map<String, Object> checkDocuments(@RequestBody String argStr) {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		List<String> parentid = new ArrayList<String>();
+		try {
+			Map<String, Object> args = JSONUtils.stringToMap(argStr);
+			String con = args.get("condition").toString();
+			String childID = args.get("childID").toString();
+			List<Map<String, Object>> list = documentService.getObjectMap(getToken(), con);
+			for(Map<String,Object> lis:list) {
+				String sql = "select * from ecm_relation where CHILD_ID = '"+childID+"' and PARENT_ID = '"+lis.get("ID").toString()+"'";
+				try {
+					List<Map<String, Object>> result = relationService.getMapList(getToken(), sql);
+					if(result.size()>0) {
+						parentid.add(lis.get("ID").toString());
+					}
+				} catch (EcmException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			mp.put("parentID", parentid);
+			mp.put("code", ActionContext.SUCESS);
+		} catch (AccessDeniedException e) {
+			mp.put("code", ActionContext.TIME_OUT);
+		}
+		return mp;
+	}
 	
 	
 	
@@ -996,4 +1026,37 @@ public class ArchiveDcController extends ControllerAbstract{
 		return mp;
 	}
 	
+	/**
+	 * 在线编辑保存文档
+	 * @param id
+	 * @param uploadFile
+	 * @return
+	 */
+	 @RequestMapping(value = "/dc/newDocumentSaveDso", method = RequestMethod.POST)
+	 @ResponseBody
+	    public String newDocumentSaveDso(@RequestParam(value = "id", required = false) String id, @RequestParam(value = "file") MultipartFile uploadFile) {
+		 String retStr ="0";
+		 try {
+			 Map<String, Object> args = new HashMap();
+			    args.put("ID", id);
+				EcmContent en = null;
+				EcmDocument doc = new EcmDocument();
+				doc.setAttributes(args);
+				if (uploadFile != null) {
+					en = new EcmContent();
+					en.setName(uploadFile.getOriginalFilename());
+					en.setContentSize(uploadFile.getSize());
+					en.setFormatName(FileUtils.getExtention(uploadFile.getOriginalFilename()));
+					en.setInputStream(uploadFile.getInputStream());
+				}
+				String objId = documentService.creatOrUpdateObject(getToken(), doc, en);
+				if( StringUtils.isNotEmpty(objId)) {
+					retStr = "1"; 
+				}
+		 	} 
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		 	return retStr;
+	    }
 }

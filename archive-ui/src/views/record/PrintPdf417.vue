@@ -17,40 +17,52 @@
           </el-select>
           
       </div> -->
-      <div style="display:inline-block;position: absolute;left:480px;">
-        <button @click="printCode" v-print="'#print'">打印</button>
+      <div style="display:inline-block">
+        <el-row>
+          <el-select v-model="printType" @change="onPrintTypeChange" >
+            <template v-for="item in printTypeList">
+                <el-option :label="item" :value="item" :key="item"></el-option>
+            </template>
+          </el-select>
+          <button @click="printCode" v-print="'#print'">打印</button>
+        </el-row>
       </div>
-      <div id='print' ref='print' :style="'position: absolute; top:0px;'">
-        <div v-for="(item,keys) in getArchiveObjs()" :key="'divk'+keys" style="width:400px">
+     <el-container style="width:100%;height:540px;overflow:auto;">
+      <div id='print' ref='print' :style="'top:0px;'">
+        <div v-for="(item,keys) in printObjects" :key="'divk'+keys" :style="'width:'+divWidth+';padding:5px;'">
           <el-row>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{item.TYPE_NAME}}</el-col>
-            <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:4px;">案卷</el-col>
-            <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:4px;">复制件</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{item.typeName}}</el-col>
+            <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{item.itemType}}</el-col>
+            <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{printType}}</el-col>
           </el-row>
           <el-row>
-            <el-col :span="24" style="color: #000000;text-align: left;font-size:28px;padding:4px;">{{item.CODING}}&nbsp;</el-col>
+            <el-col :span="24" style="color: #000000;text-align: left;font-size:28px;padding:4px;">{{item.coding}}&nbsp;</el-col>
           </el-row>
           <el-row>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">密级：{{item.C_SECURITY_LEVEL}}</el-col>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">版本：{{item.REVISION}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">密级：{{item.securityLevel}}</el-col>
+            <el-col v-if="item.revision" :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">版本：{{item.revision}}</el-col>
           </el-row>
           <el-row>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">保管期限：{{item.C_RETENTION}}</el-col>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">工程号：{{item.C_PROJECT_NUM}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">保管期限：{{item.retention}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">工程号：{{item.projectCode}}</el-col>
           </el-row>
           <el-row>
-            <el-col :span="24" style="color: #000000;text-align: left;font-size:18px;padding:4px;">归档日期：{{dateFormat(item.C_ARCHIVE_DATE)}}</el-col>
+            <el-col :span="24" style="color: #000000;text-align: left;font-size:18px;padding:4px;">归档日期：{{item.archiveDate}}</el-col>
           </el-row>
           <el-row style="padding-bottom:15px;">
-            <el-col :span="10" style="color: #000000;font-size:46px;padding-top:10px;">
-              <el-row style="color: #000000;text-align: left;font-size:18px;padding:2px;"> </el-row>
-              <el-row>{{item.C_STORE_CODING}}</el-row>
+            <el-col :span="10" style="padding-top:10px;">
+              <el-row style="color: #000000;text-align: left;font-size:18px;padding:2px;">{{item.volString}}</el-row>
+              <el-row style="color: #000000;text-align: center;font-size:46px;padding-top:10px;">{{item.storeCoding}}</el-row>
             </el-col>
-            <el-col :span="14"><canvas :ref="'canvas'+keys" :style="'display:'+noneStr"></canvas><img :ref="'image'+keys" /></el-col>
+            <el-col :span="14">
+              <img width="100%" :src="_self.axios.defaults.baseURL+'/record/print/getContentBarcode?str='+item.id +';' +item.archiveCoding + ';'+item.coding+';'+item.revision+';'+'&token='+token+'&ticket='+ticket+'_'+keys" border="0" />
+            </el-col>
           </el-row>
+          <div v-if="keys < printObjects.length-1" style="page-break-before:always;"></div>
         </div>
         <!-- <div v-if="isQRCode"  ref='qrCodeUrl2'></div> -->
   　　</div>
+     </el-container>
   </div>
 </template>
 
@@ -60,10 +72,12 @@ import PDF417 from '@/plugins/pdf417'
 import Vue from 'vue';
 import QRCode from 'qrcodejs2'// 引入qrcode
 import JsBarcode from 'jsbarcode'
+import MainContainer from '../MainContainer.vue';
 Vue.use(Print)
 Vue.use(PDF417);
 export default {
-   name: 'printArchiveCode',
+  components: { MainContainer },
+   name: 'printPDF147Code',
     
   // name: "printPage",
   data() {
@@ -79,30 +93,47 @@ export default {
       noneStr:"block",
       barCodeWidth:2,
       barCodeHeight:40,
+      printType:"原件",
+      printTypeListGeneral:["原件","复制件"],
+      printTypeListBussiness:["正本","副本","复制件"],
+      printTypeList:[],
+      printObjects:[],
+      token:"",
+      ticket:100,
     };
   },
   mounted() {
-    // 需要先显示出来，然后再隐藏掉；  否则动态生成的二维码，第一次会报错，对象找不到。可能是跟初始化有关系，没有显示出来的时候并没有初始化HTML
-      // this.dialogQrcodeVisible = false
-    this.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
-    this.getConfigParam("PrintArchiveCodeConfig");
-    // this.loadFormInfo();
-    // this.getArchiveObj(this.archiveId,this.gridName); 
-    
+    let _self = this;
+    _self.printTypeList = _self.printTypeListGeneral;
+    _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
+    _self.getConfigParam("PrintArchiveCodeConfig");
+    _self.token = sessionStorage.getItem('access-token');
   },
   props: {
-    archiveId: {type:[String,Number]},
-    currentFolderId:{type:[String,Number]},
-    tableHeight:{type:Number},
-    gridName:{type:String},
-    isQRCode:{type:Boolean,default:false},
-    isBarCode:{type:Boolean,default:false},
     archiveObjects:{type:Array,default:() => []},
     divWidth:{type:String,default:'400px'},
     divHeight:{type:String,default:'50px'},
     divMargin:{type:String,default:'10px'},
   },
   methods: {
+    loadData(data){
+      let _self = this;
+      if(data){
+        _self.archiveObjects = data;
+      }
+      for(let i=0;i< _self.archiveObjects.length;i++){
+        let obj = _self.archiveObjects[i];
+        if(obj["C_ARC_CLASSIC"] && obj["C_ARC_CLASSIC"]=="商务管理"){
+          _self.printTypeList = _self.printTypeListBussiness;
+          _self.printType ="正本";
+          break;
+        }
+      }
+      setTimeout(() => {
+        _self.getPrintObjects();
+        }, 100
+      );
+    },
       getConfigParam(keyName) {
         let _self = this;
         axios
@@ -116,42 +147,26 @@ export default {
             console.log(error);
           });
       },
-      getArchiveObjs(){
-        return this.archiveObjects;
-      },
-      refresh(objs,pixel){
-        let _self=this;
-        _self.archiveObjects=objs;
-        
-        for(let i=0;i<objs.length;i++){
-          let obj=objs[i];
-          _self.generate(obj["C_ARCHIVE_CODING"],_self.$refs['canvas'+i][0]);
-        }
-        
+      onPrintTypeChange(val){
+        this.printType = val;
+        this.getPrintObjects();
       },
 
-    getArchiveObj(id,volumeTitle){
+    getPrintObjects(){
       let _self=this;
-      _self.volumeTitle=volumeTitle;
       var m = new Map();
-      m.set('itemInfo',id);//ID 或类型
-      m.set('lang',_self.currentLanguage);
-      _self.axios({
-          headers: {
-            "Content-Type": "application/json;charset=UTF-8"
-          },
-          method: "post",
-          data: JSON.stringify(m),//_self.myItemId+_self.myTypeName,
-          url: "/dc/getArchiveObj"
-        })
+      _self.loading = true;
+      let ids = [];
+      for(let i=0;i< _self.archiveObjects.length;i++){
+        let obj = _self.archiveObjects[i];
+        ids.push(obj["ID"]);
+      }
+      m.set('ids',ids);//ID
+      m.set('printType',_self.printType);
+      _self.axios.post("/record/print/getPrintData", JSON.stringify(m))
         .then(function(response) {
-          _self.ridgeData=response.data.data;
-          _self.archiveCode= response.data.data.coding;
-          _self.archiveTitle= response.data.data.title;
-          // _self.genarateQrcode(_self.archiveCode);
-          _self.genarateBarCode('#barcode0',_self.archiveCode,_self.barCodeWidth,_self.barCodeHeight);
-          // _self.InnerFile();
-          //console.log(JSON.stringify(response.data.data));
+          _self.printObjects = response.data.data;
+          _self.ticket ++;
           _self.loading = false;
         })
         .catch(function(error) {
@@ -161,50 +176,10 @@ export default {
     },
     printCode(){
       this.noneStr = "none";
-      if(this.archiveObjects && this.archiveObjects.length>0){
-        for(var i=0; i<this.archiveObjects.length; i++){
-          this.$refs["image"+i][0].src = this.$refs['canvas'+i][0].toDataURL();
-        }
-      }
       setTimeout(() => {
       this.$print(this.$refs.print);
     }, 200);
     },
-    
-    generate(content,showCanvas) {
-        this.PDF417.init(content);             
-
-        let barcode = this.PDF417.getBarcodeArray();
-
-        // block sizes (width and height) in pixels
-        let bw = 2;
-        let bh = 2;
-
-        // create canvas element based on number of columns and rows in barcode
-        
-
-        let canvas = showCanvas;
-        canvas.width = bw * barcode['num_cols'];
-        canvas.height = bh * barcode['num_rows'];
-        
-        let ctx = canvas.getContext('2d');                    
-
-        // graph barcode elements
-        let y = 0;
-        // for each row
-        for (let r = 0; r < barcode['num_rows']; ++r) {
-            let x = 0;
-            // for each column
-            for (let c = 0; c < barcode['num_cols']; ++c) {
-                if (barcode['bcode'][r][c] == 1) {                        
-                    ctx.fillRect(x, y, bw, bh);
-                }
-                x += bw;
-            }
-            y += bh;
-        }       
-    }
-    
     
   }
 };

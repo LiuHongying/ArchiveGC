@@ -138,3 +138,32 @@ body
 {
     text-align: left;
 }
+
+.link-button{
+    height:30px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    font-size: 14px;
+    color: rgba(0,0,0,0.65);
+    line-height:30px;
+    cursor: pointer;
+    text-align:center;
+    display:inline-block;
+    padding: 0 16px;
+    margin-right: 12px;
+  }
+
+  .button-right{
+    float:center;
+  }
+
+  div.left_top{
+    left: 10px;
+    top: 10px;
+    z-index: 999;
+    }
+
+    div.left_top11{
+
+        z-index: -1;
+        }
