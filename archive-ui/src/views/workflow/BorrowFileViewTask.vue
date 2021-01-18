@@ -247,7 +247,6 @@ export default {
           "借阅单文件导出_" + new Date().Format("yyyy-MM-dd hh:mm:ss") + ".xlsx",
         sheetname: "Result",
       };
-      console.log(this.$refs.fileList.condition)
       ExcelUtil.export(params);
     },
 
