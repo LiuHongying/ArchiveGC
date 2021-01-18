@@ -71,6 +71,9 @@
         <el-form-item>
           <el-button type="primary"  @click="getWorkFlow">发起流程</el-button>
         </el-form-item>
+        <el-form-item>
+          <AddCondition v-model="AdvCondition" :inputType="hiddenInput" @sendMsg="search()"></AddCondition>
+        </el-form-item>
       </el-form>
     </template>
     <template v-slot:main="{ layout }">
@@ -138,7 +141,7 @@ import DataLayout from "@/components/ecm-data-layout";
 import DataSelect from "@/components/ecm-data-select";
 import AppraisalStartUp from "@/views/workflow/AppraisalStartUp.vue"
 import selectDC from"@/components/controls/selectDC.vue"
-
+import AddCondition from '@/views/record/AddCondition'
 export default {
   name: "TC",
   data() {
@@ -181,7 +184,9 @@ export default {
       workflow:{},
       selectedDCItems:[],
       parentID:"",
-      files4Start:[]
+      files4Start:[],
+      AdvCondition:"",
+      hiddenInput:"hidden",
     };
   },
   mounted() {
@@ -220,6 +225,11 @@ export default {
       }
       if(_self.endDate!=''&&_self.endDate!=undefined){
           key+=" and CREATION_DATE < '"+_self.endDate+"'";
+      }
+      if (_self.AdvCondition != "" && _self.AdvCondition != undefined) {
+        key +=
+          " and "+ _self.AdvCondition 
+          _self.AdvCondition=''
       }
       _self.$refs.ArchiveAppraisal.condition=key;
       _self.$refs.ArchiveAppraisal.currentPage = 1;
@@ -446,7 +456,8 @@ export default {
     DataLayout: DataLayout,
     DataSelect: DataSelect,
     AppraisalStartUp:AppraisalStartUp,
-    selectDC:selectDC
+    selectDC:selectDC,
+    AddCondition:AddCondition,
   },
 };
 </script>
