@@ -103,29 +103,32 @@
       <div :style="{position:'relative'}">
             <el-tabs value="t01" >
               <el-tab-pane :label="$t('application.FilesInWorkflow')" name="t01" >
-              <el-row v-if="isShowPrint"> 
-                <el-button
+                <el-row >
+                  <el-col :span="24" style="text-align: left">
+                    <el-form :inline="true" :model="filters" @submit.native.prevent>
+                      <el-form-item>
+                       <el-button type="primary" @click.native="exportData">{{
+                        $t("application.ExportExcel")
+                          }}</el-button>
+                      </el-form-item>
+                      <el-form-item v-if="isShowPrint">
+                        <el-button
                         type="primary"
                         size="small"
                         icon="el-icon-printer"
                         @click="beforePrint(selectedArchives,'BorrowPrintGrid','打印清单')"
                         title="打印清单"
-                >打印清单</el-button>
-              </el-row>
-                <el-row v-if="allowEdit||isShowReject">
-                  <el-col :span="24" style="text-align: left">
-                    <el-form :inline="true" :model="filters" @submit.native.prevent>
-                      <template v-if="allowEdit">
-                        <el-form-item>
+                        >打印清单</el-button>
+                        </el-form-item>
+                        <el-form-item v-if="allowEdit">
                           <el-button
                             type="primary"
                             @click="beforeAddFile"
                           >{{ $t("application.new") }}</el-button>
                         </el-form-item>
-                        <el-form-item>
+                        <el-form-item v-if="allowEdit">
                           <el-button type="warning" @click="removeRelation">{{ $t("application.delete") }}</el-button>
                         </el-form-item>
-                      </template>
                     </el-form>
                   </el-col>
                 </el-row>
@@ -233,6 +236,21 @@ export default {
   mounted() {
   },
   methods: {
+    exportData() {
+      let dataUrl = "/exchange/doc/export";
+      let cond = "ID in (select CHILD_ID from  ecm_relation where PARENT_ID ='"+this.parentId+"' and NAME = 'irel_children')"
+      let params = {
+        gridName: this.$refs.fileList.gridViewName,
+        lang: "zh-cn",
+        condition: cond,
+        filename:
+          "借阅单文件导出_" + new Date().Format("yyyy-MM-dd hh:mm:ss") + ".xlsx",
+        sheetname: "Result",
+      };
+      console.log(this.$refs.fileList.condition)
+      ExcelUtil.export(params);
+    },
+
     beforePrint(selectedRow,gridName,vtitle){
       let _self=this;
       let ids =[]
