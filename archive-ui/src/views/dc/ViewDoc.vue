@@ -21,15 +21,21 @@
       </el-col>
       <el-col :span="4" style="float:right; text-align:right;">
         <template v-if="docObj!=null">
-          <!-- <el-button size="mini" icon="el-icon-shopping-cart-2" @click="borrowItem(docObj)">借阅</el-button> -->
-          <template v-if="judgeDownload.showRelyPermit == true">
-            <el-button v-if="doc.permit>=4" size="mini" icon="el-icon-download" @click="download()">{{$t('application.download')}}</el-button>
-          </template>
-          <template v-else>
-            <template v-if="judgeDownload.downloadPermit">
-              <el-button v-if="showDownloadButton" size="mini" icon="el-icon-download" @click="download()">{{$t('application.download')}}</el-button>
+          
+          <template v-if="judgeDownload.showDownloadButton">
+
+            <template v-if="judgeDownload.borrowHistory">
+              <template v-if="judgeDownload.downloadPermit">
+                <el-button size="mini" icon="el-icon-download" @click="download()">{{$t('application.download')}}</el-button>
+              </template>
             </template>
+
+            <template v-else>
+              <el-button size="mini" icon="el-icon-download" @click="download()">{{$t('application.download')}}</el-button>
+            </template>
+
           </template>
+
         </template>
       </el-col>
     </el-header>
@@ -223,10 +229,10 @@ export default {
       borrowDialogVisible:false,
       revertType:"",
       judgeDownload:{
-        showRelyPermit:false,
+        showDownloadButton:false,
+        borrowHistory:false,
         downloadPermit:false
-      },
-      showDownloadButton:true
+      }
     }
   },
   created(){
@@ -243,7 +249,6 @@ export default {
   mounted(){
     var _self = this;
     this.docId = this.$route.query.id;
-    _self.judgeShowDownload(this.docId);
     var user = sessionStorage.getItem("access-user");
     this.user = JSON.parse(user);
     this.token = sessionStorage.getItem("access-token");
@@ -254,6 +259,7 @@ export default {
         _self.doc.changeCount = response.data.changeCount;
         // console.log(_self.docObj);
         _self.doc.id=_self.docObj.ID;
+        _self.judgeShowDownload(_self.docObj.ID,response.data.permit);
         _self.doc.code=_self.docObj.CODING;
         _self.doc.revision=_self.docObj.REVISION;
         _self.doc.title=_self.docObj.TITLE;
@@ -276,7 +282,6 @@ export default {
       }).catch(function(error) {
         console.log(error);
     });
-
 		// setInterval(function() {
 		// 	var showText1 = _self.watermarkText +' '+ _self.ip
 		// 		+' '+ _self.datetimeFormat(new Date());
@@ -327,23 +332,33 @@ export default {
             });
     },
     download(){
-      if(this.judgeDownload.showRelyPermit==false && this.judgeDownload.downloadPermit==true){
-        this.showDownloadButton = false;
+      if(this.judgeDownload.borrowHistory==true){
+        this.judgeDownload.showDownloadButton = false;
       }
       let url = this.axios.defaults.baseURL+"/dc/getContent?id="+this.doc.id+"&token="+sessionStorage.getItem('access-token')+"&action=download";
       this.recordAudit(this.doc.id);
       window.open(url, '_blank');
     },
-    judgeShowDownload(docId){
+    judgeShowDownload(docId,permitLevel){
+      //有下载权限，这时候就需要判断是否本来就有下载权限
       let _self = this;
-      var m = new Map()
-      m.set("docId",docId)
-      axios
-        .post("/archive/judgeDownloadByAudit", JSON.stringify(m))
-        .then(function(response){
-          _self.judgeDownload.showRelyPermit = response.data.showRelyPermit
-          _self.judgeDownload.downloadPermit = response.data.downloadPermit
-        })
+      console.log(permitLevel)
+      if(permitLevel>=4){
+        _self.judgeDownload.showDownloadButton = true;
+        var m = new Map()
+        m.set("docId",docId)
+        axios
+          .post("/archive/judgeDownloadByPermit", JSON.stringify(m))
+          .then(function(response){
+            if(response.data.code == 1){
+            _self.judgeDownload.borrowHistory = response.data.borrowHistory;
+            _self.judgeDownload.downloadPermit = response.data.downloadPermit;
+            }
+          })
+      }else{
+        _self.judgeDownload.showDownloadButton = false;
+        return;
+      }
     },
     recordAudit(docId){
       var m = new Map();
