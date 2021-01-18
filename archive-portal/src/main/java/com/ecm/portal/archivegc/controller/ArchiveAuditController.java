@@ -1,5 +1,8 @@
 package com.ecm.portal.archivegc.controller;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -148,4 +151,71 @@ public class ArchiveAuditController extends ControllerAbstract {
 			}
 			return mp;
 	}
+	
+	/**
+	 * Matthew changes on 2021年1月15日16:42:30
+	 * @param argStr
+	 * @return
+	 */
+	@RequestMapping("/archive/judgeDownloadByPermit")
+	@ResponseBody
+	public Map<String, Object> judgeDownloadByPermit(@RequestBody String argStr){
+		Map<String, Object> args = JSONUtils.stringToMap(argStr);
+		Boolean borrowHistory = false;
+		String docId = args.get("docId").toString();
+		Map<String, Object> mp = new HashMap<String, Object>();
+		StringBuilder relationSql = new StringBuilder("");
+		List<Map<String, Object>> relationlist = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> auditlist = new ArrayList<Map<String, Object>>();
+			try {
+				LoginUser currentUser  = this.getSession().getCurrentUser();
+				relationSql.append("select parent_id from ecm_relation where parent_id in ");
+				relationSql.append("(select id from ecm_document where type_name = '借阅单' and sub_type = '下载' and OWNER_NAME = '");
+				relationSql.append(currentUser.getUserName());
+				relationSql.append("' ) and child_id = '");
+				relationSql.append(docId);
+				relationSql.append("'");
+				relationlist = relationService.getMapList(getToken(), relationSql.toString());
+				//如果list.size=0，说明此人从未借阅过此文件，只要正常显示权限下载按钮即可。
+				//如果list.size>0，说明此人借阅过此文件，需要判断是否已经做过下载此文件。
+				if (relationlist.size()>0) {
+					borrowHistory = true;
+					mp.put("borrowHistory", borrowHistory);
+					StringBuilder parents = new StringBuilder("");
+					parents.append("select extend_id from ecm_audit_general where doc_id = '");
+					parents.append(docId);
+					parents.append("' and extend_id in (");
+					for (Map<String, Object> map : relationlist) {
+						parents.append("'"+(String)map.get("parent_id")+"',");
+					}
+					parents.deleteCharAt(parents.length()-1);
+					parents.append(") ");
+					parents.append(" and user_name = ");
+					parents.append("'"+currentUser.getUserName()+"'");
+					parents.append(" and action_name = 'ecm_download'");
+					//嗯哼，auditService没有实现getMapList方法， 尴尬，用documentService吧
+					auditlist = documentService.getMapList(getToken(), parents.toString());
+					//如果已经下载过则返回false，不可以显示下载
+					//如果还没有下载过，则返回true，可以显示下载
+					if (auditlist.size()<relationlist.size()) {
+						mp.put("downloadPermit", true);
+						mp.put("code", ActionContext.SUCESS);
+					}else {
+						mp.put("downloadPermit", false);
+						mp.put("code", ActionContext.SUCESS);
+					}
+				}else {
+					borrowHistory = false;
+					mp.put("borrowHistory", borrowHistory);
+					mp.put("downloadPermit", true);
+					mp.put("code", ActionContext.SUCESS);
+					return mp;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				mp.put("code", ActionContext.FAILURE);
+			}
+			return mp;
+	}
+	
 }
