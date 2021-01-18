@@ -8,11 +8,11 @@
 		<version>2.1.9.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.ecm.portal.civil</groupId>
-	<artifactId>CivilPortal</artifactId>
+	<groupId>com.ecm.portal.archivegc</groupId>
+	<artifactId>ArchivePortal</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>CivilPortal</name>
+	<name>ArchivePortal</name>
 	<description>ArchiveGC project for Spring Boot</description>
 
 	<properties>
@@ -26,7 +26,12 @@
             <artifactId>zisecm-portal</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        
+        <!-- https://mvnrepository.com/artifact/org.docx4j/docx4j -->
+		<dependency>
+		    <groupId>org.docx4j</groupId>
+		    <artifactId>docx4j</artifactId>
+		    <version>6.1.2</version>
+		</dependency>
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-aop</artifactId>
