@@ -29,7 +29,7 @@
             node-key="id"
             style="width: 100%"
             :render-content="renderContent"
-            :default-checked-keys="highlight - current"
+            :default-expand-all="isExpand"
             @node-click="handleNodeClick"
           ></el-tree>
         </el-container>
@@ -188,12 +188,16 @@ export default {
 
       radioValue: "案卷",
       isFile: true,
+      isExpand: false,
 
       dataList: [],
       gridList: [],
       itemDataList: [],
       itemDataListFull: [],
       selectedItems: [],
+      selectRow: [],
+      selectedFileId: "",
+
       currentPage: 1,
       pageSize: 20,
       judgement: "",
@@ -201,7 +205,7 @@ export default {
       tables: {
         main: {
           gridViewName: "GeneralPre",
-          condition: "",
+          condition: " STATUS = '预归档' ",
           folderId: "",
         },
         relevantFileDataGrid: {
@@ -248,6 +252,7 @@ export default {
         .then(function (response) {
           _self.dataList = response.data.data;
           _self.loadGridInfo(_self.defaultData);
+          _self.isExpand = true;
           _self.loading = false;
         })
         .catch(function (error) {
@@ -318,6 +323,7 @@ export default {
 
       _self.tables.main.condition=key;
       _self.tables.main.folderId=indata.id
+      console.log(indata.id);
       _self.$nextTick(()=>{
          _self.$refs.mainDataGrid.loadGridData();
          _self.$refs.relevantFileDataGrid.itemDataList = [];
@@ -342,10 +348,10 @@ export default {
 
     handleNodeClick(indata) {
       let _self = this;
-      _self.disable = false;
-      _self.exportAble = true;
+      _self.selectRow = [];
+      _self.selectedFileId = "";
+    
       _self.currentFolder = indata;
-      if (indata.extended == false) {
         _self.loading = true;
         axios
           .post("/admin/getFolder", indata.id)
@@ -360,7 +366,6 @@ export default {
             console.log(error);
             _self.loading = false;
           });
-      }
     },
 
     renderContent: function (h, { node, data, store }) {

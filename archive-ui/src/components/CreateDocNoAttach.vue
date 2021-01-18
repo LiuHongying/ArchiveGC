@@ -24,7 +24,7 @@
                       </el-col>
                     </el-row>
                   </el-card>
-                  <el-card shadow="hover">
+                  <el-card shadow="hover" v-if="showUpload">
                     <el-collapse value="上传文件" accordion>
                       <el-collapse-item
                         title="上传文件"
@@ -95,7 +95,9 @@ export default {
     typeName:{type:String,default:""},
     parentId:{type:String,default:""},
     folderId:{type:String,default:""},
-    url:{type:String,default:"/dc/newDocumentMoreFile"}
+    url:{type:String,default:"/dc/newDocumentMoreFile"},
+    showUpload:{type:Boolean,default:true},
+    extData:{type:Map,default:null}
   },
   mounted() {
     
@@ -173,6 +175,11 @@ export default {
       if(_self.folderId&&_self.folderId!=""){
         m.push(["folderId",_self.folderId]);
       }
+      if(_self.extData!=null){
+        for (let key in _self.extData) {
+          m.push([key,_self.extData[key]]);
+        }
+      }
       let formdataNew = new FormData();
       formdataNew.append("metaData", JSON.stringify(m));
       if (_self.file != "") {
@@ -181,7 +188,7 @@ export default {
       }
       
       axios
-        .post(url, formdataNew, {
+        .post(_self.url, formdataNew, {
           "Content-Type": "multipart/form-data"
         })
         .then(function(response) {

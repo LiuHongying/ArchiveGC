@@ -8,6 +8,7 @@ var rootPath = location.protocol + '//' + location.host ;
 function InitEvent() {
     oframe = document.getElementById("oframe");
     //alert("请您将IE的文档模式调成IE7标准模式");
+    document.getElementById("mainbody").style.height= (document.documentElement.clientHeight-document.getElementById("actionArea").clientHeight-0)+ "px";
     
     //OpenLocalWord() ;
        setTimeout(function()  {
@@ -76,8 +77,7 @@ function OnDocumentOpened(str, obj) {
 //dsoframe(关闭)事件
 function OnDocumentClosed() {
     //alert("触发了dsoframe的OnDocumentClosed事件！");
-    //saveToWeb();
-    //isOpened = false;
+    isOpened = false;
 }
 
 //菜单操作
@@ -107,7 +107,6 @@ function OpenDoc() {
    // document.all.oframe.Open("http://localhost/1.doc", true);
 }
 function SaveCopyDoc() {
-    alert("ss");
     if (!CheckFileOpened()) return;
     oframe.showdialog(3);
 }
@@ -396,13 +395,14 @@ function PadLeft(str, len) {
  //打开服务器文件到本地
 function OpenLocalWord() {
     var urlSrc = GetQueryValue('file');
-    
+    // oframe.Titlebar=false
+    // oframe.Menubar=false
 
    // alert("urlSrc="+urlSrc)
-    oframe.Open(urlSrc+ "&random=" + Math.random(), true, "Word.Document");
-   //oframe.SetMenuDisplay(0);
-   ToggleTitlebar();
-   ToggleMenubar();
+    oframe.Open(urlSrc+ "&random=" + Math.random(), false, "Word.Document");
+   //oframe.SetMenuDisplay(1);
+//     ToggleTitlebar();
+//    ToggleMenubar();
   // ToggleToolbars();//IE报错 隐藏菜单
 
 }
@@ -419,8 +419,9 @@ function OpenLocalWord() {
         oframe.HttpAddPostString("id", curId);
         oframe.HttpAddPostCurrFile("file", "");
         var savedId = oframe.HttpPost(rootPath + "/zisecm/dc/newDocumentSaveDso");
-        if(savedId!="0"){
+        if(savedId!=""){
             alert("上传成功");
+            return savedId;
         }else{
             alert("上传失败");
         }
@@ -430,6 +431,14 @@ function OpenLocalWord() {
 }
 
 
+function saveToWebAndClose(){
+    if(saveToWeb()!=""){
+        closeWin();
+    };
+}
 
-
-
+function closeWin(){
+    window.opener=null;
+    window.open('','_self','');
+    window.close();
+}
