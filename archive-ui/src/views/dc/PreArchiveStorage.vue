@@ -83,7 +83,7 @@
               <el-form-item>
                 <ArchieveStorage
                   :selectRowData="selectedItems"
-                  :reload-Grid="reload"
+                  @reloadGrid="reloadGrid"
                 ></ArchieveStorage>
               </el-form-item>
             </el-form>
@@ -112,6 +112,7 @@
                     v-bind:isshowOption="true"
                     v-bind:isshowSelection="true"
                     :itemDataList="itemDataList"
+                    :folderId="tables.main.folderId"
                     :optionWidth="2"
                     :isshowCustom="false"
                     :isEditProperty="true"
@@ -123,7 +124,7 @@
                   >
                   </DataGrid>
                 </template>
-                <template slot="paneR">
+                <template slot="paneR" v-if="isFile">
                   <el-row>
                     <el-col>
                       <DataGrid
@@ -201,10 +202,12 @@ export default {
         main: {
           gridViewName: "GeneralPre",
           condition: "",
+          folderId: "",
         },
         relevantFileDataGrid: {
           gridViewName: "GeneralPre",
-          condition: " a.NAME='irel_children' and b.IS_HIDDEN=0 ",
+          condition: " NAME='irel_children' and IS_HIDDEN=0 ",
+          folderId: "",
         },
       },
       tabs: {
@@ -293,26 +296,32 @@ export default {
 
     loadGridData(indata) {
       let _self = this;
-      _self.tableLoading = true;
-      var key = " C_ITEM_TYPE = '"+_self.radioValue+"' AND IS_CHILD=0  AND IS_HIDDEN=0 ";
-     
-      var m = new Map();
-      _self.gridViewTrans = indata.gridView;
-      _self.idTrans = indata.id;
-      m.set("gridName", indata.gridView);
-      m.set("folderId", indata.id);
-      m.set("condition", key);
-      m.set("pageSize", _self.pageSize);
-      m.set("pageIndex", _self.currentPage - 1);
-      m.set("orderBy", "");
-      axios
-        .post("/dc/getDocuments", JSON.stringify(m))
-        .then(function (response) {
-          _self.itemDataList = response.data.data;
-          _self.itemDataListFull = response.data.data;
-          _self.itemCount = response.data.pager.total;
-          _self.tableLoading = false;
-        });
+
+      var key = _self.inputkey;
+      
+      if (key != "") {
+        key = " (coding like '%" + key + "%' or title like '%" + key + "%') ";
+        if (_self.radioValue == "案卷") {
+          key= key + " and C_ITEM_TYPE='案卷' ";
+        } else {
+          key= key + " and C_ITEM_TYPE='文件' ";
+        }
+        
+      } else {
+        if (_self.radioValue == "案卷") {
+          key=key+ " C_ITEM_TYPE='案卷' ";
+        } else {
+          key=key+" C_ITEM_TYPE='文件' ";
+        }
+       
+      }
+
+      _self.tables.main.condition=key;
+      _self.tables.main.folderId=indata.id
+      _self.$nextTick(()=>{
+         _self.$refs.mainDataGrid.loadGridData();
+         _self.$refs.relevantFileDataGrid.itemDataList = [];
+      });
     },
 
     resize(leftPercent) {
@@ -413,14 +422,28 @@ export default {
       this.$refs.relevantFileDataGrid.loadGridData();
     },
 
-    reload() {
+    reloadGrid() {
       this.loadGridData(this.currentFolder);
     },
 
     changeRadio(val) {
       
       let _self = this;
-      _self.radioValue = val;
+      if(val=='文件'){
+        _self.isFile=false;
+        _self.topPercent=99;
+        // _self.$refs.mainDataGrid.tableHeight=(window.innerHeight-_self.startHeight);
+      }else{
+        _self.isFile=true;
+        _self.topPercent=65;
+        _self.$nextTick(()=>{
+          if(_self.$refs.relevantFileDataGrid){
+             _self.$refs.relevantFileDataGrid.itemDataList = [];
+          }
+        });
+        
+      }
+
       _self.loadGridData(_self.currentFolder);
     
     },
