@@ -75,6 +75,9 @@
             $t("application.ExportExcel")
           }}</el-button>
         </el-form-item>
+        <el-form-item>
+          <AddCondition v-model="AdvCondition" :inputType="hiddenInput" @sendMsg="search()"></AddCondition>
+        </el-form-item>
       </el-form>
     </template>
     <template v-slot:main="{ layout }">
@@ -138,6 +141,7 @@
 import DataLayout from "@/components/ecm-data-layout";
 import DataGrid from "@/components/DataGrid";
 import ExcelUtil from "@/utils/excel.js";
+import AddCondition from '@/views/record/AddCondition'
 export default {
   name: "ArchiveHandOver",
   data() {
@@ -174,7 +178,9 @@ export default {
       selectedItems: [],
       propertyVisible: false,
       locationCoding: "",
-      pendNotVisible:false
+      pendNotVisible:false,
+      AdvCondition:"",
+      hiddenInput:"hidden",
     };
   },
   props: {},
@@ -200,7 +206,7 @@ export default {
       }
       _self.pendNotVisible = true;
     },
-      saveRejectComment() {
+    saveRejectComment() {
       let _self = this;
       if (_self.pendForm.rejectComment == "") {
         _self.$message({
@@ -275,6 +281,10 @@ export default {
           "%' OR C_BATCH_CODING2 LIKE '%" +
           _self.inputValueNum +
           "%')";
+      }
+      if (_self.AdvCondition != "" && _self.AdvCondition != undefined) {
+        key +=
+          "and "+ _self.AdvCondition 
       }
 
       _self.$refs.mainDataGrid.condition = key;
@@ -426,6 +436,7 @@ export default {
     DataLayout: DataLayout,
     DataGrid: DataGrid,
     ExcelUtil: ExcelUtil,
+    AddCondition:AddCondition,
   },
 };
 </script>
