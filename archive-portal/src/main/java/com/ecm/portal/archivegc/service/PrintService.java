@@ -92,9 +92,9 @@ public class PrintService extends EcmService{
 				volCount = getCount(data,"C_VOLUME_COUNT");
 				
 			}
-			if(volCount>0) {
+			if(volCount>1) {
 				for(int i=0; i<volCount; i++) {
-					if(setCount>0) {
+					if(setCount>1) {
 						for(int j=0; j<setCount; j++) {
 							String tempStr = "第"+volCount+"_"+(i+1)+"册 第"+setCount+"_"+(j+1)+"套";
 							PrintEntity tempEn = en.clone();
@@ -109,7 +109,7 @@ public class PrintService extends EcmService{
 					}
 				}
 			}else {
-				if(setCount>0) {
+				if(setCount>1) {
 					for(int j=0; j<setCount; j++) {
 						String tempStr = "第"+setCount+"_"+(j+1)+"套";
 						PrintEntity tempEn = en.clone();

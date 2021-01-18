@@ -1,326 +1,50 @@
 <template>
   <div>
-    <button @click="printCode" v-print="'#print'">打印</button>
-    <div id="print" ref="print" style="height:95%;width:95%;">
-        <div style="text-align:center; font-size: 14px;font-family: Arial, 宋体, Helvetica, sans-serif;">备考表</div>
-     <table class="table" style="border: 1px solid #212121;">
-         <tr>
-             <td>档案号：{{archiveCode}}</td>
-             
-         </tr>
-        <tr style="border-top: 1px solid #212121;">
-            <td>
-                互见号：
-                <br/>
-                <br/>
-                &nbsp;&nbsp;卷内情况说明：<br/><br/>
-                &nbsp;&nbsp;&nbsp;&nbsp;本卷共有_________页； 图样______/_______页； 文件材料________/________
-                <br/>
-                <br/>
-                <br/>
-                页； 照片_________/________张。
-                <br/><br/><br/><br/><br/><br/>
-                其他情况；
-                <br/><br/><br/><br/><br/><br/>
-            </td>
-            
-        </tr>
-        <tr style="border-top: 1px solid #212121;">
-            <td style="text-align: center;">
-                变更记录<br>
-            </td>
-        </tr>
-        <tr style="border-top: 1px solid #212121;">
-            <td>
-                <table class="sub-table" cellspacing="0">
-                    <tr>
-                        <td rowspan="2" style="border-right: 1px solid #212121;text-align:center;">序 号</td>
-                        <td rowspan="2" style="border-right: 1px solid #212121;text-align:center;">日 期</td>
-                        <td rowspan="2" style="border-right: 1px solid #212121;text-align:center;">原页数</td>
-                        <td colspan="2" style="border-right: 1px solid #212121;text-align:center;">变动页数</td>
-                        <td rowspan="2" style="border-right: 1px solid #212121;text-align:center;">现页数</td>
-                        <td rowspan="2" style="border-right: 1px solid #212121;text-align:center;">更改文件号</td>
-                        <td rowspan="2" style="border-right: 1px solid #212121;text-align:center;">更改者</td>
-                        <td rowspan="2" style="text-align:center;">备注</td>
-                    </tr>
-                    <tr>
-                        <td style="border-top: 1px solid #212121;text-align:center;">增 加</td>
-                        <td style="border-top: 1px solid #212121;
-                         border-left: 1px solid #212121;
-                          border-right: 1px solid #212121; text-align:center;">减 少</td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;border-bottom:1px solid #212121;"></td>
-                    </tr>
-                </table>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <table class="sub-table" cellspacing="0">
-                    <tr class="sub-table-tr">
-                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;">立卷人</td>
-                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;"></td>
-                       <td class="sub-table-tdNull" style="width:12.5%">立卷日期</td>
-                       <td class="sub-table-tdNull" style="width:12.5%"></td>
-                       <td class="sub-table-tdNull" style="width:12.5%">检查人</td>
-                       <td class="sub-table-tdNull" style="width:12.5%"></td>
-                       <td class="sub-table-tdNull" style="width:12.5%">检查日期</td>
-                       <td class="sub-table-tdNull" style="border-right:0px;width:12.5%"></td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-     </table>
-      
-    </div>
-
-    <button @click="printCode" v-print="'#print'">打印</button>
+    <button @click="printPage" v-print="'#print'">打印</button>
+    <el-container style="width:100%;height:540px;overflow:auto;">
+      <div id='print' ref='print' style="height:100%;width:100%;">
+         <div v-for="(item,idx) in archiveObjects" :key="'divk'+idx" :style="'width:'+divWidth+';padding:5px;'">
+           <PreparationTableForm :ref="'printForm'+idx" :archiveId="item.ID"></PreparationTableForm>
+           <div v-if="idx < archiveObjects.length-1" style="page-break-before:always;"></div>
+         </div>
+      </div>
+     </el-container>
   </div>
 </template>
 
 <script type="text/javascript">
 import Print from "@/plugins/print";
+import PreparationTableForm from '@/views/record/PreparationTableForm.vue'
 import Vue from "vue";
-import QRCode from "qrcodejs2"; // 引入qrcode
 Vue.use(Print);
 export default {
-  name: "test",
-
-  // name: "printPage",
+  name: "PrintPreparationTable",
+  components: { 
+     PreparationTableForm:PreparationTableForm
+  },
   data() {
     return {
-      archiveCode: "",
-      innerDataList: [],
-      dialogQrcodeVisible: true,
+      archiveObjects: [],
       currentLanguage: "zh-cn",
-      gridList: [],
-      volumeTitle: "",
     };
   },
   mounted() {
-    // 需要先显示出来，然后再隐藏掉；  否则动态生成的二维码，第一次会报错，对象找不到。可能是跟初始化有关系，没有显示出来的时候并没有初始化HTML
-    // this.dialogQrcodeVisible = false
-    this.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
-
-    // this.loadFormInfo();
-    // this.getArchiveObj(this.archiveId,this.gridName);
-  },
-  props: {
-    archiveId: { type: [String, Number] },
-    currentFolderId: { type: [String, Number] },
-    tableHeight: { type: Number },
-    gridName: { type: String }
+  
   },
   methods: {
-    // 加载表格样式
-    loadGridInfo(gridName) {
-      let _self = this;
-      _self.loading = true;
-      var m = new Map();
-      m.set("gridName", gridName);
-      m.set("lang", _self.currentLanguage);
-      _self
-        .axios({
-          headers: {
-            "Content-Type": "application/json;charset=UTF-8"
-          },
-          method: "post",
-          data: JSON.stringify(m),
-          url: "/dc/getGridViewInfo"
-        })
-        .then(function(response) {
-          _self.gridList = response.data.data;
-
-          _self.loading = false;
-        })
-        .catch(function(error) {
-          console.log(error);
-          _self.loading = false;
-        });
+    refreshArchiveObj(objs){
+      let _self=this;
+      this.archiveObjects = objs;
+      if(objs){
+         setTimeout(() => {
+        for(var i=0;i<objs.length;i++){
+          _self.$refs['printForm'+i][0].loadArchiveData(objs[i].ID);
+        }},100);
+      }
     },
-    InnerFile() {
-      let _self = this;
-
-      var m = new Map();
-      m.set("id", _self.archiveId);
-
-      // console.log('pagesize:', _self.pageSize);
-      _self
-        .axios({
-          headers: {
-            "Content-Type": "application/json;charset=UTF-8"
-          },
-          method: "post",
-          data: JSON.stringify(m),
-          url: "/dc/getAllDocuByRelationParentId"
-        })
-        .then(function(response) {
-          _self.innerDataList = response.data.data;
-
-          _self.loading = false;
-        })
-        .catch(function(error) {
-          console.log(error);
-          _self.loading = false;
-        });
+    printPage(){
+      this.$print(this.$refs.print)
     },
-    getArchiveObj(id, volumeTitle) {
-      let _self = this;
-      _self.volumeTitle = volumeTitle;
-      var m = new Map();
-      m.set("itemInfo", id); //ID 或类型
-      m.set("lang", _self.currentLanguage);
-     
-      _self
-        .axios({
-          headers: {
-            "Content-Type": "application/json;charset=UTF-8"
-          },
-          method: "post",
-          data: JSON.stringify(m), //_self.myItemId+_self.myTypeName,
-          url: "/dc/getArchiveObj"
-        })
-        .then(function(response) {
-          _self.archiveCode = response.data.data.coding;
-        //   _self.archiveTitle = response.data.data.title;
-          
-          //console.log(JSON.stringify(response.data.data));
-          _self.loading = false;
-        })
-        .catch(function(error) {
-          console.log(error);
-          _self.loading = false;
-        });
-    },
-    printCode() {
-      this.$print(this.$refs.print);
-    },
-
-    checkEwmClick(url) {
-      let vm = this;
-      vm.$nextTick(() => {
-        vm.dialogQrcodeVisible = true;
-        let obj = document.getElementById("qrcodeshow");
-        obj.innerHTML = "";
-        vm.genarateQrcode(url);
-      });
-    },
-    handleDialogQrcodeClose() {
-      this.dialogQrcodeVisible = false;
-    },
-    genarateQrcode(url) {
-      this.$refs.qrCodeUrl2.innerHTML = "";
-      let qrcode = new QRCode(this.$refs.qrCodeUrl2, {
-        width: 50,
-        height: 50,
-        text: url, // 二维码地址
-        colorDark: "#000",
-        colorLight: "#fff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
-      console.log("qrcode = " + JSON.stringify(qrcode));
-    }
   }
 };
 </script>

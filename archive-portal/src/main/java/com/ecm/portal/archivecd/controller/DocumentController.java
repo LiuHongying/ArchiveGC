@@ -90,7 +90,7 @@ public class DocumentController extends ControllerAbstract {
 			}
 			String templateId="";
 			EcmContent en=null;
-			if(p.get("templateId")!=null) {
+			if(p.get("templateId")!=null&&"".equals(p.get("templateId").toString())) {
 				templateId=p.get("templateId").toString();
 				EcmContent content = contentService.getPrimaryContent(getToken(), templateId);
 				String fullPath = CacheManagerOper.getEcmStores().get(content.getStoreName()).getStorePath();

@@ -415,9 +415,8 @@
           </template>
         <template slot="paneR">
           <el-row>
-          <el-form :inline="true">
-            <el-form-item>
-              <el-input
+          <el-col :span="6">
+            <el-input
                 v-model="inputkey"
                 :placeholder="
                   $t('message.pleaseInput') + $t('application.keyword')
@@ -425,9 +424,9 @@
                 @change="searchItem"
                 prefix-icon="el-icon-search"
               ></el-input>
-            </el-form-item>
-            <el-form-item>
-              <template v-if="isFileAdmin">
+          </el-col>
+          <el-col :span="6">
+            <template v-if="isFileAdmin">
                 <el-button
                   type="primary"
                   plain
@@ -445,63 +444,51 @@
                   >{{ $t("application.destroy") }}</el-button
                 >
               </template>
-            </el-form-item>
-            <!-- <el-form-item>
-              <el-button
-                type="primary"
-                plain
-                size="medium"
-                icon="el-icon-folder-add"
-                @click="addToShopingCart()"
-                >{{ $t("application.addToShopingCart") }}</el-button
-              >
-            </el-form-item> -->
-            <el-form-item>
-              <el-button type="primary" icon="el-icon-upload2" @click="batchDialogVisible=true">批量导入</el-button>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" plain size="medium" icon="el-icon-plus" @click="beforeCreateFile">新建文件</el-button>
-            </el-form-item>
-            <!-- <el-form-item>
-              <el-button type="primary" plain size="medium" icon="el-icon-right" @click="getWorkFlow">发起流程</el-button>
-            </el-form-item> -->
-            <el-form-item>
-              <el-button icon="el-icon-delete"
+          </el-col>
+          <el-col :span="3">
+            <el-button type="primary" icon="el-icon-upload2" @click="batchDialogVisible=true">批量导入</el-button>
+          </el-col>
+          
+          <el-col :span="3">
+          <el-button type="primary" plain size="medium" icon="el-icon-plus" @click="beforeCreateFile">新建文件</el-button>
+          </el-col>
+          <el-col :span="2">
+          <el-button icon="el-icon-delete"
                   type="warning"
                   @click="
                     onDeleleItem(selectedItemList, [$refs.mainDataGrid])
                   "
                   >{{ $t("application.delete") }}</el-button
                 >
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click.native="exportData" icon="el-icon-download">{{$t("application.ExportExcel")}}</el-button>
-            </el-form-item>
-            <el-form-item>
-              <el-button
+          </el-col>
+          <el-col :span="3">
+          <el-button type="primary" @click.native="exportData" icon="el-icon-download">{{$t("application.ExportExcel")}}</el-button>
+          </el-col>
+          <el-col :span="2">
+          <el-button
                 type="primary"
                 icon="el-icon-top-right"
                 @click="moveItem()"
                 >{{ $t("application.move") }}</el-button>
-            </el-form-item>
-            <el-form-item>
-              <el-button
+          </el-col>
+          <el-col :span="2">
+          <el-button
                 type="primary"
                 icon="el-icon-upload2"
                 @click="showUpdateFile(0)"
                 >{{ $t("application.update") }}</el-button
               >
-            </el-form-item>
-            <el-form-item>
-              <el-button
+          </el-col>
+          <el-col :span="2">
+           <el-button
                 type="primary"
                 icon="el-icon-upload2"
                 @click="showUpdateFile(1)"
                 >{{ $t("application.transcript") }}</el-button
               >
-            </el-form-item>
-            <el-form-item>
-              <template v-if="isFileAdmin">
+          </el-col>
+          <el-col :span="3">
+          <template v-if="isFileAdmin">
                 <!-- `checked` 为 true显示卷宗 或 false不显示卷宗 -->
                 <el-checkbox
                   v-model="showBox"
@@ -512,14 +499,19 @@
                   }}</el-checkbox
                 >
               </template>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="beforeUploadFile('/dc/addAttachment')">添加附件</el-button>
-            </el-form-item>
-            <el-form-item>
-                <ACLManagement  :ids="selectIds">授权</ACLManagement>
-            </el-form-item>
-          </el-form>
+          </el-col>
+          
+          </el-row>
+          <el-row style="margin-top:5px;">
+            <el-col :span="3">
+            <el-button type="primary" icon="el-icon-files" @click="beforeUploadFile('/dc/addAttachment')">添加附件</el-button>
+            </el-col>
+            <el-col :span="2">
+            <ACLManagement  :ids="selectIds">授权</ACLManagement>
+            </el-col>
+            <!-- <el-col :span="3">
+            <CreateDocNoAttach style="position:relative;" typeName="图纸文件审批单">新建文件2</CreateDocNoAttach>
+            </el-col> -->
           </el-row>
           <el-row :style="'height:'+layout.height-startHeight+80">
             <DataGrid
@@ -562,6 +554,7 @@ import BatchImport from "@/components/controls/ImportDocument";
 import FolderSelector from "@/components/controls/FolderSelector";
 import ACLManagement from "@/components/ACLManagement";
 import FolderAcl from "@/components/controls/FolderAcl";
+import CreateDocNoAttach from "@/components/CreateDocNoAttach.vue";
 export default {
   components: {
     ShowProperty: ShowProperty,
@@ -577,6 +570,7 @@ export default {
     FolderSelector:FolderSelector,
     ACLManagement:ACLManagement,
     FolderAcl: FolderAcl,
+    CreateDocNoAttach:CreateDocNoAttach
   },
   data() {
     return {
@@ -1748,9 +1742,7 @@ export default {
 };
 </script>
 <style scoped>
-.el-container {
-  height: 100%;
-}
+
 /* .el-aside {
   height: 680px;
 } */

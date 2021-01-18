@@ -1,6 +1,7 @@
 <template>
   <el-container >
     <el-dialog
+      v-dialogDrag
       :visible.sync="visible"
       :append-to-body="true"
       :close-on-click-modal="false"
