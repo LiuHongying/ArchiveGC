@@ -7,28 +7,77 @@
     <link href="./style.css" rel="stylesheet" type="text/css" />
 </head>
 <style>
-   #saveId {
-        background:rgb(77, 200, 186);
-        border-color:rgb(77, 200, 186);
+
+
+    .el-button {
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    background:rgb(77, 200, 186);
+        border: 1px solid #dcdfe6;
         color:#fff;
-    }
+    text-align: center;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    -webkit-transition: .1s;
+    transition: .1s;
+    font-weight: 500;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    padding: 12px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    float: left;
+}
+
 </style>
 <body onload="InitEvent()">
-    <div id="container">
+    <div id="container" >
         
-        <div id="mainbody">
+        <div id="mainbody" >
             <!-- style="position:absolute; visibility:inherit; top:0px;left:0px;width:100%;height:40px;z-index:999;" -->
+            <div id="actionArea" style="height:40px">
             <div >
-                <input class="link-button button-right"  type="button" onclick="saveToWeb()" name="保存"    value="保存">
+                <input class="el-button"  type="button" onclick="saveToWeb()" name="保存"    value="保存">
+            </div>           
+             <div >
+                <input class="el-button"  type="button" onclick="saveToWebAndClose()" name="保存并关闭"    value="保存并关闭">
             </div>
+            <div >
+                <input class="el-button"  type="button" onclick="InitEvent()" name="重新加载"    value="重新加载">
+            </div>
+            <!-- <div >
+                <input class="el-button"  type="button" onclick="PrintDoc()" name="打印"    value="打印">
+            </div>
+           <div >
+                <input class="el-button"  type="button" onclick="ToggleTrackRevisions(true)" name="开启修订""    value="开启修订">
+            </div>            <div >
+                <input class="el-button"  type="button" onclick="ToggleTrackRevisions(false)" name="开启修订""    value="关闭修订">
+            </div>
+            <div >
+                <input class="el-button"  type="button" onclick="ToggleShowRevisions(true)" name="显示修订"    value="显示修订">
+            </div>            <div >
+                <input class="el-button"  type="button" onclick="ToggleShowRevisions(false)" name="隐藏修订"    value="隐藏修订">
+            </div>
+            <div >
+                <input class="el-button"  type="button" onclick="ToggleAllRevisions(true)" name="接受所有修订"    value="接受所有修订">
+            </div>
+            <div >
+                <input class="el-button"  type="button" onclick="ToggleAllRevisions(false)" name="拒绝所有修订"    value="拒绝所有修订">
+            </div> -->
             <!-- <div  style="background-color: black;">dddddd   dddddddddddddddddd</div> -->
+        </div>
              <div id="main" style="top:0px;left:0px;width:100%;height:100%;z-index:-1;" >
                 <object  classid="clsid:00460182-9E5E-11d5-B7C8-B8269041DD57" id="oframe" width="100%"
                     height="100%" codebase="./在线编辑.CAB#version=2,3,0,1">
                     <param name="BorderStyle" value="1">
                     <param name="TitlebarColor" value="52479">
-                    <param name="TitlebarTextColor" value="0">
-                    <param name="Menubar" value="1">    
+                    <param name="TitlebarTextColor" value="1">
+                    <param name="Titlebar" value="0">
+                    <param name="Menubar" value="0">    
                     <param id="ToolbarsId" name="Toolbars" value="1"> 
                 </object>
                 <div style="display: none">
@@ -47,6 +96,7 @@
 </html>
 
 <script>
- 
+
+
 
 </script>

@@ -120,8 +120,7 @@
               <UserSelectInput
                 v-model="form.delegateTaskUserId"
                 v-bind:inputValue="form.delegateTaskUserId"
-                v-bind:roleName="ecmCfgActivity.roleName"
-                :isRepeat="ecmCfgActivity.isMulti"
+                :isRepeat="false"
               ></UserSelectInput>
             </el-col>
           </el-row>
