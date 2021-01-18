@@ -44,6 +44,11 @@
             title="打印清单"
             >打印清单</el-button>
         </el-form-item>
+        <el-form-item>
+        <el-button type="primary" @click.native="exportData">{{
+            $t("application.ExportExcel")
+          }}</el-button>
+        </el-form-item>
       </el-form>
     </template>
     <template v-slot:main="{ layout }">
@@ -163,6 +168,7 @@
 import DataGrid from "@/components/DataGrid";
 import PrintVolumes from "@/views/record/Print4Borrow";
 import DataLayout from "@/components/ecm-data-layout";
+import ExcelUtil from "@/utils/excel.js";
 export default {
   name: "TC",
   data() {
@@ -225,7 +231,6 @@ export default {
               });
         return;
       }
-      console.log(this.$refs.PrintVolumes)
       _self.printVolumesVisible = true;
 
       setTimeout(()=>{
@@ -238,7 +243,37 @@ export default {
       _self.printObjId=selectedRow.ID;
     },
 
-
+        exportData() {
+      let condition1 =
+        "SELECT CHILD_ID from ecm_relation where PARENT_ID ='" +this.parentId +"'";
+      let finalCondition = ""
+      var fileDate = new Date();
+      let resName = ""
+      let fileDateStr =
+        fileDate.getFullYear() +
+        "" +
+        fileDate.getMonth() +
+        "" +
+        fileDate.getDate();
+      if(this.activeName=='ArchivePendingOut'){
+        let key1 = "ID IN (" + condition1 + ") AND STATUS='待入库'";
+        finalCondition = key1
+        resName = "待入库清单"
+      }
+      else if(this.activeName=='ArchivePending'){
+        let key2 = "ID IN (" + condition1 + ") AND STATUS='已完成'";
+        finalCondition = key2
+        resName = "已入库清单"
+      }
+      let params = {
+        gridName: "FormDcGrid",
+        lang: "zh-cn",
+        condition: finalCondition,
+        filename: "File_HandOver_" + fileDateStr + ".xlsx",
+        sheetname: resName,
+      };
+      ExcelUtil.export(params);
+    },
 
     // 上下分屏事件
     onSplitResize(topPercent){
@@ -449,7 +484,8 @@ export default {
   components: {
     DataGrid: DataGrid,
     DataLayout: DataLayout,
-    PrintVolumes:PrintVolumes
+    PrintVolumes:PrintVolumes,
+    ExcelUtil:ExcelUtil
   },
 };
 </script>
