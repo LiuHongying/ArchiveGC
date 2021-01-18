@@ -51,13 +51,13 @@
                 六、借阅者应在规定时间内归还，超期应办理续借手续；</br>
                 七、所借阅档案损坏或丢失应按公司规定赔偿。</br>
                 本人已仔细阅读上述“档案利用承诺书”，并承诺履行相应义务，且愿意承担因个人行为导致档案破坏、信息泄露的法律责任。
-                
                 </span>
-
+                <el-row>
+                <el-radio v-model="accept" label="接受">接受档案承诺利用书</el-radio>
+                </el-row>
                 </el-dialog>
         </el-main>
          <el-footer>
-            <el-radio v-model="accept" label="接受">接受档案承诺利用书</el-radio>
             <el-button type="success" @click="open">查看档案利用承诺书</el-button>
             <el-button @click="startUpWorkflow(workflowObj)" :loading="butt">{{$t('application.StartUpWorkflow')}}</el-button>
             <el-button @click="closePage()">{{$t('application.cancel')}}</el-button>

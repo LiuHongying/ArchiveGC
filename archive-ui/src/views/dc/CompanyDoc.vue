@@ -53,7 +53,7 @@
       @close="propertyVisible = false"
       width="90%"
     >
-      <ShowProperty
+      <ShowPropertyReadOnly
         ref="ShowProperty"
         @onSaved="onSaved"
         width="100%"
@@ -61,7 +61,7 @@
         v-bind:folderId="currentFolder.id"
         v-bind:typeName="currentFolder.typeName"
         :showTypeName="true"
-      ></ShowProperty>
+      ></ShowPropertyReadOnly>
       <div slot="footer" class="dialog-footer">
         <el-button @click="propertyVisible = false">{{
           $t("application.cancel")
@@ -353,7 +353,7 @@
 </template>
 <script>
 import AddCondition from '@/views/record/AddCondition'
-import ShowProperty from "@/components/ShowProperty";
+import ShowPropertyReadOnly from "@/components/ShowPropertyReadOnly";
 import InnerItemViewer from "./InnerItemViewer.vue";
 import BorrwoForm from "@/components/form/Borrow";
 import BorrowFile from "@/views/workflow/BorrowFile.vue";
@@ -361,7 +361,7 @@ import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue"
 import ExcelUtil from "@/utils/excel.js";
 export default {
   components: {
-    ShowProperty: ShowProperty,
+    ShowPropertyReadOnly: ShowPropertyReadOnly,
     InnerItemViewer: InnerItemViewer,
     BorrwoForm: BorrwoForm,
     BorrowStartUp: BorrowStartUp,
