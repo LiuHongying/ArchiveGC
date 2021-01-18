@@ -1,32 +1,16 @@
 <template>
   <div>
-      <!-- <div style="width:30%;display:inline-block;position: absolute; left:30px;">
-        <el-select
-            name="selectName"
-            v-model="selectedPx"
-            placeholder="'请选择条码尺寸'"
-            style="display:block;"
-            @change="refresh(archiveObjects,selectedPx)"
-            >
-            <el-option label="1条码" value="1" key='2'></el-option>
-            <el-option label="2条码" value="2" key='2'></el-option>
-            <el-option label="3条码" value="3" key='3'></el-option>
-            <el-option label="4条码" value="4" key='4'></el-option>
-            <el-option label="5条码" value="5" key='5'></el-option>
-            <el-option label="6条码" value="6" key='6'></el-option>
-          </el-select>
-          
-      </div> -->
+
      <div style="display:inline-block;position: absolute;left:500px;">
         <button @click="printCode" v-print="'#print'">打印</button>
       </div>
       <div id='print' ref='print' :style="'position: absolute; top:0px;'">
-        <div v-for="(item,keys) in getArchiveObjs()" :key="'divk'+keys" 
+        <div v-for="(item,idx) in archiveObjects" :key="'divk'+idx" 
         :style="'width:'+divWidth+';height:'+divHeight+';text-align:center;margin:'+divMargin+';line-height:'+divHeight+';font-size:'+fontSize+';'">
-          <!-- <img :id="'barcode'+keys" :key="'itmk'+keys" /> -->
-          档 号 &nbsp; {{item.C_ARCHIVE_CODING}}
+          <span>档 号 &nbsp; {{item.C_ARCHIVE_CODING}}</span>
+          <div style="page-break-before:always;"></div>
         </div>
-        <!-- <div v-if="isQRCode"  ref='qrCodeUrl2'></div> -->
+        
   　　</div>
   </div>
 </template>
@@ -34,8 +18,6 @@
 <script type="text/javascript">
 import Print from '@/plugins/print'
 import Vue from 'vue';
-import QRCode from 'qrcodejs2'// 引入qrcode
-import JsBarcode from 'jsbarcode'
 Vue.use(Print)
 export default {
    name: 'printArchiveCode',
@@ -51,7 +33,6 @@ export default {
       volumeTitle:"",
       ridgeData:[],
       selectedPx:'112',
-      
       barCodeWidth:2,
       barCodeHeight:40,
     };
@@ -60,18 +41,12 @@ export default {
     // 需要先显示出来，然后再隐藏掉；  否则动态生成的二维码，第一次会报错，对象找不到。可能是跟初始化有关系，没有显示出来的时候并没有初始化HTML
       // this.dialogQrcodeVisible = false
     this.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
-    this.getConfigParam("PrintArchiveCodeConfig");
+    //this.getConfigParam("PrintArchiveCodeConfig");
     // this.loadFormInfo();
     // this.getArchiveObj(this.archiveId,this.gridName); 
     
   },
   props: {
-    archiveId: {type:[String,Number]},
-    currentFolderId:{type:[String,Number]},
-    tableHeight:{type:Number},
-    gridName:{type:String},
-    isQRCode:{type:Boolean,default:false},
-    isBarCode:{type:Boolean,default:false},
     archiveObjects:{type:Array,default:() => []},
     divWidth:{type:String,default:'90mm'},
     divHeight:{type:String,default:'10mm'},
@@ -92,82 +67,17 @@ export default {
             console.log(error);
           });
       },
-      getArchiveObjs(){
-        return this.archiveObjects;
-      },
       refresh(objs,pixel){
         let _self=this;
         _self.archiveObjects=objs;
         
         
       },
-    getArchiveObj(id,volumeTitle){
-      let _self=this;
-      _self.volumeTitle=volumeTitle;
-      var m = new Map();
-      m.set('itemInfo',id);//ID 或类型
-      m.set('lang',_self.currentLanguage);
-      _self.axios({
-          headers: {
-            "Content-Type": "application/json;charset=UTF-8"
-          },
-          method: "post",
-          data: JSON.stringify(m),//_self.myItemId+_self.myTypeName,
-          url: "/dc/getArchiveObj"
-        })
-        .then(function(response) {
-          _self.ridgeData=response.data.data;
-          _self.archiveCode= response.data.data.coding;
-          _self.archiveTitle= response.data.data.title;
-          // _self.genarateQrcode(_self.archiveCode);
-          _self.genarateBarCode('#barcode0',_self.archiveCode,_self.barCodeWidth,_self.barCodeHeight);
-          // _self.InnerFile();
-          //console.log(JSON.stringify(response.data.data));
-          _self.loading = false;
-        })
-        .catch(function(error) {
-          console.log(error);
-          _self.loading = false;
-        });
-    },
+    
     printCode(){
       this.$print(this.$refs.print);
     },
-    
-    checkEwmClick (url) {
-      let vm = this
-      vm.$nextTick(() => {
-        vm.dialogQrcodeVisible = true
-        let obj = document.getElementById('qrcodeshow')
-        obj.innerHTML = ''
-        vm.genarateQrcode(url)
-      })
-    },
-    handleDialogQrcodeClose () {
-      this.dialogQrcodeVisible = false
-    },
-    genarateBarCode(elId,value,width,height){
-      JsBarcode(elId, value, {
-        format: 'CODE39',
-        lineColor: '#000',
-        background: '#EBEEF5',
-        width: 1,//2
-        height: height,//40
-        displayValue: true
-      })
-    },
-    genarateQrcode (url) {
-      this.$refs.qrCodeUrl2.innerHTML='';
-      let qrcode = new QRCode(this.$refs.qrCodeUrl2, {
-        width: 50,
-        height: 50,
-        text: url, // 二维码地址
-        colorDark: '#000',
-        colorLight: '#fff',
-        correctLevel: QRCode.CorrectLevel.H
-      })
-      console.log('qrcode = ' + JSON.stringify(qrcode))
-    }
+
   }
 };
 </script>

@@ -82,7 +82,7 @@
                   dataUrl="/dc/getDocuments"
                   v-bind:tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
                   v-bind:isshowOption="true" v-bind:isshowSelection ="true"
-                  gridViewName="ArchiveAppraisalGrid"
+                  gridViewName="ArchiveDestructionGrid"
                   condition="TYPE_NAME='档案销毁单' and STATUS='新建' and IS_RELEASED=1 "
                   :optionWidth = "2"
                   :isshowCustom="false"
