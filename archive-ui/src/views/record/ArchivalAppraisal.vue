@@ -210,7 +210,7 @@ export default {
       let _self = this;
       let key="TYPE_NAME='档案鉴定单' and IS_RELEASED=1";
       if(_self.inputValueNum!=''&&_self.inputValueNum!=undefined){
-        key+="and (CODING LIKE '%"+_self.inputValueNum+"%' OR TITLE LIKE '%"+_self.inputValueNum+"%')";
+        key+=" and (CODING LIKE '%"+_self.inputValueNum+"%' OR TITLE LIKE '%"+_self.inputValueNum+"%')";
       }
       if(_self.value!=''&&_self.value!=undefined){
         key+=" and STATUS = '"+_self.value+"'";
