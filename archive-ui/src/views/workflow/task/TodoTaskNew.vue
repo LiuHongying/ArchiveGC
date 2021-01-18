@@ -1,5 +1,5 @@
 <template>
-  <div>
+    <div>
     <el-dialog
       :title="dialogTitle"
       :visible.sync="dialogVisible"
@@ -31,7 +31,7 @@
         >{{datetimeFormat(currentData.createTime,'')}}</el-form-item>
       </el-form>
       <!-- <el-divider content-position="left">表单信息</el-divider> -->
-
+      <div id='print' ref='print' style="height:100%;">
       <component style="width:100%"
         ref="propertiesComp"
         :is="taskName"
@@ -49,6 +49,7 @@
         :isShowReject="isShowReject"
         @click="click"
       ></component>
+
       <el-divider content-position="left">流转意见</el-divider>
       <el-table :data="taskList" border v-loading="loading" style="width: 100%">
         <el-table-column label="序号" width="65">
@@ -84,6 +85,7 @@
         <el-table-column prop="result" label="完成结果" width="100"></el-table-column>
         <el-table-column prop="message" label="审批意见" min-width="15%"></el-table-column>
       </el-table>
+      </div>
       <el-divider content-position="left">批注意见</el-divider>
       <el-form :model="form">
         <el-row>
@@ -126,6 +128,7 @@
           <el-row></el-row>
         </div>
       </el-form>
+      
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogVisible = false">{{$t('application.cancel')}}</el-button>
         <el-button
@@ -134,6 +137,7 @@
         >{{delegateButton}}</el-button>
         <el-button @click="claim(currentData)">认领任务</el-button>
         <el-button @click="completetask(form)">完成任务</el-button>
+  　　　 <button @click="printCode" v-print="'#print'">打印</button>
       </div>
     </el-dialog>
     <el-row>
@@ -211,6 +215,7 @@
       :total="itemCount"
     ></el-pagination>
   </div>
+    </div>
 </template>
 
 <script type="text/javascript">
@@ -333,6 +338,9 @@ export default {
     _self.refreshData();
   },
   methods: {
+    printCode(){
+    this.$print(this.$refs.print)
+    },
     click(value) {
       if(value.get("metaData")){
         this.formData = value.get("metaData");

@@ -103,7 +103,7 @@
 
     <el-dialog v-dialogDrag  :title="dialog.title" :visible.sync="dialog.visible" width="90%" :before-close="handleClose">      
       <template v-if="dialog.title==$t('application.dcproper')">
-        <ShowProperty ref="ShowProperty" :itemId="doc.id" :typeName="doc.typeName" :folderId="doc.folderId" :showTypeName="true"></ShowProperty>
+        <ShowPropertyReadOnly ref="ShowProperty" :itemId="doc.id" :typeName="doc.typeName" :folderId="doc.folderId" :showTypeName="true"></ShowPropertyReadOnly>
       </template>
       <template v-if="dialog.title==$t('application.relationDC')">
        <RelationDocs :docId="docId"></RelationDocs>
@@ -145,7 +145,7 @@
 
 <script>
 
-import ShowProperty from '@/components/ShowProperty.vue'
+import ShowPropertyReadOnly from '@/components/ShowPropertyReadOnly.vue'
 import Watermark from "@/assets/js/watermark.js"
 import DocAttrs from './DocAttrs.vue'
 import RelationDocs from './RelationDocs.vue'
@@ -173,7 +173,7 @@ import { timeout } from 'q'
 
 export default {
   components:{
-    ShowProperty:ShowProperty,
+    ShowPropertyReadOnly:ShowPropertyReadOnly,
     DocAttrs:DocAttrs,
     RelationDocs:RelationDocs,
     DocVersion:DocVersion,

@@ -12,6 +12,7 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.slf4j.Logger;
@@ -28,6 +29,8 @@ import com.ecm.common.util.FileUtils;
 import com.ecm.common.util.JSONUtils;
 import com.ecm.core.ActionContext;
 import com.ecm.core.cache.manager.impl.CacheManagerCfgActivity;
+import com.ecm.core.dao.EcmAuditWorkitemMapper;
+import com.ecm.core.entity.EcmAuditWorkitem;
 import com.ecm.core.entity.EcmCfgActivity;
 import com.ecm.core.entity.EcmContent;
 import com.ecm.core.entity.EcmDocument;
@@ -70,6 +73,10 @@ public class WorkFlowCenter extends ControllerAbstract {
 	private FolderService folderService;
 	@Autowired
 	private RelationService relationService;
+	
+
+	@Autowired
+	private EcmAuditWorkitemMapper ecmAuditWorkitemMapper;
 
 	/**
 	 * 创建文件或关联文件
@@ -452,6 +459,58 @@ public class WorkFlowCenter extends ControllerAbstract {
 		mp.put("data", workflowData);
 		mp.put("pager", pager);
 		mp.put("code", ActionContext.SUCESS);
+		return mp;
+	}
+	
+	/**
+	 * 
+	 * 从EcmAudit获取流程审批信息
+	 * 
+	 * @param processInstanceId
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/dc/getWorkflowTaskInfo", method = RequestMethod.POST) 
+	public Map<String, Object> getWorkflowTaskInfo(@RequestBody String argStr) {
+		Map<String, Object> args = JSONUtils.stringToMap(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+	
+		String docId = args.get("docId").toString();
+		//String processInstanceId = args.get("processInstanceId").toString();
+		List<Map> resultList = new ArrayList<Map>();
+		String isPocessFinished = "0";
+		try {
+//			List<EcmAuditWorkitem> tasks = ecmAuditWorkitemMapper
+//					.selectByCondition("PROCESS_INSTANCE_ID='" + processInstanceId + "' order by CREATE_TIME desc");
+//			
+			
+			String processInstanceId = "";
+			List<EcmAuditWorkitem> tasks = ecmAuditWorkitemMapper
+					.selectByCondition("DOC_ID ='" + docId + "' order by CREATE_TIME desc");
+			for (EcmAuditWorkitem task : tasks) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("id", task.getTaskId());
+				map.put("name", task.getTaskName());
+				map.put("assignee", task.getAssignee());
+				map.put("result", task.getResult());
+				map.put("message", task.getMessage());
+				map.put("createTime", task.getCreateTime());
+				map.put("endTime", task.getEndTime());
+				map.put("processInstanceId", task.getProcessInstanceId());
+				processInstanceId=task.getProcessInstanceId();
+				resultList.add(map);
+			}
+			
+			HistoricProcessInstance hiProcessInstance = historyService.createHistoricProcessInstanceQuery()
+					.processInstanceId(processInstanceId).unfinished().singleResult();
+			if (hiProcessInstance == null) {
+				isPocessFinished = "1";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		mp.put("data", resultList);
+		mp.put("isPocessFinished", isPocessFinished);
+
 		return mp;
 	}
 }

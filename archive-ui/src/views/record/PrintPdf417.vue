@@ -17,20 +17,19 @@
           </el-select>
           
       </div> -->
-      <div style="display:inline-block;position: absolute;top:40px;left:480px;">
+      <div style="display:inline-block">
         <el-row>
           <el-select v-model="printType" @change="onPrintTypeChange" >
             <template v-for="item in printTypeList">
                 <el-option :label="item" :value="item" :key="item"></el-option>
             </template>
           </el-select>
-        </el-row>
-        <el-row>
           <button @click="printCode" v-print="'#print'">打印</button>
         </el-row>
       </div>
-      <div id='print' ref='print' :style="'position: absolute; top:0px;'">
-        <div v-for="(item,keys) in printObjects" :key="'divk'+keys" style="width:400px;padding:4px;">
+     <el-container style="width:100%;height:540px;overflow:auto;">
+      <div id='print' ref='print' :style="'top:0px;'">
+        <div v-for="(item,keys) in printObjects" :key="'divk'+keys" :style="'width:'+divWidth+';padding:5px;'">
           <el-row>
             <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{item.typeName}}</el-col>
             <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{item.itemType}}</el-col>
@@ -59,9 +58,11 @@
               <img width="100%" :src="_self.axios.defaults.baseURL+'/record/print/getContentBarcode?str='+item.id +';' +item.archiveCoding + ';'+item.coding+';'+item.revision+';'+'&token='+token+'&ticket='+ticket+'_'+keys" border="0" />
             </el-col>
           </el-row>
+          <div v-if="keys < printObjects.length-1" style="page-break-before:always;"></div>
         </div>
         <!-- <div v-if="isQRCode"  ref='qrCodeUrl2'></div> -->
   　　</div>
+     </el-container>
   </div>
 </template>
 
@@ -71,9 +72,11 @@ import PDF417 from '@/plugins/pdf417'
 import Vue from 'vue';
 import QRCode from 'qrcodejs2'// 引入qrcode
 import JsBarcode from 'jsbarcode'
+import MainContainer from '../MainContainer.vue';
 Vue.use(Print)
 Vue.use(PDF417);
 export default {
+  components: { MainContainer },
    name: 'printPDF147Code',
     
   // name: "printPage",

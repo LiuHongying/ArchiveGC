@@ -313,7 +313,7 @@ export default {
   methods: {
     showUserSelector() {
       if (this.selectedItemId == 0) {
-        this.$message("请选择角色!");
+        this.$message("请选择知悉范围!");
         return;
       }
       this.selectUserDialogVisible = true;
