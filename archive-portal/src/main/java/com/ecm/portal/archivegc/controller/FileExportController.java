@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,6 +53,7 @@ public class FileExportController extends ControllerAbstract{
 		String folderId = (String) args.get("folderId");
 		String gridName = (String) args.get("gridName");
 		String lang = (String) args.get("lang");
+		String cond = (String) args.get("condition");
 		int pageSize = Integer.parseInt(args.get("pageSize").toString());
 		int pageIndex = Integer.parseInt(args.get("pageIndex").toString());
 		Pager pager = new Pager();
@@ -93,7 +95,10 @@ public class FileExportController extends ControllerAbstract{
 			datalist.add(titleCNName);
 			
 			StringBuffer condition = new StringBuffer("(" + gv.getCondition() + ") ");
-			condition.append(" and FOLDER_ID in (SELECT id from ecm_folder where folder_path like '%" + ecmFolder.getFolderPath() + "%')");
+			if(!StringUtils.isEmpty(cond)) {
+				condition.append(" AND (" +cond+") ");
+			}
+			condition.append(" and FOLDER_ID in (SELECT id from ecm_folder where folder_path like '" + ecmFolder.getFolderPath() + "%')");
 			
 			List<Map<String, Object>> infList = documentService.getObjectsByConditon(getToken(), gridName, folderId, pager, condition.toString(), args.get("orderBy").toString());
 			

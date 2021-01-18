@@ -105,6 +105,15 @@
     </el-dialog>
 
     <el-dialog
+      title="属性批量更新"
+      width="50%"
+      :visible="batchUpdateVisible"
+      @close="batchUpdateVisible=false"
+    >
+      <BatchUpdate></BatchUpdate>
+    </el-dialog>
+
+    <el-dialog
       title="打印档号"
       width="43%"
       :visible="printArchiveCodeVisible"
@@ -435,6 +444,14 @@
                           plain
                           @click="beforeModify()"
                         >修改</el-button>
+                       </el-form-item>
+                      <el-form-item>
+                        <el-button
+                          type="primary"
+                          size="small"
+                          plain
+                          @click="batchUpdateVisible=true"
+                        >更新</el-button>
                       </el-form-item>
                       <el-form-item>
                         <el-button type="primary"
@@ -567,6 +584,8 @@ import PrintCoverpage from "@/views/record/PrintCoverpage.vue"
 import PrintPdf417 from "@/views/record/PrintPdf417.vue"
 import BatchImport from "@/components/controls/ImportDocument";
 import ExcelUtil from "@/utils/excel.js";
+import BatchUpdate from "@/views/record/BatchUpdate.vue" 
+
 export default {
   name: "ArchiveArrange",
   components: {
@@ -580,7 +599,7 @@ export default {
     PreparationTablePrint:PreparationTablePrint,
     PrintBarCode:PrintBarCode,
     PrintArchiveCode:PrintArchiveCode,
-    //Prints:Prints
+    BatchUpdate:BatchUpdate,
     DataLayout:DataLayout,
     PrintPdf417:PrintPdf417,
     BatchImport:BatchImport,
@@ -643,6 +662,7 @@ export default {
       currentPage: 1,
       dialogVisible: false,
       propertyVisible: false,
+      batchUpdateVisible: false,
       mountParentDoc:true,
       showButton: true,
       selectedItems: [],
@@ -851,10 +871,10 @@ export default {
       let _self = this;
       let params = {
         URL: "/file/exportFolderPath",
-        gridName: _self.currentFolder.gridView,
+        gridName: _self.$refs.mainDataGrid.gridViewName,
         folderId: _self.currentFolder.id,
         orderBy: "MODIFIED_DATE desc",
-        pageSize: _self.pageSize,
+        pageSize: _self.pageSize*10,
         pageIndex: _self.currentPage - 1,
         lang: "zh-cn",
       };
