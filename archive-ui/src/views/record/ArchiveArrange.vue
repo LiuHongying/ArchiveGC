@@ -263,7 +263,7 @@
                         size="small"
                         title="挂载文件"
                         icon="el-icon-upload2"
-                        @click="beforeMount(selectedItems);uploadUrl='/dc/mountFile'"
+                        @click="beforeMount(selectedItems,true);uploadUrl='/dc/mountFile'"
                       >挂载文件</el-button>
                       </el-form-item>
                       <el-form-item>
@@ -466,6 +466,7 @@
                         gridViewName="ArrangeGrid"
                         @rowclick="beforeShowInnerFile"
                         @selectchange="selectChange"
+                        :showBatchCheck="true"
                       ></DataGrid>
                     </el-col>
                   </el-row>
@@ -492,7 +493,7 @@
                       plain
                       size="small"
                       title="挂载文件"
-                      @click="beforeMount(selectedInnerItems);uploadUrl='/dc/mountFile'"
+                      @click="beforeMount(selectedInnerItems,false);uploadUrl='/dc/mountFile'"
                     >挂载文件</el-button>
                     
                     <!--
@@ -531,6 +532,7 @@
                         :isShowChangeList="false"
                         :optionWidth = "2"
                         @selectchange="selectInnerChange"
+                        :showBatchCheck="true"
                       ></DataGrid>
                     </el-col>
                   </el-row>
@@ -641,6 +643,7 @@ export default {
       currentPage: 1,
       dialogVisible: false,
       propertyVisible: false,
+      mountParentDoc:true,
       showButton: true,
       selectedItems: [],
       selectedOutItems: [],
@@ -1375,8 +1378,9 @@ export default {
         });
     },
     //挂载
-    beforeMount(selrow) {
+    beforeMount(selrow, isParent) {
       let _self = this;
+      _self.mountParentDoc = isParent;
       _self.fileList = [];
       if (selrow.length!=1||selrow[0].ID == undefined) {
         //  _self.$message("请选择一条数据！");
@@ -1421,8 +1425,11 @@ export default {
         })
         .then(function(response) {
           _self.importdialogVisible = false;
-          // _self.refreshData();
-          _self.showInnerFile(_self.selectRow);
+          if( _self.mountParentDoc){
+            _self.searchItem();
+          }else{
+            _self.showInnerFile(_self.selectRow);
+          }
           // _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
           _self.$message({
             showClose: true,
@@ -2342,6 +2349,7 @@ export default {
         if(_self.$refs.leftDataGrid){
              _self.$refs.leftDataGrid.itemDataList = [];
           }
+          _self.pieceNumVisible = false;
         _self.searchItem();
       });
       
@@ -2372,6 +2380,7 @@ export default {
               type: "success"
             });
             _self.pieceNum=response.data.data;
+           
           } else {
             // _self.$message(response.data.message);
             _self.$message({
