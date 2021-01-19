@@ -70,6 +70,7 @@
             },
             methods:{
                 loadFormInfo(){
+                    this.$refs.ShowProperty.myItemId = this.parentId
                     this.$refs.ShowProperty.myTypeName=this.workflowObj.FORMNAME;
                     this.$refs.ShowProperty.loadFormInfo();
                 },
