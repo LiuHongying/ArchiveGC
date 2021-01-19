@@ -188,7 +188,7 @@ export default {
       leftStorageName: "PreArchiveftHeight",
       topStorageName: "PreArchiveTopHeight",
       // 非split pan 控制区域高度
-      startHeight: 135,
+      startHeight: 125,
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
@@ -197,7 +197,7 @@ export default {
       bottomHeight: 35,
 
       rightTableHeight: (window.innerHeight - 150) / 2,
-      asideHeight: window.innerHeight - 95,
+      asideHeight: window.innerHeight - 80,
       treeHight: window.innerHeight - 135,
       asideWidth: "100%",
 
@@ -244,10 +244,10 @@ export default {
   },
 
   created() {
-    setTimeout(() => {
-      this.topPercent = this.getStorageNumber(this.topStorageName, 60);
-      this.leftPercent = this.getStorageNumber(this.leftStorageName, 20);
-    }, 300);
+
+    this.topPercent = this.getStorageNumber(this.topStorageName, 60);
+    this.leftPercent = this.getStorageNumber(this.leftStorageName, 20);
+
   },
 
   mounted() {
@@ -259,6 +259,7 @@ export default {
     }
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
+    _self.topPercent = 65;
     _self.searchFolder();
   },
 

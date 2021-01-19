@@ -37,14 +37,27 @@ public class MoveFileToReorganizeListener implements TaskListener{
 	@Autowired
 	private AuditService auditService;
 	
+	
+	@Autowired
+	private FolderPathService folderPathService;
+	
+	@Autowired
+	private FolderService folderService;
+	
+	@Autowired
+	private AuthService authService;
+	
 
+	@Autowired
+	private Environment env;
+	
 	@Override
 	public void notify(DelegateTask task) {
 		// TODO Auto-generated method stub
 		if ("create".equals(task.getEventName())) {
 
 			// TODO Auto-generated method stub
-			/*
+			
 			IEcmSession session=EcmSessionFactory.getWorkflowSession(env, authService);
 			String token=session.getToken();
 			String formId= task.getVariable("formId").toString();
@@ -77,7 +90,7 @@ public class MoveFileToReorganizeListener implements TaskListener{
 					EcmSessionFactory.releaseSession(authService, session);
 				}
 			}
-			*/
+	
 		
 		}else if("complete".equals(task.getEventName())) {
 			String formId= task.getVariable("formId").toString();

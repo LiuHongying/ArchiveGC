@@ -474,16 +474,12 @@ export default {
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
-      topbarHeight: 45,
+      topbarHeight: 55,
       // 底部除列表高度
       bottomHeight: 35,
-
-      rightTableHeight: (window.innerHeight - 150) / 2,
-
       AddConds: "",
       innerTableHeight: window.innerHeight - 360,
-      tableHeight: window.innerHeight - 170,
-      asideHeight: window.innerHeight - 100,
+      asideHeight: window.innerHeight - 80,
       treeHeight: window.innerHeight - 120,
       asideWidth: "100%",
       currentLanguage: "zh-cn",
@@ -547,10 +543,8 @@ export default {
     };
   },
   created() {
-    setTimeout(() => {
-      this.topPercent = this.getStorageNumber(this.topStorageName, 60);
-      this.leftPercent = this.getStorageNumber(this.leftStorageName, 20);
-    }, 300);
+    this.topPercent = this.getStorageNumber(this.topStorageName, 60);
+    this.leftPercent = this.getStorageNumber(this.leftStorageName, 20);
     var username = sessionStorage.getItem("access-userName");
     let _self = this;
     axios.post("/user/getGroupByUserName", username).then(function (response) {
@@ -571,6 +565,7 @@ export default {
     }
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
+    _self.topPercent = 65;
     _self.search();
   },
   methods: {
@@ -579,7 +574,9 @@ export default {
       if (val == "文件") {
         _self.isFile = false;
         _self.topPercent = 99;
+        _self.startHeight = 145;
       } else {
+        _self.startHeight = 135;
         _self.isFile = true;
         _self.topPercent = 65;
         _self.$nextTick(() => {
@@ -823,14 +820,18 @@ export default {
           _self.itemDataList = response.data.data;
           _self.itemDataListFull = response.data.data;
           _self.itemCount = response.data.pager.total;
-          _self.tableHeight = window.innerHeight - 170;
+          //_self.tableHeight = window.innerHeight - 170;
           //console.log(JSON.stringify(response.data.datalist));
           _self.tableLoading = false;
-        });
+        }).catch(function(error) {
+        console.log(error);
+        _self.tableLoading = false;
+      });
     },
     //获取包含卷盒在内的所有信息
     loadAllGridData(indata) {
       let _self = this;
+      _self.tableLoading = true;
       var key = _self.sqlStringFilter(_self.inputkey);
       var m = new Map();
       m.set("gridName", indata.gridView);
@@ -846,8 +847,11 @@ export default {
           _self.itemDataListFull = response.data.data;
           _self.itemCount = response.data.pager.total;
           //console.log(JSON.stringify(response.data.datalist));
-          _self.loading = false;
-        });
+          _self.tableLoading = false;
+        }).catch(function(error) {
+        console.log(error);
+        _self.tableLoading = false;
+      });
     },
     selectChange(selection) {
       this.selectedItemList = [];
