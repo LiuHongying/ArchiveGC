@@ -124,27 +124,7 @@
       </div>
     </el-dialog>
     <el-dialog :title="$t('application.Import')" :visible.sync="importdialogVisible" width="70%">
-      <el-form size="mini" :label-width="formLabelWidth">
-        <div style="height:200px;overflow-y:scroll; overflow-x:scroll;">
-          <el-upload
-            :limit="100"
-            :file-list="fileList"
-            action
-            :on-change="handleChange"
-            :auto-upload="false"
-            :multiple="false"
-          >
-            <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
-          </el-upload>
-        </div>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="importdialogVisible = false">{{$t('application.cancel')}}</el-button>
-        <el-button
-          type="primary"
-          @click="uploadData(uploadID)"
-        >{{$t('application.start')+$t('application.Import')}}</el-button>
-      </div>
+      <BatchFileMount ref="BatchFileMount" @afterMountFile="afterMountFile"></BatchFileMount>
     </el-dialog>
 
     <el-dialog title="取批次号"
@@ -272,7 +252,7 @@
                         size="small"
                         title="挂载文件"
                         icon="el-icon-upload2"
-                        @click="beforeMount(selectedItems,true);uploadUrl='/dc/mountFile'"
+                        @click="beforeMount(selectedItems,true);"
                       >挂载文件</el-button>
                       </el-form-item>
                       <el-form-item>
@@ -510,7 +490,7 @@
                       plain
                       size="small"
                       title="挂载文件"
-                      @click="beforeMount(selectedInnerItems,false);uploadUrl='/dc/mountFile'"
+                      @click="beforeMount(selectedInnerItems,false);"
                     >挂载文件</el-button>
                     
                     <!--
@@ -585,13 +565,14 @@ import PrintPdf417 from "@/views/record/PrintPdf417.vue"
 import BatchImport from "@/components/controls/ImportDocument";
 import ExcelUtil from "@/utils/excel.js";
 import BatchUpdate from "@/views/record/BatchUpdate.vue" 
+import BatchFileMount from "@/views/record/BatchFileMount.vue" 
 
 export default {
   name: "ArchiveArrange",
   components: {
     ShowProperty: ShowProperty,
     TypeSelectComment:TypeSelectComment,
-    // PDFViewer: PDFViewer,
+    BatchFileMount: BatchFileMount,
     DataGrid: DataGrid,
     PrintPage: PrintPage,
     PrintVolumes: PrintVolumes,
@@ -1402,19 +1383,27 @@ export default {
     beforeMount(selrow, isParent) {
       let _self = this;
       _self.mountParentDoc = isParent;
-      _self.fileList = [];
-      if (selrow.length!=1||selrow[0].ID == undefined) {
-        //  _self.$message("请选择一条数据！");
+      if (selrow.length<1||selrow[0].ID == undefined) {
         _self.$message({
           showClose: true,
-          message: "请选择一条数据！",
+          message: "请至少勾选一条数据！",
           duration: 2000,
           type: "warning"
         });
         return;
       }
-      _self.uploadID = selrow[0].ID;
       _self.importdialogVisible = true;
+      setTimeout(()=>{
+        _self.$refs.BatchFileMount.archiveObjects = selrow;
+      },100);
+    },
+    //挂载成功触发事件
+    afterMountFile(){
+      if(this.mountParentDoc){
+        this.loadGridData(this.currentFolder);
+      }else{
+        this.showInnerFile(this.selectedRow);
+      }
     },
     getFormData(selId) {
       let _self = this;
