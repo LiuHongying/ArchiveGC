@@ -1068,7 +1068,7 @@ export default {
         });
       }
     },
-    //添加到借阅单
+    //添加到收藏夹
     addToShopingCart() {
       let _self = this;
       var m = new Map();

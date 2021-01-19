@@ -69,6 +69,16 @@
                 >
               </el-form-item>
               <el-form-item>
+                <el-button
+                  type="primary"
+                  plain
+                  size="medium"
+                  icon="el-icon-folder-add"
+                  @click="addToShopingCart()"
+                  >添加到收藏</el-button
+                >
+              </el-form-item>
+              <el-form-item>
                 <el-button type="primary" @click.native="exportData">{{
                   $t("application.ExportExcel")
                 }}</el-button>
@@ -478,6 +488,52 @@ export default {
       };
       console.log(params);
       ExcelUtil.export4Cnpe(params);
+    },
+
+        //添加到收藏夹
+    addToShopingCart() {
+      let _self = this;
+      var m = new Map();
+      var addItemId = "";
+      if (this.selectedItems.length > 0) {
+        var addItemId = [];
+        if (this.selectedItems.length > 0) {
+          for (var i = 0; i < this.selectedItems.length; i++) {
+            addItemId.push(this.selectedItems[i].ID);
+          }
+        }
+
+        axios
+          .post("/dc/addToShopingCart", JSON.stringify(addItemId))
+          .then(function (response) {
+            if (response.data.code) {
+              if (_self.showBox) {
+                _self.loadAllGridData(_self.currentFolder);
+              } else {
+                _self.loadGridData(_self.currentFolder);
+              }
+              _self.$message({
+                showClose: true,
+                message: _self.$t("message.AddSuccess"),
+                duration: 2000,
+                type: "success",
+              });
+            } else {
+              _self.$message({
+                showClose: true,
+                message: "添加失败!",
+                duration: 2000,
+                type: "warning",
+              });
+            }
+          });
+      } else {
+        this.$message({
+          showClose: true,
+          message: "请勾选待添加文件!",
+          duration: 2000,
+        });
+      }
     },
 
     penddingStorage() {
