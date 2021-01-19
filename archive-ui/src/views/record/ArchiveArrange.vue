@@ -12,11 +12,15 @@
         </el-row>
         <el-row style="padding:15px">
         <span>选择操作类型</span>
-        <el-select v-model="Choice" @change="changeType">
+        <el-select @change="onChoiceChange" v-model="Choice" >
           <div v-for="items in modifyOption">
               <el-option :label="items" :value="items"></el-option>
           </div>
           </el-select>
+        </el-row>
+        <el-row v-if="isMF" style="padding:15px">
+          <span >输入部分替换内容</span>
+          <el-input style="width:220px" v-model="MFinput"></el-input>
         </el-row>
         <el-row style="padding:15px">
           <span>输入修改内容</span>
@@ -24,6 +28,7 @@
         </el-row>
         <el-row style="padding:15px;padding-left:200px">
           <el-button @click="submitModify" type='primary' style="padding-left:200px">提交修改</el-button>
+          <el-button @click="close">取消</el-button>
         </el-row>
 
     </el-dialog>
@@ -506,6 +511,12 @@
                     -->
                     <el-button type="primary" plain size="small" title="上移" @click="onMoveUp()">上移</el-button>
                     <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
+                    <el-button
+                          type="primary"
+                          size="small"
+                          plain
+                          @click="beforeInnerModify()"
+                    >修改</el-button>
                     <el-button type="warning" plain size="small" title="删除"  @click="logicallyDel(selectedInnerItems,function(){
                           let _self=this;
                           if(_self.$refs.leftDataGrid){
@@ -712,7 +723,11 @@ export default {
       newChildDoc: false,
       hiddenInput:"hidden",
       AddConds:'',
-      volumeInArchiveGridName:""
+      volumeInArchiveGridName:"",
+      isInnerModify:false,
+      isModify:false,
+      isMF:false,
+      MFinput:""
     };
   },
   
@@ -754,6 +769,16 @@ export default {
       }, 100);
   },
   methods: {
+    onChoiceChange(){
+      if(this.Choice=='部分替换'){
+      this.isMF = true}
+      if(this.Choice!='部分替换'){
+        this.isMF = false
+      }
+    },
+    close(){
+      this.modifyVisible = false
+    },
     fileAttrsCopy(copyType){
       let _self = this;
       if(_self.currentFolder.id==undefined){
@@ -1493,18 +1518,23 @@ export default {
           _self.modifyOption=['全部替换']
           return
         }else if(item.controlType=='TextBox'||item.controlType=='TextArea'){
-          _self.modifyOption=['加前缀','加后缀','全部替换']
+          _self.modifyOption=['加前缀','加后缀','全部替换','部分替换']
         }
       }                 
       })
     },
-
     submitModify(){
       let ids = []
       let _self = this
       let attr=''
+      if(this.isModify==true){
       for(let i=0;i<this.selectedItems.length;i++){
         ids.push(this.selectedItems[i].ID)
+      }}
+      if(this.isInnerModify==true){
+        for(let i=0;i<this.selectedInnerItems.length;i++){
+        ids.push(this.selectedInnerItems[i].ID)
+      }
       }
       _self.objectSrc.forEach(item => {
         if(item.id==_self.resChoice) {        //找到对应字段了
@@ -1518,8 +1548,8 @@ export default {
       m.set("ids",ids)
       m.set("modifyType",this.Choice)
       m.set("attr",attr)
+      m.set("MFinput",_self.MFinput)
       if(this.isDates==true){
-        console.log(this.ChoiceInput)
          var r=this.ChoiceInput.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/); 
           if(r==null){
             this.$alert("请输入格式正确的日期\n\r日期格式：yyyy-mm-dd\n\r例    如：2021-01-01\n\r");
@@ -1543,6 +1573,7 @@ export default {
           _self.$message("修改成功！")
           _self.modifyVisible=false
           _self.$refs.mainDataGrid.loadGridData()
+          _self.$refs.leftDataGrid.loadGridData()
         }
         })
         .catch(function(error) {
@@ -1656,6 +1687,9 @@ export default {
       this.selectedOutItems = val;
     },
     selectInnerChange(val) {
+      this.ChoiceTypeName=''
+      this.ChoiceTypeName = val[0].TYPE_NAME
+      this.getTypeNamesByMainList(this.ChoiceTypeName)
       this.selectedInnerItems = val;
     },
     
@@ -1696,7 +1730,19 @@ export default {
       
       
     },
+    beforeInnerModify(){
+      this.isInnerModify = true
+      this.isModify = false
+      if(this.selectedInnerItems.length==0){
+        this.$message("请选择至少一条文件进行修改！")
+        return
+      }
+      this.modifyVisible = true
+      this.getTypeNamesByMainList(this.ChoiceTypeName)
+    },
     beforeModify(){
+      this.isModify = true
+      this.isInnerModify = false
       if(this.selectedItems.length==0){
         this.$message("请选择至少一条文件进行修改！")
         return
