@@ -64,7 +64,7 @@ public class Distribute {
 		order.addAttribute("C_HOST", mainReceiver);//主送
 		order.addAttribute("C_PARTICIPATION", subReceiver);//抄送
 		order.addAttribute("C_COPY_TO", reader);//阅知
-		order.addAttribute("C_FROM_CODING", sender);//发送人
+		order.addAttribute("C_FROM", sender);//发送人
 		order.setTypeName("分发单");
 		order.setStatus("新建");
 		documentService.newObject(token, order, null);
@@ -123,14 +123,14 @@ public class Distribute {
 				if(copyTos.length>0) {
 					users.addAll(Arrays.asList(copyTos));
 				}
-				List<Map<String,Object>> relations= relationService.getObjectMap(token,
-						" parent_id='"+order.getId()+"' and name='irel_children'");
+				String sql="select * from ecm_relation where parent_id='"+order.getId()+"' and name='irel_children'";
+				List<Map<String,Object>> relations= relationService.getMapList(token,sql );
 				if(relations!=null&&relations.size()>0) {
 					String childId= relations.get(0).get("CHILD_ID").toString();
 					EcmDocument docObj= documentService.getObjectById(token, childId);
 					
 					if(users.size()>1) {
-						distributeDataOption(token, docObj,order, hosts, participations, copyTos);
+						distributeDataOption(token, null,docObj,order, hosts, participations, copyTos);
 					}else if(users.size()==0){
 						documentService.grantUser(token, childId, users.get(0),
 								ObjectPermission.BROWSER, new Date());
@@ -157,7 +157,7 @@ public class Distribute {
 	 * @throws Exception 
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	public EcmDocument distributeDataOption(String token,EcmDocument docObj,EcmDocument parentOrder,
+	public EcmDocument distributeDataOption(String token,String sender,EcmDocument docObj,EcmDocument parentOrder,
 			String[] hosts,String[] participations,String[] copytos) throws Exception {
 		for(int i=0;hosts!=null&&i<hosts.length;i++) {
 			EcmDocument order = new EcmDocument();
@@ -165,9 +165,10 @@ public class Distribute {
 			String dt= df.format(new Date());
 			order.setName(docObj.getName()+"的分发单，分发日期"+dt);
 			order.addAttribute("C_HOST", hosts[i]);//主送
-			order.addAttribute("C_FROM_CODING", parentOrder.getAttributeValue("C_FROM_CODING"));//发送人
+			order.addAttribute("C_FROM", 
+					(sender==null||"".equals(sender))?parentOrder.getAttributeValue("C_FROM"):sender);//发送人
 			order.setTypeName("分发单");
-			order.setStatus("新建");
+			order.setStatus("已生效");
 			documentService.grantUser(token, docObj.getId(), hosts[i],
 					ObjectPermission.BROWSER, new Date());
 			distributeOrder(token, order, parentOrder.getId(), docObj.getId());
@@ -180,9 +181,9 @@ public class Distribute {
 			String dt= df.format(new Date());
 			order.setName(docObj.getName()+"的分发单，分发日期"+dt);
 			order.addAttribute("C_PARTICIPATION", participations[i]);//抄送
-			order.addAttribute("C_FROM_CODING", parentOrder.getAttributeValue("C_FROM_CODING"));//发送人
+			order.addAttribute("C_FROM", parentOrder.getAttributeValue("C_FROM"));//发送人
 			order.setTypeName("分发单");
-			order.setStatus("新建");
+			order.setStatus("已生效");
 			documentService.grantUser(token, docObj.getId(), participations[i],
 					ObjectPermission.BROWSER, new Date());
 			distributeOrder(token, order,  parentOrder.getId(), docObj.getId());
@@ -194,9 +195,9 @@ public class Distribute {
 			String dt= df.format(new Date());
 			order.setName(docObj.getName()+"的分发单，分发日期"+dt);
 			order.addAttribute("C_COPY_TO", copytos[i]);//阅知
-			order.addAttribute("C_FROM_CODING", parentOrder.getAttributeValue("C_FROM_CODING"));//发送人
+			order.addAttribute("C_FROM", parentOrder.getAttributeValue("C_FROM"));//发送人
 			order.setTypeName("分发单");
-			order.setStatus("新建");
+			order.setStatus("已生效");
 			documentService.grantUser(token, docObj.getId(), copytos[i],
 					ObjectPermission.BROWSER, new Date());
 			distributeOrder(token, order,  parentOrder.getId(), docObj.getId());
@@ -216,7 +217,17 @@ public class Distribute {
 		
 	}
 	
-
+	/**
+	 * 母单
+	 * @param token
+	 * @param doc 文件对象
+	 * @return
+	 * @throws Exception
+	 */
+	public EcmDocument orderForMainDistribution(String token,String docId) throws Exception {
+		EcmDocument doc=documentService.getObjectById(token, docId);
+		return orderForMainDistribution(token,doc);
+	}
 	
 	/**
 	 * 母单
@@ -227,9 +238,9 @@ public class Distribute {
 	 */
 	public EcmDocument orderForMainDistribution(String token,EcmDocument doc) throws Exception {
 		return orderForMainDistribution(token,doc,
-				doc.getAttributeValue("C_FROM_CODING"),
-				doc.getAttributeValue("C_COMMENT"),
-				doc.getAttributeValue("C_COMMENT1"),
+				doc.getAttributeValue("C_FROM"),
+				doc.getAttributeValue("C_HOST"),
+				doc.getAttributeValue("C_PARTICIPATION"),
 				doc.getAttributeValue("C_COPY_TO")
 				);
 	}

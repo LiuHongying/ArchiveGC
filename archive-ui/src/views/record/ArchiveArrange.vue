@@ -105,6 +105,15 @@
     </el-dialog>
 
     <el-dialog
+      title="属性批量更新"
+      width="50%"
+      :visible="batchUpdateVisible"
+      @close="batchUpdateVisible=false"
+    >
+      <BatchUpdate></BatchUpdate>
+    </el-dialog>
+
+    <el-dialog
       title="打印档号"
       width="43%"
       :visible="printArchiveCodeVisible"
@@ -263,7 +272,7 @@
                         size="small"
                         title="挂载文件"
                         icon="el-icon-upload2"
-                        @click="beforeMount(selectedItems);uploadUrl='/dc/mountFile'"
+                        @click="beforeMount(selectedItems,true);uploadUrl='/dc/mountFile'"
                       >挂载文件</el-button>
                       </el-form-item>
                       <el-form-item>
@@ -435,6 +444,14 @@
                           plain
                           @click="beforeModify()"
                         >修改</el-button>
+                       </el-form-item>
+                      <el-form-item>
+                        <el-button
+                          type="primary"
+                          size="small"
+                          plain
+                          @click="batchUpdateVisible=true"
+                        >更新</el-button>
                       </el-form-item>
                       <el-form-item>
                         <el-button type="primary"
@@ -466,6 +483,7 @@
                         gridViewName="ArrangeGrid"
                         @rowclick="beforeShowInnerFile"
                         @selectchange="selectChange"
+                        :showBatchCheck="true"
                       ></DataGrid>
                     </el-col>
                   </el-row>
@@ -492,7 +510,7 @@
                       plain
                       size="small"
                       title="挂载文件"
-                      @click="beforeMount(selectedInnerItems);uploadUrl='/dc/mountFile'"
+                      @click="beforeMount(selectedInnerItems,false);uploadUrl='/dc/mountFile'"
                     >挂载文件</el-button>
                     
                     <!--
@@ -535,6 +553,7 @@
                         :isShowChangeList="false"
                         :optionWidth = "2"
                         @selectchange="selectInnerChange"
+                        :showBatchCheck="true"
                       ></DataGrid>
                     </el-col>
                   </el-row>
@@ -569,6 +588,8 @@ import PrintCoverpage from "@/views/record/PrintCoverpage.vue"
 import PrintPdf417 from "@/views/record/PrintPdf417.vue"
 import BatchImport from "@/components/controls/ImportDocument";
 import ExcelUtil from "@/utils/excel.js";
+import BatchUpdate from "@/views/record/BatchUpdate.vue" 
+
 export default {
   name: "ArchiveArrange",
   components: {
@@ -582,7 +603,7 @@ export default {
     PreparationTablePrint:PreparationTablePrint,
     PrintBarCode:PrintBarCode,
     PrintArchiveCode:PrintArchiveCode,
-    //Prints:Prints
+    BatchUpdate:BatchUpdate,
     DataLayout:DataLayout,
     PrintPdf417:PrintPdf417,
     BatchImport:BatchImport,
@@ -645,6 +666,8 @@ export default {
       currentPage: 1,
       dialogVisible: false,
       propertyVisible: false,
+      batchUpdateVisible: false,
+      mountParentDoc:true,
       showButton: true,
       selectedItems: [],
       selectedOutItems: [],
@@ -859,10 +882,11 @@ export default {
       let _self = this;
       let params = {
         URL: "/file/exportFolderPath",
-        gridName: _self.currentFolder.gridView,
+        gridName: _self.$refs.mainDataGrid.gridViewName,
         folderId: _self.currentFolder.id,
         orderBy: "MODIFIED_DATE desc",
-        pageSize: _self.pageSize,
+        condition: "IS_HIDDEN=0",
+        pageSize: _self.pageSize*10,
         pageIndex: _self.currentPage - 1,
         lang: "zh-cn",
       };
@@ -1386,8 +1410,9 @@ export default {
         });
     },
     //挂载
-    beforeMount(selrow) {
+    beforeMount(selrow, isParent) {
       let _self = this;
+      _self.mountParentDoc = isParent;
       _self.fileList = [];
       if (selrow.length!=1||selrow[0].ID == undefined) {
         //  _self.$message("请选择一条数据！");
@@ -1432,8 +1457,11 @@ export default {
         })
         .then(function(response) {
           _self.importdialogVisible = false;
-          // _self.refreshData();
-          _self.showInnerFile(_self.selectRow);
+          if( _self.mountParentDoc){
+            _self.searchItem();
+          }else{
+            _self.showInnerFile(_self.selectRow);
+          }
           // _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
           _self.$message({
             showClose: true,
@@ -2392,6 +2420,7 @@ export default {
         if(_self.$refs.leftDataGrid){
              _self.$refs.leftDataGrid.itemDataList = [];
           }
+          _self.pieceNumVisible = false;
         _self.searchItem();
       });
       
@@ -2422,6 +2451,7 @@ export default {
               type: "success"
             });
             _self.pieceNum=response.data.data;
+           
           } else {
             // _self.$message(response.data.message);
             _self.$message({

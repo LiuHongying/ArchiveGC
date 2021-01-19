@@ -1,17 +1,11 @@
 <template>
   <div>
-    <div class="navbar">
-      <el-breadcrumb>
-        <el-breadcrumb-item>{{$t('route.fileManage')}}</el-breadcrumb-item>
-        <el-breadcrumb-item>{{$t('route.batchUpdate')}}</el-breadcrumb-item>
-      </el-breadcrumb>
-    </div>
     <div>
       <el-form label-width="120px" v-loading="loading" @submit.native.prevent>
         <el-row > 
           <el-col :span="24" style="float: left;text-align:left;">
             <br>
-            &nbsp; &nbsp; 批量更新的Excel文件为库存档案Excel导出结果，修改需要更新属性值，删除不需要修改属性列（ID列不能删除）。
+            &nbsp; &nbsp; 批量更新的Excel文件为Excel导出结果，修改需要更新属性值，删除不需要修改属性列（ID列不能删除）,空值不处理。
             <br>
             <br>
           </el-col>

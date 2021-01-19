@@ -36,6 +36,11 @@
           <el-button type="primary" @click="submit('主表')">出库</el-button>
         </el-form-item>
         <el-form-item>
+        <el-button type="primary" @click.native="exportData">{{
+            $t("application.ExportExcel")
+          }}</el-button>
+        </el-form-item>
+        <el-form-item>
           <el-button
             type="primary"
             size="small"
@@ -163,6 +168,7 @@
 import DataGrid from "@/components/DataGrid";
 import DataLayout from "@/components/ecm-data-layout";
 import PrintVolumes from "@/views/record/Print4Borrow";
+import ExcelUtil from "@/utils/excel.js";
 export default {
   name: "TC",
   data() {
@@ -199,6 +205,39 @@ export default {
     this.search();
   },
   methods: {
+      exportData() {
+      let condition1 =
+        "SELECT CHILD_ID from ecm_relation where PARENT_ID ='" +this.parentId +"'";
+      let finalCondition = ""
+      let resName = ""
+      var fileDate = new Date();
+      let fileDateStr =
+        fileDate.getFullYear() +
+        "" +
+        fileDate.getMonth() +
+        "" +
+        fileDate.getDate();
+      if(this.activeName=='ArchivePendingOut'){
+        let key1 = "ID IN (" + condition1 + ") AND STATUS='待出库'";
+        finalCondition = key1
+        resName="待出库清单"
+      }
+      else if(this.activeName=='ArchivePending'){
+        let key2 = "ID IN (" + condition1 + ") AND STATUS='待入库'";
+        finalCondition = key2
+        resName="待入库清单"
+      }
+      let params = {
+        gridName: "FormDcGrid",
+        lang: "zh-cn",
+        condition: finalCondition,
+        filename: "待出库清单_" + fileDateStr + ".xlsx",
+        sheetname: resName,
+      };
+      ExcelUtil.export(params);
+    },
+
+
     beforePrint(selectedRow,gridName,vtitle){
       let _self=this;
       let ids =[]
@@ -225,7 +264,6 @@ export default {
               });
         return;
       }
-      console.log(this.$refs.PrintVolumes)
       _self.printVolumesVisible = true;
 
       setTimeout(()=>{
@@ -446,7 +484,8 @@ export default {
   components: {
     DataGrid: DataGrid,
     DataLayout: DataLayout,
-    PrintVolumes:PrintVolumes
+    PrintVolumes:PrintVolumes,
+    ExcelUtil:ExcelUtil
   },
 };
 </script>

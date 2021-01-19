@@ -653,6 +653,16 @@ public class ArchiveDcController extends ControllerAbstract{
 					if(pdata!=null&&pdata.size()>0) {
 						String parentId= pdata.get(0).get("parent_id").toString();
 						EcmDocument archiveObj= documentService.getObjectById(getToken(), parentId);
+						//设置案卷版本为最高版本
+						if(!StringUtils.isEmpty(doc.getRevision())) {
+							if(!StringUtils.isEmpty(archiveObj.getRevision())) {
+								if(archiveObj.getRevision().toUpperCase().compareTo(doc.getRevision().toUpperCase())<0) {
+									archiveObj.setRevision(doc.getRevision());
+								}
+							}else {
+								archiveObj.setRevision(doc.getRevision());
+							}
+						}
 						fetchInfo(getToken(), archiveObj);
 					}
 					
