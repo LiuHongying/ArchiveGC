@@ -10,11 +10,11 @@
       width="70%"
     >
       <el-row>
-        <el-col>
+        <el-col v-if="showFileType">
           {{$t('application.pleaseSelect')}}{{$t('application.type')}}
           <font style="color:red;">*</font>：
         </el-col>
-        <el-col>
+        <el-col v-if="showFileType">
           <el-select v-model="typeName" @change="refreshData(typeName)">
             <div v-for="options in typeNameOptions">
               <el-option :label="options" :value="options"></el-option>
@@ -205,6 +205,10 @@ export default {
       type: String,
       default: "所有",
     },
+    showFileType:{
+      type: Boolean,
+      default: true
+    }
   },
 
   methods: {

@@ -511,6 +511,9 @@
                             }
                           _self.loadGridData(_self.currentFolder);
                         })">{{$t('application.delete')}}</el-button>
+                    <template style="float: right;text-align:right;padding-left:5px;">
+                      <AddCondition ref="childAddCondition" v-model="childAddConds" :inputType="hiddenInput" :showFileType= false :typeName='childTypeName' @change="searchChildItem"></AddCondition>
+                    </template>
                   </el-row>
                   <el-row>
                     <el-col :span="24">
@@ -518,13 +521,14 @@
                         ref="leftDataGrid"
                         key="left"
                         @rowclick="selectOneFile"
-                        dataUrl="/dc/getDocuByRelationParentId"
+                        :dataUrl="leftParam.childUrl"
                         gridViewName='ArrangeInnerGrid'
-                        condition="and a.NAME='irel_children' and b.IS_HIDDEN=0"
+                        :condition="leftParam.childCondition"
                         :parentId="parentId"
                         v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
                         :isshowOption="true"
                         :isshowSelection="true"
+                        :folderId="mainParam.folderId"
                         showOptions="查看内容"
                         :isShowChangeList="false"
                         :optionWidth = "2"
@@ -716,6 +720,13 @@ export default {
       newChildDoc: false,
       hiddenInput:"hidden",
       AddConds:'',
+      childAddConds:'',
+      childTypeName:'',
+      leftParam:{
+        childUrl:'/dc/getDocuByRelationParentId',
+        childCondition:"and a.NAME='irel_children' and b.IS_HIDDEN=0",
+      },
+      
       volumeInArchiveGridName:""
     };
   },
@@ -1592,8 +1603,37 @@ export default {
       // let keys = Object.keys(row)
       // console.log(row.TYPE_NAME)
       // this.getTypeNamesByMainList(row.TYPE_NAME)
+      let _self = this;
       this.innerSelectedOne = [];
+      _self.leftParam.childCondition = "and a.NAME='irel_children' and b.IS_HIDDEN=0"
+      _self.leftParam.childUrl = "/dc/getDocuByRelationParentId"
       this.showInnerFile(row);
+      if (row != null) {
+        if(row.C_ITEM_TYPE!='案卷'){
+          _self.childTypeName = '所有'
+        }else{
+          _self.getChildType(row.TYPE_NAME);
+          console.log(_self.childTypeName)
+          _self.$refs.childAddCondition.loadColumnInfo(_self.childTypeName);
+        }
+      }
+    },
+    //获取卷盒下的文件类型
+    getChildType(fileType){
+      let _self = this;
+      axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: fileType,
+          url: "/dc/getBoxChildType"
+        }).then(function(response){
+          _self.childTypeName = response.data.data
+          console.log(_self.childTypeName)
+        }).catch(function(error){
+          console.log(error)
+        })
     },
     showInnerFile(row) {
       let _self = this;
@@ -2101,7 +2141,17 @@ export default {
       this.loadGridData(this.currentFolder);
       //  this. loadPageInfo(this.currentFolder);
     },
-    
+    searchChildItem(){
+      let _self = this;
+      console.log(_self.childAddConds)
+      var parentCond = ' and id in (select child_id from ecm_relation where parent_id='+"'"+_self.selectRow.ID+"'"+')';
+      var childCondition = _self.childAddConds+parentCond+' and IS_HIDDEN=0';
+      //_self.leftParam.childCondition = _self.childAddConds+parentCond+' and IS_HIDDEN=0';
+      //_self.leftParam.childUrl = "/dc/getInnerFolderDocuments"
+      _self.$refs.leftDataGrid.condition = childCondition;
+      _self.$refs.leftDataGrid.dataUrl = "/dc/getInnerFolderDocuments";
+      _self.$refs.leftDataGrid.loadGridData();
+    },
     penddingStorage(){
       let _self=this;
       if (_self.selectedItems.length == 0) {

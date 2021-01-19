@@ -152,6 +152,29 @@ public class ArchiveDcController extends ControllerAbstract{
 		return mp;
 		
 	}
+	/**
+	 * 根据配置获取卷盒下的文件类型
+	 * @param argStr
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/dc/getBoxChildType", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> getBoxChildTypeName(@RequestBody String argStr) throws Exception {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		if(argStr!=null) {
+			String typeName=argStr.toString();
+			AttrCopyCfgEntity en = customCacheService.getAttrCopyCfg(getToken(), typeName,false);
+			if(en!=null) {
+				mp.put("data", en.getToType());
+				mp.put("code", ActionContext.SUCESS);
+			}else {
+				mp.put("data", "");
+				mp.put("code", ActionContext.FAILURE);
+			}
+		}
+		return mp;
+	}
 	
 	@RequestMapping(value = "/dc/getDocConfig", method = RequestMethod.POST)
 	@ResponseBody
