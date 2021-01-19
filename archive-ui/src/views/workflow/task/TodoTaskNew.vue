@@ -1,5 +1,5 @@
 <template>
-    <div>
+  <div>
     <el-dialog
       :title="dialogTitle"
       :visible.sync="dialogVisible"
@@ -9,7 +9,7 @@
       custom-class="customWidth"
     >
       <el-form style="padding-bottom:30px">
-          <el-form-item
+        <el-form-item
           label="流程名称:"
           :label-width="formLabelWidth"
           style="float:left"
@@ -31,60 +31,61 @@
         >{{datetimeFormat(currentData.createTime,'')}}</el-form-item>
       </el-form>
       <!-- <el-divider content-position="left">表单信息</el-divider> -->
-      <div id='print' ref='print' style="height:100%;">
-      <component style="width:100%"
-        ref="propertiesComp"
-        :is="taskName"
-        v-model="formData"
-        :formId="form.formId"
-        :allowEdit="allowEdit"
-        :docId="form.formId"
-        :taskForm="formData"
-        :istask="1"
-        :formParameter="formParameter"
-        :processDefinitionId="currentData.processDefinitionId"
-        :activityName="currentData.name"
-        :formEditPermision="formEditPermision"
-        :formEnableType="this.$options.name"
-        :isShowReject="isShowReject"
-        @click="click"
-      ></component>
+      <div id="print" ref="print" style="height:100%;">
+        <component
+          style="width:100%"
+          ref="propertiesComp"
+          :is="taskName"
+          v-model="formData"
+          :formId="form.formId"
+          :allowEdit="allowEdit"
+          :docId="form.formId"
+          :taskForm="formData"
+          :istask="1"
+          :formParameter="formParameter"
+          :processDefinitionId="currentData.processDefinitionId"
+          :activityName="currentData.name"
+          :formEditPermision="formEditPermision"
+          :formEnableType="this.$options.name"
+          :isShowReject="isShowReject"
+          @click="click"
+        ></component>
 
-      <el-divider content-position="left">流转意见</el-divider>
-      <el-table :data="taskList" border v-loading="loading" style="width: 100%">
-        <el-table-column label="序号" width="65">
-          <template slot-scope="scope">
-            <div v-if="scope.row.endTime==null||scope.row.endTime==''">
-              <el-tooltip class="item" effect="light" content="未完成" placement="right">
-                <el-button type="success" round>{{scope.$index+1}}</el-button>
-              </el-tooltip>
-            </div>
-            <div v-else>
-              <el-tooltip class="item" effect="light" content="已完成" placement="right">
-                <el-button type="info" round>{{scope.$index+1}}</el-button>
-              </el-tooltip>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="name" label="名称" width="160"></el-table-column>
-        <el-table-column prop="assignee" label="用户" width="100"></el-table-column>
-        <el-table-column
-          prop="createTime"
-          label="开始时间"
-          sortable
-          :formatter="dateFormatter"
-          width="180"
-        ></el-table-column>
-        <el-table-column
-          prop="endTime"
-          label="完成时间"
-          sortable
-          :formatter="dateFormatter"
-          width="180"
-        ></el-table-column>
-        <el-table-column prop="result" label="完成结果" width="100"></el-table-column>
-        <el-table-column prop="message" label="审批意见" min-width="15%"></el-table-column>
-      </el-table>
+        <el-divider content-position="left">流转意见</el-divider>
+        <el-table :data="taskList" border v-loading="loading" style="width: 100%">
+          <el-table-column label="序号" width="65">
+            <template slot-scope="scope">
+              <div v-if="scope.row.endTime==null||scope.row.endTime==''">
+                <el-tooltip class="item" effect="light" content="未完成" placement="right">
+                  <el-button type="success" round>{{scope.$index+1}}</el-button>
+                </el-tooltip>
+              </div>
+              <div v-else>
+                <el-tooltip class="item" effect="light" content="已完成" placement="right">
+                  <el-button type="info" round>{{scope.$index+1}}</el-button>
+                </el-tooltip>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="name" label="名称" width="160"></el-table-column>
+          <el-table-column prop="assignee" label="用户" width="100"></el-table-column>
+          <el-table-column
+            prop="createTime"
+            label="开始时间"
+            sortable
+            :formatter="dateFormatter"
+            width="180"
+          ></el-table-column>
+          <el-table-column
+            prop="endTime"
+            label="完成时间"
+            sortable
+            :formatter="dateFormatter"
+            width="180"
+          ></el-table-column>
+          <el-table-column prop="result" label="完成结果" width="100"></el-table-column>
+          <el-table-column prop="message" label="审批意见" min-width="15%"></el-table-column>
+        </el-table>
       </div>
       <el-divider content-position="left">批注意见</el-divider>
       <el-form :model="form">
@@ -127,7 +128,7 @@
           <el-row></el-row>
         </div>
       </el-form>
-      
+
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogVisible = false">{{$t('application.cancel')}}</el-button>
         <el-button
@@ -136,40 +137,40 @@
         >{{delegateButton}}</el-button>
         <el-button @click="claim(currentData)">认领任务</el-button>
         <el-button @click="completetask(form)">完成任务</el-button>
-  　　　 <button @click="printCode" v-print="'#print'">打印</button>
+        <button @click="printCode" v-print="'#print'">打印</button>
       </div>
     </el-dialog>
     <el-row>
       <el-form ref="workflowForm" :model="workflowForm">
-          <el-form-item label="流程名称" :label-width="formLabelWidth" style="float:left">
-              <el-select v-model="workflowForm.workflowName" @change="changeJobNames()">
-                <div v-for="item in workflowNames" :key="item.id" >
-                  <el-option :label="item.name" :value="item.id"></el-option>
-                </div>
-              </el-select>
-          </el-form-item>
-          <el-form-item label="任务名称" :label-width="formLabelWidth" style="float:left">
-              <el-select v-model="workflowForm.jobName">
-                <div v-for="item in jobNames" :key="item.id" >
-                  <el-option :label="item.activityName" :value="item.activityName"></el-option>
-                </div>
-              </el-select>
-          </el-form-item>
-          <el-form-item label="到达时间" :label-width="formLabelWidth" style="float:left">
-              <el-date-picker
-                v-model="workflowForm.startTimeAfter"
-                auto-complete="off"
-                value-format="yyyy-MM-dd HH:mm:ss"
-              ></el-date-picker>
-              <el-date-picker
-                v-model="workflowForm.startTimeBefore"
-                auto-complete="off"
-                value-format="yyyy-MM-dd HH:mm:ss"
-              ></el-date-picker>
-            </el-form-item>
-            <el-form-item style="float:left;padding-left:3px">
-              <el-button type="primary" :plain="true" size="small" @click="search()">查询</el-button>
-            </el-form-item>
+        <el-form-item label="流程名称" :label-width="formLabelWidth" style="float:left">
+          <el-select v-model="workflowForm.workflowName" @change="changeJobNames()">
+            <div v-for="item in workflowNames" :key="item.id">
+              <el-option :label="item.name" :value="item.id"></el-option>
+            </div>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="任务名称" :label-width="formLabelWidth" style="float:left">
+          <el-select v-model="workflowForm.jobName">
+            <div v-for="item in jobNames" :key="item.id">
+              <el-option :label="item.activityName" :value="item.activityName"></el-option>
+            </div>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="到达时间" :label-width="formLabelWidth" style="float:left">
+          <el-date-picker
+            v-model="workflowForm.startTimeAfter"
+            auto-complete="off"
+            value-format="yyyy-MM-dd HH:mm:ss"
+          ></el-date-picker>
+          <el-date-picker
+            v-model="workflowForm.startTimeBefore"
+            auto-complete="off"
+            value-format="yyyy-MM-dd HH:mm:ss"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item style="float:left;padding-left:3px">
+          <el-button type="primary" :plain="true" size="small" @click="search()">查询</el-button>
+        </el-form-item>
       </el-form>
     </el-row>
     <el-table
@@ -214,7 +215,6 @@
       :total="itemCount"
     ></el-pagination>
   </div>
-    </div>
 </template>
 
 <script type="text/javascript">
@@ -229,24 +229,24 @@ import borrow1 from "@/components/form/Borrow1.vue";
 import CommonView from "@/views/workflow/CommonView.vue";
 import CommonViewRelyDocType from "@/views/workflow/CommonViewRelyDocType.vue";
 import CommonViewRelyFolder from "@/views/workflow/CommonViewRelyFolder.vue";
-import DeliverFormTask from "@/views/workflow/DeliverFormTask.vue"
+import DeliverFormTask from "@/views/workflow/DeliverFormTask.vue";
 import UpdateDocContent from "@/views/workflow/LinkMainAttachmentFile.vue";
 import UpdateDocContentByReviewer from "@/views/workflow/LinkMainAttachmentFileByReviewer.vue";
-import BorrowView from "@/views/workflow/BorrowView.vue"
-import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
-import CancelView from "@/views/workflow/CancelView.vue"
-import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue"
-import DesignCancelViewReadOnly from "@/views/workflow/DesignCancelViewReadOnly.vue"
-import DesignCancelView from "@/views/workflow/DesignCancelView.vue"
-import ViewDocNpc from "@/views/npc/ViewDocNpc.vue"
-import AppraisalView from "@/views/workflow/AppraisalView.vue"
-import AppraisalViewReadOnly from "@/views/workflow/AppraisalViewReadOnly.vue"
-import DestoryStartUp from "@/views/workflow/DestoryStartUp.vue"
-import DestoryViewReadOnly from "@/views/workflow/DestoryViewReadOnly.vue"
-import ViolationStartUp from "@/views/workflow/ViolationStartUp.vue"
-import ViolationViewReadOnly from "@/views/workflow/ViolationViewReadOnly.vue"
-import DestoryViewUpdate from "@/views/workflow/DestoryViewUpdate.vue"
-import BorrowViewPrint from "@/views/workflow/BorrowViewPrint.vue"
+import BorrowView from "@/views/workflow/BorrowView.vue";
+import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue";
+import CancelView from "@/views/workflow/CancelView.vue";
+import CancelViewReadOnly from "@/views/workflow/CancelViewReadOnly.vue";
+import DesignCancelViewReadOnly from "@/views/workflow/DesignCancelViewReadOnly.vue";
+import DesignCancelView from "@/views/workflow/DesignCancelView.vue";
+import ViewDocNpc from "@/views/npc/ViewDocNpc.vue";
+import AppraisalView from "@/views/workflow/AppraisalView.vue";
+import AppraisalViewReadOnly from "@/views/workflow/AppraisalViewReadOnly.vue";
+import DestoryStartUp from "@/views/workflow/DestoryStartUp.vue";
+import DestoryViewReadOnly from "@/views/workflow/DestoryViewReadOnly.vue";
+import ViolationStartUp from "@/views/workflow/ViolationStartUp.vue";
+import ViolationViewReadOnly from "@/views/workflow/ViolationViewReadOnly.vue";
+import DestoryViewUpdate from "@/views/workflow/DestoryViewUpdate.vue";
+import BorrowViewPrint from "@/views/workflow/BorrowViewPrint.vue";
 export default {
   name: "TodoTask",
   permit: 1,
@@ -259,31 +259,30 @@ export default {
     CommonView: CommonView,
     UpdateDocContent: UpdateDocContent,
     UpdateDocContentByReviewer: UpdateDocContentByReviewer,
-    DeliverFormTask:DeliverFormTask,
-    BorrowViewReadOnly:BorrowViewReadOnly,
-    BorrowView:BorrowView,
-    CommonViewRelyDocType:CommonViewRelyDocType,
+    DeliverFormTask: DeliverFormTask,
+    BorrowViewReadOnly: BorrowViewReadOnly,
+    BorrowView: BorrowView,
+    CommonViewRelyDocType: CommonViewRelyDocType,
     CommonViewRelyFolder: CommonViewRelyFolder,
-    CancelView:CancelView,
-    CancelViewReadOnly : CancelViewReadOnly,
-    DesignCancelView:DesignCancelView,
-    DesignCancelViewReadOnly:DesignCancelViewReadOnly,
-    ViewDocNpc:ViewDocNpc,
-    AppraisalViewReadOnly:AppraisalViewReadOnly,
-    AppraisalView:AppraisalView,
-    DestoryStartUp:DestoryStartUp,
-    DestoryViewReadOnly:DestoryViewReadOnly,
-    ViolationStartUp:ViolationStartUp,
-    ViolationViewReadOnly:ViolationViewReadOnly,
-    DestoryViewUpdate:DestoryViewUpdate,
-    BorrowViewPrint:BorrowViewPrint
-
+    CancelView: CancelView,
+    CancelViewReadOnly: CancelViewReadOnly,
+    DesignCancelView: DesignCancelView,
+    DesignCancelViewReadOnly: DesignCancelViewReadOnly,
+    ViewDocNpc: ViewDocNpc,
+    AppraisalViewReadOnly: AppraisalViewReadOnly,
+    AppraisalView: AppraisalView,
+    DestoryStartUp: DestoryStartUp,
+    DestoryViewReadOnly: DestoryViewReadOnly,
+    ViolationStartUp: ViolationStartUp,
+    ViolationViewReadOnly: ViolationViewReadOnly,
+    DestoryViewUpdate: DestoryViewUpdate,
+    BorrowViewPrint: BorrowViewPrint
   },
   data() {
     return {
-      workflowNames:[],
-      jobNames:[],
-      sequenceName:'',
+      workflowNames: [],
+      jobNames: [],
+      sequenceName: "",
       currentData: [],
       taskName: "",
       taskTableData: [],
@@ -317,13 +316,13 @@ export default {
       rejectButton: "驳回",
       allowEdit: false,
       sequenceFlow: [],
-      isShowReject:false,
-      formParameter:{},
+      isShowReject: false,
+      formParameter: {},
       workflowForm: {
         workflowName: "",
-        jobName:"",
-        startTimeAfter:"",
-        startTimeBefore:""
+        jobName: "",
+        startTimeAfter: "",
+        startTimeBefore: ""
       }
     };
   },
@@ -337,18 +336,18 @@ export default {
     _self.refreshData();
   },
   methods: {
-    printCode(){
-    this.$print(this.$refs.print)
+    printCode() {
+      this.$print(this.$refs.print);
     },
     click(value) {
-      if(value.get("metaData")){
+      if (value.get("metaData")) {
         this.formData = value.get("metaData");
-      }else{
-        this.formData=value;
+      } else {
+        this.formData = value;
       }
-      
+
       this.taskForm = value.get("metaData");
-      console.log(this.taskForm)
+      console.log(this.taskForm);
     },
     refreshData() {
       let _self = this;
@@ -431,24 +430,23 @@ export default {
       //       _self.$refs.propertiesComp.saveCurrentForm();
       //       break;
       //   }
-        // if(_self.currentData.processDefinitionId.split(":")[0]=="BianJiaoShenPi"){
-          try{
-            
-            _self.$refs.propertiesComp.sendData();
-          }catch(e){
-            _self.completetaskFinal(_self);
-            return;
-          }
-        let docMap = _self.getFormdataMap();
-        axios
-          .post("/dc/saveDocument", docMap)
-          .then(function(response) {
-            _self.completetaskFinal(_self);
-          })
-          .catch(function(error) {
-            console.log(error);
-            _self.loading = false;
-          });
+      // if(_self.currentData.processDefinitionId.split(":")[0]=="BianJiaoShenPi"){
+      try {
+        _self.$refs.propertiesComp.sendData();
+      } catch (e) {
+        _self.completetaskFinal(_self);
+        return;
+      }
+      let docMap = _self.getFormdataMap();
+      axios
+        .post("/dc/saveDocument", docMap)
+        .then(function(response) {
+          _self.completetaskFinal(_self);
+        })
+        .catch(function(error) {
+          console.log(error);
+          _self.loading = false;
+        });
       // } else {
       //   _self.completetaskFinal(_self);
       // }
@@ -547,22 +545,24 @@ export default {
         var m = new Map();
         m.set("processDefinitionId", indata.processDefinitionId);
         m.set("activityName", indata.name);
-        m.set("taskId",indata.id);
+        m.set("taskId", indata.id);
         axios
           .post("/workflow/getEcmCfgActivity", JSON.stringify(m))
           .then(function(response) {
             _self.ecmCfgActivity = response.data.data;
-            if(_self.ecmCfgActivity.formParameter){
-              _self.formParameter= JSON.parse(_self.ecmCfgActivity.formParameter) 
+            if (_self.ecmCfgActivity.formParameter) {
+              _self.formParameter = JSON.parse(
+                _self.ecmCfgActivity.formParameter
+              );
             }
             _self.taskName = _self.ecmCfgActivity.componentName;
             _self.rejectButton = _self.ecmCfgActivity.rejectActivityLabel;
             _self.allowEdit = _self.ecmCfgActivity.enableEdit;
-            _self.sequenceFlow=response.data.sequenceNames;
-            if(_self.sequenceFlow.indexOf('驳回')>-1){
-              _self.isShowReject=true;
-            }else{
-              _self.isShowReject=false;
+            _self.sequenceFlow = response.data.sequenceNames;
+            if (_self.sequenceFlow.indexOf("驳回") > -1) {
+              _self.isShowReject = true;
+            } else {
+              _self.isShowReject = false;
             }
             if (_self.allowEdit === true) {
               _self.formEditPermision = 1;
@@ -637,26 +637,26 @@ export default {
       let _self = this;
       _self.refreshData();
     },
-    loadWorkflowInfo(){
-      let _self = this
+    loadWorkflowInfo() {
+      let _self = this;
       axios.get("/cfgworkflow/processes").then(function(response) {
-        _self.workflowNames = response.data.data
+        _self.workflowNames = response.data.data;
       });
     },
-    changeJobNames(){
+    changeJobNames() {
       let _self = this;
-      _self.workflowForm.jobName = ""
+      _self.workflowForm.jobName = "";
       var jobNamesArr = new Array();
       axios
-        .get("/cfgworkflow/cfgActivities/"+_self.workflowForm.workflowName)
+        .get("/cfgworkflow/cfgActivities/" + _self.workflowForm.workflowName)
         .then(function(response) {
-        jobNamesArr = response.data.data
-        jobNamesArr.forEach(function(value,index){
-          if(value.activityName == "start"){
-            jobNamesArr.splice(index, 1)
-          }
-        })
-        _self.jobNames = jobNamesArr
+          jobNamesArr = response.data.data;
+          jobNamesArr.forEach(function(value, index) {
+            if (value.activityName == "start") {
+              jobNamesArr.splice(index, 1);
+            }
+          });
+          _self.jobNames = jobNamesArr;
         })
         .catch(function(error) {
           console.log(error);

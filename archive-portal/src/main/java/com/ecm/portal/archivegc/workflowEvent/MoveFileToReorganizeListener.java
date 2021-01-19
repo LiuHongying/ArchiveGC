@@ -23,34 +23,39 @@ import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
 import com.ecm.icore.service.IEcmSession;
 import com.ecm.portal.archivegc.utils.EcmSessionFactory;
-/**
- * 文档提交流程，文档提交检查
- * @author Atos
- *
- */
 @Component(value="moveFileToReorganizeListener")
 public class MoveFileToReorganizeListener implements TaskListener{
 	private Logger log=LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	DocumentService documentService;
-	
+	@Autowired
+	private Environment env;
+	@Autowired
+	private AuthService authService;
+	@Autowired
+	private FolderService folderService;
 	@Autowired
 	private AuditService auditService;
 	
-
+	@Autowired
+	private FolderPathService folderPathService;
 	@Override
 	public void notify(DelegateTask task) {
 		// TODO Auto-generated method stub
 		if ("create".equals(task.getEventName())) {
 
 			// TODO Auto-generated method stub
-			/*
+
 			IEcmSession session=EcmSessionFactory.getWorkflowSession(env, authService);
 			String token=session.getToken();
 			String formId= task.getVariable("formId").toString();
-			String sql="select child_id as ID from ecm_relation where name='irel_children' and parent_id='"+formId+"'"
-					+ " union select child_id as ID from ecm_relation where parent_id in(select child_id from ecm_relation"
-					+ " where name='irel_children' and parent_id ='"+formId+"')";
+//			String sql="select child_id as ID from ecm_relation where name='irel_children' and parent_id='"+formId+"'"
+//					+ " union select child_id as ID from ecm_relation where parent_id in(select child_id from ecm_relation"
+//					+ " where name='irel_children' and parent_id ='"+formId+"')";
+			String sql="select CHILD_ID from ecm_relation where name='irel_parent' and parent_id='"+formId+"' " + 
+					"	union " + 
+					"	select child_id as ID from ecm_relation where name='irel_children' "
+					+ " and parent_id in(select CHILD_ID from ecm_relation where name='irel_parent' and parent_id='"+formId+"')";
 			try {
 				List<Map<String,Object>> objList= documentService.getMapList(token, sql);
 				for (Map<String, Object> map : objList) {
@@ -77,7 +82,7 @@ public class MoveFileToReorganizeListener implements TaskListener{
 					EcmSessionFactory.releaseSession(authService, session);
 				}
 			}
-			*/
+		
 		
 		}else if("complete".equals(task.getEventName())) {
 			String formId= task.getVariable("formId").toString();
@@ -85,13 +90,13 @@ public class MoveFileToReorganizeListener implements TaskListener{
 			IEcmSession session = null;
 			try {
 				session = EcmSessionFactory.getSession(token);
-				//String userName =session.getCurrentUser().getUserName();
+				String userName =session.getCurrentUser().getUserName();
 				String sql="select child_id as ID from ecm_relation where name='irel_children' and parent_id='"+formId+"'";
 				List<Map<String,Object>> objList= documentService.getMapList(token, sql);
 				for (Map<String, Object> map : objList) {
 					String relevantArchiveId= map.get("ID").toString();
-					//EcmDocument arrchive= documentService.getObjectById(token, relevantArchiveId);
-					auditService.newAudit(token, "流程", "检查", relevantArchiveId, "", "文档提交归档流程至整编库");
+					EcmDocument arrchive= documentService.getObjectById(token, relevantArchiveId);
+					auditService.newAudit(token, "文档提交归档流程", "整编", relevantArchiveId, "", "文档提交归档流程至整编库");
 				}
 			} catch (AccessDeniedException | EcmException e) {
 				// TODO Auto-generated catch block
