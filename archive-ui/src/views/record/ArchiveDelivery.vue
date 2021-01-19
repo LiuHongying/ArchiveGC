@@ -360,7 +360,7 @@ import DataLayout from "@/components/ecm-data-layout";
 import "url-search-params-polyfill";
 
 import PrintPage from "@/views/record/PrintPage";
-import PrintVolumes from "@/views/record/PrintVolumes";
+import PrintVolumes from "@/views/record/PrintVolumes4Delivery";
 import AddReuse from "@/views/record/AddReuse";
 import BatchImport from '@/components/controls/ImportDocument'
 

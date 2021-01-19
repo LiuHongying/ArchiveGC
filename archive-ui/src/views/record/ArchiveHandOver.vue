@@ -105,7 +105,7 @@
               v-bind:isshowSelection="true"
               :optionWidth="2"
               :isshowCustom="false"
-              :isEditProperty="true"
+              :isEditProperty="false"
               showOptions="查看内容"
               :isShowChangeList="false"
               @selectchange="onSelectChange"

@@ -56,6 +56,7 @@ import com.ecm.core.service.QueryService;
 import com.ecm.core.service.RelationService;
 import com.ecm.portal.archive.common.ChildrenObjAction;
 import com.ecm.portal.archivegc.service.ImportServiceGc;
+import com.ecm.portal.archivegc.service.MountFileService;
 import com.ecm.portal.controller.ControllerAbstract;
 import com.ecm.portal.entity.AttrCopyCfgEntity;
 import com.ecm.portal.service.CustomCacheService;
@@ -84,6 +85,9 @@ public class ArchiveDcController extends ControllerAbstract{
 	
 	@Autowired
 	private CustomCacheService customCacheService;
+	
+	@Autowired
+	private MountFileService mountFileService;
 	
 	@RequestMapping(value = "/dc/getEcmDefTypes", method = RequestMethod.POST)
 	@ResponseBody
@@ -147,6 +151,29 @@ public class ArchiveDcController extends ControllerAbstract{
 		
 		return mp;
 		
+	}
+	/**
+	 * 根据配置获取卷盒下的文件类型
+	 * @param argStr
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/dc/getBoxChildType", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> getBoxChildTypeName(@RequestBody String argStr) throws Exception {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		if(argStr!=null) {
+			String typeName=argStr.toString();
+			AttrCopyCfgEntity en = customCacheService.getAttrCopyCfg(getToken(), typeName,false);
+			if(en!=null) {
+				mp.put("data", en.getToType());
+				mp.put("code", ActionContext.SUCESS);
+			}else {
+				mp.put("data", "");
+				mp.put("code", ActionContext.FAILURE);
+			}
+		}
+		return mp;
 	}
 	
 	@RequestMapping(value = "/dc/getDocConfig", method = RequestMethod.POST)
@@ -983,6 +1010,7 @@ public class ArchiveDcController extends ControllerAbstract{
 		mp.put("code", ActionContext.SUCESS);
 		return mp;
 	}
+	
 	@RequestMapping(value = "/dc/recyclebin/resetDC", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> resetDC(@RequestBody String argStr) throws Exception {
@@ -1069,4 +1097,24 @@ public class ArchiveDcController extends ControllerAbstract{
 			}
 		 	return retStr;
 	    }
+	 
+	 @RequestMapping(value = "/dc/batchMountFile", method = RequestMethod.POST)
+		@ResponseBody
+		public Map<String, Object> BatchMountFile(@RequestParam("ids")List<String> ids, @RequestParam("files") MultipartFile[] files) throws AccessDeniedException{
+			Map<String, Object> mp = new HashMap<String, Object>();
+			
+			String msg;
+			try {
+				msg = mountFileService.BatchMountFile(getToken(), ids, files);
+				mp.put("code", ActionContext.SUCESS);
+				mp.put("data", msg);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("data", e.getMessage());
+			}
+			
+			return mp;
+		}
 }
