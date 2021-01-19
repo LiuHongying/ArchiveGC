@@ -335,7 +335,7 @@
                                   }}</span>
                                 </div>
                                 <div v-else>
-                                  <span @click="rowClick(scope.row)">{{
+                                  <span>{{
                                     scope.row[citem.attrName]
                                   }}</span>
                                 </div>
@@ -355,7 +355,7 @@
                                   }}</span>
                                 </div>
                                 <div v-else>
-                                  <span @click="rowClick(scope.row)">{{
+                                  <span>{{
                                     scope.row[citem.attrName]
                                   }}</span>
                                 </div>
@@ -417,6 +417,11 @@
                               100 -
                             bottomHeight
                           "
+                          :isshowOption="true"
+                          :isshowSelection="true"
+                          :optionWidth = "2"
+                          :isEditProperty="false"
+                          showOptions="查看内容"
                           dataUrl="/dc/getDocuments"
                         >
                         </DataGrid>
@@ -517,7 +522,7 @@ export default {
       borrowDialogVisible: false,
       shopingCartDialogVisible: false,
       defaultData: {
-        gridView: "GeneralGrid",
+        gridView: "GeneralView",
       },
       borrowForm: {
         taskId: 0,
@@ -681,7 +686,7 @@ export default {
     rowClick(row) {
       this.currentId = row.ID;
       if (row.TYPE_NAME == "卷盒" || row.C_ITEM_TYPE == "案卷") {
-        this.itemDialogVisible = true;
+        //this.itemDialogVisible = true;
         let _self = this;
         setTimeout(() => {
           _self.$refs.innerItemViewer.id = _self.currentId;
