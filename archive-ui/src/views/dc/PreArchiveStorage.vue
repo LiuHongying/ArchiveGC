@@ -239,6 +239,7 @@ export default {
         activeNum: "",
       },
       inputFolder: "",
+      typeName:"",
     };
   },
 
