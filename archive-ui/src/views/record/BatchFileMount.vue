@@ -4,7 +4,7 @@
       <el-form label-width="120px" v-loading="loading" @submit.native.prevent>
             <el-row>
               <div style="float: left;text-align:left;">
-                &nbsp; &nbsp; 根据文件名挂载，单个文件挂载不约束文件名。
+                &nbsp; &nbsp; 根据文件名挂载到文件或卷内文件，单个文件挂载不约束文件名。
                 <br/>
                 多个文件挂载命名规则：编码(版本)，如：1188XGASBS01(A).pdf,1188XGASBS01.pdf(无版本)。
                 <br />
