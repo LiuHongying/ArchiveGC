@@ -471,20 +471,21 @@
                 </template>
                 <template slot="paneR" v-if="isFile">
                   <el-row>
-                    <span style="float:left;text-align:left;padding:5px;">卷内文件列表</span>
-                    <!-- <el-button type="primary" plain size="small" title="自动组卷"  @click="autoPaper()">自动组卷</el-button> -->
-                    <!-- <el-button type="primary" plain size="small"  @click="childrenTypeSelectVisible=true">{{$t('application.createDocument')}}</el-button>
-                            <el-button type="primary" plain size="small" :title="$t('application.addReuseFile')"  @click="reuseVisible=true">{{$t('application.addReuseFile')}}</el-button>
-                            
-                            
-                            <el-button type="primary" plain size="small" title="挂载文件"  @click="importdialogVisible=true;uploadUrl='/dc/mountFile'">挂载文件</el-button>
-                    <el-button type="primary" plain size="small" :title="$t('application.viewRedition')"  @click="importdialogVisible=true;uploadUrl='/dc/addRendition'">格式副本</el-button>-->
+                    <el-form inline="true">
+                      <el-form-item>
+                    <span>卷内文件列表</span>
+                      </el-form-item>
+                      <el-form-item>
                     <el-button type="primary" plain size="small" @click="beforeCreateFile(selectRow)">著录</el-button>
+                    </el-form-item>
+                      <el-form-item>
                     <el-button
                     type="primary"
                     plain
                     size="small"
                     @click="fileAttrsCopy(2)">复制著录</el-button>
+                    </el-form-item>
+                      <el-form-item>
                     <el-button
                       type="primary"
                       plain
@@ -492,18 +493,14 @@
                       title="挂载文件"
                       @click="beforeMount(selectedInnerItems,false);"
                     >挂载文件</el-button>
-                    
-                    <!--
-                    <el-button
-                      type="primary"
-                      plain
-                      size="small"
-                      :title="$t('application.viewRedition')"
-                      @click="beforeMount(selectedInnerItems);uploadUrl='/dc/addRendition'"
-                    >格式副本</el-button>
-                    -->
+                    </el-form-item>
+                      <el-form-item>
                     <el-button type="primary" plain size="small" title="上移" @click="onMoveUp()">上移</el-button>
+                    </el-form-item>
+                      <el-form-item>
                     <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
+                    </el-form-item>
+                      <el-form-item>
                     <el-button type="warning" plain size="small" title="删除"  @click="logicallyDel(selectedInnerItems,function(){
                           let _self=this;
                           if(_self.$refs.leftDataGrid){
@@ -511,9 +508,12 @@
                             }
                           _self.loadGridData(_self.currentFolder);
                         })">{{$t('application.delete')}}</el-button>
-                    <template style="float: right;text-align:right;padding-left:5px;">
+                    </el-form-item>
+                      <el-form-item>
+ 
                       <AddCondition ref="childAddCondition" v-model="childAddConds" :inputType="hiddenInput" :showFileType= false :typeName='childTypeName' @change="searchChildItem"></AddCondition>
-                    </template>
+                    </el-form-item>
+                    </el-form>
                   </el-row>
                   <el-row>
                     <el-col :span="24">
@@ -599,13 +599,13 @@ export default {
       // 本地存储高度名称
       topStorageName: 'ArchiveArrangeHeight',
       // 非split pan 控制区域高度
-      startHeight: 135,
+      startHeight: 125,
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
       topbarHeight: 125,
       // 底部除列表高度
-      bottomHeight: 25,
+      bottomHeight: 35,
       isExpand: false,
       rightTableHeight: (window.innerHeight - 150) / 2,
       asideHeight: window.innerHeight - 95,
