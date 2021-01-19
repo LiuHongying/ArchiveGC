@@ -41,7 +41,7 @@ public class PrintService extends EcmService{
 				ids = "'"+id+"'";
 			}
 		}
-		String sql = "select ID,TYPE_NAME,C_ITEM_TYPE,C_ARC_CLASSIC,C_ARCHIVE_CODING,C_STORE_CODING,CODING,REVISION,C_PROJECT_CODE,C_PROJECT_NUM,C_SECURITY_LEVEL,C_RETENTION,C_SET_COUNT,C_VOLUME_COUNT,C_COUNT2,C_COPY_COUNT,C_COUNT1,C_ARCHIVE_DATE " + 
+		String sql = "select ID,TYPE_NAME,C_ITEM_TYPE,C_ARC_CLASSIC,C_ARCHIVE_CODING,C_FROM_CODING,C_STORE_CODING,CODING,REVISION,C_PROJECT_CODE,C_PROJECT_NUM,C_SECURITY_LEVEL,C_RETENTION,C_SET_COUNT,C_VOLUME_COUNT,C_COUNT2,C_COPY_COUNT,C_COUNT1,C_ARCHIVE_DATE " + 
 				" from ecm_document where id in("+ids+") order by TYPE_NAME,CODING,C_ARCHIVE_DATE";
 		List<Map<String,Object>> dataList = documentService.getMapList(token, sql);
 		for(Map<String,Object> data: dataList) {
@@ -53,7 +53,15 @@ public class PrintService extends EcmService{
 			en.setTypeName((String)data.get("TYPE_NAME"));
 			en.setItemType((String)data.get("C_ITEM_TYPE"));
 			en.setArchiveCoding((String)data.get("C_ARCHIVE_CODING"));
-			en.setCoding((String)data.get("CODING"));
+			//工程建设、工程设计 显示图册号
+			if("工程设计".equals(archiveClassic) || "工程建设".equals(archiveClassic)) {
+				en.setCoding((String)data.get("C_FROM_CODING"));
+			}
+			//其次设置编码
+			if(StringUtils.isEmpty(en.getCoding())){
+				en.setCoding((String)data.get("CODING"));
+			}
+			//编码为空再设置档号
 			if(StringUtils.isEmpty(en.getCoding())){
 				en.setCoding(en.getArchiveCoding());
 			}
