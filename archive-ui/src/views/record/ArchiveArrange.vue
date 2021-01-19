@@ -110,6 +110,15 @@
     </el-dialog>
 
     <el-dialog
+      title="属性批量更新"
+      width="50%"
+      :visible="batchUpdateVisible"
+      @close="batchUpdateVisible=false"
+    >
+      <BatchUpdate></BatchUpdate>
+    </el-dialog>
+
+    <el-dialog
       title="打印档号"
       width="43%"
       :visible="printArchiveCodeVisible"
@@ -120,27 +129,7 @@
       </div>
     </el-dialog>
     <el-dialog :title="$t('application.Import')" :visible.sync="importdialogVisible" width="70%">
-      <el-form size="mini" :label-width="formLabelWidth">
-        <div style="height:200px;overflow-y:scroll; overflow-x:scroll;">
-          <el-upload
-            :limit="100"
-            :file-list="fileList"
-            action
-            :on-change="handleChange"
-            :auto-upload="false"
-            :multiple="false"
-          >
-            <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
-          </el-upload>
-        </div>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="importdialogVisible = false">{{$t('application.cancel')}}</el-button>
-        <el-button
-          type="primary"
-          @click="uploadData(uploadID)"
-        >{{$t('application.start')+$t('application.Import')}}</el-button>
-      </div>
+      <BatchFileMount ref="BatchFileMount" @afterMountFile="afterMountFile"></BatchFileMount>
     </el-dialog>
 
     <el-dialog title="取批次号"
@@ -268,7 +257,7 @@
                         size="small"
                         title="挂载文件"
                         icon="el-icon-upload2"
-                        @click="beforeMount(selectedItems);uploadUrl='/dc/mountFile'"
+                        @click="beforeMount(selectedItems,true);"
                       >挂载文件</el-button>
                       </el-form-item>
                       <el-form-item>
@@ -440,6 +429,14 @@
                           plain
                           @click="beforeModify()"
                         >修改</el-button>
+                       </el-form-item>
+                      <el-form-item>
+                        <el-button
+                          type="primary"
+                          size="small"
+                          plain
+                          @click="batchUpdateVisible=true"
+                        >更新</el-button>
                       </el-form-item>
                       <el-form-item>
                         <el-button type="primary"
@@ -471,6 +468,7 @@
                         gridViewName="ArrangeGrid"
                         @rowclick="beforeShowInnerFile"
                         @selectchange="selectChange"
+                        :showBatchCheck="true"
                       ></DataGrid>
                     </el-col>
                   </el-row>
@@ -497,7 +495,7 @@
                       plain
                       size="small"
                       title="挂载文件"
-                      @click="beforeMount(selectedInnerItems);uploadUrl='/dc/mountFile'"
+                      @click="beforeMount(selectedInnerItems,false);"
                     >挂载文件</el-button>
                     
                     <!--
@@ -524,6 +522,9 @@
                             }
                           _self.loadGridData(_self.currentFolder);
                         })">{{$t('application.delete')}}</el-button>
+                    <template style="float: right;text-align:right;padding-left:5px;">
+                      <AddCondition ref="childAddCondition" v-model="childAddConds" :inputType="hiddenInput" :showFileType= false :typeName='childTypeName' @change="searchChildItem"></AddCondition>
+                    </template>
                   </el-row>
                   <el-row>
                     <el-col :span="24">
@@ -531,17 +532,19 @@
                         ref="leftDataGrid"
                         key="left"
                         @rowclick="selectOneFile"
-                        dataUrl="/dc/getDocuByRelationParentId"
+                        :dataUrl="leftParam.childUrl"
                         gridViewName='ArrangeInnerGrid'
-                        condition="and a.NAME='irel_children' and b.IS_HIDDEN=0"
+                        :condition="leftParam.childCondition"
                         :parentId="parentId"
                         v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
                         :isshowOption="true"
                         :isshowSelection="true"
+                        :folderId="mainParam.folderId"
                         showOptions="查看内容"
                         :isShowChangeList="false"
                         :optionWidth = "2"
                         @selectchange="selectInnerChange"
+                        :showBatchCheck="true"
                       ></DataGrid>
                     </el-col>
                   </el-row>
@@ -576,12 +579,15 @@ import PrintCoverpage from "@/views/record/PrintCoverpage.vue"
 import PrintPdf417 from "@/views/record/PrintPdf417.vue"
 import BatchImport from "@/components/controls/ImportDocument";
 import ExcelUtil from "@/utils/excel.js";
+import BatchUpdate from "@/views/record/BatchUpdate.vue" 
+import BatchFileMount from "@/views/record/BatchFileMount.vue" 
+
 export default {
   name: "ArchiveArrange",
   components: {
     ShowProperty: ShowProperty,
     TypeSelectComment:TypeSelectComment,
-    // PDFViewer: PDFViewer,
+    BatchFileMount: BatchFileMount,
     DataGrid: DataGrid,
     PrintPage: PrintPage,
     PrintVolumes: PrintVolumes,
@@ -589,7 +595,7 @@ export default {
     PreparationTablePrint:PreparationTablePrint,
     PrintBarCode:PrintBarCode,
     PrintArchiveCode:PrintArchiveCode,
-    //Prints:Prints
+    BatchUpdate:BatchUpdate,
     DataLayout:DataLayout,
     PrintPdf417:PrintPdf417,
     BatchImport:BatchImport,
@@ -652,6 +658,8 @@ export default {
       currentPage: 1,
       dialogVisible: false,
       propertyVisible: false,
+      batchUpdateVisible: false,
+      mountParentDoc:true,
       showButton: true,
       selectedItems: [],
       selectedOutItems: [],
@@ -727,7 +735,15 @@ export default {
       isInnerModify:false,
       isModify:false,
       isMF:false,
-      MFinput:""
+      MFinput:"",
+      childAddConds:'',
+      childTypeName:'',
+      leftParam:{
+        childUrl:'/dc/getDocuByRelationParentId',
+        childCondition:"and a.NAME='irel_children' and b.IS_HIDDEN=0",
+      },
+      
+      volumeInArchiveGridName:""
     };
   },
   
@@ -873,10 +889,11 @@ export default {
       let _self = this;
       let params = {
         URL: "/file/exportFolderPath",
-        gridName: _self.currentFolder.gridView,
+        gridName: _self.$refs.mainDataGrid.gridViewName,
         folderId: _self.currentFolder.id,
         orderBy: "MODIFIED_DATE desc",
-        pageSize: _self.pageSize,
+        condition: "IS_HIDDEN=0",
+        pageSize: _self.pageSize*10,
         pageIndex: _self.currentPage - 1,
         lang: "zh-cn",
       };
@@ -1400,21 +1417,30 @@ export default {
         });
     },
     //挂载
-    beforeMount(selrow) {
+    beforeMount(selrow, isParent) {
       let _self = this;
-      _self.fileList = [];
-      if (selrow.length!=1||selrow[0].ID == undefined) {
-        //  _self.$message("请选择一条数据！");
+      _self.mountParentDoc = isParent;
+      if (selrow.length<1||selrow[0].ID == undefined) {
         _self.$message({
           showClose: true,
-          message: "请选择一条数据！",
+          message: "请至少勾选一条数据！",
           duration: 2000,
           type: "warning"
         });
         return;
       }
-      _self.uploadID = selrow[0].ID;
       _self.importdialogVisible = true;
+      setTimeout(()=>{
+        _self.$refs.BatchFileMount.archiveObjects = selrow;
+      },100);
+    },
+    //挂载成功触发事件
+    afterMountFile(){
+      if(this.mountParentDoc){
+        this.loadGridData(this.currentFolder);
+      }else{
+        this.showInnerFile(this.selectedRow);
+      }
     },
     getFormData(selId) {
       let _self = this;
@@ -1446,8 +1472,11 @@ export default {
         })
         .then(function(response) {
           _self.importdialogVisible = false;
-          // _self.refreshData();
-          _self.showInnerFile(_self.selectRow);
+          if( _self.mountParentDoc){
+            _self.searchItem();
+          }else{
+            _self.showInnerFile(_self.selectRow);
+          }
           // _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
           _self.$message({
             showClose: true,
@@ -1606,8 +1635,37 @@ export default {
       // let keys = Object.keys(row)
       // console.log(row.TYPE_NAME)
       // this.getTypeNamesByMainList(row.TYPE_NAME)
+      let _self = this;
       this.innerSelectedOne = [];
+      _self.leftParam.childCondition = "and a.NAME='irel_children' and b.IS_HIDDEN=0"
+      _self.leftParam.childUrl = "/dc/getDocuByRelationParentId"
       this.showInnerFile(row);
+      if (row != null) {
+        if(row.C_ITEM_TYPE!='案卷'){
+          _self.childTypeName = '所有'
+        }else{
+          _self.getChildType(row.TYPE_NAME);
+          console.log(_self.childTypeName)
+          _self.$refs.childAddCondition.loadColumnInfo(_self.childTypeName);
+        }
+      }
+    },
+    //获取卷盒下的文件类型
+    getChildType(fileType){
+      let _self = this;
+      axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: fileType,
+          url: "/dc/getBoxChildType"
+        }).then(function(response){
+          _self.childTypeName = response.data.data
+          console.log(_self.childTypeName)
+        }).catch(function(error){
+          console.log(error)
+        })
     },
     showInnerFile(row) {
       let _self = this;
@@ -2130,7 +2188,17 @@ export default {
       this.loadGridData(this.currentFolder);
       //  this. loadPageInfo(this.currentFolder);
     },
-    
+    searchChildItem(){
+      let _self = this;
+      console.log(_self.childAddConds)
+      var parentCond = ' and id in (select child_id from ecm_relation where parent_id='+"'"+_self.selectRow.ID+"'"+')';
+      var childCondition = _self.childAddConds+parentCond+' and IS_HIDDEN=0';
+      //_self.leftParam.childCondition = _self.childAddConds+parentCond+' and IS_HIDDEN=0';
+      //_self.leftParam.childUrl = "/dc/getInnerFolderDocuments"
+      _self.$refs.leftDataGrid.condition = childCondition;
+      _self.$refs.leftDataGrid.dataUrl = "/dc/getInnerFolderDocuments";
+      _self.$refs.leftDataGrid.loadGridData();
+    },
     penddingStorage(){
       let _self=this;
       if (_self.selectedItems.length == 0) {
@@ -2388,6 +2456,7 @@ export default {
         if(_self.$refs.leftDataGrid){
              _self.$refs.leftDataGrid.itemDataList = [];
           }
+          _self.pieceNumVisible = false;
         _self.searchItem();
       });
       
@@ -2418,6 +2487,7 @@ export default {
               type: "success"
             });
             _self.pieceNum=response.data.data;
+           
           } else {
             // _self.$message(response.data.message);
             _self.$message({

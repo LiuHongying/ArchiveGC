@@ -11,10 +11,6 @@ export default {
   },
   props: {
     selectRowData: { type: Array, default: [] },
-    reloadGrid: {
-      type: Function,
-      required: true,
-    },
   },
   mounted() {},
   methods: {
@@ -52,7 +48,7 @@ export default {
               duration: 2000,
               type: "success",
             });
-            this.$props.reloadGrid('');
+            _self.$emit("reloadGrid", "submitReload");
           } else {
             _self.$message({
               showClose: true,
