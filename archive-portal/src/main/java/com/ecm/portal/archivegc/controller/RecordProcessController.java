@@ -16,8 +16,13 @@ import com.ecm.common.util.JSONUtils;
 import com.ecm.core.ActionContext;
 import com.ecm.core.dao.EcmDocumentMapper;
 import com.ecm.core.entity.EcmDocument;
+import com.ecm.core.entity.EcmFolder;
+import com.ecm.core.exception.AccessDeniedException;
+import com.ecm.core.exception.EcmException;
+import com.ecm.core.exception.NoPermissionException;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
+import com.ecm.core.service.FolderService;
 import com.ecm.portal.archive.common.Constants;
 import com.ecm.portal.controller.ControllerAbstract;
 
@@ -27,23 +32,36 @@ public class RecordProcessController extends ControllerAbstract {
 	@Autowired
 	private DocumentService documentService;
 	@Autowired
-	private FolderPathService folderpathService;
+	private FolderPathService folderPathService;
+	@Autowired
+	private FolderService folderService;
+	
 	
 	@RequestMapping(value = "/record/archiveStorage", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String,Object> archiveStorage(@RequestBody String argStr) throws Exception {
+	public Map<String,Object> archiveStorage(@RequestBody String argStr) {
 		List<String> list = JSONUtils.stringToArray(argStr);
 		Map<String, Object> mp = new HashMap<String, Object>();
 		
 		for(String fileId:list) {
-			//EcmDocument doc= this.getObjectById(getToken(), fileId);
-			EcmDocument doc = documentService.getObjectById(getToken(), fileId);
-			doc.addAttribute("Status", "待入库");
-			doc.addAttribute("IS_RELEASED", "1");
-			documentService.updateObject(getToken(), doc);
+			try {
+				//EcmDocument doc= this.getObjectById(getToken(), fileId);
+				EcmDocument doc = documentService.getObjectById(getToken(), fileId);
+				doc.setStatus("待入库");
+				doc.addAttribute("IS_RELEASED", "1");
+				doc.setFolderId(fileId);
+				documentService.updateObject(getToken(), doc,null);
+			}catch(NoPermissionException | AccessDeniedException | EcmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("message", "操作失败");
+				return mp;
+			}
 		}	
 		
 		mp.put("code", ActionContext.SUCESS);
+		mp.put("message", "操作成功");
 		return mp;
 	}
 	
@@ -103,7 +121,7 @@ public class RecordProcessController extends ControllerAbstract {
 			List<Map<String, Object>> listAcl = documentService.getMapList(getToken(), sqlAcl);
 			String parentAclName= listAcl.get(0).get("NAME").toString();
 			
-			String parentFolderId = folderpathService.getReleaseFolderId(getToken(), parentDoc.getAttributes());
+			String parentFolderId = folderPathService.getReleaseFolderId(getToken(), parentDoc.getAttributes());
 			parentDoc.addAttribute("FOLDER_ID", parentFolderId);
 			parentDoc.addAttribute("STATUS", Constants.INSTORAGE);
 			parentDoc.addAttribute("IS_RELEASED", "1");
