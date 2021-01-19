@@ -653,7 +653,7 @@ public class ImportServiceGc extends EcmService {
 			setDefaultValues(documentService.getSession(token), doc.getAttributes());
 			if(idType == 0) {
 				if (ImportServiceGc.importDocFolderId == null || "".equals(ImportServiceGc.importDocFolderId)) {
-					ImportServiceGc.importDocFolderId = folderPathService.getFolderId(token, doc.getAttributes(), "3");
+					ImportServiceGc.importDocFolderId = folderPathService.getFolderId(token, doc.getAttributes(), "1");
 				}
 				doc.setFolderId(ImportServiceGc.importDocFolderId);
 			}else {
