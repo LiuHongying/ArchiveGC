@@ -40,7 +40,8 @@
       :close-on-click-modal="false"
       v-dialogDrag
     >
-      <div><AppraisalStartUp :workflowObj="workflow" :showUploadFile="true" :parentId="parentID" :workflowFileList="files4Start" @close="flowVisible = false"></AppraisalStartUp></div>
+      <div><AppraisalStartUp ref="AppraisalStartUp" 
+      :workflowObj="workflow" :showUploadFile="true" :parentId="parentID" :workflowFileList="files4Start" @close="flowVisible = false"></AppraisalStartUp></div>
     </el-dialog>
       <el-form :inline="true" @submit.native.prevent>
         <el-form-item>
@@ -441,6 +442,7 @@ export default {
           console.log(_self.workflow)
           _self.parentID=_self.selectedThItems[0].ID
           _self.flowVisible = true;
+          _self.$refs.AppraisalStartUp.loadFormInfo()
         })
         .catch(function (error) {
           console.log(error);

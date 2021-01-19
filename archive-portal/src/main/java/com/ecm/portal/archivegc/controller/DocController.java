@@ -393,6 +393,13 @@ public class DocController  extends ControllerAbstract  {
 			 tempAttr.put(attr,res);
 			 documentService.updateObject(getToken(), tempAttr);
 			}
+			if(modifyType.equals("部分替换")) {
+				String MFinput = args.get("MFinput").toString();		//获取指定修改的部分内容
+				String Attribute=tempAttr.get(attr).toString();			//取出要修改的字段
+				String result = Attribute.replaceAll(MFinput, res);
+				tempAttr.put(attr, result);
+				documentService.updateObject(getToken(), tempAttr);
+			}
 		}
 		mp.put("code", 1);
 		return mp;

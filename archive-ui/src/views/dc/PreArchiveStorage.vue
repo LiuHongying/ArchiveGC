@@ -14,14 +14,16 @@
             overflow: 'auto',
           }"
         >
-        <el-header>
-          <el-input
-            style="width: 150px"
-            v-model="inputFolder"
-            placeholder='请输入文件夹名称'
-            @keyup.enter.native="searchFolder()"
-          ></el-input>
-          <el-button type="primary" @click="searchFolder()">{{$t("application.SearchData")}}</el-button>
+          <el-header>
+            <el-input
+              style="width: 150px"
+              v-model="inputFolder"
+              placeholder="请输入文件夹名称"
+              @keyup.enter.native="searchFolder()"
+            ></el-input>
+            <el-button type="primary" @click="searchFolder()">{{
+              $t("application.SearchData")
+            }}</el-button>
           </el-header>
           <el-tree
             :props="defaultProps"
@@ -81,10 +83,16 @@
                 ></AddCondition>
               </el-form-item>
               <el-form-item>
-                <ArchieveStorage
-                  :selectRowData="selectedItems"
-                  @reloadGrid="reloadGrid"
-                ></ArchieveStorage>
+                <el-button
+                  type="primary"
+                  plain
+                  :loading="releaseLoading"
+                  size="small"
+                  icon="el-icon-right"
+                  @click="penddingStorage"
+                  title="提交入库"
+                  >提交入库</el-button
+                >
               </el-form-item>
             </el-form>
           </template>
@@ -111,7 +119,6 @@
                     "
                     v-bind:isshowOption="true"
                     v-bind:isshowSelection="true"
-                    :itemDataList="itemDataList"
                     :folderId="tables.main.folderId"
                     :optionWidth="2"
                     :isshowCustom="false"
@@ -131,8 +138,12 @@
                         ref="relevantFileDataGrid"
                         key="relevantFile"
                         v-bind="tables.relevantFileDataGrid"
-                        v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
-                         dataUrl="/dc/getDocuments"
+                        v-bind:tableHeight="
+                          ((layout.height - startHeight) * (100 - topPercent)) /
+                            100 -
+                          bottomHeight
+                        "
+                        dataUrl="/dc/getDocuments"
                       >
                       </DataGrid>
                     </el-col>
@@ -151,7 +162,6 @@ import DataLayout from "@/components/ecm-data-layout";
 import DataGrid from "@/components/DataGrid";
 import AddCondition from "@/views/record/AddCondition.vue";
 import StartupComponent from "@/views/workflow/StartupComponent.vue";
-import ArchieveStorage from "@/components/SubmitFolder.vue";
 import ExcelUtil from "@/utils/excel.js";
 export default {
   data() {
@@ -189,6 +199,7 @@ export default {
       radioValue: "案卷",
       isFile: true,
       isExpand: false,
+      releaseLoading: false,
 
       dataList: [],
       gridList: [],
@@ -217,7 +228,7 @@ export default {
       tabs: {
         activeNum: "",
       },
-      inputFolder:"",
+      inputFolder: "",
     };
   },
 
@@ -241,37 +252,36 @@ export default {
   },
 
   methods: {
-    searchFolder(){
-      let _self = this
-      if(_self.inputFolder!=''&&_self.inputFolder!=undefined){
+    searchFolder() {
+      let _self = this;
+      if (_self.inputFolder != "" && _self.inputFolder != undefined) {
         var m = new Map();
         m.set("NAME", _self.inputFolder);
-        m.set("parentPath","/预归档库")
+        m.set("parentPath", "/预归档库");
         axios
-        .post("/admin/searchFolder",JSON.stringify(m))
-        .then(function (response) {
-          _self.dataList = response.data.data;
-          _self.loadGridInfo(_self.defaultData);
-          _self.isExpand = true;
-          _self.loading = false;
-        })
-        .catch(function (error) {
-          console.log(error);
-          _self.loading = false;
-        });
-      }
-      else{
+          .post("/admin/searchFolder", JSON.stringify(m))
+          .then(function (response) {
+            _self.dataList = response.data.data;
+            _self.loadGridInfo(_self.defaultData);
+            _self.isExpand = true;
+            _self.loading = false;
+          })
+          .catch(function (error) {
+            console.log(error);
+            _self.loading = false;
+          });
+      } else {
         axios
-        .post("/admin/getPreArchivesFolder", 0)
-        .then(function (response) {
-          _self.dataList = response.data.data;
-          _self.loadGridInfo(_self.defaultData);
-          _self.loading = false;
-        })
-        .catch(function (error) {
-          console.log(error);
-          _self.loading = false;
-        });
+          .post("/admin/getPreArchivesFolder", 0)
+          .then(function (response) {
+            _self.dataList = response.data.data;
+            _self.loadGridInfo(_self.defaultData);
+            _self.loading = false;
+          })
+          .catch(function (error) {
+            console.log(error);
+            _self.loading = false;
+          });
       }
     },
     // 加载表格样式
@@ -303,30 +313,28 @@ export default {
       let _self = this;
 
       var key = _self.inputkey;
-      
+
       if (key != "") {
         key = " (coding like '%" + key + "%' or title like '%" + key + "%') ";
         if (_self.radioValue == "案卷") {
-          key= key + " and C_ITEM_TYPE='案卷' ";
+          key = key + " and C_ITEM_TYPE='案卷' ";
         } else {
-          key= key + " and C_ITEM_TYPE='文件' ";
+          key = key + " and C_ITEM_TYPE='文件' ";
         }
-        
       } else {
         if (_self.radioValue == "案卷") {
-          key=key+ " C_ITEM_TYPE='案卷' ";
+          key = key + " C_ITEM_TYPE='案卷' ";
         } else {
-          key=key+" C_ITEM_TYPE='文件' ";
+          key = key + " C_ITEM_TYPE='文件' ";
         }
-       
       }
 
-      _self.tables.main.condition=key;
-      _self.tables.main.folderId=indata.id
+      _self.tables.main.condition = key;
+      _self.tables.main.folderId = indata.id;
       console.log(indata.id);
-      _self.$nextTick(()=>{
-         _self.$refs.mainDataGrid.loadGridData();
-         _self.$refs.relevantFileDataGrid.itemDataList = [];
+      _self.$nextTick(() => {
+        _self.$refs.mainDataGrid.loadGridData();
+        _self.$refs.relevantFileDataGrid.itemDataList = [];
       });
     },
 
@@ -350,22 +358,22 @@ export default {
       let _self = this;
       _self.selectRow = [];
       _self.selectedFileId = "";
-    
+
       _self.currentFolder = indata;
-        _self.loading = true;
-        axios
-          .post("/admin/getFolder", indata.id)
-          .then(function (response) {
-            indata.children = response.data.data;
-            indata.extended = true;
-            _self.inputkey = "";
-            _self.loading = false;
-            _self.loadGridData(indata);
-          })
-          .catch(function (error) {
-            console.log(error);
-            _self.loading = false;
-          });
+      _self.loading = true;
+      axios
+        .post("/admin/getFolder", indata.id)
+        .then(function (response) {
+          indata.children = response.data.data;
+          indata.extended = true;
+          _self.inputkey = "";
+          _self.loading = false;
+          _self.loadGridData(indata);
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.loading = false;
+        });
     },
 
     renderContent: function (h, { node, data, store }) {
@@ -388,8 +396,13 @@ export default {
 
     search() {
       let _self = this;
-      let key = " FOLDER_ID='"+_self.currentFolder.id+"' AND C_ITEM_TYPE = '"+_self.radioValue+"' AND IS_CHILD=0  AND IS_HIDDEN=0 ";
-     
+      let key =
+        " FOLDER_ID='" +
+        _self.currentFolder.id +
+        "' AND C_ITEM_TYPE = '" +
+        _self.radioValue +
+        "' AND IS_CHILD=0  AND IS_HIDDEN=0 ";
+
       if (_self.inputValueNum != "" && _self.inputValueNum != undefined) {
         key +=
           "and (CODING LIKE '%" +
@@ -403,7 +416,7 @@ export default {
         key += " and " + _self.advCondition;
       }
 
-      _self.$refs.mainDataGrid.condition = key;
+      _self.$refs.mainDataGrid.condition += key;
       _self.$refs.mainDataGrid.currentPage = 1;
       _self.$refs.mainDataGrid.loadGridInfo();
       _self.$refs.mainDataGrid.loadGridData();
@@ -423,7 +436,7 @@ export default {
       var key1 = "ID IN (" + condition1 + ") AND IS_HIDDEN=0";
       this.$refs.relevantFileDataGrid.condition = key1;
       this.$refs.relevantFileDataGrid.gridViewName = "GeneralPre";
-      this.$refs.relevantFileDataGrid.loadGridInfo();
+      this.$refs.relevantFileDataGrid.itemDataList = [];
       this.$refs.relevantFileDataGrid.loadGridData();
     },
 
@@ -432,25 +445,22 @@ export default {
     },
 
     changeRadio(val) {
-      
       let _self = this;
-      if(val=='文件'){
-        _self.isFile=false;
-        _self.topPercent=99;
+      if (val == "文件") {
+        _self.isFile = false;
+        _self.topPercent = 99;
         // _self.$refs.mainDataGrid.tableHeight=(window.innerHeight-_self.startHeight);
-      }else{
-        _self.isFile=true;
-        _self.topPercent=65;
-        _self.$nextTick(()=>{
-          if(_self.$refs.relevantFileDataGrid){
-             _self.$refs.relevantFileDataGrid.itemDataList = [];
+      } else {
+        _self.isFile = true;
+        _self.topPercent = 65;
+        _self.$nextTick(() => {
+          if (_self.$refs.relevantFileDataGrid) {
+            _self.$refs.relevantFileDataGrid.itemDataList = [];
           }
         });
-        
       }
 
       _self.loadGridData(_self.currentFolder);
-    
     },
 
     exportData() {
@@ -469,6 +479,61 @@ export default {
       console.log(params);
       ExcelUtil.export4Cnpe(params);
     },
+
+    penddingStorage() {
+      let _self = this;
+      var m = [];
+      let tab = _self.selectedItems;
+
+      if (_self.selectedItems.length == 0) {
+        _self.$message({
+          showClose: true,
+          message: _self.$t("message.pleaseSelectDC"),
+          duration: 2000,
+          type: "warning",
+        });
+        return;
+      }
+
+      var i;
+      for (i = 0; i < tab.length; i++) {
+        m.push(tab[i]["ID"]);
+      }
+
+      axios
+        .post("/record/archiveStorage", JSON.stringify(m), {
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+          },
+        })
+        .then(function (response) {
+          if (response.data.code == 1) {
+            _self.$message({
+              showClose: true,
+              message: _self.$t("message.operationSuccess"),
+              duration: 2000,
+              type: "success",
+            });
+            _self.$refs.mainDataGrid.loadGridData();
+          } else {
+            _self.$message({
+              showClose: true,
+              message: _self.$t("message.operationFaild"),
+              duration: 5000,
+              type: "error",
+            });
+          }
+        })
+        .catch(function (error) {
+          _self.$message({
+            showClose: true,
+            message: _self.$t("message.operationFaild"),
+            duration: 5000,
+            type: "error",
+          });
+          console.log(error);
+        });
+    },
   },
 
   components: {
@@ -476,7 +541,6 @@ export default {
     DataGrid: DataGrid,
     AddCondition: AddCondition,
     StartupComponent: StartupComponent,
-    ArchieveStorage: ArchieveStorage,
     ExcelUtil: ExcelUtil,
   },
 };
