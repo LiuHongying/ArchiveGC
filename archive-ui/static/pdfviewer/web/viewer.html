@@ -34,6 +34,21 @@ See https://github.com/adobe-type-tools/cmap-resources
 
 <!-- This snippet is used in production (included from viewer.html) -->
 <link rel="resource" type="application/l10n" href="locale/locale.properties">
+<script>
+    function getQueryString(name) {
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+      var reg_rewrite = new RegExp("(^|/)" + name + "/([^/]*)(/|$)", "i");
+      var r = window.location.search.substr(1).match(reg);
+      var q = window.location.pathname.substr(1).match(reg_rewrite);
+      if(r != null){
+          return unescape(r[2]);
+      }else if(q != null){
+          return unescape(q[2]);
+      }else{
+          return null;
+      }
+  }
+</script>
 <script src="../build/pdf.js"></script>
 
 
@@ -196,8 +211,8 @@ See https://github.com/adobe-type-tools/cmap-resources
                   <span data-l10n-id="open_file_label">Open</span>
                 </button>
 
-                <button id="print" class="toolbarButton print hiddenMediumView" title="Print" tabindex="33" data-l10n-id="print" >
-                  <span data-l10n-id="print_label">Print</span>
+                <button id="print" class="toolbarButton print hiddenMediumView" title="Print" tabindex="33" data-l10n-id="print" style="visibility: hidden;">
+                  <span data-l10n-id="print_label">Printaaa</span>
                 </button>
 
                 <button id="download" class="toolbarButton download hiddenMediumView" title="Download" tabindex="34" data-l10n-id="download" style="visibility: hidden;">
@@ -391,6 +406,38 @@ See https://github.com/adobe-type-tools/cmap-resources
 
     </div> <!-- outerContainer -->
     <div id="printContainer"></div>
+    <script>
+      var printButton = document.getElementById("print");
+      var borrowHistory = getQueryString("borrowHistory");
+      var showPrintButton = getQueryString("showPrintButton");
+      var auditUrl = getQueryString("audit");
+      var invokeUrl = getQueryString("invoke");
+      console.log("showPrint"+showPrintButton)
+      console.log("history"+borrowHistory)
+      if(showPrintButton=="true"){
+        printButton.style.visibility = 'visible';
+      }else{
+        printButton.style.visibility = 'hidden';
+      }
+      printButton.onclick = function () {
+        var request = new XMLHttpRequest();
+        var url = auditUrl;
+        console.log(url)
+        request.open('GET',url,true);
+        request.send();
+        if(borrowHistory=="true"){
+          printButton.style.visibility = 'hidden';
+          let xmlrequet = new XMLHttpRequest();
+          let url = invokeUrl;
+          console.log(url);
+          xmlrequet.open('GET',url,true);
+          xmlrequet.send();
+        }else{
+          printButton.style.visibility = 'visible';
+        }
+      }
+
+    </script>
   </body>
 </html>
 
