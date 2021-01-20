@@ -55,8 +55,8 @@
              <!-- <JTViewer v-else-if="viewerType==7" v-bind:id="doc.id" format="obj" :fileName="doc.C_IMPORT_NAME"></JTViewer>
              <ThreeDsViewer v-else-if="viewerType==8" v-bind:id="doc.id" ></ThreeDsViewer> -->
              <!-- End -->
-             <!-- 以下是新的代码 -->
-             <ThreeDsViewer v-else-if="viewerType==7" v-bind:id="doc.id" ></ThreeDsViewer>
+             <!-- 以下是新的代码-->
+             <ThreeDsViewer v-else-if="viewerType==7" v-bind:id="doc.id" ></ThreeDsViewer> 
              <div v-else-if="doc.contentSize==0" style="padding-top:40px;">
                 {{$t('application.noE-File')}}
             </div>
@@ -76,6 +76,7 @@
               <el-button type="primary" plain @click="menuClick($t('application.relationDC'))">{{$t('application.relationDC')}}</el-button><br/>
               <el-button type="primary" plain @click="menuClick($t('application.DCver'))">{{$t('application.DCver')}}</el-button><br/>
               <el-button type="primary" plain @click="menuClick($t('application.Rendition'))">{{$t('application.Rendition')}}</el-button><br/>
+               <el-button type="primary" plain @click="menuClick($t('application.viewWorkflow'))">{{$t('application.viewWorkflow')}}</el-button><br/>
               <!-- <el-button type="primary" plain @click="menuClick('利用信息')">利用信息</el-button><br/> -->
               <template v-if="doc.typeName=='文件传递单'" >
                 <el-button type="primary" plain @click="menuClick($t('application.TransferDoc'))">{{$t('application.TransferDoc')}}</el-button><br/>
@@ -105,6 +106,9 @@
       </template>
        <template v-if="dialog.title==$t('application.Rendition')">
         <ViewRedition :docId="docId" :downloadEnable="doc.permit>=4"></ViewRedition>
+      </template>
+       <template v-if="dialog.title==$t('application.viewWorkflow')">
+       <ViewWorkflow :docId="docId"></ViewWorkflow>
       </template>
       <template v-if="dialog.title==$t('application.TransferDoc')">
         <InTransferDoc :docId="docId"></InTransferDoc>
@@ -144,6 +148,7 @@ import RelationDocs from './RelationDocs.vue'
 import DocVersion from './DocVersion.vue'
 import UseInfo from './UseInfo.vue'
 import ViewRedition from './ViewRedition.vue'
+import ViewWorkflow from './ViewWorkflow.vue' 
 
 import PdfViewer from './PdfViewer.vue'
 import OfficeDocViewer from './OfficeDocViewer.vue'
