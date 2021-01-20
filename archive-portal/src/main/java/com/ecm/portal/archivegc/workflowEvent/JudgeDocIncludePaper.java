@@ -46,18 +46,18 @@ public class JudgeDocIncludePaper implements JavaDelegate{
 				if(map == null) {
 					continue;
 				}
-				if (map.get("hasPaper").equals("是")) {
+				if (map.get("hasPaper").equals("有")) {
 					flag = true;
 					break;
 				}
 			}
 			EcmDocument ecmObject = documentService.getObjectById(ecmSession.getToken(), formId);
 			if (flag) {
-				ecmObject.addAttribute("C_INCLUDE_PAPER", "是");
-				execution.setVariable("C_INCLUDE_PAPER", "是");
+				ecmObject.addAttribute("C_INCLUDE_PAPER", "有");
+				execution.setVariable("C_INCLUDE_PAPER", "有");
 			}else {
-				ecmObject.addAttribute("C_INCLUDE_PAPER", "否");
-				execution.setVariable("C_INCLUDE_PAPER", "否");
+				ecmObject.addAttribute("C_INCLUDE_PAPER", "无");
+				execution.setVariable("C_INCLUDE_PAPER", "无");
 			}
 			documentService.updateObject(ecmSession.getToken(), ecmObject, null);
 		} catch (Exception e) {

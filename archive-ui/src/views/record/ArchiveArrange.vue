@@ -2011,9 +2011,13 @@ export default {
               
             } else {
               // _self.$message(_self.$t('message.newFailured'));
+              let msg = _self.$t('message.newFailured');
+              if(response.data.message){
+                msg += ":" + response.data.message;
+              }
               _self.$message({
                 showClose: true,
-                message: _self.$t('message.newFailured'),
+                message: msg,
                 duration: 2000,
                 type: "warning"
               });

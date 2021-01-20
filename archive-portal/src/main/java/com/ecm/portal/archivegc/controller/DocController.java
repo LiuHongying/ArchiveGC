@@ -460,7 +460,7 @@ public class DocController  extends ControllerAbstract  {
 			EcmFolder ecmFolder = folderService.getObjectById(getToken(), folderId);
 			EcmGridView gv = CacheManagerOper.getEcmGridViews().get(args.get("gridName").toString());
 			StringBuffer condition = new StringBuffer(
-					"(" + gv.getCondition() + " and  STATUS<>'作废' AND IS_CURRENT=1 AND IS_RELEASED=1  AND C_ITEM_TYPE <>'案卷') ");
+					"(" + gv.getCondition() + " and  STATUS<>'作废' AND IS_CURRENT=1 AND IS_RELEASED=1) ");
 			int pageSize = Integer.parseInt(args.get("pageSize").toString());
 			int pageIndex = Integer.parseInt(args.get("pageIndex").toString());
 			Pager pager = new Pager();
@@ -490,6 +490,8 @@ public class DocController  extends ControllerAbstract  {
 			}
 		} catch (AccessDeniedException e) {
 			mp.put("code", ActionContext.TIME_OUT);
+		} catch(Exception ex) {
+			mp.put("code", ActionContext.FAILURE);
 		}
 		return mp;
 	}

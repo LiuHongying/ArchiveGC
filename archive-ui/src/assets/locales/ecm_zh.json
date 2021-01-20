@@ -556,7 +556,9 @@
     "Drafts":"草稿箱",
     "preArchive":"预归档库",
     "knowledgeBase":"知识库",
-    "effectiveDocuments":"生效文件"
+    "effectiveDocuments":"生效文件",
+    "distribute":"分发",
+    "haveReaded":"已阅"
 },
 "message": {
     "conditionS":"条件选择",

@@ -545,7 +545,9 @@
     "Drafts":"drafts",
     "preArchive":"PreArchive",
     "knowledgeBase":"knowledgeBase",
-    "effectiveDocuments":"Effective Documents"
+    "effectiveDocuments":"Effective Documents",
+    "distribute":"Distribute",
+    "haveReaded":"Have readed"
 },
 "message": {
     "conditionS":"Select Condition",

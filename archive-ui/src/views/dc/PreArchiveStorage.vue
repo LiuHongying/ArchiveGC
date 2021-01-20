@@ -120,6 +120,21 @@
                 >
               </el-form-item>
               <el-form-item>
+                <el-button
+                  type="primary"
+                  plain
+                  size="medium"
+                  icon="el-icon-folder-add"
+                  @click="addToShopingCart()"
+                  >添加到收藏</el-button
+                >
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click.native="exportData">{{
+                  $t("application.ExportExcel")
+                }}</el-button>
+              </el-form-item>
+                            <el-form-item>
                         <el-dropdown class="avatar-container right-menu-item" trigger="click">
                           <div class="avatar-wrapper">
                             <i class="el-icon-printer"></i>
@@ -159,12 +174,7 @@
                             </el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click.native="exportData">{{
-                  $t("application.ExportExcel")
-                }}</el-button>
-              </el-form-item>
+                            </el-form-item>
               <el-form-item>
                 <AddCondition
                   @change="searchItem"
@@ -276,7 +286,7 @@ export default {
       leftStorageName: "PreArchiveftHeight",
       topStorageName: "PreArchiveTopHeight",
       // 非split pan 控制区域高度
-      startHeight: 135,
+      startHeight: 125,
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
@@ -285,7 +295,7 @@ export default {
       bottomHeight: 35,
 
       rightTableHeight: (window.innerHeight - 150) / 2,
-      asideHeight: window.innerHeight - 95,
+      asideHeight: window.innerHeight - 80,
       treeHight: window.innerHeight - 135,
       asideWidth: "100%",
 
@@ -332,14 +342,15 @@ export default {
         activeNum: "",
       },
       inputFolder: "",
+      typeName:"",
     };
   },
 
   created() {
-    setTimeout(() => {
-      this.topPercent = this.getStorageNumber(this.topStorageName, 60);
-      this.leftPercent = this.getStorageNumber(this.leftStorageName, 20);
-    }, 300);
+
+    this.topPercent = this.getStorageNumber(this.topStorageName, 60);
+    this.leftPercent = this.getStorageNumber(this.leftStorageName, 20);
+
   },
 
   mounted() {
@@ -351,6 +362,7 @@ export default {
     }
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
+    _self.topPercent = 65;
     _self.searchFolder();
   },
 
@@ -743,6 +755,52 @@ export default {
       };
       console.log(params);
       ExcelUtil.export4Cnpe(params);
+    },
+
+        //添加到收藏夹
+    addToShopingCart() {
+      let _self = this;
+      var m = new Map();
+      var addItemId = "";
+      if (this.selectedItems.length > 0) {
+        var addItemId = [];
+        if (this.selectedItems.length > 0) {
+          for (var i = 0; i < this.selectedItems.length; i++) {
+            addItemId.push(this.selectedItems[i].ID);
+          }
+        }
+
+        axios
+          .post("/dc/addToShopingCart", JSON.stringify(addItemId))
+          .then(function (response) {
+            if (response.data.code) {
+              if (_self.showBox) {
+                _self.loadAllGridData(_self.currentFolder);
+              } else {
+                _self.loadGridData(_self.currentFolder);
+              }
+              _self.$message({
+                showClose: true,
+                message: _self.$t("message.AddSuccess"),
+                duration: 2000,
+                type: "success",
+              });
+            } else {
+              _self.$message({
+                showClose: true,
+                message: "添加失败!",
+                duration: 2000,
+                type: "warning",
+              });
+            }
+          });
+      } else {
+        this.$message({
+          showClose: true,
+          message: "请勾选待添加文件!",
+          duration: 2000,
+        });
+      }
     },
 
     penddingStorage() {
