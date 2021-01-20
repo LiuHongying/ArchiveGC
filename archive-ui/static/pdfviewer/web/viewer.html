@@ -212,7 +212,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                 </button>
 
                 <button id="print" class="toolbarButton print hiddenMediumView" title="Print" tabindex="33" data-l10n-id="print" style="visibility: hidden;">
-                  <span data-l10n-id="print_label">Printaaa</span>
+                  <span data-l10n-id="print_label">Print</span>
                 </button>
 
                 <button id="download" class="toolbarButton download hiddenMediumView" title="Download" tabindex="34" data-l10n-id="download" style="visibility: hidden;">
@@ -412,8 +412,6 @@ See https://github.com/adobe-type-tools/cmap-resources
       var showPrintButton = getQueryString("showPrintButton");
       var auditUrl = getQueryString("audit");
       var invokeUrl = getQueryString("invoke");
-      console.log("showPrint"+showPrintButton)
-      console.log("history"+borrowHistory)
       if(showPrintButton=="true"){
         printButton.style.visibility = 'visible';
       }else{
@@ -422,14 +420,12 @@ See https://github.com/adobe-type-tools/cmap-resources
       printButton.onclick = function () {
         var request = new XMLHttpRequest();
         var url = auditUrl;
-        console.log(url)
         request.open('GET',url,true);
         request.send();
         if(borrowHistory=="true"){
           printButton.style.visibility = 'hidden';
           let xmlrequet = new XMLHttpRequest();
           let url = invokeUrl;
-          console.log(url);
           xmlrequet.open('GET',url,true);
           xmlrequet.send();
         }else{
