@@ -1064,40 +1064,6 @@ public class ArchiveDcController extends ControllerAbstract{
 		return mp;
 	}
 	
-	/**
-	 * 在线编辑保存文档
-	 * @param id
-	 * @param uploadFile
-	 * @return
-	 */
-	 @RequestMapping(value = "/dc/newDocumentSaveDso", method = RequestMethod.POST)
-	 @ResponseBody
-	    public String newDocumentSaveDso(@RequestParam(value = "id", required = false) String id, @RequestParam(value = "file") MultipartFile uploadFile) {
-		 String retStr ="0";
-		 try {
-			 Map<String, Object> args = new HashMap();
-			    args.put("ID", id);
-				EcmContent en = null;
-				EcmDocument doc = new EcmDocument();
-				doc.setAttributes(args);
-				if (uploadFile != null) {
-					en = new EcmContent();
-					en.setName(uploadFile.getOriginalFilename());
-					en.setContentSize(uploadFile.getSize());
-					en.setFormatName(FileUtils.getExtention(uploadFile.getOriginalFilename()));
-					en.setInputStream(uploadFile.getInputStream());
-				}
-				String objId = documentService.creatOrUpdateObject(getToken(), doc, en);
-				if( StringUtils.isNotEmpty(objId)) {
-					retStr = "1"; 
-				}
-		 	} 
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		 	return retStr;
-	    }
-	 
 	 @RequestMapping(value = "/dc/batchMountFile", method = RequestMethod.POST)
 		@ResponseBody
 		public Map<String, Object> BatchMountFile(@RequestParam("ids")List<String> ids, @RequestParam("files") MultipartFile[] files) throws AccessDeniedException{
@@ -1117,4 +1083,40 @@ public class ArchiveDcController extends ControllerAbstract{
 			
 			return mp;
 		}
+	 
+	 /**
+		 * 在线编辑保存文档
+		 * @param id
+		 * @param uploadFile
+		 * @return
+		 */
+		 @RequestMapping(value = "/dc/newDocumentSaveDso", method = RequestMethod.POST)
+		 @ResponseBody
+		    public String newDocumentSaveDso(@RequestParam(value = "id", required = false) String id, @RequestParam(value = "file") MultipartFile uploadFile) {
+			 String retStr ="0";
+			 try {
+				 Map<String, Object> args = new HashMap();
+				    args.put("ID", id);
+					EcmContent en = null;
+					EcmDocument doc = new EcmDocument();
+					doc.setAttributes(args);
+					if (uploadFile != null) {
+						en = new EcmContent();
+						en.setName(uploadFile.getOriginalFilename());
+						en.setContentSize(uploadFile.getSize());
+						en.setFormatName(FileUtils.getExtention(uploadFile.getOriginalFilename()));
+						en.setInputStream(uploadFile.getInputStream());
+					}
+				//	String objId = documentService.creatOrUpdateObject(getToken(), doc, en);// WORD在线编辑保存
+					//WORD在线编辑保存
+					String objId = documentService.checkInUpgradeContent(getToken(), id, en); 
+					if( StringUtils.isNotEmpty(objId)) {
+						retStr = "1"; 
+					}
+			 	} 
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			 	return retStr;
+		    }
 }
