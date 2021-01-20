@@ -1,10 +1,10 @@
 <template>
   <div id="print" ref="print" style="width:100%;">
-    <div style="height:50px">
+    <div style="height:80px">
 
     </div>
     <div class="topItem">
-      424
+      
     </div>
     <div class="topItem">
       {{archiveObject.C_ARCHIVE_CODING}}
@@ -18,7 +18,7 @@
     <div class="titleItem"> 
       {{archiveObject.TITLE}}
     </div>
-    <div style="height:72px">
+    <div style="height:75px">
 
     </div>
     <div class="bottomItem"> 
@@ -83,9 +83,9 @@ export default {
   text-align:left; 
   color: #000000;
   padding-top: 12px;
-  padding-bottom: 6px;
+  padding-bottom: 2px;
   padding-left:200px;
-  font-size:22pt;
+  font-size:16pt;
 }
 .titleItem{
   line-height: 27px;
@@ -94,16 +94,16 @@ export default {
   color: #000000;
   padding-left:270px;
   padding-right:90px;
-  font-size:18pt;
+  font-size:16pt;
   vertical-align: bottom;
   display: table-cell;
 }
 .bottomItem{
   text-align:left; 
   color: #000000;
-  padding-top: 12px;
+  padding-top: 10px;
   padding-bottom: 15px;
   padding-left:270px;
-  font-size:18pt;
+  font-size:16pt;
 }
 </style>
