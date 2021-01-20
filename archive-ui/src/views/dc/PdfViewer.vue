@@ -35,10 +35,10 @@ export default {
     this.writeAudit(this.id)
   },
   methods: {
-    loadUrl() {
+    loadUrl(hasBorrowHistory) {
       let _self = this;
       var showPrintButton = _self.judgePrint.showPrintButton;
-      var borrowHistory = _self.judgePrint.borrowHistory;
+      var borrowHistory = hasBorrowHistory;
       var baseURL = _self.axios.defaults.baseURL;
       var params = "&showPrintButton="+showPrintButton+"&borrowHistory="+borrowHistory
       let getfileUrl =  _self.axios.defaults.baseURL+"/dc/getContent?id="+_self.id+"&token="+sessionStorage.getItem('access-token')+"&format=pdf";
@@ -64,16 +64,17 @@ export default {
         _self.judgePrint.showPrintButton = true;
         var m = new Map()
         m.set("docId",docId)
-        axios
+       axios
           .post("/archive/judgePrintByPermit", JSON.stringify(m))
           .then(function(response){
             if(response.data.code == 1){
             _self.judgePrint.borrowHistory = response.data.borrowHistory;
+            _self.loadUrl(_self.judgePrint.borrowHistory);
             }
           })
       }else{
         _self.judgePrint.showPrintButton = false;
-        return;
+        _self.loadUrl(false);
       }
     }
   }
