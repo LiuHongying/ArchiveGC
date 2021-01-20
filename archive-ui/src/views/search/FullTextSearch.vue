@@ -37,6 +37,7 @@
       <el-button @click="handleScendSearch()" type="primary">{{$t('application.scendSearch')}}</el-button>
       </div>
     </el-dialog>
+    <div v-if="searched==false" style="height:60px;"></div>
     <div class="searchInput" >
       <!-- <el-autocomplete
         class="inline-input"
@@ -303,7 +304,8 @@ export default {
       dialogVisible: false,
       tableHeight: window.innerHeight - 170,
       formLabelWidth: "120px",
-      loadData:false
+      loadData:false,
+      searched:false,
     };
   },
   created() {
@@ -485,8 +487,10 @@ export default {
     saveItem() {},
     onSaved() {},
     search(isScend) {
+
       window.addEventListener("scroll", this.handleScroll);
       let _self = this;
+      _self.searched = true;
       _self.loadData = true;
       _self.isScend = isScend;
       _self.loading = true;

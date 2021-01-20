@@ -1,6 +1,6 @@
 <template>
   <div id="print" ref="print" style="width:100%;">
-    <div style="height:85px">
+    <div style="height:50px">
 
     </div>
     <div class="topItem">
@@ -12,13 +12,13 @@
     <div class="topItem">
       {{archiveObject.C_ARC_CLASSIC}}
     </div>
-    <div style="height:720px">
+    <div style="height:432px">
 
     </div>
     <div class="titleItem"> 
       {{archiveObject.TITLE}}
     </div>
-    <div style="height:120px">
+    <div style="height:72px">
 
     </div>
     <div class="bottomItem"> 
@@ -82,28 +82,28 @@ export default {
 .topItem{
   text-align:left; 
   color: #000000;
-  padding-top: 20px;
-  padding-bottom: 10px;
-  padding-left:330px;
-  font-size:28pt;
+  padding-top: 12px;
+  padding-bottom: 6px;
+  padding-left:200px;
+  font-size:22pt;
 }
 .titleItem{
-  line-height: 45px;
-  height: 110px;
+  line-height: 27px;
+  height: 70px;
   text-align:left; 
   color: #000000;
-  padding-left:450px;
-  padding-right:150px;
-  font-size:24pt;
+  padding-left:270px;
+  padding-right:90px;
+  font-size:18pt;
   vertical-align: bottom;
   display: table-cell;
 }
 .bottomItem{
   text-align:left; 
   color: #000000;
-  padding-top: 20px;
-  padding-bottom: 24px;
-  padding-left:450px;
-  font-size:24pt;
+  padding-top: 12px;
+  padding-bottom: 15px;
+  padding-left:270px;
+  font-size:18pt;
 }
 </style>

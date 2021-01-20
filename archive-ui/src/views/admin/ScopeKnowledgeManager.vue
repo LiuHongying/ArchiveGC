@@ -27,8 +27,14 @@
         <el-row>
           <el-col :span="24">
             <el-form-item label="说明" :label-width="formLabelWidth">
-              <!--<el-input v-model="form.description" auto-complete="off"></el-input>-->
-                <UserSelectInput  v-model="form.description" v-bind:inputValue="form.description" v-bind:isRepeat="true"></UserSelectInput>
+              <el-input v-model="form.description" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="管理员" :label-width="formLabelWidth">
+                <UserSelectInput  v-model="form.manager" v-bind:inputValue="form.manager" v-bind:isRepeat="true"></UserSelectInput>
             </el-form-item>
           </el-col>
         </el-row>
@@ -78,6 +84,11 @@
           <el-table-column label="说明" min-width="30%">
             <template slot-scope="scope">
               <span>{{scope.row.description}}</span>
+            </template>
+          </el-table-column>
+           <el-table-column label="管理员" min-width="30%">
+            <template slot-scope="scope">
+              <span>{{scope.row.manager}}</span>
             </template>
           </el-table-column>
           <el-table-column label="操作" width="160">
