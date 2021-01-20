@@ -360,7 +360,7 @@ import DataLayout from "@/components/ecm-data-layout";
 import "url-search-params-polyfill";
 
 import PrintPage from "@/views/record/PrintPage";
-import PrintVolumes from "@/views/record/PrintVolumes";
+import PrintVolumes from "@/views/record/PrintVolumes4Delivery";
 import AddReuse from "@/views/record/AddReuse";
 import BatchImport from '@/components/controls/ImportDocument'
 
@@ -1758,9 +1758,13 @@ export default {
               
             } else {
               // _self.$message(_self.$t('message.newFailured'));
+              let msg = _self.$t('message.newFailured');
+              if(response.data.message){
+                msg += ":" + response.data.message;
+              }
               _self.$message({
                 showClose: true,
-                message: _self.$t('message.newFailured'),
+                message: msg,
                 duration: 2000,
                 type: "warning"
               });

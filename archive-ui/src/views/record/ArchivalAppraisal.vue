@@ -40,7 +40,8 @@
       :close-on-click-modal="false"
       v-dialogDrag
     >
-      <div><AppraisalStartUp :workflowObj="workflow" :showUploadFile="true" :parentId="parentID" :workflowFileList="files4Start" @close="flowVisible = false"></AppraisalStartUp></div>
+      <div><AppraisalStartUp ref="AppraisalStartUp" 
+      :workflowObj="workflow" :showUploadFile="true" :parentId="parentID" :workflowFileList="files4Start" @close="flowVisible = false"></AppraisalStartUp></div>
     </el-dialog>
       <el-form :inline="true" @submit.native.prevent>
         <el-form-item>
@@ -70,6 +71,9 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary"  @click="getWorkFlow">发起流程</el-button>
+        </el-form-item>
+        <el-form-item>
+          <AddCondition v-model="AdvCondition" :inputType="hiddenInput" @sendMsg="search()"></AddCondition>
         </el-form-item>
       </el-form>
     </template>
@@ -138,7 +142,7 @@ import DataLayout from "@/components/ecm-data-layout";
 import DataSelect from "@/components/ecm-data-select";
 import AppraisalStartUp from "@/views/workflow/AppraisalStartUp.vue"
 import selectDC from"@/components/controls/selectDC.vue"
-
+import AddCondition from '@/views/record/AddCondition'
 export default {
   name: "TC",
   data() {
@@ -181,7 +185,9 @@ export default {
       workflow:{},
       selectedDCItems:[],
       parentID:"",
-      files4Start:[]
+      files4Start:[],
+      AdvCondition:"",
+      hiddenInput:"hidden",
     };
   },
   mounted() {
@@ -210,7 +216,7 @@ export default {
       let _self = this;
       let key="TYPE_NAME='档案鉴定单' and IS_RELEASED=1";
       if(_self.inputValueNum!=''&&_self.inputValueNum!=undefined){
-        key+="and (CODING LIKE '%"+_self.inputValueNum+"%' OR TITLE LIKE '%"+_self.inputValueNum+"%')";
+        key+=" and (CODING LIKE '%"+_self.inputValueNum+"%' OR TITLE LIKE '%"+_self.inputValueNum+"%')";
       }
       if(_self.value!=''&&_self.value!=undefined){
         key+=" and STATUS = '"+_self.value+"'";
@@ -220,6 +226,11 @@ export default {
       }
       if(_self.endDate!=''&&_self.endDate!=undefined){
           key+=" and CREATION_DATE < '"+_self.endDate+"'";
+      }
+      if (_self.AdvCondition != "" && _self.AdvCondition != undefined) {
+        key +=
+          " and "+ _self.AdvCondition 
+          _self.AdvCondition=''
       }
       _self.$refs.ArchiveAppraisal.condition=key;
       _self.$refs.ArchiveAppraisal.currentPage = 1;
@@ -431,6 +442,7 @@ export default {
           console.log(_self.workflow)
           _self.parentID=_self.selectedThItems[0].ID
           _self.flowVisible = true;
+          _self.$refs.AppraisalStartUp.loadFormInfo()
         })
         .catch(function (error) {
           console.log(error);
@@ -446,7 +458,8 @@ export default {
     DataLayout: DataLayout,
     DataSelect: DataSelect,
     AppraisalStartUp:AppraisalStartUp,
-    selectDC:selectDC
+    selectDC:selectDC,
+    AddCondition:AddCondition,
   },
 };
 </script>

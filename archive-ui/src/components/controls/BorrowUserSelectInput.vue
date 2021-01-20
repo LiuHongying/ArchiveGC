@@ -1,13 +1,14 @@
 <template>
   <el-container >
     <el-dialog
+      v-dialogDrag
       :visible.sync="visible"
       :append-to-body="true"
       :close-on-click-modal="false"
       @open="refreshData"
       @close="closeDialog"
       :title="$t('application.selectUser')"
-      width="60%"
+      width="70%"
     >
       <div>
         <el-header>
@@ -28,7 +29,8 @@
                 @selection-change="handleSelectionChange"
               >
                 <el-table-column type="selection" width="60"></el-table-column>
-                <el-table-column prop="name" :label="$t('application.userName')" width="140"></el-table-column>
+                <el-table-column prop="name" :label="$t('application.userName')" width="120"></el-table-column>
+                <el-table-column prop="departmentName" :label="$t('application.group')" width="120"></el-table-column>
                 <el-table-column prop="email" :label="$t('application.email')"></el-table-column>
               </el-table>
             </el-col>
@@ -63,7 +65,8 @@
                 @selection-change="handleRightSelectionChange"
               >
                 <el-table-column type="selection" width="60"></el-table-column>
-                <el-table-column prop="name" :label="$t('application.userName')" width="140"></el-table-column>
+                <el-table-column prop="name" :label="$t('application.userName')" width="120"></el-table-column>
+                <el-table-column prop="departmentName" :label="$t('application.group')" width="120"></el-table-column>
                 <el-table-column prop="email" :label="$t('application.email')"></el-table-column>
               </el-table>
             </el-col>
@@ -224,6 +227,9 @@ export default {
       this.refreshData();
     },
     addToRight() {
+      if(!this.isRepeat && this.rightList.length>0){
+        return;
+      }
       for (var i = 0; i < this.tranList.length; i++) {
         this.rightList.push(this.tranList[i]);
         if(!this.isRepeat){
@@ -243,6 +249,7 @@ export default {
       }
     },
     addToLeft() {
+      
       for (var i = 0; i < this.tranList2.length; i++) {
         this.dataList.push(this.tranList2[i]);
       }

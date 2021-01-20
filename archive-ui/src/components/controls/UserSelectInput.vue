@@ -8,7 +8,7 @@
       @open="refreshData"
       @close="closeDialog"
       :title="$t('application.selectUser')"
-      width="60%"
+      width="70%"
     >
       <div>
           <el-row v-if="roleName == ''">
@@ -51,7 +51,8 @@
                 @selection-change="handleSelectionChange"
               >
                 <el-table-column type="selection" width="60"></el-table-column>
-                <el-table-column prop="name" :label="$t('application.userName')" width="100"></el-table-column>
+                <el-table-column prop="name" :label="$t('application.userName')" width="120"></el-table-column>
+                <el-table-column prop="departmentName" :label="$t('application.group')" width="120"></el-table-column>
                 <el-table-column prop="email" :label="$t('application.email')"></el-table-column>
               </el-table>
             </el-col>
@@ -86,7 +87,8 @@
                 @selection-change="handleRightSelectionChange"
               >
                 <el-table-column type="selection" width="60"></el-table-column>
-                <el-table-column prop="name" :label="$t('application.userName')" width="100"></el-table-column>
+                <el-table-column prop="name" :label="$t('application.userName')" width="120"></el-table-column>
+                <el-table-column prop="departmentName" :label="$t('application.group')" width="120"></el-table-column>
                 <el-table-column prop="email" :label="$t('application.email')"></el-table-column>
               </el-table>
             </el-col>

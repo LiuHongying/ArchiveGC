@@ -1,7 +1,11 @@
 <template>
   <DataLayout>
     <template v-slot:header>
-      <el-dialog title="保存当前查询条件" :visible.sync="saveDialogVisible" width="50%">
+      <el-dialog
+        title="保存当前查询条件"
+        :visible.sync="saveDialogVisible"
+        width="50%"
+      >
         <span>
           <el-row :gutter="10">
             <el-col :span="4">
@@ -13,17 +17,17 @@
           </el-row>
         </span>
         <span slot="footer" class="dialog-footer">
-        <el-button @click="saveDialogVisible = false">取消</el-button>
-        <el-button
-          type="primary"
-          @click="saveCondition()" 
-          >保存
-        </el-button>
-      </span>
+          <el-button @click="saveDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveCondition()">保存 </el-button>
+        </span>
       </el-dialog>
       <el-form :inline="true">
         <el-form-item>
-          <el-input style="width:200px" v-model="inputValueNum" placeholder="查询字段范围：编码/题名"></el-input>
+          <el-input
+            style="width: 200px"
+            v-model="inputValueNum"
+            placeholder="查询字段范围：编码/题名"
+          ></el-input>
         </el-form-item>
         <el-form-item>
           <el-date-picker
@@ -43,10 +47,23 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search()" icon="el-icon-search">查询</el-button>
+          <el-button type="primary" @click="search()" icon="el-icon-search"
+            >查询</el-button
+          >
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="saveDialogVisible = true">保存当前查询条件</el-button>
+          <el-button type="primary" @click="saveDialogVisible = true"
+            >保存当前查询条件</el-button
+          >
+        </el-form-item>
+        <el-form-item>
+          <AddCondition
+            @change="searchItem"
+            v-model="advCondition"
+            v-bind:typeName="typeName"
+            :inputValue="advCondition"
+            :inputType="hiddenInput"
+          ></AddCondition>
         </el-form-item>
       </el-form>
     </template>
@@ -99,6 +116,7 @@
 <script type="text/javascript">
 import DataLayout from "@/components/ecm-data-layout";
 import DataGrid from "@/components/DataGrid";
+import AddCondition from "@/views/record/AddCondition.vue";
 export default {
   name: "Subscription",
   data() {
@@ -119,6 +137,10 @@ export default {
       restaurants: [],
       inputValueNum: "",
       inputValueName: "",
+      advCondition: "",
+      typeName:"",
+
+      hiddenInput: "hidden",
 
       gridList: [],
       itemDataList: [],
@@ -174,6 +196,10 @@ export default {
       _self.inputValueNum;
     },
 
+    searchItem() {
+      this.search();
+    },
+
     handleIconClick(indata) {
       let _self = this;
 
@@ -191,16 +217,24 @@ export default {
       var map = new Map();
       var user = this.currentUser();
 
-      map.set("loginName", user);
+      map.set("CREATOR", user);
       map.set("Name", indata.Name);
 
-      axios.post();
+      axios
+        .post("/condition/save", JSON.stringify(m))
+        .then(function (response) {
+          _self.loading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     },
   },
 
   components: {
     DataLayout: DataLayout,
     DataGrid: DataGrid,
+    AddCondition: AddCondition,
   },
 };
 </script>

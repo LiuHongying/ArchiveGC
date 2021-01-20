@@ -44,12 +44,9 @@
           :itemId="selectedItemId"
           :typeName="typeName"
         ></ShowPropertyReadOnly>
-        <RelationViewer
-          v-if="showRelationViewer"
-          ref="RelationViewer"
-          :allowEdit="isEditProperty"
-        ></RelationViewer>
         <div slot="footer" class="dialog-footer">
+          <el-button v-if="showBatchCheck" @click="onPrevDoc" :disabled="prevButtonDisabled">上一条</el-button>
+          <el-button v-if="showBatchCheck" @click="onNextDoc" :disabled="nextButtonDisabled">下一条</el-button>
           <slot name="saveButton" :data="propertiesData">
             <el-button v-if="isEditProperty" @click="saveItem()">{{
               $t("application.save")
@@ -279,11 +276,11 @@
                       <el-dropdown-item
                         v-if="showOptions.indexOf('查看属性') != -1"
                         icon="el-icon-info"
-                        @click.native="showItemProperty(selectedRow)"
+                        @click.native="showItemProperty(scope.$index, selectedRow)"
                         >{{ $t("application.viewProperty") }}</el-dropdown-item
                       >
                       <el-dropdown-item
-                        v-if="showOptions.indexOf('加入购物车') != -1"
+                        v-if="showOptions.indexOf('加入收藏夹') != -1"
                         icon="el-icon-circle-plus-outline"
                         @click.native="addToShoppingCar([selectedRow])"
                         >{{ $t("application.addCart") }}</el-dropdown-item
@@ -309,7 +306,7 @@
                 size="small"
                 :title="$t('application.property')"
                 icon="el-icon-info"
-                @click="showItemProperty(scope.row)"
+                @click="showItemProperty(scope.$index,scope.row)"
               ></el-button>
             </slot>
           </template>
@@ -322,7 +319,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[10, 20, 50, 100, 200]"
+        :page-sizes="[10, 20, 50, 100, 200, 500,1000]"
         :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="itemCount"
@@ -335,7 +332,6 @@ import "@/utils/dialog";
 import ShowProperty from "@/components/ShowProperty";
 import ShowPropertyReadOnly from "@/components/ShowPropertyReadOnly"
 import EcmCustomColumns from "@/components/ecm-custom-columns";
-import RelationViewer from "@/components/RelationViewer";
 export default {
   name: "dataGrid",
   data() {
@@ -362,6 +358,7 @@ export default {
       showFields: [],
       selectedItemId: "",
       selectedRow: "",
+      selectedRows:[],
       typeName: "",
       selectedKey: [],
       selectedIndex: "",
@@ -376,8 +373,10 @@ export default {
         gridviewName: "",
         isCustom: false,
       },
-      showRelationViewer: false,
       timer: null,
+      currentDocIndex: 0,
+      prevButtonDisabled:true,
+      nextButtonDisabled:true,
     };
   },
   props: {
@@ -401,12 +400,13 @@ export default {
     parentId: { type: String, default: "" },
     isShowMoreOption: { type: Boolean, default: true }, //是否显示功能菜单
     isShowPropertyButton: { type: Boolean, default: true }, //是否显示属性按钮
-    showOptions: { type: String, default: "查看内容,查看属性,加入购物车,升版" }, //功能菜单显示控制
+    showOptions: { type: String, default: "查看内容,查看属性,加入收藏夹,升版" }, //功能菜单显示控制
     isShowChangeList: { type: Boolean, default: true }, //是否显示列表选择
     optionWidth: { type: Number, default: 3.5 }, //操作列宽度，放几个按钮
     pageSize: { type: Number, default: 20 },//每页显示数量
     folderId:{type:String,default:""},//目录ID
     isLoadGridInfo: { type: Boolean, default: true },
+    showBatchCheck: { type: Boolean, default: false },
   },
   watch: {
     showFields(val, oldVal) {
@@ -441,7 +441,6 @@ export default {
     ShowProperty: ShowProperty,
     ShowPropertyReadOnly:ShowPropertyReadOnly,
     EcmCustomColumns: EcmCustomColumns,
-    RelationViewer: RelationViewer,
   },
   mounted() {
     // this.ready();
@@ -457,12 +456,41 @@ export default {
     }
   },
   methods: {
-    // clickCheck(row){
-    //   if(row){
-    //     this.$refs.datatable.clearSelection();
-    //     this.$refs.datatable.toggleRowSelection(row);
-    //   }
-    // },
+    //上一个文档
+    onPrevDoc(){
+      if(this.currentDocIndex>0){
+        this.currentDocIndex --;
+        this.showItemProperty(this.currentDocIndex, this.itemDataList[this.currentDocIndex]);
+      }
+    },
+    //下一个文档
+    onNextDoc(){
+      if(this.currentDocIndex <  this.itemDataList.length-1){
+        this.currentDocIndex ++;
+        this.showItemProperty(this.currentDocIndex, this.itemDataList[this.currentDocIndex]);
+      }
+    },
+    //刷新上一个、下一个按钮
+    refreshBatchBotton(){
+      let _self = this;
+      if(_self.showBatchCheck && _self.selectedItemId && _self.selectedItemId != ""){
+        if(_self.itemDataList && _self.itemDataList.length>0){
+          for(var i=0;i< _self.itemDataList.length; i++){
+            if(_self.selectedItemId == _self.itemDataList[i].ID){
+              _self.prevButtonDisabled = false;
+              _self.nextButtonDisabled = false;
+              if(i==0){
+                _self.prevButtonDisabled = true;
+              }
+              if(i == _self.itemDataList.length-1){
+                _self.nextButtonDisabled = true;
+              }
+              return;
+            }
+          }
+        }
+      }
+    },
     onPropertiesSaveSuccess(props) {
       this.$emit("onPropertiesSaveSuccess", props);
     },
@@ -481,6 +509,7 @@ export default {
     // 加载表格数据
     loadGridData(gvname) {
       let _self = this;
+      _self.selectedRows = [];
       // let tbHeight = _self.tableHeight;
       _self.loading = true;
       var m = new Map();
@@ -879,10 +908,13 @@ export default {
       this.$refs.ShowProperty.saveItem();
     },
     //查看属性
-    showItemProperty(indata) {
+    showItemProperty(i,indata) {
       let _self = this;
+      
       _self.selectedItemId = indata.ID;
+      _self.currentDocIndex = i;
       _self.propertyVisible = true;
+      _self.refreshBatchBotton();
       _self.$nextTick(() => {
         if (_self.$refs.ShowProperty) {
           _self.$refs.ShowProperty.myItemId = indata.ID;
@@ -894,22 +926,6 @@ export default {
           }
           _self.$refs.ShowProperty.loadFormInfo();
           _self.getPropertiesData();
-          if (
-            indata.C_ITEM_TYPE == "文函" &&
-            indata.TYPE_NAME != "会议纪要" &&
-            indata.TYPE_NAME != "图文传真" &&
-            indata.TYPE_NAME != "接口信息传递单" &&
-            indata.TYPE_NAME != "接口信息答复单"
-          ) {
-            _self.showRelationViewer = true;
-            setTimeout(() => {
-              if (_self.$refs.RelationViewer) {
-                _self.$refs.RelationViewer.loadData(indata);
-              }
-            }, 100);
-          } else {
-            _self.showRelationViewer = false;
-          }
         }
       });
     },
@@ -921,7 +937,9 @@ export default {
       } else {
         //this.$message("新建成功!");
       }
-      this.propertyVisible = false;
+      if(!this.showBatchCheck){
+        this.propertyVisible = false;
+      }
     },
     showFieldOption() {
       let _self = this;
@@ -1005,17 +1023,18 @@ export default {
     },
     rowClick(row) {
       this.selectedRow = row;
-      /*
-      if(row&&this.isshowSelection){
+      
+      if(row&&this.isshowSelection && this.selectedRows && this.selectedRows.length<2){
         this.$refs.datatable.clearSelection();
         this.$refs.datatable.toggleRowSelection(row);
-      }*/
+      }
       this.$emit("rowclick", row);
     },
     dbclick(row) {
       this.$emit("dbclick", row);
     },
     selectChange(val) {
+      this.selectedRows = val;
       this.$emit("selectchange", val);
     },
     //row 行对象，column 列对象,cell 单元格,event 事件对象
