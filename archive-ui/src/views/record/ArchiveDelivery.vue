@@ -434,6 +434,7 @@ export default {
       currentPage: 1,
       dialogVisible: false,
       propertyVisible: false,
+      loadInfo:false,
       showButton: true,
       typeSelectVisible: false,
       selectRow: [],
@@ -1618,7 +1619,11 @@ export default {
             _self.$refs.ShowProperty.setMainSubRelation(mp);
             _self.$refs.ShowProperty.setMainObject(copyInfo);
           }
-          _self.$refs.ShowProperty.loadFormInfo();
+          if(_self.loadInfo){
+              _self.$refs.ShowProperty.loadFormInfo();
+            }else{
+              _self.loadInfo = true;
+            }
         });
         // setTimeout(()=>{
         //   if(_self.$refs.ShowProperty){
