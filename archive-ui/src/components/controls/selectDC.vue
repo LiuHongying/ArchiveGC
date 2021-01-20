@@ -395,10 +395,10 @@ export default {
         var nowDate = new Date().getTime();
         if(this.DCtype=="到期文档"){
             this.dataUrl="/dc/getDocuments4DC"
-            this.conditionDC="C_INCLUDE_PAPER='是' and IS_RELEASED=1"+this.conditionFile
+            this.conditionDC="C_INCLUDE_PAPER='有' and IS_RELEASED=1"+this.conditionFile
         }else{
             this.dataUrl="/dc/getDocuments"
-            this.conditionDC="C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+this.conditionFile
+            this.conditionDC="C_INCLUDE_PAPER='有' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+this.conditionFile
         }
         setTimeout(() => {
             this.searchItem()
