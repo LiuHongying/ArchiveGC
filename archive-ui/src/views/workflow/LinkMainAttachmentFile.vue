@@ -6,7 +6,8 @@
                 <el-form size="mini" :label-width="formLabelWidth" v-loading='uploading'>
                     <div style="height:150px;overflow-y:scroll; overflow-x:scroll;">
                     <el-upload
-                        :limit="100"
+                        :limit="1"
+                        :on-exceed ="limitMessage"
                         :file-list="fileList"
                         action
                         :on-change="handleChange"
@@ -190,6 +191,14 @@ export default {
         }, 300);
     },
     methods: {
+        limitMessage(){
+        this.$message({
+                showClose: true,
+                message:"仅可以上传一个电子文件",
+                duration: 2000,
+                type: 'warning'
+                });
+        },
         // 上下分屏事件
         onSplitResize(topPercent){
             // 顶部百分比*100
