@@ -13,7 +13,7 @@
         </el-col>
         
         <el-col :span="3">
-          <DistributeRecord :distributeId="currentId"></DistributeRecord>
+          <DistributeRecord :distributeId="currentId">分发记录</DistributeRecord>
         </el-col>
       </el-row>
       <el-row>
@@ -24,11 +24,11 @@
           v-bind:tableHeight="(layout.height-startHeight-75)"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
-          gridViewName="DistributionGrid"
+          gridViewName="DistributionGridMysender"
           :optionWidth="2"
           :condition="condition"
           :isshowCustom="false"
-          :isEditProperty="false"
+          :isEditProperty="true"
           showOptions
           :isShowChangeList="false"
           :isInitData="true"
@@ -61,7 +61,7 @@ export default {
   },
   data() {
     return {
-      condition: " STATUS='已阅'",
+      condition: "",
       inputkey: "",
       selectedItems: [],
       selectedItemList: [],
@@ -125,48 +125,7 @@ export default {
           console.log(error);
         });
     },
-    readed() {
-      let _self = this;
-      if (_self.selectIds.length == 0) {
-        _self.$message({
-          showClose: true,
-          message: "请选择一条或多条数据！",
-          duration: 2000,
-          type: "warning"
-        });
-        return;
-      }
-      _self
-        .axios({
-          headers: {
-            "Content-Type": "application/json;charset=UTF-8"
-          },
-          method: "post",
-          data: JSON.stringify(_self.selectIds),
-          url: "/cd/dc/readedDistribution"
-        })
-        .then(function(response) {
-          if (response.data.code == "1") {
-            _self.$message({
-              showClose: true,
-              message: "操作成功！",
-              duration: 2000,
-              type: "success"
-            });
-            _self.$refs.mainDataGrid.loadGridData();
-          } else {
-            _self.$message({
-              showClose: true,
-              message: response.data.message,
-              duration: 2000,
-              type: "error"
-            });
-          }
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
-    },
+    
     selectChange(selection) {
       this.selectedItems = selection;
       this.selectedItemList = selection;
@@ -183,7 +142,7 @@ export default {
     searchItem() {
       let _self = this;
       let key = _self.inputkey;
-      _self.condition = " STATUS='已阅'";
+      _self.condition = " ";
       if (key != "") {
         let c =
           " CODING like '%" +

@@ -12,7 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+  /**
+  * Matthew changes on 2021年1月20日14:35:31
+  */
+  .cover{
+    position:absolute;
+    top:0;
+   overflow:hidden
+   }
 .textLayer {
   position: absolute;
   left: 0;

@@ -734,12 +734,12 @@ export default {
       isMF:false,
       MFinput:"",
       childAddConds:'',
-      childTypeName:'',
+      childTypeName:'所有',
       leftParam:{
         childUrl:'/dc/getDocuByRelationParentId',
         childCondition:"and a.NAME='irel_children' and b.IS_HIDDEN=0",
       },
-      
+      loadInfo:false,
       volumeInArchiveGridName:""
     };
   },
@@ -889,7 +889,7 @@ export default {
         gridName: _self.$refs.mainDataGrid.gridViewName,
         folderId: _self.currentFolder.id,
         orderBy: "MODIFIED_DATE desc",
-        condition: "IS_HIDDEN=0",
+        condition: _self.$refs.mainDataGrid.condition,
         pageSize: _self.pageSize*10,
         pageIndex: _self.currentPage - 1,
         lang: "zh-cn",
@@ -933,8 +933,13 @@ export default {
 			  }
 			  _self.$refs.ShowProperty.setMainSubRelation(mp);
 			  _self.$refs.ShowProperty.setMainObject(copyInfo);
-			}
-            _self.$refs.ShowProperty.loadFormInfo();
+      }
+            if(_self.loadInfo){
+              _self.$refs.ShowProperty.loadFormInfo();
+            }else{
+              _self.loadInfo = true;
+            }
+
           }
         }, 10);
       } else {

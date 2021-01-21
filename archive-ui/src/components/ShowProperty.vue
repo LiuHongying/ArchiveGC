@@ -331,6 +331,7 @@ export default {
       return parseInt(dt) - parseInt(today);
 	  },
     getFormData(){
+      debugger;
       let _self = this;
       var m = new Map();
       var c;
@@ -343,17 +344,17 @@ export default {
             if(dataRows[i].attrName !='FOLDER_ID'&&dataRows[i].attrName !='ID')
             {
               var val = dataRows[i].defaultValue;
-              if(val && dataRows[i].isRepeat){
-                var temp = "";
-              // console.log(val);
-                for(let j=0,len=val.length;j<len;j++){
-                  temp = temp + val[j]+";";
-                  //console.log(temp);
-                }
-                temp = temp.substring(0,temp.length-1);
-                val = temp;
-                //console.log(val);
-              }
+              // if(val && dataRows[i].isRepeat){
+              //   var temp = "";
+              // // console.log(val);
+              //   for(let j=0,len=val.length;j<len;j++){
+              //     temp = temp + val[j]+";";
+              //     //console.log(temp);
+              //   }
+              //   temp = temp.substring(0,temp.length-1);
+              //   val = temp;
+              //   //console.log(val);
+              // }
               m.set(dataRows[i].attrName, val);
             }
           }
@@ -535,7 +536,16 @@ export default {
               for (i in frmItems) {
                 let val = tab[frmItems[i].attrName];
                 if(val && frmItems[i].isRepeat){
-                  val = val.split(";");
+                  
+                  if(frmItems[i].controlType=='TextBox' || frmItems[i].controlType=='Select' || frmItems[i].controlType=='SQLSelect' || frmItems[i].controlType=='ValueSelect'){
+                    if(frmItems[i].defaultValue==null){
+                      // frmItems[i].defaultValue =[]
+                      val = [];
+                    }else{
+                      // frmItems[i].defaultValue =  frmItems[i].defaultValue.split(";");
+                      val = val.split(";");
+                    }
+                  }
                 }
                 
                 frmItems[i].defaultValue = val;

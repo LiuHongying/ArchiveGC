@@ -49,4 +49,55 @@ export const npcRouter =  [
         name: '文件创建',
         component: () => import('@/views/npc/CreateWithTemp.vue')
     },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:"effectiveDocuments"
+        },
+        path: '/npc/CreateWithTemplate2',
+        name: '文件创建2',
+        component: () => import('@/views/archivecd/CreateWithTemp.vue')
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:"distribute"
+        },
+        path: '/npc/distribute',
+        name: '分发',
+        component: () => import('@/views/archivecd/distribute/DistributeList.vue')
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:"haveReaded"
+        },
+        path: '/npc/readed',
+        name: '分发',
+        component: () => import('@/views/archivecd/distribute/DistributeListReaded.vue')
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:"Mysender"
+        },
+        path: '/npc/Mysender',
+        name: '我的分发',
+        component: () => import('@/views/archivecd/distribute/DistributeListSender.vue')
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
+            title:"Approving"
+        },
+        path: '/npc/Approve',
+        name: '批示',
+        component: () => import('@/views/archivecd/distribute/DistributeApproval.vue')
+    },
+    
 ]

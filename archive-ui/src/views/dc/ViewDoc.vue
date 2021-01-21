@@ -335,7 +335,13 @@ export default {
         this.judgeDownload.showDownloadButton = false;
         this.revokeDocAcl(this.doc.id);
       }
-      let url = this.axios.defaults.baseURL+"/dc/getContent?id="+this.doc.id+"&token="+sessionStorage.getItem('access-token')+"&action=download";
+      var url = "";
+      if(this.doc.format == "pdf"){
+        url = this.axios.defaults.baseURL+"/dc/getContent4Water?id="+this.doc.id+"&token="+sessionStorage.getItem('access-token')+"&action=download";
+      }else{
+        url = this.axios.defaults.baseURL+"/dc/getContent?id="+this.doc.id+"&token="+sessionStorage.getItem('access-token')+"&action=download";
+      }
+      
       this.recordAudit(this.doc.id);
       window.open(url, '_blank');
     },

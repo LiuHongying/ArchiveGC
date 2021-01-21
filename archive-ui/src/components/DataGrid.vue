@@ -47,6 +47,9 @@
         <div slot="footer" class="dialog-footer">
           <el-button v-if="showBatchCheck" @click="onPrevDoc" :disabled="prevButtonDisabled">上一条</el-button>
           <el-button v-if="showBatchCheck" @click="onNextDoc" :disabled="nextButtonDisabled">下一条</el-button>
+          <slot name="addButton">
+
+          </slot>
           <slot name="saveButton" :data="propertiesData">
             <el-button v-if="isEditProperty" @click="saveItem()">{{
               $t("application.save")
@@ -407,6 +410,7 @@ export default {
     folderId:{type:String,default:""},//目录ID
     isLoadGridInfo: { type: Boolean, default: true },
     showBatchCheck: { type: Boolean, default: false },
+    extparam:{type:Map,default:null}
   },
   watch: {
     showFields(val, oldVal) {
@@ -519,6 +523,12 @@ export default {
       m.set("condition", _self.condition);
       if (_self.parentId != "") {
         m.set("id", _self.parentId);
+      }
+      if(_self.extparam!=null){
+        _self.extparam.forEach(function (value, key, map) {
+           m.set(key,value);
+        });
+        
       }
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", _self.currentPage - 1);
