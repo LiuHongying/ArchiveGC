@@ -1109,10 +1109,10 @@ public class ArchiveDcController extends ControllerAbstract{
 					}
 				//	String objId = documentService.creatOrUpdateObject(getToken(), doc, en);// WORD在线编辑保存
 					//WORD在线编辑保存
-					String objId = documentService.checkInUpgradeContent(getToken(), id, en); 
-					if( StringUtils.isNotEmpty(objId)) {
-						retStr = "1"; 
-					}
+					//String objId = documentService.checkInUpgradeContent(getToken(), id, en); 
+//					if( StringUtils.isNotEmpty(objId)) {
+//						retStr = "1"; 
+//					}
 			 	} 
 				catch (Exception e) {
 					e.printStackTrace();
