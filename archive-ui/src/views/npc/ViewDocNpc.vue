@@ -23,7 +23,28 @@
                     <el-button type="primary" @click="uploadDataSub()">{{$t('application.start')+$t('application.Import')}}</el-button>
                 </div>
             </el-dialog>
-
+               <!-- 添加格式副本 -->
+            <el-dialog :title="$t('application.Import')" :visible.sync="importdialogVisible" width="70%"
+            :close-on-click-modal="false" :append-to-body="true">
+                <el-form size="mini" :label-width="formLabelWidth" v-loading='uploading'>
+                  <div style="height:200px;overflow-y:scroll; overflow-x:scroll;">
+                    <el-upload
+                      :limit="100"
+                      :file-list="fileListRedition"
+                      action
+                      :on-change="handleChangeRedition"
+                      :auto-upload="false"
+                      :multiple="false"
+                    >
+                      <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
+                    </el-upload>
+                  </div>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                  <el-button @click="importdialogVisible = false">{{$t('application.cancel')}}</el-button>
+                  <el-button type="primary" @click="uploadDataForRedition()">{{$t('application.start')+$t('application.Import')}}</el-button>
+                </div>
+            </el-dialog>
     </template>
     <template v-slot:main="{ layout }">
       <!-- <el-card shadow="hover">
@@ -86,6 +107,10 @@
              <el-col :span="2">
               <el-button  type="success" @click="showItemContentEdit(formId)">在线编辑</el-button>
             </el-col>
+            <el-col :span="2">
+                <el-button type="primary" @click="beforeUploadFileRedition('/dc/addRendition')" >格式副本</el-button> 
+            </el-col>
+            
             <el-col :span="2" v-if="allowEdit">
               <MountFile  
                   :selectedItem="[{'ID':formId}]"
@@ -188,14 +213,17 @@ export default {
     return {
       file: [],
       fileList: [],
+      fileListRedition: [],
       uploadFileModel:"",
       fileAttachList:[],
       approvalUserList:[],
       taskForm:{},
       formLabelWidth: "120px",
       importSubVisible:false,
+      importdialogVisible: false,
       uploadUrl:"",
       selectedAttachment:[],
+      selectedFileItem:[],
       resultData:{},
       docObj:null,
        doc:{
@@ -495,6 +523,96 @@ export default {
         _self.taskForm=arr;
         });
      
+    },
+
+     beforeUploadSubFile(uploadpath){
+        let _self=this;
+        if(_self.formId==undefined||_self.formId==""){
+            // _self.$message('请选择一条文件数据');
+            _self.$message({
+                    showClose: true,
+                    message:  _self.$t('message.pleaseSelectOneDesigndoc'),
+                    duration: 2000,
+                    type: "warning"
+                });
+            return;
+        }
+        _self.uploadUrl=uploadpath;
+        _self.fileAttachList=[];
+        _self.importSubVisible=true;
+        
+    },
+    //上传格式副本窗体
+    beforeUploadFileRedition(uploadpath){
+      let _self=this;
+        if(_self.formId==undefined||_self.formId==""){
+            // _self.$message('请选择一条文件数据');
+            _self.$message({
+                    showClose: true,
+                    message:  _self.$t('message.pleaseSelectOneDesigndoc'),
+                    duration: 2000,
+                    type: "warning"
+                });
+            return;
+        }
+      _self.uploadUrl=uploadpath;
+      _self.fileListRedition=[];
+      _self.importdialogVisible=true;
+      
+    },
+
+handleChangeRedition(file, fileList) {
+      this.fileListRedition = fileList;
+      //console.log(file);
+      // console.log(fileList);
+    },
+      getFormDataForRedition() {
+        let _self = this;
+        let formdata = new FormData();
+        var data = {};
+        data["ID"] = _self.formId;//_self.selectedInnerItems[0].ID;//_self.selectedFileId;
+        formdata.append("metaData", JSON.stringify(data));
+        debugger
+        _self.fileListRedition.forEach(function(file) {
+            //console.log(file.name);
+            formdata.append("uploadFile", file.raw, file.name);
+        });
+        return formdata;
+    },
+     //上传文件
+    uploadDataForRedition() {
+      let _self = this;
+      debugger
+      let formdata = _self.getFormDataForRedition();;
+      console.log("UploadData getData");
+      console.log(formdata);
+      _self.uploading=true;
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          datatype: "json",
+          method: "post",
+          data: formdata,
+          url: _self.uploadUrl
+        })
+        .then(function(response) {
+          _self.importdialogVisible = false;
+          // _self.refreshData();
+          _self.uploading=false;
+          // _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
+          _self.$message({
+                showClose: true,
+                message: _self.$t('application.Import')+_self.$t('message.success'),
+                duration: 2000,
+                type: 'success'
+              });
+        })
+        .catch(function(error) {
+          _self.uploading=false;
+          console.log(error);
+        });
     },
   }
 };

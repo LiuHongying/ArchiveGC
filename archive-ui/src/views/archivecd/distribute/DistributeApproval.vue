@@ -13,7 +13,7 @@
         </el-col>
 
         <el-col :span="3">
-          <el-button type="primary" @click="readed()">已阅</el-button>
+          <el-button type="primary" @click="distributeBatch()" icon="el-icon-check">批量批示</el-button>
         </el-col>
       </el-row>
       <el-row>
@@ -73,7 +73,35 @@ export default {
   props: {},
   mounted() {},
   methods: {
+    distributeBatch() {
+      let _self = this;
+
+      axios
+        .post("/cd/dc/distributeBatchApprove", JSON.stringify(_self.selectIds))
+        .then(function(response) {
+          let code = response.data.code;
+          //console.log(JSON.stringify(response));
+          if (code == 1) {
+            _self.$message({
+              showClose: true,
+              message: "批示成功",
+              duration: 2000,
+              type: "success"
+            });
+            _self.searchItem();
+            _self.$emit("onSaved", "update");
+            _self.$emit("onSaveSuccess", m);
+          } else {
+            _self.$message(_self.$t("message.saveFailured"));
+          }
+        })
+        .catch(function(error) {
+          _self.$message(_self.$t("message.saveFailured"));
+          console.log(error);
+        });
+    },
     saveItem() {
+      let _self = this;
       let formData = this.$refs.mainDataGrid.$refs.ShowProperty.getFormData();
       let jsonStr = formData.get("metaData");
       let m = JSON.parse(jsonStr);
@@ -82,12 +110,12 @@ export default {
         .then(function(response) {
           let code = response.data.code;
           //console.log(JSON.stringify(response));
-          if (code == 1) {
+          if (code == "1") {
             _self.$message({
               showClose: true,
               message: "分发成功",
               duration: 2000,
-              type: "warning"
+              type: "success"
             });
             _self.searchItem();
             _self.$emit("onSaved", "update");

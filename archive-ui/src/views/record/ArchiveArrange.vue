@@ -889,7 +889,7 @@ export default {
         gridName: _self.$refs.mainDataGrid.gridViewName,
         folderId: _self.currentFolder.id,
         orderBy: "MODIFIED_DATE desc",
-        condition: "IS_HIDDEN=0",
+        condition: _self.$refs.mainDataGrid.condition,
         pageSize: _self.pageSize*10,
         pageIndex: _self.currentPage - 1,
         lang: "zh-cn",
