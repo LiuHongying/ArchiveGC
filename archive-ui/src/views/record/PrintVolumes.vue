@@ -39,7 +39,12 @@
         <el-button type="primary" @click="dialogQrcodeVisible = false">{{$t('application.close')}}</el-button>
       </span>
     </el-dialog> -->
-
+        <el-select @change="onChoiceChange" v-model="Choice" >
+          <el-option label="通用打印" value="通用打印"></el-option>
+          <el-option label="商务文件移交单正本" value="商务文件移交单正本"></el-option>
+          <el-option label="商务文件移交单副本" value="商务文件移交单副本"></el-option>
+          </el-select>
+          <button @click="printCode" v-print="'#print'">打印</button>
       <div id='print' ref='print' style="height:95%;width:95%;">
 
         <!-- <div class="table-a"> 
@@ -190,7 +195,6 @@
           </div>
   　　　　</div>
 
-  　　　　<button @click="printCode" v-print="'#print'">打印</button>
   </div>
 </template>
 
@@ -212,7 +216,9 @@ export default {
       currentLanguage: "zh-cn",
       gridList:[],
       volumeTitle:"",
-      showSingle:true
+      showSingle:true,
+      Choice:"",
+
     };
   },
   mounted() {
@@ -231,6 +237,18 @@ export default {
     gridName:{type:String}
   },
   methods: {
+    onChoiceChange(){
+      let _self = this
+      if(this.Choice=='商务文件移交单正本'){
+        this.loadGridInfo("BusinessPrintGrid")
+      }
+      if(this.Choice=='商务文件移交单副本'){
+        this.loadGridInfo("BusinessPrintGrid4Content")
+      }
+      if(this.Choice=='通用打印'){
+        this.loadGridInfo("PrintDelivery")
+      }
+    },
 
       // 加载表格样式
     loadGridInfo(gridName) 
