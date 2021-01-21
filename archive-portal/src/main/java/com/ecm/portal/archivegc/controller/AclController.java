@@ -34,7 +34,7 @@ public class AclController extends ControllerAbstract{
 			LoginUser currentUser  = this.getSession().getCurrentUser();
 			String userName = currentUser.getUserName();
 			
-			String condition = "DESCRIPTION like '%" + userName+ "%'  or creator  like  '%" + userName+ "%' "  ;
+			String condition = "MANAGER like '%" + userName+ "%'  or creator  like  '%" + userName+ "%' "  ;
 			
 			Map<String, Object> args = JSONUtils.stringToMap(argStr);
 			List<EcmGroup> list = null;

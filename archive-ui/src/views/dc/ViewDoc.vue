@@ -24,15 +24,7 @@
           
           <template v-if="judgeDownload.showDownloadButton">
 
-            <template v-if="judgeDownload.borrowHistory">
-              <template v-if="judgeDownload.downloadPermit">
-                <el-button size="mini" icon="el-icon-download" @click="download()">{{$t('application.download')}}</el-button>
-              </template>
-            </template>
-
-            <template v-else>
-              <el-button size="mini" icon="el-icon-download" @click="download()">{{$t('application.download')}}</el-button>
-            </template>
+            <el-button size="mini" icon="el-icon-download" @click="download()">{{$t('application.download')}}</el-button>
 
           </template>
 
@@ -52,7 +44,7 @@
              </div>
            </template>
            <template v-else>
-             <PdfViewer v-if="viewerType==1" v-bind:id="doc.id" v-bind:format="doc.format"></PdfViewer>
+             <PdfViewer v-if="viewerType==1" v-bind:id="doc.id" v-bind:format="doc.format" v-bind:permitLevel="judgePrint.printPermit"></PdfViewer>
              <OfficeDocViewer v-else-if="viewerType==2" v-bind:id="doc.id" v-bind:format="doc.format"></OfficeDocViewer>
              <ImageViewer v-else-if="viewerType==3" v-bind:id="doc.id" v-bind:format="doc.format"></ImageViewer>
              <VideoPlayer v-else-if="viewerType==4" v-bind:id="doc.id" v-bind:format="doc.format"></VideoPlayer>
@@ -63,8 +55,8 @@
              <!-- <JTViewer v-else-if="viewerType==7" v-bind:id="doc.id" format="obj" :fileName="doc.C_IMPORT_NAME"></JTViewer>
              <ThreeDsViewer v-else-if="viewerType==8" v-bind:id="doc.id" ></ThreeDsViewer> -->
              <!-- End -->
-             <!-- 以下是新的代码 -->
-             <ThreeDsViewer v-else-if="viewerType==7" v-bind:id="doc.id" ></ThreeDsViewer>
+             <!-- 以下是新的代码-->
+             <ThreeDsViewer v-else-if="viewerType==7" v-bind:id="doc.id" ></ThreeDsViewer> 
              <div v-else-if="doc.contentSize==0" style="padding-top:40px;">
                 {{$t('application.noE-File')}}
             </div>
@@ -84,6 +76,7 @@
               <el-button type="primary" plain @click="menuClick($t('application.relationDC'))">{{$t('application.relationDC')}}</el-button><br/>
               <el-button type="primary" plain @click="menuClick($t('application.DCver'))">{{$t('application.DCver')}}</el-button><br/>
               <el-button type="primary" plain @click="menuClick($t('application.Rendition'))">{{$t('application.Rendition')}}</el-button><br/>
+               <el-button type="primary" plain @click="menuClick($t('application.viewWorkflow'))">{{$t('application.viewWorkflow')}}</el-button><br/>
               <!-- <el-button type="primary" plain @click="menuClick('利用信息')">利用信息</el-button><br/> -->
               <template v-if="doc.typeName=='文件传递单'" >
                 <el-button type="primary" plain @click="menuClick($t('application.TransferDoc'))">{{$t('application.TransferDoc')}}</el-button><br/>
@@ -113,6 +106,9 @@
       </template>
        <template v-if="dialog.title==$t('application.Rendition')">
         <ViewRedition :docId="docId" :downloadEnable="doc.permit>=4"></ViewRedition>
+      </template>
+       <template v-if="dialog.title==$t('application.viewWorkflow')">
+       <ViewWorkflow :docId="docId"></ViewWorkflow>
       </template>
       <template v-if="dialog.title==$t('application.TransferDoc')">
         <InTransferDoc :docId="docId"></InTransferDoc>
@@ -152,6 +148,7 @@ import RelationDocs from './RelationDocs.vue'
 import DocVersion from './DocVersion.vue'
 import UseInfo from './UseInfo.vue'
 import ViewRedition from './ViewRedition.vue'
+import ViewWorkflow from './ViewWorkflow.vue' 
 
 import PdfViewer from './PdfViewer.vue'
 import OfficeDocViewer from './OfficeDocViewer.vue'
@@ -230,8 +227,10 @@ export default {
       revertType:"",
       judgeDownload:{
         showDownloadButton:false,
-        borrowHistory:false,
-        downloadPermit:false
+        borrowHistory:false
+      },
+      judgePrint:{
+        printPermit:""
       }
     }
   },
@@ -259,6 +258,7 @@ export default {
         _self.doc.changeCount = response.data.changeCount;
         // console.log(_self.docObj);
         _self.doc.id=_self.docObj.ID;
+        _self.judgePrint.printPermit = response.data.permit;
         _self.judgeShowDownload(_self.docObj.ID,response.data.permit);
         _self.doc.code=_self.docObj.CODING;
         _self.doc.revision=_self.docObj.REVISION;
@@ -293,7 +293,6 @@ export default {
     initViewerType(){
       let _self = this;
       if(_self.doc){
-        console.log("typename:"+_self.doc.typeName);
         if(_self.doc.typeName == "卷盒" || _self.doc.typeName=="图册" || _self.docObj.C_ITEM_TYPE=='案卷'){
           _self.viewerType = 100;
         } else if(_self.doc.format == "pdf"){
@@ -334,15 +333,21 @@ export default {
     download(){
       if(this.judgeDownload.borrowHistory==true){
         this.judgeDownload.showDownloadButton = false;
+        this.revokeDocAcl(this.doc.id);
       }
-      let url = this.axios.defaults.baseURL+"/dc/getContent?id="+this.doc.id+"&token="+sessionStorage.getItem('access-token')+"&action=download";
+      var url = "";
+      if(this.doc.format == "pdf"){
+        url = this.axios.defaults.baseURL+"/dc/getContent4Water?id="+this.doc.id+"&token="+sessionStorage.getItem('access-token')+"&action=download";
+      }else{
+        url = this.axios.defaults.baseURL+"/dc/getContent?id="+this.doc.id+"&token="+sessionStorage.getItem('access-token')+"&action=download";
+      }
+      
       this.recordAudit(this.doc.id);
       window.open(url, '_blank');
     },
     judgeShowDownload(docId,permitLevel){
       //有下载权限，这时候就需要判断是否本来就有下载权限
       let _self = this;
-      console.log(permitLevel)
       if(permitLevel>=4){
         _self.judgeDownload.showDownloadButton = true;
         var m = new Map()
@@ -352,7 +357,6 @@ export default {
           .then(function(response){
             if(response.data.code == 1){
             _self.judgeDownload.borrowHistory = response.data.borrowHistory;
-            _self.judgeDownload.downloadPermit = response.data.downloadPermit;
             }
           })
       }else{
@@ -371,6 +375,13 @@ export default {
           
         })
     },  
+    revokeDocAcl(docId){
+      var m = new Map();
+      m.set("docId",docId)
+      axios
+        .post("/archive/revokeAcl", JSON.stringify(m))
+        .then(function(response){})
+    },
     menuClick(type){
       console.log(this.$t('application.dcproper'))
       this.dialog.title=type;
