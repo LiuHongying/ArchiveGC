@@ -267,6 +267,7 @@
                     @selectchange="onSelectChange"
                     @rowclick="onDataGridRowClick"
                     dataUrl="/dc/getDocuments"
+                    :showBatchCheck="true"
                   >
                   </DataGrid>
                 </template>
@@ -283,6 +284,7 @@
                           bottomHeight
                         "
                         dataUrl="/dc/getDocuments"
+                        :showBatchCheck="true"
                       >
                       </DataGrid>
                     </el-col>
