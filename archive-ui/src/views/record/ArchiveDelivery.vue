@@ -975,7 +975,7 @@ export default {
       // }
       _self.loadInnerGridInfo();
       var m = new Map();
-      m.set("gridName", "DeliveryInnerGrid");
+      m.set("gridName", "ArrangeInnerGrid");
       // m.set("gridName","DrawingGrid");
       m.set("condition", "");
       if (_self.selectRow) {
@@ -1206,7 +1206,7 @@ export default {
       let _self = this;
       _self.loading = true;
       var m = new Map();
-      m.set("gridName", "DeliveryInnerGrid");
+      m.set("gridName", "ArrangeInnerGrid");
       // m.set("gridName","DrawingGrid");
       m.set("lang", _self.currentLanguage);
       _self
