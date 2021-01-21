@@ -198,7 +198,8 @@ export default {
             isShowRelevant:true,
             selectedTabName:'t03',
             docId:"",
-            isOnly:false
+            isOnly:false,
+            attachmentId:""
         }
     },
     created(){
@@ -269,19 +270,10 @@ export default {
                     });
                     return;
             }
-            if( _self.selectedAttachment==undefined || _self.selectedAttachment.length<1){
-                _self.$message({
-                    showClose: true,
-                    message: _self.$t('message.PleaseSelectOneContent'),
-                    duration: 2000,
-                    type: "warning"
-                    });
-                    return;
-            }
             var m = new Map();
             let formdata = new FormData();
             m.set("primaryId",_self.selectedItems[0].ID)
-            m.set("contentId",_self.selectedAttachment[0].ID)
+            m.set("contentId",_self.attachmentId)
             formdata.append("metaData",JSON.stringify(m))
             _self
                 .axios({
@@ -356,13 +348,33 @@ export default {
                 });
             },
         rowClick(row){
+            console.log(row)
             this.selectRow=row;
             this.parentId=row.ID;
             let _self=this;
+            _self.attachmentId = "";
+            _self.getAttachmentFile(this.parentId)
             _self.$nextTick(()=>{
                     _self.$refs.attachmentDoc.parentId=row.ID;
                     _self.$refs.attachmentDoc.loadGridData();
                });
+        },
+        getAttachmentFile(parentId){
+            let _self = this;
+             var m = new Map();
+             m.set("id",parentId)
+             m.set("condition","and a.name = 'irel_children' ")
+             m.set("pageSize", 1);
+             m.set("pageIndex", 0);
+             m.set("orderBy", "")
+            axios
+            .post("/dc/getDocuByRelationParentId", JSON.stringify(m))
+            .then(function (response) {
+                _self.attachmentId = response.data.data[0].ID
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
         },
         showUpdateFile(indata) {
             let _self = this;

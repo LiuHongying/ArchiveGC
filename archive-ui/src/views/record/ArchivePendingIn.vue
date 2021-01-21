@@ -40,7 +40,7 @@
             type="primary"
             size="small"
             icon="el-icon-printer"
-            @click="beforePrint(selectedArchives,'FormDcGrid','打印清单')"
+            @click="beforePrint(selectedItems,'FormDcGrid')"
             title="打印清单"
             >打印清单</el-button>
         </el-form-item>
@@ -166,7 +166,7 @@
 </template>
 <script type="text/javascript">
 import DataGrid from "@/components/DataGrid";
-import PrintVolumes from "@/views/record/Print4Borrow";
+import PrintVolumes from "@/views/record/PrintVolumes4PreArchive";
 import DataLayout from "@/components/ecm-data-layout";
 import ExcelUtil from "@/utils/excel.js";
 export default {
@@ -198,31 +198,31 @@ export default {
       selectedArchives:[],
       printVolumesVisible:false,
       formType:"",
-      formCoding:""
+      formCoding:"",
+      conds:""
     };
   },
   mounted() {
     this.search();
   },
   methods: {
-        beforePrint(selectedRow,gridName,vtitle){
+    beforePrint(selectedRow,gridName){
       let _self=this;
       let ids =[]
       //console.log(this.activeName)
-      if(this.activeName=='ArchivePendingOut'){
-        this.selectedArchives = this.$refs.PendingGrid.itemDataList
-        vtitle = "待入库清单"
-      }
-      else if(this.activeName=='ArchivePending'){
-        this.selectedArchives = this.$refs.PendedGrid.itemDataList    
-        vtitle = "已入库清单"
-      }
-      for(let i = 0;i < _self.selectedArchives.length;i++){
-        ids[i] = _self.selectedArchives[i].ID
-      }
+      // if(this.activeName=='ArchivePendingOut'){
+      //   this.selectedArchives = this.$refs.PendingoutGrid.itemDataList
+      //   //vtitle = "待出库清单"
+      // }
+      // else if(this.activeName=='ArchivePending'){
+      //   this.selectedArchives = this.$refs.PendingoutGrid.itemDataList    
+      //   //vtitle = "已出库清单"
+      // }
+      // for(let i = 0;i < _self.selectedArchives.length;i++){
+      //   ids[i] = _self.selectedArchives[i].ID
+      // }
       //console.log(_self.selectedArchives[0].ID)
-      if(_self.selectedArchives.length==0){
-        // _self.$message('请选择一条数据进行打印');
+      if(selectedRow.length==0){
         _self.$message({
                 showClose: true,
                 message: '请选择一条数据进行打印!',
@@ -236,11 +236,8 @@ export default {
       setTimeout(()=>{
         _self.$refs.printVolumes.dialogQrcodeVisible = false
         _self.$refs.printVolumes.getTypes(_self.formType,_self.formCoding)
-        _self.$refs.printVolumes.getArchiveObj(ids, gridName,vtitle); 
-      },10);
-
-      _self.printGridName=gridName;
-      _self.printObjId=selectedRow.ID;
+        _self.$refs.printVolumes.refreshDataGrid(selectedRow,gridName,"入库清单"); 
+      },100);
     },
 
         exportData() {
@@ -266,11 +263,11 @@ export default {
         resName = "已入库清单"
       }
       let params = {
-        gridName: "FormDcGrid",
+        gridName: "FormGrid",
         lang: "zh-cn",
-        condition: finalCondition,
-        filename: "File_HandOver_" + fileDateStr + ".xlsx",
-        sheetname: resName,
+        condition: this.conds,
+        filename: "待入库清单_" + fileDateStr + ".xlsx",
+        sheetname: "待入库清单",
       };
       ExcelUtil.export(params);
     },
@@ -313,6 +310,7 @@ export default {
       if(_self.endDate!=''&&_self.endDate!=undefined){
           key+=" and CREATION_DATE < '"+_self.endDate+"'";
       }
+      this.conds = key
       _self.$refs.APendingGrid.condition=key;
       _self.$refs.APendingGrid.currentPage = 1;
       _self.$refs.APendingGrid.loadGridInfo();

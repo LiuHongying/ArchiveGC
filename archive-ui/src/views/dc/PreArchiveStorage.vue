@@ -39,57 +39,69 @@
       <template slot="paneR">
         <DataLayout>
           <template v-slot:header>
-      <el-dialog
-      title=""
-      width="50%"
-      :visible="printPdf417Visible"
-      @close="printPdf417Visible=false"
-      >
-      <div style="height:600px;">
-        <PrintPdf417 ref="printPdf417" :archiveObjects="selectedItems" :isBarCode="true"></PrintPdf417>
-      </div>
-    </el-dialog>
-    <el-dialog :visible.sync="printVolumesVisible" width="80%">
-      <PrintVolumes
-        ref="printVolumes"
-        v-bind:archiveId="archiveId"
-        v-bind:currentFolderId="currentFolder.id"
-      ></PrintVolumes>
-    </el-dialog>
-    <el-dialog
-      title="打印条码"
-      width="43%"
-      :visible="printBarCodeVisible"
-      @close="printBarCodeVisible=false"
-    >
-      <div style="height:600px;">
-        <PrintBarCode ref="printBarCode" :archiveObjects="selectedItems" :isBarCode="true"></PrintBarCode>
-      </div>
-    </el-dialog>
-    <el-dialog
-      title="打印档号"
-      width="43%"
-      :visible="printArchiveCodeVisible"
-      @close="printArchiveCodeVisible=false"
-    >
-      <div style="height:600px;">
-        <PrintArchiveCode ref="printArchiveCode" :archiveObjects="selectedItems" :isBarCode="true"></PrintArchiveCode>
-      </div>
-    </el-dialog>
-    <el-dialog :visible.sync="PreparationTablePrintVisible" width="80%"
-    @close="PreparationTablePrintVisible=false">
-      <PreparationTablePrint
-        ref="PreparationTablePrint"
-        v-bind:archiveId="archiveId"
-        v-bind:currentFolderId="currentFolder.id"
-      ></PreparationTablePrint>
-    </el-dialog>
-    <el-dialog :visible.sync="PrintCoverpageVisible" width="80%">
-      <PrintCoverpage ref="PrintCoverpage"></PrintCoverpage>
-    </el-dialog>
-
-
-
+            <el-dialog
+              title=""
+              width="50%"
+              :visible="printPdf417Visible"
+              @close="printPdf417Visible = false"
+            >
+              <div style="height: 600px">
+                <PrintPdf417
+                  ref="printPdf417"
+                  :archiveObjects="selectedItems"
+                  :isBarCode="true"
+                ></PrintPdf417>
+              </div>
+            </el-dialog>
+            <el-dialog :visible.sync="printVolumesVisible" width="80%">
+              <PrintVolumes
+                ref="printVolumes"
+                v-bind:archiveId="archiveId"
+                v-bind:currentFolderId="currentFolder.id"
+              ></PrintVolumes>
+            </el-dialog>
+            <el-dialog
+              title="打印条码"
+              width="43%"
+              :visible="printBarCodeVisible"
+              @close="printBarCodeVisible = false"
+            >
+              <div style="height: 600px">
+                <PrintBarCode
+                  ref="printBarCode"
+                  :archiveObjects="selectedItems"
+                  :isBarCode="true"
+                ></PrintBarCode>
+              </div>
+            </el-dialog>
+            <el-dialog
+              title="打印档号"
+              width="43%"
+              :visible="printArchiveCodeVisible"
+              @close="printArchiveCodeVisible = false"
+            >
+              <div style="height: 600px">
+                <PrintArchiveCode
+                  ref="printArchiveCode"
+                  :archiveObjects="selectedItems"
+                  :isBarCode="true"
+                ></PrintArchiveCode>
+              </div>
+            </el-dialog>
+            <el-dialog
+              :visible.sync="PreparationTablePrintVisible"
+              width="80%"
+              @close="PreparationTablePrintVisible = false"
+            >
+              <PreparationTablePrint
+                ref="PreparationTablePrint"
+                v-bind:archiveId="archiveId"
+                v-bind:currentFolderId="currentFolder.id"
+              ></PreparationTablePrint>
+            </el-dialog>
+            <el-dialog :visible.sync="PrintCoverpageVisible" width="80%">
+              <PrintCoverpage ref="PrintCoverpage"></PrintCoverpage>
+            </el-dialog>
             <el-form :inline="true" @submit.native.prevent>
               <el-form-item>
                 <el-input
@@ -134,47 +146,72 @@
                   $t("application.ExportExcel")
                 }}</el-button>
               </el-form-item>
-                            <el-form-item>
-                        <el-dropdown class="avatar-container right-menu-item" trigger="click">
-                          <div class="avatar-wrapper">
-                            <i class="el-icon-printer"></i>
-                            <span>打印</span>
-                          </div>
-                          <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item divided>
-                              <span @click="beforePrintPdf417(selectedItems)" style="display:block;">
-                                <i class="el-icon-printer"></i>
-                                打印条码
-                              </span>
-                            </el-dropdown-item>
-                            <el-dropdown-item divided>
-                              <span @click="beforePrintArchiveCode(selectedItems,'打印档号')" style="display:block;">
-                                <i class="el-icon-printer"></i>
-                                打印档号
-                              </span>
-                            </el-dropdown-item>
-                             
-                            <el-dropdown-item divided>
-                              <span @click="beforePrintCoverpage(selectedItems)" style="display:block;">
-                                <i class="el-icon-printer"></i>
-                                打印封面
-                              </span>
-                            </el-dropdown-item>
-                            <el-dropdown-item divided>
-                              <span @click="beforePrintInnerDoc(selectedItems,'ArrangeInnerGridPrint')" style="display:block;">
-                                <i class="el-icon-printer"></i>
-                                打印卷内目录
-                              </span>
-                            </el-dropdown-item>
-                            <el-dropdown-item divided>
-                              <span @click="beforePrintPreparationTable(selectedItems)" style="display:block;">
-                                <i class="el-icon-printer"></i>
-                                打印备考表
-                              </span>
-                            </el-dropdown-item>
-                          </el-dropdown-menu>
-                        </el-dropdown>
-                            </el-form-item>
+              <el-form-item>
+                <el-dropdown
+                  class="avatar-container right-menu-item"
+                  trigger="click"
+                >
+                  <div class="avatar-wrapper">
+                    <i class="el-icon-printer"></i>
+                    <span>打印</span>
+                  </div>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item divided>
+                      <span
+                        @click="beforePrintPdf417(selectedItems)"
+                        style="display: block"
+                      >
+                        <i class="el-icon-printer"></i>
+                        打印条码
+                      </span>
+                    </el-dropdown-item>
+                    <el-dropdown-item divided>
+                      <span
+                        @click="
+                          beforePrintArchiveCode(selectedItems, '打印档号')
+                        "
+                        style="display: block"
+                      >
+                        <i class="el-icon-printer"></i>
+                        打印档号
+                      </span>
+                    </el-dropdown-item>
+
+                    <el-dropdown-item divided>
+                      <span
+                        @click="beforePrintCoverpage(selectedItems)"
+                        style="display: block"
+                      >
+                        <i class="el-icon-printer"></i>
+                        打印封面
+                      </span>
+                    </el-dropdown-item>
+                    <el-dropdown-item divided>
+                      <span
+                        @click="
+                          beforePrintInnerDoc(
+                            selectedItems,
+                            'ArrangeInnerGridPrint'
+                          )
+                        "
+                        style="display: block"
+                      >
+                        <i class="el-icon-printer"></i>
+                        打印卷内目录
+                      </span>
+                    </el-dropdown-item>
+                    <el-dropdown-item divided>
+                      <span
+                        @click="beforePrintPreparationTable(selectedItems)"
+                        style="display: block"
+                      >
+                        <i class="el-icon-printer"></i>
+                        打印备考表
+                      </span>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </el-form-item>
               <el-form-item>
                 <AddCondition
                   @change="searchItem"
@@ -265,11 +302,11 @@ import DataGrid from "@/components/DataGrid";
 import AddCondition from "@/views/record/AddCondition.vue";
 import StartupComponent from "@/views/workflow/StartupComponent.vue";
 import ExcelUtil from "@/utils/excel.js";
-import PreparationTablePrint from "@/views/record/PreparationTablePrint.vue"
-import PrintBarCode from "@/views/record/PrintBarCode.vue"
-import PrintArchiveCode from "@/views/record/PrintArchiveCode.vue"
-import PrintCoverpage from "@/views/record/PrintCoverpage.vue"
-import PrintPdf417 from "@/views/record/PrintPdf417.vue"
+import PreparationTablePrint from "@/views/record/PreparationTablePrint.vue";
+import PrintBarCode from "@/views/record/PrintBarCode.vue";
+import PrintArchiveCode from "@/views/record/PrintArchiveCode.vue";
+import PrintCoverpage from "@/views/record/PrintCoverpage.vue";
+import PrintPdf417 from "@/views/record/PrintPdf417.vue";
 import PrintVolumes from "@/views/record/PrintVolumes4Archive";
 export default {
   data() {
@@ -308,12 +345,12 @@ export default {
       isFile: true,
       isExpand: false,
       releaseLoading: false,
-      PreparationTablePrintVisible:false,
-      printBarCodeVisible:false,
-      PrintCoverpageVisible:false,
-      printArchiveCodeVisible:false,
-      printPdf417Visible:false,
-      printVolumesVisible:false,
+      PreparationTablePrintVisible: false,
+      printBarCodeVisible: false,
+      PrintCoverpageVisible: false,
+      printArchiveCodeVisible: false,
+      printPdf417Visible: false,
+      printVolumesVisible: false,
       dataList: [],
       gridList: [],
       itemDataList: [],
@@ -321,11 +358,11 @@ export default {
       selectedItems: [],
       selectRow: [],
       selectedFileId: "",
-      archiveId:"",
+      archiveId: "",
       currentPage: 1,
       pageSize: 20,
       judgement: "",
-      currentFolder:[],
+      currentFolder: [],
       tables: {
         main: {
           gridViewName: "GeneralPre",
@@ -342,15 +379,13 @@ export default {
         activeNum: "",
       },
       inputFolder: "",
-      typeName:"",
+      typeName: "",
     };
   },
 
   created() {
-
     this.topPercent = this.getStorageNumber(this.topStorageName, 60);
     this.leftPercent = this.getStorageNumber(this.leftStorageName, 20);
-
   },
 
   mounted() {
@@ -363,19 +398,48 @@ export default {
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
     _self.topPercent = 65;
-    _self.searchFolder();
+
+    if (_self.inputFolder != "" && _self.inputFolder != undefined) {
+      var m = new Map();
+      m.set("NAME", _self.inputFolder);
+      m.set("parentPath", "/预归档库");
+      axios
+        .post("/admin/searchFolder", JSON.stringify(m))
+        .then(function (response) {
+          _self.dataList = response.data.data;
+          _self.loadGridInfo(_self.defaultData);
+          _self.isExpand = true;
+          _self.loading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.loading = false;
+        });
+    } else {
+      axios
+        .post("/admin/getPreArchivesFolder", 0)
+        .then(function (response) {
+          _self.dataList = response.data.data;
+          _self.handleNodeClick(_self.dataList[0]);
+          _self.loading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.loading = false;
+        });
+    }
   },
 
   methods: {
-      beforePrintArchiveCode(selectedRows,vtitle) {
+    beforePrintArchiveCode(selectedRows, vtitle) {
       let _self = this;
-      if (selectedRows == undefined||selectedRows.length==0) {
+      if (selectedRows == undefined || selectedRows.length == 0) {
         // _self.$message('请选择一条数据进行打印');
         _self.$message({
           showClose: true,
           message: "请至少选择一条数据进行打印",
           duration: 2000,
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -385,18 +449,17 @@ export default {
         // _self.$refs.printBarCode.archiveObjects=selectedRows;
         _self.$refs.printArchiveCode.refresh(selectedRows, 1);
       }, 10);
-
     },
 
-    beforePrintPdf417(selectedRows){
+    beforePrintPdf417(selectedRows) {
       let _self = this;
-      if (selectedRows == undefined||selectedRows.length==0) {
+      if (selectedRows == undefined || selectedRows.length == 0) {
         // _self.$message('请选择一条数据进行打印');
         _self.$message({
           showClose: true,
           message: "请选择至少一条数据进行打印",
           duration: 2000,
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -405,15 +468,15 @@ export default {
         _self.$refs.printPdf417.loadData(selectedRows);
       }, 10);
     },
-        beforePrintBarCode(selectedRows,vtitle) {
+    beforePrintBarCode(selectedRows, vtitle) {
       let _self = this;
-      if (selectedRows == undefined||selectedRows.length==0) {
+      if (selectedRows == undefined || selectedRows.length == 0) {
         // _self.$message('请选择一条数据进行打印');
         _self.$message({
           showClose: true,
           message: "请选择一条数据进行打印",
           duration: 2000,
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -423,9 +486,8 @@ export default {
         // _self.$refs.printBarCode.archiveObjects=selectedRows;
         _self.$refs.printBarCode.refreshBarCode(selectedRows, 1);
       }, 10);
-
     },
-        beforePrintRidge(selectedRow, gridName, vtitle) {
+    beforePrintRidge(selectedRow, gridName, vtitle) {
       let _self = this;
       if (selectedRow.ID == undefined) {
         // _self.$message('请选择一条数据进行打印');
@@ -433,7 +495,7 @@ export default {
           showClose: true,
           message: "请选择一条数据进行打印",
           duration: 2000,
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -447,86 +509,82 @@ export default {
       _self.printGridName = gridName;
       _self.printObjId = selectedRow.ID;
     },
-        beforePrintPreparationTable(selectedRows){
-      let _self=this;
-      if (selectedRows == undefined||selectedRows.length==0) {
+    beforePrintPreparationTable(selectedRows) {
+      let _self = this;
+      if (selectedRows == undefined || selectedRows.length == 0) {
         // _self.$message('请选择一条数据进行打印');
         _self.$message({
           showClose: true,
           message: "请选择至少一个案卷进行打印",
           duration: 2000,
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       _self.PreparationTablePrintVisible = true;
 
-      setTimeout(()=>{
-        _self.$refs.PreparationTablePrint.refreshArchiveObj(selectedRows); 
-      },100);
-
+      setTimeout(() => {
+        _self.$refs.PreparationTablePrint.refreshArchiveObj(selectedRows);
+      }, 100);
     },
-        beforePrintCoverpage(selectedRows){
-      let _self=this;
-      if (selectedRows == undefined||selectedRows.length==0) {
+    beforePrintCoverpage(selectedRows) {
+      let _self = this;
+      if (selectedRows == undefined || selectedRows.length == 0) {
         // _self.$message('请选择一条数据进行打印');
         _self.$message({
           showClose: true,
           message: "请选择至少一个案卷进行打印",
           duration: 2000,
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       _self.PrintCoverpageVisible = true;
 
-      setTimeout(()=>{
-        _self.$refs.PrintCoverpage.refreshArchiveObj(selectedRows); 
-      },100);
-
+      setTimeout(() => {
+        _self.$refs.PrintCoverpage.refreshArchiveObj(selectedRows);
+      }, 100);
     },
 
-        beforePrintInnerDoc(selectedRows,gridName){
-      let _self=this;
-      if (selectedRows == undefined||selectedRows.length==0) {
+    beforePrintInnerDoc(selectedRows, gridName) {
+      let _self = this;
+      if (selectedRows == undefined || selectedRows.length == 0) {
         // _self.$message('请选择一条数据进行打印');
         _self.$message({
           showClose: true,
           message: "请选择至少一个案卷进行打印",
           duration: 2000,
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       _self.printVolumesVisible = true;
-      setTimeout(()=>{
-        _self
-        .axios.post("/dc/getPrintArchiveGrid",selectedRows[0].TYPE_NAME)
-        .then(function(response) {
-          if(response.data.code=='1'){
-            let printGridName=response.data.data.attributes.C_TO;
-            _self.$refs.printVolumes.dialogQrcodeVisible = false
-            _self.$refs.printVolumes.refreshDataGrid(selectedRows,
-            printGridName); 
-          }else{
-            _self.$refs.printVolumes.dialogQrcodeVisible = false
-             _self.$refs.printVolumes.refreshDataGrid(selectedRows,
-            gridName); 
-          }
-        })
-        .catch(function(error) {
-         
-          _self.$message({
-            showClose: true,
-            message: "操作失败",
-            duration: 5000,
-            type: "error"
+      setTimeout(() => {
+        _self.axios
+          .post("/dc/getPrintArchiveGrid", selectedRows[0].TYPE_NAME)
+          .then(function (response) {
+            if (response.data.code == "1") {
+              let printGridName = response.data.data.attributes.C_TO;
+              _self.$refs.printVolumes.dialogQrcodeVisible = false;
+              _self.$refs.printVolumes.refreshDataGrid(
+                selectedRows,
+                printGridName
+              );
+            } else {
+              _self.$refs.printVolumes.dialogQrcodeVisible = false;
+              _self.$refs.printVolumes.refreshDataGrid(selectedRows, gridName);
+            }
+          })
+          .catch(function (error) {
+            _self.$message({
+              showClose: true,
+              message: "操作失败",
+              duration: 5000,
+              type: "error",
+            });
+            console.log(error);
           });
-          console.log(error);
-        });
-
-        
-      },100);
+      }, 100);
     },
 
     searchFolder() {
@@ -742,13 +800,12 @@ export default {
 
     exportData() {
       let _self = this;
-      console.log(_self.currentPage);
-      console.log(_self.pageSize);
       let params = {
         URL: "/file/exportFolderPath",
         gridName: _self.currentFolder.gridView,
         folderId: _self.currentFolder.id,
         orderBy: "MODIFIED_DATE desc",
+        condition: _self.$refs.mainDataGrid.condition,
         pageSize: _self.pageSize,
         pageIndex: (_self.currentPage - 1) * _self.pageSize,
         lang: "zh-cn",
@@ -757,7 +814,7 @@ export default {
       ExcelUtil.export4Cnpe(params);
     },
 
-        //添加到收藏夹
+    //添加到收藏夹
     addToShopingCart() {
       let _self = this;
       var m = new Map();
@@ -865,12 +922,12 @@ export default {
     AddCondition: AddCondition,
     StartupComponent: StartupComponent,
     ExcelUtil: ExcelUtil,
-    PreparationTablePrint:PreparationTablePrint,
-    PrintBarCode:PrintBarCode,
-    PrintArchiveCode:PrintArchiveCode,
-    PrintPdf417:PrintPdf417,
-    PrintCoverpage:PrintCoverpage,
-    PrintVolumes:PrintVolumes
+    PreparationTablePrint: PreparationTablePrint,
+    PrintBarCode: PrintBarCode,
+    PrintArchiveCode: PrintArchiveCode,
+    PrintPdf417: PrintPdf417,
+    PrintCoverpage: PrintCoverpage,
+    PrintVolumes: PrintVolumes,
   },
 };
 </script>

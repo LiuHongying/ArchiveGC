@@ -39,7 +39,7 @@ var excel = {
       } else {
         var link = document.createElement("a");
         link.href = window.URL.createObjectURL(blob);
-        link.download = fileName;
+        link.download = decodeURIComponent(fileName);
         link.click();
         //释放内存
         window.URL.revokeObjectURL(link.href);
