@@ -363,5 +363,37 @@ public class DocumentController extends ControllerAbstract {
 		mp.put("code", ActionContext.SUCESS);
 		return mp;
 	}
-	
+	/**
+	 * 分发
+	 * @param metaData 元数据
+	 * @param mainFile 主文件
+	 * @param attachFiles 附件
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/dc/distributeBatchApprove", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> distributeBatchApprove(@RequestBody String args) throws Exception {
+		Map<String,Object> mp=new HashMap<String, Object>();
+		try {
+			List<String> ids = JSONUtils.stringToArray(args);
+			for (int i = 0; ids!=null&&i < ids.size(); i++) {
+				String id=ids.get(i);
+				EcmDocument order= documentService.getObjectById(getToken(), id);
+				distributeComponent.updateOrderForDistributionStatus(getToken(), order, "已生效");
+			}
+			
+		}catch (Exception e) {
+			// TODO: handle exception
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", "操作失败请联系管理员！"+e.getMessage());
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			return mp;
+		}
+		
+		
+		mp.put("code", ActionContext.SUCESS);
+		return mp;
+	}
 }

@@ -447,6 +447,9 @@
                       <el-form-item>
                       <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
                       </el-form-item>
+                      <el-form-item>
+                        <AddToArchive :folderId="currentFolder.id" :fileIds="selectedIds" @savesuccess='searchItem' ></AddToArchive>
+                      </el-form-item>
                     </el-col>
                   </el-row>
                   </el-form>
@@ -578,6 +581,7 @@ import BatchImport from "@/components/controls/ImportDocument";
 import ExcelUtil from "@/utils/excel.js";
 import BatchUpdate from "@/views/record/BatchUpdate.vue" 
 import BatchFileMount from "@/views/record/BatchFileMount.vue" 
+import AddToArchive from "@/views/record/AddToArchive.vue"
 
 export default {
   name: "ArchiveArrange",
@@ -597,7 +601,8 @@ export default {
     PrintPdf417:PrintPdf417,
     BatchImport:BatchImport,
     AddCondition:AddCondition,
-    PrintCoverpage:PrintCoverpage
+    PrintCoverpage:PrintCoverpage,
+    AddToArchive:AddToArchive
   },
   data() {
     return {
@@ -740,7 +745,8 @@ export default {
         childCondition:"and a.NAME='irel_children' and b.IS_HIDDEN=0",
       },
       loadInfo:false,
-      volumeInArchiveGridName:""
+      volumeInArchiveGridName:"",
+      selectedIds:[]
     };
   },
   
@@ -1745,6 +1751,9 @@ export default {
       this.ChoiceTypeName = val[0].TYPE_NAME
       this.getTypeNamesByMainList(this.ChoiceTypeName)
       this.selectedItems = val;
+      this.selectedItems.forEach((e)=>{
+        this.selectedIds.push(e.ID);
+      });
     },
     // 表格行选择
     selectOutChange(val) {
