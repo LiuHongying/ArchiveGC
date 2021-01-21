@@ -742,13 +742,12 @@ export default {
 
     exportData() {
       let _self = this;
-      console.log(_self.currentPage);
-      console.log(_self.pageSize);
       let params = {
         URL: "/file/exportFolderPath",
         gridName: _self.currentFolder.gridView,
         folderId: _self.currentFolder.id,
         orderBy: "MODIFIED_DATE desc",
+        condition: _self.$refs.mainDataGrid.condition,
         pageSize: _self.pageSize,
         pageIndex: (_self.currentPage - 1) * _self.pageSize,
         lang: "zh-cn",
