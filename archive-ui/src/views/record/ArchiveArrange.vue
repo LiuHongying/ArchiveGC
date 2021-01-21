@@ -251,6 +251,9 @@
                       >批量导入</el-button>
                       </el-form-item>
                       <el-form-item>
+                        <AddToArchive :folderId="currentFolder.id" :archiveObjects="selectedItems" @savesuccess='searchItem' ></AddToArchive>
+                      </el-form-item>
+                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
@@ -447,9 +450,7 @@
                       <el-form-item>
                       <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
                       </el-form-item>
-                      <el-form-item>
-                        <AddToArchive :folderId="currentFolder.id" :fileIds="selectedIds" @savesuccess='searchItem' ></AddToArchive>
-                      </el-form-item>
+                     
                     </el-col>
                   </el-row>
                   </el-form>
@@ -467,6 +468,7 @@
                         :folderId="mainParam.folderId"
                         showOptions="查看内容"
                         :isShowChangeList="false"
+                        :isshowCustom="false"
                         :optionWidth = "2"
                         gridViewName="ArrangeGrid"
                         @rowclick="beforeShowInnerFile"
@@ -746,7 +748,6 @@ export default {
       },
       loadInfo:false,
       volumeInArchiveGridName:"",
-      selectedIds:[]
     };
   },
   
@@ -1751,9 +1752,7 @@ export default {
       this.ChoiceTypeName = val[0].TYPE_NAME
       this.getTypeNamesByMainList(this.ChoiceTypeName)
       this.selectedItems = val;
-      this.selectedItems.forEach((e)=>{
-        this.selectedIds.push(e.ID);
-      });
+      
     },
     // 表格行选择
     selectOutChange(val) {

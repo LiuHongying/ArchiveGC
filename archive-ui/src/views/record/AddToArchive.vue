@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <span>
     <el-dialog
       title="添加至案卷"
       :visible.sync="createFileVisible"
@@ -56,10 +56,10 @@
         </slot>
       </div>
     </el-dialog>
-    <el-button icon="el-icon-plus" @click="show" type="success">
-      <slot>添加至案卷</slot>
+    <el-button icon="el-icon-plus" @click="show" type="primary" plain size="small">
+      添加至案卷
     </el-button>
-  </div>
+  </span>
 </template>
 <script>
 import DataGrid from "@/components/DataGrid";
@@ -72,22 +72,25 @@ export default {
   },
   data() {
     return {
-      condition: " C_ITEM_TYPE='案卷' and IS_HIDDEN=0",
+      condition: " C_ITEM_TYPE='案卷' and IS_HIDDEN=0 and  status='整编'",
       mainParam: {
-        folderId: "",
-        condition: ""
+        folderId: "C_ITEM_TYPE",
+        condition: "  C_ITEM_TYPE='案卷' and IS_HIDDEN=0 and  status='整编'"
       },
       inputkey:"",
       currentId: "",
       createFileVisible: false,
-      butt: false
+      butt: false,
+      fileIds:[],
     };
   },
   props: {
     folderId: { type: String, default: "" },
-    fileIds: { type: Array, default: () => [] }
+    archiveObjects: { type: Array, default: () => [] }
   },
-  mounted() {},
+  mounted() {
+    this.mainParam.folderId = this.folderId;
+  },
   methods: {
     saveItem() {
       let _self = this;
@@ -138,6 +141,10 @@ export default {
         });
     },
     show() {
+      this.archiveObjects.forEach((e)=>{
+        this.fileIds.push(e.ID);
+      });
+      this.mainParam.folderId = this.folderId;
       this.createFileVisible = true;
     },
     rowClick(row) {
@@ -150,7 +157,7 @@ export default {
     searchItem() {
       let _self = this;
 
-      var key = "C_ITEM_TYPE='案卷' and IS_HIDDEN=0 ";
+      var key = "C_ITEM_TYPE='案卷' and IS_HIDDEN=0 and status='整编'";
 
       if (_self.inputkey != "") {
         key =key+" and (coding like '%" + _self.inputkey + "%' or title like '%" + _self.inputkey + "%') ";
