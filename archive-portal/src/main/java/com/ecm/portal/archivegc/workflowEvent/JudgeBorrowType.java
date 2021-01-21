@@ -41,10 +41,10 @@ public class JudgeBorrowType implements JavaDelegate {
 			EcmDocument ecmObject = documentService.getObjectById(ecmSession.getToken(), formId);
 			String type = varMap.get("SUB_TYPE").toString();
 			if(!type.equals("纸质借阅")||!type.equals("纸质复制")) {
-				execution.setVariable("C_INCLUDE_PAPER", "是");
+				execution.setVariable("C_INCLUDE_PAPER", "有");
 			}
 			if(type.equals("纸质借阅")||type.equals("纸质复制")||type.equals("查阅")) {
-				execution.setVariable("C_INCLUDE_PAPER", "否");
+				execution.setVariable("C_INCLUDE_PAPER", "无");
 			}
 	}
 		catch (Exception e) {
