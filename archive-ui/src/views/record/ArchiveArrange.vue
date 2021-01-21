@@ -1605,6 +1605,11 @@ export default {
           _self.modifyVisible=false
           _self.$refs.mainDataGrid.loadGridData()
           _self.$refs.leftDataGrid.loadGridData()
+          _self.resChoice = ""
+          _self.Choice = ""
+          _self.MFinput = ""
+          _self.isMF = false
+          _self.ChoiceInput = ""
         }
         })
         .catch(function(error) {
