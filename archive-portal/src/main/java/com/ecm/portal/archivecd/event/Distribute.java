@@ -16,11 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ecm.core.PermissionContext.ObjectPermission;
 import com.ecm.core.entity.EcmDocument;
 import com.ecm.core.entity.EcmRelation;
+import com.ecm.core.entity.Pager;
 import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.exception.EcmException;
 import com.ecm.core.exception.NoPermissionException;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.RelationService;
+
 
 @Component
 public class Distribute {
@@ -71,7 +73,7 @@ public class Distribute {
 		EcmRelation relation=new EcmRelation();
 		relation.setParentId(order.getId());
 		relation.setChildId(doc.getId());
-		relation.setName("irel_children");
+		relation.setName("文件分发");
 		relationService.newObject(token, relation);
 		documentService.newAudit(token, "Portal", "新建", order.getId(), null, null);
 		return order;
@@ -123,7 +125,7 @@ public class Distribute {
 				if(copyTos.length>0) {
 					users.addAll(Arrays.asList(copyTos));
 				}
-				String sql="select * from ecm_relation where parent_id='"+order.getId()+"' and name='irel_children'";
+				String sql="select * from ecm_relation where parent_id='"+order.getId()+"' and name='文件分发'";
 				List<Map<String,Object>> relations= relationService.getMapList(token,sql );
 				if(relations!=null&&relations.size()>0) {
 					String childId= relations.get(0).get("CHILD_ID").toString();
@@ -169,6 +171,7 @@ public class Distribute {
 					(sender==null||"".equals(sender))?parentOrder.getAttributeValue("C_FROM"):sender);//发送人
 			order.setTypeName("分发单");
 			order.setStatus("已生效");
+			order.addAttribute("IS_RELEASED", "1");
 			documentService.grantUser(token, docObj.getId(), hosts[i],
 					ObjectPermission.BROWSER, new Date());
 			distributeOrder(token, order, parentOrder.getId(), docObj.getId());
@@ -184,6 +187,7 @@ public class Distribute {
 			order.addAttribute("C_FROM", parentOrder.getAttributeValue("C_FROM"));//发送人
 			order.setTypeName("分发单");
 			order.setStatus("已生效");
+			order.addAttribute("IS_RELEASED", "1");
 			documentService.grantUser(token, docObj.getId(), participations[i],
 					ObjectPermission.BROWSER, new Date());
 			distributeOrder(token, order,  parentOrder.getId(), docObj.getId());
@@ -198,6 +202,7 @@ public class Distribute {
 			order.addAttribute("C_FROM", parentOrder.getAttributeValue("C_FROM"));//发送人
 			order.setTypeName("分发单");
 			order.setStatus("已生效");
+			order.addAttribute("IS_RELEASED", "1");
 			documentService.grantUser(token, docObj.getId(), copytos[i],
 					ObjectPermission.BROWSER, new Date());
 			distributeOrder(token, order,  parentOrder.getId(), docObj.getId());
@@ -211,7 +216,7 @@ public class Distribute {
 		String orderId= documentService.newObject(token, childOrder, null);
 		EcmRelation relation=new EcmRelation("分发",parentId,orderId);
 		relationService.newObject(token, relation);
-		EcmRelation relation2=new EcmRelation("irel_children",orderId,docId);
+		EcmRelation relation2=new EcmRelation("文件分发",orderId,docId);
 		relationService.newObject(token, relation2);
 		return childOrder;
 		
@@ -244,6 +249,33 @@ public class Distribute {
 				doc.getAttributeValue("C_COPY_TO")
 				);
 	}
+	/**
+	 * 通过分发单Id查找记录
+	 * @param distributeId
+	 * @return
+	 * @throws EcmException 
+	 */
+	public List<Map<String,Object>> getDistributeRecordByDistributeId(String token,String distributeId,Pager pager) throws EcmException{
+		String sql="select * from (select x.* from ecm_document x, ( "
+				+"select a.PARENT_ID from ecm_relation a,ecm_relation b where "
+				+ "a.CHILD_ID=b.CHILD_ID and b.PARENT_ID='"+distributeId+"' "
+				+ "and a.`NAME`='文件分发' and b.`NAME`='文件分发'"
+				+")t where x.ID=t.PARENT_ID)t ORDER BY CREATION_DATE asc";
+		return documentService.getMapList(token, sql, pager);
+	}
+	/**
+	 * 通过文件Id查找分发记录
+	 * @param fileId
+	 * @return
+	 * @throws EcmException 
+	 */
+	public List<Map<String,Object>> getDistributeRecordByFileId(String token,String fileId,Pager pager) throws EcmException{
+		String sql="select * from(select x.* from ecm_document x, ( "
+				+"select PARENT_ID from ecm_relation where CHILD_ID='"+fileId+"' and `NAME`='文件分发'"
+				+")t where x.ID=t.PARENT_ID) t ORDER BY CREATION_DATE asc";
+		return documentService.getMapList(token, sql, pager);
+	}
+	
 	/**
 	 * 创建子单
 	 * @param docId

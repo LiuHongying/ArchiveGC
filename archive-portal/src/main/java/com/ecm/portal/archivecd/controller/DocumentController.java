@@ -27,6 +27,7 @@ import com.ecm.core.entity.EcmFolder;
 import com.ecm.core.entity.EcmGridView;
 import com.ecm.core.entity.EcmRelation;
 import com.ecm.core.entity.LoginUser;
+import com.ecm.core.entity.Pager;
 import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.exception.EcmException;
 import com.ecm.core.service.ContentService;
@@ -161,7 +162,7 @@ public class DocumentController extends ControllerAbstract {
 			EcmDocument pObj= documentService.getObjectById(getToken(), parentId);
 			String sql = "select b.*,a.id as RELATION_ID,a.NAME as RELATION_NAME,a.PARENT_ID,a.CHILD_ID,a.ORDER_INDEX"
 					+ " from ecm_relation a, ecm_document b where  a.CHILD_ID=b.ID "
-					+ " and a.PARENT_ID='"+parentId+"' and name='irel_children' order by a.ORDER_INDEX,b.CREATION_DATE";
+					+ " and a.PARENT_ID='"+parentId+"' and a.name='文件分发' order by a.ORDER_INDEX,b.CREATION_DATE";
 			List<Map<String,Object>> list = documentService.getMapList(getToken(), sql);
 			Map<String,Object> docData= list.get(0);
 			EcmDocument docObj=new EcmDocument();
@@ -270,5 +271,97 @@ public class DocumentController extends ControllerAbstract {
 		return mp;
 	}
 	
+	@RequestMapping(value="/dc/readedDistribution", method = RequestMethod.POST)
+	@ResponseBody	
+	public Map<String, Object> readedDistribution(@RequestBody String param){
+		List<String> distributionIdList= JSONUtils.stringToArray(param);
+		Map<String,Object> mp=new HashMap<String, Object>();
+		try {
+			for(int i=0;distributionIdList!=null&&i<distributionIdList.size();i++) {
+				String id= distributionIdList.get(i);
+				EcmDocument doc= documentService.getObjectById(getToken(), id);
+				doc.setStatus("已阅");
+				documentService.updateObject(getToken(), doc, null);
+			}
+			mp.put("code", ActionContext.SUCESS);
+		}catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", "操作失败,请联系系统管理员！");
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+		
+		return mp;
+	}
+	@RequestMapping(value = "/dc/getDistributeRecord", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
+	@ResponseBody
+	public Map<String, Object> getDocuments(@RequestBody String argStr) {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			Map<String,Object> params= JSONUtils.stringToMap(argStr);
+			int pageSize = Integer.parseInt(params.get("pageSize").toString());
+			int pageIndex = Integer.parseInt(params.get("pageIndex").toString());
+			Pager pager = new Pager();
+			pager.setPageIndex(pageIndex);
+			pager.setPageSize(pageSize);
+			Object distributeObj=  params.get("distributeId");
+			Object fildObj=params.get("fileId");
+			if(distributeObj==null&&fildObj==null) {
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("message", "未指定文件或分发单！");
+				return mp;
+			}
+			List<Map<String,Object>> data=null;
+			if(distributeObj!=null) {
+				data=distributeComponent.getDistributeRecordByDistributeId(getToken(), distributeObj.toString(), pager);
+			}else {
+				data=distributeComponent.getDistributeRecordByFileId(getToken(), fildObj.toString(), pager);
+			}
+			mp.put("pager", pager);
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("data", data);
+		}catch (Exception e) {
+			// TODO: handle exception
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", "操作失败，请联系管理员");
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+		
+		
+		return mp;
+	}
+	/**
+	 * 分发
+	 * @param metaData 元数据
+	 * @param mainFile 主文件
+	 * @param attachFiles 附件
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/dc/distributeApprove", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> distributeApprove(@RequestBody String metaData) throws Exception {
+		Map<String,Object> mp=new HashMap<String, Object>();
+		try {
+			Map<String, Object> args = JSONUtils.stringToMap(metaData);
+			EcmDocument order = new EcmDocument();
+			order.setAttributes(args);
+			distributeComponent.updateOrderForDistributionStatus(getToken(), order, "已生效");
+		}catch (Exception e) {
+			// TODO: handle exception
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", "操作失败请联系管理员！"+e.getMessage());
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			return mp;
+		}
+		
+		
+		mp.put("code", ActionContext.SUCESS);
+		return mp;
+	}
 	
 }

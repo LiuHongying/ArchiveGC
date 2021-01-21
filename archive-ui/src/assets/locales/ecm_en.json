@@ -547,7 +547,9 @@
     "knowledgeBase":"knowledgeBase",
     "effectiveDocuments":"Effective Documents",
     "distribute":"Distribute",
-    "haveReaded":"Have readed"
+    "haveReaded":"Have readed",
+    "Mysender":"My distributes",
+    "Approving":"Approving"
 },
 "message": {
     "conditionS":"Select Condition",
