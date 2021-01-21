@@ -18,6 +18,9 @@
         <el-col :span="3">
           <el-button type="primary" @click="readed()">已阅</el-button>
         </el-col>
+        <el-col :span="3">
+          <DistributeRecord :distributeId="currentId"></DistributeRecord>
+        </el-col>
       </el-row>
       <el-row>
         <DataGrid
@@ -53,12 +56,14 @@
 import DataGrid from "@/components/DataGrid.vue";
 import DataLayout from "@/components/ecm-data-layout";
 import CreateDocNoAttach from "@/components/CreateDocNoAttach.vue";
+import DistributeRecord from "@/views/archivecd/distribute/DistributeRecord.vue"
 export default {
   name: "distributeList",
   components: {
     DataGrid: DataGrid,
     DataLayout: DataLayout,
-    CreateDocNoAttach:CreateDocNoAttach
+    CreateDocNoAttach:CreateDocNoAttach,
+    DistributeRecord:DistributeRecord
   },
   data() {
     return {
@@ -81,7 +86,7 @@ export default {
       let distributeId = indata.ID;
       let m = new Map();
       m.set("id", distributeId);
-      m.set("condition", " and a.name='irel_children'");
+      m.set("condition", " and a.name='文件分发'");
       let _self = this;
       _self
         .axios({

@@ -558,7 +558,9 @@
     "knowledgeBase":"知识库",
     "effectiveDocuments":"生效文件",
     "distribute":"分发",
-    "haveReaded":"已阅"
+    "haveReaded":"已阅",
+    "Mysender":"我的分发",
+    "Approving":"待批示"
 },
 "message": {
     "conditionS":"条件选择",

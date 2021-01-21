@@ -11,9 +11,9 @@
             prefix-icon="el-icon-search"
           ></el-input>
         </el-col>
-        
+
         <el-col :span="3">
-          <DistributeRecord :distributeId="currentId"></DistributeRecord>
+          <el-button type="primary" @click="readed()">已阅</el-button>
         </el-col>
       </el-row>
       <el-row>
@@ -24,11 +24,11 @@
           v-bind:tableHeight="(layout.height-startHeight-75)"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
-          gridViewName="DistributionGrid"
+          gridViewName="DistributionGridApprove"
           :optionWidth="2"
           :condition="condition"
           :isshowCustom="false"
-          :isEditProperty="false"
+          :isEditProperty="true"
           showOptions
           :isShowChangeList="false"
           :isInitData="true"
@@ -41,6 +41,7 @@
             icon="el-icon-reading"
             @click.native="showItemContent(scope.data.row)"
           >{{ $t("application.viewContent") }}</el-dropdown-item>
+          <el-button slot="addButton" @click="saveItem()">分发</el-button>
         </DataGrid>
       </el-row>
     </template>
@@ -50,18 +51,18 @@
 import DataGrid from "@/components/DataGrid.vue";
 import DataLayout from "@/components/ecm-data-layout";
 import CreateDocNoAttach from "@/components/CreateDocNoAttach.vue";
-import DistributeRecord from "@/views/archivecd/distribute/DistributeRecord.vue"
+import DistributeRecord from "@/views/archivecd/distribute/DistributeRecord.vue";
 export default {
   name: "distributeList",
   components: {
     DataGrid: DataGrid,
     DataLayout: DataLayout,
-    CreateDocNoAttach:CreateDocNoAttach,
-    DistributeRecord:DistributeRecord
+    CreateDocNoAttach: CreateDocNoAttach,
+    DistributeRecord: DistributeRecord
   },
   data() {
     return {
-      condition: " STATUS='已阅'",
+      condition: " STATUS='新建'",
       inputkey: "",
       selectedItems: [],
       selectedItemList: [],
@@ -72,6 +73,34 @@ export default {
   props: {},
   mounted() {},
   methods: {
+    saveItem() {
+      let formData = this.$refs.mainDataGrid.$refs.ShowProperty.getFormData();
+      let jsonStr = formData.get("metaData");
+      let m = JSON.parse(jsonStr);
+      axios
+        .post("/cd/dc/distributeApprove", JSON.stringify(m))
+        .then(function(response) {
+          let code = response.data.code;
+          //console.log(JSON.stringify(response));
+          if (code == 1) {
+            _self.$message({
+              showClose: true,
+              message: "分发成功",
+              duration: 2000,
+              type: "warning"
+            });
+            _self.searchItem();
+            _self.$emit("onSaved", "update");
+            _self.$emit("onSaveSuccess", m);
+          } else {
+            _self.$message(_self.$t("message.saveFailured"));
+          }
+        })
+        .catch(function(error) {
+          _self.$message(_self.$t("message.saveFailured"));
+          console.log(error);
+        });
+    },
     rowClick(row) {
       this.currentId = row.ID;
     },
@@ -183,7 +212,7 @@ export default {
     searchItem() {
       let _self = this;
       let key = _self.inputkey;
-      _self.condition = " STATUS='已阅'";
+      _self.condition = " STATUS='新建'";
       if (key != "") {
         let c =
           " CODING like '%" +
