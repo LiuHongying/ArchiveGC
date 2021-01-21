@@ -198,7 +198,8 @@ export default {
       selectedArchives:[],
       printVolumesVisible:false,
       formType:"",
-      formCoding:""
+      formCoding:"",
+      conds:""
     };
   },
   mounted() {
@@ -228,11 +229,11 @@ export default {
         resName="待入库清单"
       }
       let params = {
-        gridName: "FormDcGrid",
+        gridName: "FormGrid",
         lang: "zh-cn",
-        condition: finalCondition,
-        filename: "待出库清单_" + fileDateStr + ".xlsx",
-        sheetname: resName,
+        condition: this.conds,
+        filename: "待出库清单_"+ fileDateStr +".xlsx",
+        sheetname: "待出库清单",
       };
       ExcelUtil.export(params);
     },
@@ -309,6 +310,7 @@ export default {
       if(_self.endDate!=''&&_self.endDate!=undefined){
           key+=" and CREATION_DATE < '"+_self.endDate+"'";
       }
+      this.conds = key
       _self.$refs.APendingoutGrid.condition=key;
       _self.$refs.APendingoutGrid.currentPage = 1;
       _self.$refs.APendingoutGrid.loadGridInfo();
