@@ -2105,6 +2105,7 @@ export default {
         _self.propertyVisible = true;
         _self.$nextTick(()=>{
           _self.$refs.ShowProperty.loadFormInfo();
+          _self.loadInfo = true;
         });
     },
     // 新建文件夹事件
