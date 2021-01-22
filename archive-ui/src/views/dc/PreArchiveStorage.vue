@@ -282,6 +282,10 @@
                             100 -
                           bottomHeight
                         "
+                    v-bind:isshowOption="true"
+                    :isshowCustom="false"
+                    :isEditProperty="true"
+                    :isShowChangeList="false"
                         dataUrl="/dc/getDocuments"
                       >
                       </DataGrid>
