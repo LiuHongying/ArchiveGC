@@ -549,7 +549,8 @@
     "distribute":"Distribute",
     "haveReaded":"Have readed",
     "Mysender":"My distributes",
-    "Approving":"Approving"
+    "Approving":"Approving",
+    "DistributeManagement":"DistributeManagement"
 },
 "message": {
     "conditionS":"Select Condition",
