@@ -63,10 +63,20 @@ export const npcRouter =  [
         meta: {
             requireAuth: true,
             permit: 1,
+            title:"DistributeManagement"
+        },
+        path: '/npc/DistributeManagement',
+        name: '分发管理',
+        component: () => import('@/views/archivecd/distribute/DistributeManagement.vue')
+    },
+    {
+        meta: {
+            requireAuth: true,
+            permit: 1,
             title:"distribute"
         },
         path: '/npc/distribute',
-        name: '分发',
+        name: '待阅',
         component: () => import('@/views/archivecd/distribute/DistributeList.vue')
     },
     {
@@ -76,7 +86,7 @@ export const npcRouter =  [
             title:"haveReaded"
         },
         path: '/npc/readed',
-        name: '分发',
+        name: '已阅',
         component: () => import('@/views/archivecd/distribute/DistributeListReaded.vue')
     },
     {
