@@ -41,6 +41,7 @@ import com.ecm.core.entity.EcmRelation;
 import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.exception.EcmException;
 import com.ecm.core.exception.NoPermissionException;
+import com.ecm.core.exception.SqlDeniedException;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
@@ -670,7 +671,7 @@ public class ArchiveDcController extends ControllerAbstract {
 			try {
 //				String id=obj.get("ID").toString();
 				EcmDocument doc = documentService.getObjectById(getToken(), id);
-				if ("设计文件".equals(doc.getTypeName())) {
+				if ("设计文件".equals(doc.getTypeName())||"科研文件".equals(doc.getTypeName())) {
 					String sql = "select parent_id from ecm_relation where child_id='" + id
 							+ "' and name='irel_children'";
 					List<Map<String, Object>> pdata = documentService.getMapList(getToken(), sql);
@@ -689,8 +690,9 @@ public class ArchiveDcController extends ControllerAbstract {
 							}
 						}
 						fetchInfo(getToken(), archiveObj);
+						doc.addAttribute("C_ARCHIVE_CODING", pdata.get(0).get("C_ARCHIVE_CODING").toString());
+						doc.addAttribute("C_STORE_CODING", pdata.get(0).get("C_STORE_CODING").toString());
 					}
-
 				}
 				doc.setStatus("待入库");
 
@@ -1194,4 +1196,41 @@ public class ArchiveDcController extends ControllerAbstract {
 
 	}
 
+	//检查同编码科研文件设计文件是否存在
+	@RequestMapping(value = "/dc/Archive/checkDC", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
+	@ResponseBody
+	public Map<String, Object> checkDC(@RequestBody String argStr) {
+		List<String> list = JSONUtils.stringToArray(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		for (String id : list) {
+			try {
+				EcmDocument doc = documentService.getObjectById(getToken(), id);
+				if ("设计文件".equals(doc.getTypeName())||"科研文件".equals(doc.getTypeName())) {
+					String coding= doc.getAttributeValue("CODING").toString();
+					String condition=" coding='"+coding+"' and IS_CURRENT=1 AND IS_RELEASED=1";
+					List<EcmDocument> currentObjs;
+					try {
+						currentObjs = documentService.getObjects(getToken(), condition);
+						if(currentObjs==null||currentObjs.size()<1) {
+							mp.put("code", ActionContext.FAILURE);
+							mp.put("message", "文件"+coding+"不能进行提交入库");
+							return mp;
+						}
+					} catch (SqlDeniedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			} catch (AccessDeniedException | EcmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("message", "操作失败");
+				return mp;
+			}
+		}
+		mp.put("code", ActionContext.SUCESS);
+		mp.put("message", "操作成功");
+		return mp;
+	}
 }
