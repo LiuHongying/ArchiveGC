@@ -80,6 +80,16 @@ const router = new Router({
     },
     {
       meta: {
+          requireAuth: true,
+          permit: 1,
+          title: '商务文件查询'
+      },
+      path: '/record/selectbusinessDC',
+      name: '商务文件查询',
+      component: () => import('@/views/record/SelectBuinessDC.vue'),
+    },
+    {
+      meta: {
         requireAuth: true,
         title: 'helpCenter'
       },

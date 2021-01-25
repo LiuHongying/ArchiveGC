@@ -1074,9 +1074,14 @@ export default {
         })
         .then(function(response) {
           let code=response.data.code;
+          let fileType
           if(code=='1'){
             let data=response.data.data;
-            let fileType=data[0].C_TO;
+            data.forEach(item => {
+              if(item.C_TO!=row.TYPE_NAME) {
+                fileType=item.C_TO;
+              }                 
+            })
             _self.newChildDoc = true;
             _self.newArchiveFileItem(fileType,row, response.data.copyInfo);
             //writeAudit(_self.parentId);
