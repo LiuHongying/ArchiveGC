@@ -421,7 +421,7 @@
                           :loading="releaseLoading"
                           size="small"
                           icon="el-icon-right"
-                          @click="penddingStorage"
+                          @click="checkDC"
                           title="提交入库"
                         >提交入库</el-button>
                       </el-form-item>
@@ -2244,7 +2244,6 @@ export default {
       let p=new Array();
       _self.selectedItems.forEach(e=>{
         p.push(e.ID);
-       
       });
       _self
           .axios({
@@ -2272,6 +2271,59 @@ export default {
           .catch(function(error) {
             console.log(error);
           });
+    },
+    checkDC(){
+      let _self = this
+      if (_self.selectedItems.length == 0) {
+        //  _self.$message("请选择一条卷盒数据！");
+        _self.$message({
+          showClose: true,
+          message: "请选择一条或多条数据！",
+          duration: 2000,
+          type: "warning"
+        });
+        return;
+      }
+      for(var i=0;i<_self.selectedItems.length;i++){
+         if(_self.selectedItems[i].C_BATCH_CODING2==null || _self.selectedItems[i].C_BATCH_CODING2.length == 0){
+           _self.$message({
+            showClose: true,
+            message: "请生成批次号后再提交！",
+            duration: 5000,
+            type: "warning"
+          });
+          return;
+        }
+      }
+      var m = [];
+      let tab = _self.selectedItems;
+      var i;
+      for (i in tab) {
+        m.push(tab[i]["ID"]);
+      }
+      axios.post("/dc/Archive/checkDC",JSON.stringify(m),{
+        headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+        }
+      })
+      .then(function (response) {
+        let code = response.data.code;
+        if (code == 1) {
+          _self.penddingStorage()
+        } else {
+          _self.$message({
+            showClose: true,
+            message:response.data.message,
+            duration: 2000,
+            type: "warning",
+          });
+          return;
+        }
+      })
+      .catch(function (error) {
+        _self.$message(response.data.message);
+        console.log(error);
+      });
     },
     moveToPreFilling(){
       let _self=this;

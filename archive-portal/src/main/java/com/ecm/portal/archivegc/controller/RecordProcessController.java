@@ -17,12 +17,14 @@ import com.ecm.core.ActionContext;
 import com.ecm.core.dao.EcmDocumentMapper;
 import com.ecm.core.entity.EcmDocument;
 import com.ecm.core.entity.EcmFolder;
+import com.ecm.core.entity.EcmRelation;
 import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.exception.EcmException;
 import com.ecm.core.exception.NoPermissionException;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
+import com.ecm.core.service.RelationService;
 import com.ecm.portal.archive.common.Constants;
 import com.ecm.portal.controller.ControllerAbstract;
 
@@ -35,7 +37,9 @@ public class RecordProcessController extends ControllerAbstract {
 	private FolderPathService folderPathService;
 	@Autowired
 	private FolderService folderService;
-	
+
+	@Autowired
+	private RelationService relationService;
 	
 	@RequestMapping(value = "/record/archiveStorage", method = RequestMethod.POST)
 	@ResponseBody
@@ -101,9 +105,20 @@ public class RecordProcessController extends ControllerAbstract {
 			EcmDocument parentDoc= documentService.getObjectById(getToken(), fileId);
 			
 			String typeName= parentDoc.getTypeName();
-			if("设计文件".equals(typeName)) {
+			//设置密级
+			String parentSecurityLevel= parentDoc.getSecurityLevel();
+			if(parentSecurityLevel==null||"".equals(parentSecurityLevel)) {
+				parentSecurityLevel="内部公开";
+			}
+			String parentAclName= getAclName(parentSecurityLevel);
+			String parentFolderId = folderPathService.getReleaseFolderId(getToken(), parentDoc.getAttributes());
+			parentDoc.addAttribute("FOLDER_ID", parentFolderId);
+			parentDoc.addAttribute("STATUS", Constants.INSTORAGE);
+			parentDoc.addAttribute("IS_RELEASED", "1");
+			parentDoc.addAttribute("ACL_NAME", parentAclName);
+			if("设计文件".equals(typeName)||"科研文件".equals(typeName)) {
 				String coding= parentDoc.getAttributeValue("CODING").toString();
-				String condition=" coding='"+coding+"' and IS_CURRENT=1";
+				String condition=" coding='"+coding+"' and IS_CURRENT=1 AND IS_RELEASED=1";
 				List<EcmDocument> currentObjs= documentService.getObjects(getToken(), condition);
 				if(currentObjs!=null&&currentObjs.size()>0) {
 					EcmDocument currentObj= currentObjs.get(0);
@@ -111,27 +126,29 @@ public class RecordProcessController extends ControllerAbstract {
 					documentService.updateObject(getToken(), currentObj);
 					parentDoc.setCurrent(true);
 //					documentService.updateObject(getToken(), parentDoc);
+					//查找存在的文件所在的案卷
+					String sql2="select parent_id from ecm_relation where child_id='"+currentObj.getId()+"' "+ " and name='irel_children'";
+					List<Map<String,Object>> parentsIds= documentService.getMapList(getToken(), sql2);
+					String parentID=parentsIds.get(0).get("parent_id").toString();
+					//创建关系，新文件与原文件所在案卷
+					EcmRelation relation=new EcmRelation();
+					relation.setParentId(parentID);
+					
+					relation.setChildId(parentDoc.getId());
+					relation.setName("irel_children");
+					try {
+						relationService.newObject(getToken(), relation);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
-			String parentSecurityLevel= parentDoc.getSecurityLevel();
-			if(parentSecurityLevel==null||"".equals(parentSecurityLevel)) {
-				parentSecurityLevel="内部公开";
-			}
-			String sqlAcl = "select NAME from ecm_acl ea where DESCRIPTION = '" + parentSecurityLevel + "'";
-			List<Map<String, Object>> listAcl = documentService.getMapList(getToken(), sqlAcl);
-			String parentAclName= listAcl.get(0).get("NAME").toString();
-			
-			String parentFolderId = folderPathService.getReleaseFolderId(getToken(), parentDoc.getAttributes());
-			parentDoc.addAttribute("FOLDER_ID", parentFolderId);
-			parentDoc.addAttribute("STATUS", Constants.INSTORAGE);
-			parentDoc.addAttribute("IS_RELEASED", "1");
-			parentDoc.addAttribute("ACL_NAME", parentAclName);
-			
 			documentService.updateObject(getToken(), parentDoc, null);
 			documentService.newAudit(getToken(), "Portal", "入库", parentDoc.getId(), null, null);
 			String sql1="select child_id from ecm_relation where parent_id='"+fileId+"' "+ " and name='irel_children'";
 			List<Map<String,Object>> childrenIds= documentService.getMapList(getToken(), sql1);
-			
+			//更新案卷子文件
 			for(int n=0;childrenIds!=null&&n<childrenIds.size();n++ ) {
 				Map<String,Object> child= childrenIds.get(n);
 				String childId=child.get("child_id").toString();
@@ -140,10 +157,7 @@ public class RecordProcessController extends ControllerAbstract {
 				if(childSecurityLevel==null||"".equals(childSecurityLevel)) {
 					childSecurityLevel="内部公开";
 				}
-				String sqlAclChild = "select NAME from ecm_acl ea where DESCRIPTION = '" + childSecurityLevel + "'";
-				
-				List<Map<String, Object>> listAclChild = documentService.getMapList(getToken(), sqlAclChild);
-				String childAclName= listAclChild.get(0).get("NAME").toString();
+				String childAclName= getAclName(childSecurityLevel);
 				childDoc.addAttribute("FOLDER_ID", parentFolderId);
 				childDoc.addAttribute("STATUS", Constants.INSTORAGE);
 				childDoc.addAttribute("IS_RELEASED", "1");
@@ -151,13 +165,25 @@ public class RecordProcessController extends ControllerAbstract {
 				documentService.updateObject(getToken(), childDoc, null);
 				
 			}
-			
 		}
 		
 		Map<String, Object> mp = new HashMap<String, Object>();
 		mp.put("code", ActionContext.SUCESS);
 		return mp;
 		
+	}
+	public String getAclName(String SecurityLevel) {
+		String AclName  = null;
+		if(SecurityLevel.equals("内部公开")) {
+			AclName="acl_release_public";
+		}
+		if(SecurityLevel.equals("受限")) {
+			AclName="acl_release_control";
+		}
+		if(SecurityLevel.equals("普通商密")||SecurityLevel.equals("核心商密")) {
+			AclName="acl_release_scuret";
+		}
+		return AclName;
 	}
 	
 	

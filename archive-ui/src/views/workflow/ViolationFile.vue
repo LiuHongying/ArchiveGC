@@ -209,6 +209,10 @@ export default {
                 this.cost = this.cost - 800
                 continue
             }
+             if(this.selectedRemoveFiles[tab].C_SECURITY_LEVEL == '核心商密'){
+                this.cost = this.cost - 1000
+                continue
+            }
             if(this.selectedRemoveFiles[tab].C_SECURITY_LEVEL != ''){
                 this.cost = this.cost - 800
                 continue
@@ -246,6 +250,10 @@ export default {
             }
             if(this.selectedFiles[tab].C_SECURITY_LEVEL == '内部公开'||this.selectedFiles[tab].C_SECURITY_LEVEL == '非密'){
                 this.cost = this.cost + 500
+                continue
+            }
+            if(this.selectedRemoveFiles[tab].C_SECURITY_LEVEL == '核心商密'){
+                this.cost = this.cost + 1000
                 continue
             }
             if(this.selectedFiles[tab].C_SECURITY_LEVEL != '内部公开'||this.selectedFiles[tab].C_SECURITY_LEVEL != '非密'){
