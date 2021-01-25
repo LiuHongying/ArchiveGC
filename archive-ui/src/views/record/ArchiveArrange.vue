@@ -1254,7 +1254,12 @@ export default {
         _self
         .axios.post("/dc/getPrintArchiveGrid",selectedRows[0].TYPE_NAME)
         .then(function(response) {
+          _self.$refs.printVolumes.isBusiness= false
           if(response.data.code=='1'){
+            if(selectedRows[0].TYPE_NAME=='合同管理案卷'){    
+              _self.$refs.printVolumes.isBusiness = true
+            }
+            _self.$refs.printVolumes.selectedRows = selectedRows
             let printGridName=response.data.data.attributes.C_TO;
             _self.$refs.printVolumes.dialogQrcodeVisible = false
             _self.$refs.printVolumes.refreshDataGrid(selectedRows,

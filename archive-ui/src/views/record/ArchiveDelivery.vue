@@ -209,7 +209,7 @@
            plain
             size="small"
           icon="el-icon-printer"
-          @click="beforePrint(selectRow,'PrintVolumeOrder','文件清单')"
+          @click="beforePrint(selectRow,'PrintDelivery','文件清单')"
         >打印清单</el-button>
          <el-button
           type="primary"
