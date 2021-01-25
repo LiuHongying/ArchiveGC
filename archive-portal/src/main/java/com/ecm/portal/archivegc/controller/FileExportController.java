@@ -85,12 +85,11 @@ public class FileExportController extends ControllerAbstract{
 			
 			String[] titleName = new String[list.size()];
 			String[] titleCNName = new String[list.size()];
+			titleName[0]="ID";
 			titleCNName[0]="ID";
 			
-			for (int i = 0; i < list.size(); i++) {
-				titleName[i] = list.get(i).getAttrName();
-			}
 			for (int i = 1; i < list.size(); i++) {
+				titleName[i] = list.get(i-1).getAttrName();
 				titleCNName[i] = list.get(i - 1).getLabel();
 			}
 			datalist.add(titleCNName);
