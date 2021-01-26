@@ -2,16 +2,59 @@
   <el-container>
     <el-header>
       <el-row>
+        <!-- Matthew changes on 2021年1月25日17:07:23 -->
           <el-form size="small" label-width="100" inline>
-            <el-form-item label="名称">
-              <el-select v-model="selectedName">
-                <el-option v-for="item in customNames" :key="item.name" :label="item.description" :value="item.name" @click.native="onSelectChange(item)"></el-option>
+            <el-form-item
+            :label="$t('application.fileType')"
+          >
+            <el-select
+              name="selectName"
+              v-model="selectedClassic"
+              :placeholder="$t('application.selectFileType')"
+              @change="getTypeNameByClassic(selectedClassic)"
+            >
+              <template v-for="(name,nameIndex) in classicNames">
+                <el-option :label="name" :value="name" :key="'PT_'+nameIndex"></el-option>
+              </template>
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            :label="$t('application.fileType')"
+          >
+            <el-select
+              name="selectName"
+              v-model="selectedTypeName"
+              :placeholder="$t('application.selectFileType')"
+              @change="getCustomization(selectedTypeName)"
+            >
+              <template v-for="(name,nameIndex) in typeNames" >
+                <el-option :label="name" :value="name" :key="'CT_'+nameIndex"></el-option>
+              </template>
+            </el-select>
+          </el-form-item>
+             <!-- end -->
+             <el-form-item>
+                <el-button type="primary" @click="saveListConfig">{{$t('application.saveNewListConfig')}}</el-button>
+                <!-- <el-button @click="createGridView">{{$t('application.new')}}</el-button>
+                <el-button @click="deleteGridView">{{$t('application.delete')}}</el-button> -->
+             </el-form-item>
+          </el-form>
+        </el-row>
+        <el-row>
+          <el-form size="small" label-width="100" inline>
+            <el-form-item label="配置列表">
+              <el-select v-model="selectedName" @change="refreshConfig(selectedName)">
+                <!-- Matthew changes on 2021年1月26日15:08:48 -->
+                <!-- <el-option v-for="item in customNames" :key="item.name" :label="item.description" :value="item.name" @click.native="onSelectChange(item)"></el-option> -->
+                <el-option v-for="item in customNames" :key="item.id" :label="item.name" :value="item.id" @click.native="refreshConfig(item)"></el-option>
+                <!-- end -->
               </el-select>
             </el-form-item>
-             <el-form-item>
-                <el-button @click="createGridView">{{$t('application.new')}}</el-button>
-                <el-button @click="deleteGridView">{{$t('application.delete')}}</el-button>
-             </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="useConfig">{{$t('application.useConfig')}}</el-button>
+              <el-button type="success" @click="updateConfig">{{$t('application.updateConfig')}}</el-button>
+              <el-button type="danger" @click="deleteListConfig">{{$t('application.deleteListConfig')}}</el-button>
+            </el-form-item>
           </el-form>
         </el-row>
     </el-header>
@@ -82,7 +125,7 @@
       </el-row>
     </el-main>
     <el-footer style="text-align: right;">
-      <el-button @click="saveCustomColumn">{{$t('application.save')}}</el-button>
+      <!-- <el-button @click="saveCustomColumn">{{$t('application.save')}}</el-button> -->
       <el-button @click="cancelCustomColumn">{{$t('application.cancel')}}</el-button>
     </el-footer>
   </el-container>
@@ -107,6 +150,13 @@ export default {
   },
   data(){
     return{
+      //Matthew changes on 2021年1月25日17:09:06
+      typeNames: [],
+      selectedTypeName: "",
+      classicNames: [],
+      selectedClassic:"",
+      configId:"",
+      // end
       customNames:[],
       selectedName:"",
       currentLanguage:"zh-cn",
@@ -133,7 +183,8 @@ export default {
     }
   },
   mounted(){
-    this.loadCustomName()
+    this.getClassicNames("ClassicNames");
+    //this.loadCustomName()
     this.loadSysColumnInfo()
     this.tables.source.data = this.sysColumnInfo
   },
@@ -143,6 +194,182 @@ export default {
       }
   },
   methods:{
+    //Matthew changes on 2021年1月25日17:09:23
+    useConfig(){
+      let _self = this;
+      _self.$emit("loadUserListConfig", _self.tables.target.data);
+    },
+    refreshConfig(item){
+      let _self = this;
+      _self.configId = item.id
+      let url = "/archive/getConfigById";
+      let m = new Map();
+      m.set("id",item.id);
+      axios.post(url,JSON.stringify(m)).then(function(response){
+            if(response.data.code==1) {
+              _self.tables.target.data = JSON.parse(response.data.data)
+            }
+          })
+    },
+    refreshConfigList(typeName){
+      let _self = this;
+      let url = "/archive/getConfigList";
+      let m = new Map();
+      m.set("typeName",typeName);
+      axios.post(url,JSON.stringify(m)).then(function(response){
+            if(response.data.code==1) {
+              _self.customNames = response.data.data
+            }
+          })
+    },
+    saveListConfig(){
+      let _self = this;
+      if(_self.tables.target.data.length<1){
+        _self.$message({ message: '没有选择项，无法保存', type: 'warning' })
+        return;
+      }
+      var screenConfigArr = [];
+      for(var i =0;i<_self.tables.target.data.length;i++){
+        let currentData = _self.tables.target.data[i]
+        let dataMap = {
+          "id":currentData.id,
+          "attrName":currentData.attrName,
+          "orderIndex":i+1,
+          "label":currentData.label,
+          "width":currentData.width,
+          "visibleType":currentData.visibleType,
+          "allowOrderby":currentData.allowOrderby
+        }
+        screenConfigArr.push(dataMap)
+      }
+      this.$prompt('请输入配置名称', '新建配置', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(({ value }) => {
+          //配置名称
+          _self.selectedName = value
+          //文档类型
+          var typeName = _self.selectedTypeName
+          //配置信息
+          var configContent = JSON.stringify(screenConfigArr)
+          let m = new Map();
+          m.set('configName',_self.selectedName);
+          m.set('typeName',typeName);
+          m.set('configContent',configContent)
+          let url = "/archive/customListConfig"
+          axios.post(url,JSON.stringify(m)).then(function(response){
+            if(response.data.code==1) {
+              _self.$message({showClose: true,message:_self.$t('message.saveSuccess'),duration: 2000,type: "Success"});
+              _self.refreshConfigList(_self.selectedTypeName)
+            }
+          })
+        }).catch();
+    },
+    updateConfig(){
+      let _self = this;
+      if(_self.tables.target.data.length<1){
+        _self.$message({ message: '没有选择项，无法更新', type: 'warning' })
+        return;
+      }
+      var screenConfigArr = [];
+      for(var i =0;i<_self.tables.target.data.length;i++){
+        let currentData = _self.tables.target.data[i]
+        let dataMap = {
+          "id":currentData.id,
+          "attrName":currentData.attrName,
+          "orderIndex":i+1,
+          "label":currentData.label,
+          "width":currentData.width,
+          "visibleType":currentData.visibleType,
+          "allowOrderby":currentData.allowOrderby
+        }
+        screenConfigArr.push(dataMap)
+      }
+      var configContent = JSON.stringify(screenConfigArr)
+      let mp = new Map();
+      let url = "/archive/deleteOrUpdateConfig";
+      mp.set("id",_self.configId);
+      mp.set("configContent",configContent);
+      mp.set("aciton","update");
+      axios.post(url,JSON.stringify(mp)).then(function(response){
+            if(response.data.code==1) {
+              _self.$message({showClose: true,message:'更新成功',duration: 2000,type: "Success"});
+              _self.refreshConfigList(_self.selectedTypeName)
+            }
+          })
+    },
+    deleteListConfig(){
+      let mp = new Map();
+      let url = "/archive/deleteOrUpdateConfig";
+      mp.set("id",_self.configId);
+      mp.set("aciton","delete");
+      axios.post(url,JSON.stringify(mp)).then(function(response){
+            if(response.data.code==1) {
+              _self.$message({showClose: true,message:'删除成功',duration: 2000,type: "Success"});
+              _self.refreshConfigList(_self.selectedTypeName)
+            }
+          })
+    },
+    getCustomization(keyName){
+      this.selectedName = "";
+      this.configId = "";
+      this.refreshConfigList(keyName)
+      this.loadCustomColumnInfo(keyName)
+      this.tables.target.data = []
+    },
+    getClassicNames(keyName) {
+      let _self = this;
+      let pm = new Map();
+      pm.set("configName", keyName);
+      // pm.set('parentId',"'"+p+"'");
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: JSON.stringify(pm),
+          url: "/dc/getObjectsByConfigClauseNoPage"
+        })
+        .then(function(response) {
+          var i;
+          let temp = response.data.data;
+          for (i = 0; i < temp.length; i++) {
+            _self.classicNames.push(temp[i].NAME);
+          }
+          console.log(_self.contractors);
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
+    getTypeNameByClassic(keyName) {
+      let _self = this;
+      _self.selectedTypeName = "";
+      _self.typeNames = [];
+      axios
+        .post("/dc/getEcmDefTypes", keyName)
+        .then(function(response) {
+          if (response.data.code == 1) {
+            response.data.data.forEach(element => {
+              _self.typeNames.push(element.name);
+            });
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
+    loadCustomColumnInfo(keyName){
+      let _self = this
+      let url = "/archive/getFormItems/"+keyName+"/"+this.currentLanguage
+      axios.post(url).then(function(response){
+        _self.tables.source.data = response.data.data
+      }).catch(function(error){
+        console.log(error)
+      })
+    },
+    // end
     loadSysColumnInfo(){
       let _self = this
       let url = "/admin/getFormItems/"+this.gridViewName+"/"+this.currentLanguage

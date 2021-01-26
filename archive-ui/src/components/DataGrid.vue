@@ -13,6 +13,7 @@
         <EcmCustomColumns
           ref="ecmCustomColumns"
           :gridViewName="gridViewName"
+          @loadUserListConfig="showCustomListConfig"
           @onClose="onCloseCustom" @onCancel="editColumn=false"
         >
         </EcmCustomColumns>
@@ -243,8 +244,8 @@
                   <el-dropdown-item
                     v-for="(item, idx) in customList"
                     :key="idx + '_Cz'"
-                    @click.native="showCustomInfo(item)"
-                    >{{ item.description }}</el-dropdown-item
+                    @click.native="showConfigInfo(item)"
+                    >{{ item.name }}</el-dropdown-item
                   >
                 </el-dropdown-menu>
               </el-dropdown>
@@ -451,7 +452,8 @@ export default {
     this.gridviewInfo.gridviewName = this.gridViewName;
     this.gridviewInfo.isCustom = false;
     this.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
-    this.loadCustomName();
+    //this.loadCustomName();
+    this.loadCustomListConfig()
     if(this.isLoadGridInfo){
       this.loadGridInfo();
     }
@@ -460,6 +462,41 @@ export default {
     }
   },
   methods: {
+    //Matthew changes on 2021年1月26日15:48:46
+    showCustomListConfig(val){
+      let _self = this;
+      _self.gridviewInfo.isCustom = true;
+      _self.columnList = val;
+      _self.loadGridData();
+    },
+    loadCustomListConfig(){
+      let _self = this;
+      let url = "/archive/getConfigList";
+      let mp = new Map()
+      axios.post(url,JSON.stringify(mp)).then(function(response){
+            if (response.data.code == 1) {
+            _self.customList = response.data.data;
+            _self.gridviewInfo.gridviewName = _self.gridViewName;
+            _self.gridviewInfo.isCustom = false;
+          }
+          })
+    },
+    showConfigInfo(item){
+      let id = item.id;
+      let _self = this;
+      var m = new Map();
+      m.set("id", id);
+      let url = "/archive/getConfigById";
+      axios.post(url,JSON.stringify(m)).then(function(response){
+            if(response.data.code==1) {
+              _self.gridviewInfo.gridviewName = item.name;
+              _self.gridviewInfo.isCustom = true;
+            _self.columnList = JSON.parse(response.data.data);
+            _self.loadGridData();
+            }
+          })
+    },
+    //end
     //上一个文档
     onPrevDoc(){
       if(this.currentDocIndex>0){
