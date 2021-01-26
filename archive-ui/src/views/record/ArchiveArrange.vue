@@ -277,7 +277,7 @@
                           _self.loadGridData(_self.currentFolder);
                         })"
                         :title="$t('application.delete')+$t('application.document')"
-                      >{{$t('application.delete')+$t('application.document')}}</el-button> 
+                      >{{$t('application.delete')}}</el-button> 
                       </el-form-item>
                       <el-form-item>
                       <el-button
@@ -454,7 +454,7 @@
                         <el-dropdown class="avatar-container right-menu-item" trigger="click">
                           <div class="avatar-wrapper">
                             <i class="el-icon-caret-bottom"></i>
-                            <span>更多操作</span>
+                            <span>更多</span>
                           </div>
                           <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item divided>
