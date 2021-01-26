@@ -425,7 +425,7 @@
                           title="提交入库"
                         >提交入库</el-button>
                       </el-form-item>
-                      <el-form-item>
+                      <!-- <el-form-item>
                         <el-button
                           type="primary"
                           size="small"
@@ -446,11 +446,45 @@
                         plain
                         size="small"
                         @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
-                      </el-form-item>
+                      </el-form-item> -->
                       <el-form-item>
                       <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
                       </el-form-item>
-                     
+                      <el-form-item>
+                        <el-dropdown class="avatar-container right-menu-item" trigger="click">
+                          <div class="avatar-wrapper">
+                            <i class="el-icon-caret-bottom"></i>
+                            <span>更多操作</span>
+                          </div>
+                          <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item divided>
+                              <span @click="beforeModify()" style="display:block;">
+                                <i class="el-icon-s-tools"></i>
+                                修改
+                              </span>
+                            </el-dropdown-item>
+                            <el-dropdown-item divided>
+                              <span @click="batchUpdateVisible=true" style="display:block;">
+                                <i class="el-icon-s-tools"></i>
+                                更新
+                              </span>
+                            </el-dropdown-item>
+                             
+                            <el-dropdown-item divided>
+                              <span @click="exportData()" style="display:block;">
+                                <i class="el-icon-s-tools"></i>
+                                导出EXCEL
+                              </span>
+                            </el-dropdown-item>
+                            <el-dropdown-item divided>
+                              <span @click="SearchBusinessDC()" style="display:block;">
+                                <i class="el-icon-s-tools"></i>
+                                商务文件查询
+                              </span>
+                            </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </el-dropdown>
+                      </el-form-item>                      
                     </el-col>
                   </el-row>
                   </el-form>
@@ -523,7 +557,6 @@
                         })">{{$t('application.delete')}}</el-button>
                     </el-form-item>
                       <el-form-item>
- 
                       <AddCondition ref="childAddCondition" v-model="childAddConds" :inputType="hiddenInput" :showFileType= false :typeName='childTypeName' @change="searchChildItem"></AddCondition>
                     </el-form-item>
                     </el-form>
@@ -742,6 +775,7 @@ export default {
       MFinput:"",
       childAddConds:'',
       childTypeName:'所有',
+      imageViewVisible:false,
       leftParam:{
         childUrl:'/dc/getDocuByRelationParentId',
         childCondition:"and a.NAME='irel_children' and b.IS_HIDDEN=0",
@@ -789,6 +823,12 @@ export default {
       }, 100);
   },
   methods: {
+     SearchBusinessDC() {
+      let href = this.$router.resolve({
+        path: "/record/selectbusinessDC",
+      });
+      window.open(href.href, "_blank");
+    },
     onChoiceChange(){
       if(this.Choice=='部分替换'){
       this.isMF = true}
