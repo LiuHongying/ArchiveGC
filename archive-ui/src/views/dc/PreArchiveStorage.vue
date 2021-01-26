@@ -53,6 +53,33 @@
                 ></PrintPdf417>
               </div>
             </el-dialog>
+                <el-dialog title="取批次号"
+    :visible.sync="pieceNumVisible"
+    @close="pieceNumVisible = false"
+    width="640px"
+    >
+    <el-row>
+      <el-form label-width="80px">
+        <el-col :span="12">
+          <el-form-item label="批次号">
+            <el-input v-model="pieceNum" auto-complete="off"></el-input>
+          </el-form-item>
+          
+        </el-col>
+        <el-col :span="12">
+          <div style="margin-top:6px">
+            <el-button type="primary" @click="takePiecesNumber">取批次号</el-button>
+          </div>
+          
+        </el-col>
+        
+      </el-form>
+    </el-row>
+      <div slot="footer" class="dialog-footer" style="text-align:center;">
+        <el-button type="primary" @click="savePiecesNumber">{{$t('application.ok')}}</el-button>
+        <el-button @click="pieceNumVisible = false">{{$t('application.cancel')}}</el-button>
+      </div>
+    </el-dialog>
             <el-dialog :visible.sync="printVolumesVisible" width="80%">
               <PrintVolumes
                 ref="printVolumes"
@@ -230,8 +257,17 @@
                   icon="el-icon-right"
                   @click="penddingStorage"
                   title="提交入库"
-                  >提交入库</el-button
-                >
+                  >提交入库</el-button>
+              </el-form-item>
+              <el-form-item>
+                <el-button
+                    type="primary"
+                    plain
+                    size="small"
+                    icon="el-icon-folder-add"
+                    @click="pieceNumVisible=true"
+                    title="生成批次号"
+                  >生成批次号</el-button>
               </el-form-item>
             </el-form>
           </template>
@@ -357,6 +393,8 @@ export default {
       printArchiveCodeVisible: false,
       printPdf417Visible: false,
       printVolumesVisible: false,
+      pieceNumVisible:false,
+      pieceNum:"",//批次号
       dataList: [],
       gridList: [],
       itemDataList: [],
@@ -437,6 +475,82 @@ export default {
   },
 
   methods: {
+      takePiecesNumber(){
+      let _self=this;
+      let m=new Map();
+      m.set('TYPE_NAME','批次号');
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: JSON.stringify(m), //JSON.stringify(m),
+          url: "/dc/takeNumbersByPolicy"
+        })
+        .then(function(response) {
+          
+          let code = response.data.code;
+          if (code == 1) {
+            //  _self.$message("取号成功！");
+            _self.$message({
+              showClose: true,
+              message: "取号成功！",
+              duration: 2000,
+              type: "success"
+            });
+            _self.pieceNum=response.data.data;
+           
+          } else {
+            // _self.$message(response.data.message);
+            _self.$message({
+              showClose: true,
+              message: response.data.message,
+              duration: 2000,
+              type: "warning"
+            });
+          }
+        })
+        .catch(function(error) {
+          _self.getNumLoading = false;
+          // _self.$message(_self.$t("message.takeNumberFaild"));
+          _self.$message({
+            showClose: true,
+            message: _self.$t("message.takeNumberFaild"),
+            duration: 5000,
+            type: "error"
+          });
+          console.log(error);
+        });
+    },
+        savePiecesNumber(){
+      let _self=this;
+      if(_self.selectedItems==undefined||_self.selectedItems.length==0){
+         _self.$message({
+              showClose: true,
+              message: _self.$t('message.PleaseSelectOneOrMoreData'),
+              duration: 2000,
+              type: "error"
+            });
+            return;
+      }
+      let p=new Array();
+      _self.selectedItems.forEach(e=>{
+        let m=new Map();
+        m.set("ID",e.ID);
+        m.set("C_BATCH_CODING2",_self.pieceNum);
+        p.push(m);
+      });
+      console.log(p)
+      _self.updateData(p,function(){
+        if(_self.$refs.relevantFileDataGrid){
+             _self.$refs.relevantFileDataGrid.itemDataList = [];
+          }
+          _self.pieceNumVisible = false;
+        _self.searchItem();
+      });
+      
+    },
     beforePrintArchiveCode(selectedRows, vtitle) {
       let _self = this;
       if (selectedRows == undefined || selectedRows.length == 0) {
