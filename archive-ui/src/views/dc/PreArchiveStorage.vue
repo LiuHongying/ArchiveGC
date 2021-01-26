@@ -982,9 +982,6 @@ export default {
 
     penddingStorage() {
       let _self = this;
-      var m = [];
-      let tab = _self.selectedItems;
-
       if (_self.selectedItems.length == 0) {
         _self.$message({
           showClose: true,
@@ -994,12 +991,30 @@ export default {
         });
         return;
       }
-
+      var m = [];
+      let error =""
+      let tab = _self.selectedItems;
       var i;
-      for (i = 0; i < tab.length; i++) {
+      let j = 1
+      for (i in tab) {
+        if(tab[i].C_ARCHIVE_CODING==null||tab[i].C_ARCHIVE_CODING==''){
+          error +=j+'.'+tab[i].TITLE+'<br/>'
+          j++
+        }
+        if(tab[i].C_ARCHIVE_CODING!=null&&tab[i].C_ARCHIVE_CODING!='')
         m.push(tab[i]["ID"]);
       }
-
+      if(error.length!=0){
+        error += '上述文件的文档号为空，已跳过'
+        _self.$message({
+        dangerouslyUseHTMLString: true,
+        message: error,
+        type: 'warning'
+        })
+      }
+      if(m.length==0){
+        return
+      }
       axios
         .post("/record/archiveStorage", JSON.stringify(m), {
           headers: {

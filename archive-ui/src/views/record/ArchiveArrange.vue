@@ -2346,10 +2346,28 @@ export default {
         }
       }
       var m = [];
+      let error =""
       let tab = _self.selectedItems;
       var i;
       for (i in tab) {
+        if(tab[i].C_ARCHIVE_CODING==null||tab[i].C_ARCHIVE_CODING==''){
+          let j=1
+          error +=j+'.'+tab[i].TITLE+'<br/>'
+          j++
+        }
+        if(tab[i].C_ARCHIVE_CODING!=null&&tab[i].C_ARCHIVE_CODING!='')
         m.push(tab[i]["ID"]);
+      }
+      if(error.length!=0){
+        error += '上述文件的文档号为空，已跳过'
+        _self.$message({
+        dangerouslyUseHTMLString: true,
+        message: error,
+        type: 'warning'
+        })
+      }
+      if(m.length==0){
+        return
       }
       axios.post("/dc/Archive/checkDC",JSON.stringify(m),{
         headers: {
@@ -2387,10 +2405,29 @@ export default {
         });
         return;
       }
-      let p=new Array();
-      _self.selectedItems.forEach(e=>{
-        p.push(e.ID);
-      });
+      var m = [];
+      let error =""
+      let tab = _self.selectedItems;
+      var i;
+      for (i in tab) {
+        if(tab[i].C_ARCHIVE_CODING==null||tab[i].C_ARCHIVE_CODING==''){
+          let j=1
+          error +=j+'.'+tab[i].TITLE+'<br/>'
+        }
+        if(tab[i].C_ARCHIVE_CODING!=null&&tab[i].C_ARCHIVE_CODING!='')
+        m.push(tab[i]["ID"]);
+      }
+      if(error.length!=0){
+        error += '上述文件的文档号为空，已跳过'
+        _self.$message({
+        dangerouslyUseHTMLString: true,
+        message: error,
+        type: 'warning'
+        })
+      }
+    if(m.length==0){
+        return
+      }
       _self
           .axios({
             headers: {
@@ -2398,7 +2435,7 @@ export default {
             },
             datatype: "json",
             method: "post",
-            data: JSON.stringify(p),
+            data: JSON.stringify(m),
             url: "/dc/moveToPreFiling"
           })
           .then(function(response) {
