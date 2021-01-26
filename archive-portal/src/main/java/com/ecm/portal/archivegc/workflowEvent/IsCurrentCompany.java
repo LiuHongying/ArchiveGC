@@ -50,6 +50,7 @@ public class IsCurrentCompany implements JavaDelegate{
 			List<Map<String,Object>> createRes = documentService.getMapList(ecmSession.getToken(), sqlCreate);
 			String creatorGroup = createRes.get(0).get("GROUP_NAME").toString();	//表单创建人所属部门
 			
+			
 			String sql = "select distinct * from ecm_document where id in(select CHILD_ID from ecm_relation where parent_id = '"+formId+"')";
 			List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);
 			for(Map<String,Object> mp : mps) {
@@ -71,6 +72,7 @@ public class IsCurrentCompany implements JavaDelegate{
 				}	//上面这循环用来判断借阅文件是否是本部门的
 				}
 					//下面这循环用来判断借阅文件包含密级
+			execution.setVariable("IS_CORE", "否");
 			for(Map<String,Object> mp :mps) {
 				if(mp.get("C_SECURITY_LEVEL").toString().equals("核心商密")&&isCurrentDepartment == true) {
 					execution.setVariable("IS_CORE", "是");
