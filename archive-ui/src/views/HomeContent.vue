@@ -21,7 +21,7 @@
       </div>
       <el-row>
         <el-col :span="16">
-          <el-card :body-style="{ height: '120px' }">
+          <el-card :body-style="{ height: '120px' }" v-if="!outUser">
             <div slot="header" class="clearfix" style="padding-bottom: 5px">
               <span style="float: left" class="ecmtitle">{{
                 $t("route.fullTextSearch")
@@ -151,7 +151,7 @@
                  <img :src="item">
                </span>
              </PaoMaDeng> -->
-          <el-card :body-style="{ height: '280px' }">
+          <el-card :body-style="{ height: '280px' }" v-if="!outUser">
             <div slot="header" class="clearfix" style="padding-bottom: 5px">
               <span style="float: left" class="ecmtitle">业务流程</span>
             </div>
@@ -203,7 +203,7 @@
               <span style="float: left" class="ecmtitle">个人中心</span>
             </div>
             <el-row class="person-row">
-            <el-col :span="8">
+            <el-col :span="8" v-if="!outUser">
               <i style="font-size: 28px;color: #409EFF;" class="el-icon-star-off"></i>
               <el-link
                 :underline="false"
@@ -416,6 +416,7 @@ export default {
       dialogVisible: false,
       workflow: {},
       dialogtitle:"",
+      outUser:false
     };
   },
   components: {
@@ -429,12 +430,20 @@ export default {
   },
   created() {
     let _self = this;
+     let user = this.currentUser();
+      user.roles.forEach(function(item){
+        if(item=='文印人员'){
+          _self.outUser = true
+        }
+      });
     _self.getToDoList();
-    _self.loadCards();
+    if(!_self.outUser){
+      _self.loadCards();
+    }
     _self.getNewsList();
-    _self.getDocument();
+    //_self.getDocument();
     _self.getCarousel();
-    _self.getRegulation();
+    //_self.getRegulation();
   },
   mounted() {
     let _self = this;

@@ -278,10 +278,19 @@ export default {
           // if(dataRows[i].required){
           //    console.log(dataRows[i].label+":"+dataRows[i].defaultValue+":"+typeof(dataRows[i].defaultValue));
           // }
-          if(_self.validateValue(dataRows[i]) && (typeof(dataRows[i].defaultValue)==='undefined' || dataRows[i].defaultValue==null||dataRows[i].defaultValue==""))
+          if(_self.validateValue(dataRows[i]) && (typeof(dataRows[i].defaultValue)==='undefined' || dataRows[i].defaultValue==null|| dataRows[i].defaultValue=="" ))
           {
-            msg += "["+dataRows[i].label+"] ";
-            ret = false;
+            if(typeof(dataRows[i].defaultValue)==='number' && dataRows[i].defaultValue>-1){
+
+            }else{
+              msg += "["+dataRows[i].label+"] ";
+              ret = false;
+            }
+            // console.log(typeof(dataRows[i].defaultValue)==='undefined');
+            // console.log(dataRows[i].defaultValue==null);
+            // console.log(dataRows[i].defaultValue=="");
+            // console.log(dataRows[i]);
+            // console.log(dataRows[i].label+":"+dataRows[i].defaultValue+":"+typeof(dataRows[i].defaultValue));
           }else if(dataRows[i].validatePolicy != null && dataRows[i].validatePolicy != ""){
             if((_self.myItemId == null || _self.myItemId =="") && dataRows[i].validatePolicy.indexOf(";")>-1){
               let p = dataRows[i].validatePolicy.split(";")[1];
