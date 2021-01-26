@@ -59,6 +59,7 @@ public class ImportUserDept {
 			  }
 		  }
 	}
+
 	
 	/**
 	 *      通过EXCEL导入部门
@@ -71,17 +72,35 @@ public class ImportUserDept {
 	public void importGroupByExcel(String token, InputStream in, String fileName) throws Exception  {
 		  Workbook wb = ImportExeclUtil.chooseWorkbook(fileName, in);
 		  DeptInfoCD  obj = new DeptInfoCD();//Bean 和EXCEL字段需要按顺序对应
+		  //根目录
+		  EcmGroup newDeptRoot=  new  EcmGroup();
+		  newDeptRoot.setName("核动力研究设计院");
+		  newDeptRoot.setParentId("0");
+		  newDeptRoot.setGroupType("1"); 
+		  newDeptRoot.setId("99999");
+		  groupService.newGroup(token, newDeptRoot);
+		  
 		  List<DeptInfoCD> readDateListT = ImportExeclUtil.readDateListT(wb, obj, 2, 0);
 		  for (int i = 0; i < readDateListT.size(); i++) {
 			  DeptInfoCD  syncDept = readDateListT.get(i);
 			  System.out.println(syncDept.getId() +" " +syncDept.getDeptId() +" " +syncDept.getDeptName()  +" " +syncDept.getDeptParentId()  +" "+syncDept.getDeptStatus()  +" " +syncDept.getDeptOrder()  );
 			  EcmGroup ecmGroup = groupService.getGroupByName(token, syncDept.getDeptName());
 			  if (ecmGroup == null) {
-				  EcmGroup newDept=  new  EcmGroup();
-				  newDept.setName(syncDept.getDeptName());
-				  newDept.setExtendId(syncDept.getDeptId());
-				  newDept.setGroupType("1"); 
-				  groupService.newGroup(token, newDept);
+				  if(Strings.isEmpty(syncDept.getDeptParentId())) {
+					  EcmGroup newDept=  new  EcmGroup();
+					  newDept.setName(syncDept.getDeptName());
+					  newDept.setExtendId(syncDept.getDeptId());
+					  newDept.setGroupType("1"); 
+					  newDept.setParentId(newDeptRoot.getId()); //设置顶级ID
+					  groupService.newGroup(token, newDept);
+				  }else {
+					  EcmGroup newDept=  new  EcmGroup();
+					  newDept.setName(syncDept.getDeptName());
+					  newDept.setExtendId(syncDept.getDeptId());
+					  newDept.setGroupType("1"); 
+					  groupService.newGroup(token, newDept);
+				  }
+				
 			  }
 		  }
 		  
@@ -101,11 +120,14 @@ public class ImportUserDept {
 					  }
 				  } 
 				  if (childGroup != null && parentGroup !=null) {
-					 groupService.addRole(null, parentGroup.getId(), childGroup.getId());
+					  childGroup.setParentId(parentGroup.getId());
+					  groupService.updateGroup(token, childGroup);
+					 //groupService.addRole(null, parentGroup.getId(), childGroup.getId());
 				  }
 			  }
 		}
 	}
+	
 	
 	/**
 	 *      用户加入部门
@@ -156,5 +178,61 @@ public class ImportUserDept {
 
 	
 	
+	
+//	/**
+//	 *      通过EXCEL导入部门  
+//	 * @param in
+//	 * @param fileName
+//	 * @throws Exception 
+//	 */
+//
+//	@Transactional(rollbackFor = Exception.class)
+//	public void importGroupByExcel(String token, InputStream in, String fileName) throws Exception  {
+//		  Workbook wb = ImportExeclUtil.chooseWorkbook(fileName, in);
+//		  DeptInfoCD  obj = new DeptInfoCD();//Bean 和EXCEL字段需要按顺序对应
+//		  //根目录
+//		  EcmGroup newDeptRoot=  new  EcmGroup();
+//		  newDeptRoot.setName("核动力研究设计院");
+//		  newDeptRoot.setParentId("0");
+//		  newDeptRoot.setGroupType("1"); 
+//		  newDeptRoot.setId("99999");
+//		  groupService.newGroup(token, newDeptRoot);
+//		  List<DeptInfoCD> readDateListT = ImportExeclUtil.readDateListT(wb, obj, 2, 0);
+//		  
+//		  
+//		  for (int i = 0; i < readDateListT.size(); i++) {
+//			  DeptInfoCD  syncDept = readDateListT.get(i);
+//			  System.out.println(syncDept.getId() +" " +syncDept.getDeptId() +" " +syncDept.getDeptName()  +" " +syncDept.getDeptParentId()  +" "+syncDept.getDeptStatus()  +" " +syncDept.getDeptOrder()  );
+//			  EcmGroup ecmGroup = groupService.getGroupByName(token, syncDept.getDeptName());
+//			  if (ecmGroup == null) {
+//				  EcmGroup newDept=  new  EcmGroup();
+//				  newDept.setName(syncDept.getDeptName());
+//				  newDept.setExtendId(syncDept.getDeptId());
+//				  newDept.setGroupType("1"); 
+//				  groupService.newGroup(token, newDept);
+//			  }
+//		  }
+//		  
+//		  //建立部门之间关系
+//		  for (int i = 0; i < readDateListT.size(); i++) {
+//			  DeptInfoCD  syncChildDept = readDateListT.get(i);
+//			  String childDeptParentId = syncChildDept.getDeptParentId();
+//			  if(!Strings.isEmpty(childDeptParentId)) {
+//				  //通过部门名称获取已经创建的部门信息
+//				  EcmGroup childGroup = groupService.getGroupByName(token, syncChildDept.getDeptName());
+//				  EcmGroup parentGroup = null;
+//				  for (int j = 0; j < readDateListT.size(); j++) {
+//					  DeptInfoCD  syncParentDept = readDateListT.get(j);
+//					  if(syncParentDept.getDeptId().equals(childDeptParentId)) {
+//						   parentGroup = groupService.getGroupByName(token, syncParentDept.getDeptName());
+//						   break;
+//					  }
+//				  } 
+//				  if (childGroup != null && parentGroup !=null) {
+//					 groupService.addRole(null, parentGroup.getId(), childGroup.getId());
+//				  }
+//			  }
+//		}
+//	}
 	
 }
