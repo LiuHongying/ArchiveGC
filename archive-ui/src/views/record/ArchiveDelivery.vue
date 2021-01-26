@@ -218,7 +218,7 @@
           icon="el-icon-delete"
           @click="onDeleleItem()"
         >{{$t('application.delete')}}</el-button>
-        <el-button type="primary" size="small" plain  @click="showItemContent()" >商务文件查询</el-button>
+        <el-button type="primary" size="small" plain  @click="SearchBusinessDC()" >商务文件查询</el-button>
       </el-col>
     </el-row>
     <template v-slot:main="{layout}">
@@ -2445,7 +2445,7 @@ export default {
       // this.loadPageInfo();
     },
     // 商务文件查询
-    showItemContent() {
+    SearchBusinessDC() {
       let href = this.$router.resolve({
         path: "/record/selectbusinessDC",
       });
