@@ -66,6 +66,7 @@ export default {
       currentLanguage: "zh-cn",
       gridList:[],
       volumeTitle:"",
+      condition:"",
     };
   },
   mounted() {
@@ -100,8 +101,9 @@ export default {
       let _self = this;
       var m = new Map();
       m.set('id',_self.archiveId);
+      m.set('condition',_self.condition)
       _self
-      .axios.post("/dc/getAllDocuByRelationParentId",JSON.stringify(m))
+      .axios.post("/dc/getAllDocusByRelationParentId",JSON.stringify(m))
       .then(function(response) {
         
         _self.innerDataList = response.data.data;

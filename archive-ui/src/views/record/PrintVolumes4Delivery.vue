@@ -41,8 +41,8 @@
     </el-dialog> -->
         <el-select @change="onChoiceChange" v-model="Choice" >
           <el-option label="通用打印" value="通用打印"></el-option>
-          <el-option label="商务文件移交单正本" value="商务文件移交单正本"></el-option>
-          <el-option label="商务文件移交单副本" value="商务文件移交单副本"></el-option>
+          <el-option label="商务案卷正本" value="商务文件移交单正本"></el-option>
+          <el-option label="商务案卷副本" value="商务文件移交单副本"></el-option>
           </el-select>
           <button @click="printCode" v-print="'#print'">打印</button>
       <div id='print' ref='print' style="height:95%;width:95%;">
@@ -217,7 +217,8 @@ export default {
       gridList:[],
       volumeTitle:"",
       showSingle:true,
-      Choice:"",
+      Choice:"通用打印",
+      condition:""
 
     };
   },
@@ -240,14 +241,21 @@ export default {
     onChoiceChange(){
       let _self = this
       if(this.Choice=='商务文件移交单正本'){
+        this.condition = "and C_TYPE1='正本'"
         this.loadGridInfo("BusinessPrintGrid")
+        this.InnerFile()
       }
       if(this.Choice=='商务文件移交单副本'){
+        this.condition = "and C_TYPE1='副本'"
         this.loadGridInfo("BusinessPrintGrid4Content")
+        this.InnerFile()
       }
       if(this.Choice=='通用打印'){
-        this.loadGridInfo("PrintDelivery")
+      this.condition = ''
+      this.loadGridInfo("PrintDelivery")
+      this.InnerFile()
       }
+      console.log(this.condition)
     },
 
       // 加载表格样式
@@ -282,7 +290,7 @@ export default {
       
       var m = new Map();
       m.set('id',_self.archiveId);
-      
+      m.set('condition',_self.condition)
       // console.log('pagesize:', _self.pageSize);
       _self
       .axios({
@@ -291,7 +299,7 @@ export default {
         },
         method: "post",
         data: JSON.stringify(m),
-        url: "/dc/getAllDocuByRelationParentId"
+        url: "/dc/getAllDocusByRelationParentId"
       })
       .then(function(response) {
         

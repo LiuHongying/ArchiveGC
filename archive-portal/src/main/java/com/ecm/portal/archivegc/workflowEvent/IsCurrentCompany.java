@@ -40,6 +40,7 @@ public class IsCurrentCompany implements JavaDelegate{
 		String workflowSpecialUserName = env.getProperty("ecm.username");
 		IEcmSession ecmSession = null;
 		try {
+			boolean isCurrentDepartment = true; 	//记录当前文件是否是本部门
 			ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
 			Map<String, Object> varMap = execution.getVariables();
 			String formId = varMap.get("formId").toString();
@@ -64,8 +65,16 @@ public class IsCurrentCompany implements JavaDelegate{
 				}
 				if(!department.equals(creatorGroup)||!department.equals(toDepartment)) {		//只要遇到一次不是自己部门的文件，就直接设为false，后跳出循环
 					execution.setVariable("IS_CURRENT_COMPANY", "否");
+					isCurrentDepartment = true;
 					break;
 				}
+				}	//上面这循环用来判断借阅文件是否是本部门的
+				}
+					//下面这循环用来判断借阅文件包含密级
+			for(Map<String,Object> mp :mps) {
+				if(mp.get("C_SECURITY_LEVEL").toString().equals("核心商密")&&isCurrentDepartment == true) {
+					execution.setVariable("IS_CORE", "是");
+					execution.setVariable("IS_CURRENT_COMPANY", "已找到商密文件");
 				}
 			}
 			

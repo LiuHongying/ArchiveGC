@@ -1,5 +1,10 @@
 <template>
   <div>
+      <el-select v-if="isBusiness" @change="onChoiceChange" v-model="Choice" >
+      <el-option label="通用打印" value="通用打印"></el-option>
+      <el-option label="商务文件正本" value="商务文件移交单正本"></el-option>
+      <el-option label="商务文件副本" value="商务文件移交单副本"></el-option>
+      </el-select>
     <button @click="printPage" v-print="'#print'">打印</button>
      <el-container style="width:100%;height:540px;overflow:auto;">
       <div id='print' ref='print' style="height:100%;width:100%;">
@@ -26,6 +31,9 @@ export default {
   data() {
     return {
       currentLanguage: "zh-cn",
+      isBusiness:false,
+      Choice:"通用打印",
+      selectedRows:[]
     };
   },
   mounted() {
@@ -37,13 +45,31 @@ export default {
     archiveObjects:{type:Array,default:() => []},
   },
   methods: {
-
+    onChoiceChange(){
+      let _self = this
+      if(this.Choice=='商务文件移交单正本'){
+        this.condition = "and C_TYPE1='正本'"
+        //this.$refs.PrintVolumesGrid.condition = "and C_TYPE1='正本'"
+        this.refreshDataGrid(this.selectedRows,"BusinessFilePrintGrid")
+      }
+      if(this.Choice=='商务文件移交单副本'){
+        this.condition = "and C_TYPE1='副本'"
+        // this.$refs.PrintVolumesGrid.condition = "and C_TYPE1='副本'"
+        this.refreshDataGrid(this.selectedRows,"BusinessFilePrintGrid4Content")
+      }
+      if(this.Choice=='通用打印'){
+      this.condition = ""
+      //this.$refs.PrintVolumesGrid.condition = ''
+      this.refreshDataGrid(this.selectedRows,"ArrangeInnerGridBusiness")
+      }
+    },
     refreshDataGrid(objs,gridName){
       let _self=this;
       this.archiveObjects = objs;
       if(objs){
          setTimeout(() => {
         for(var i=0;i<objs.length;i++){
+          _self.$refs['innerGrid'+i][0].condition = _self.condition
           _self.$refs['innerGrid'+i][0].loadArchiveData(objs[i].ID,gridName);
         }},100);
       }

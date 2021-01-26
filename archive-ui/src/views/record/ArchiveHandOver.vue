@@ -1,5 +1,44 @@
 <template>
   <DataLayout>
+  <el-dialog
+      title="库位号更新"
+      width="50%"
+      :visible="batchUpdateVisible"
+      @close="batchUpdateVisible=false"
+    >
+      <template>
+        <div>
+          <div>
+            <el-form label-width="120px" v-loading="loading" @submit.native.prevent>
+              <el-row>
+                <el-col :span="4">
+                  <el-form-item :label="'Excel'+$t('message.file')" style="float: left;">
+                    <el-upload
+                      :limit="1"
+                      :file-list="fileList"
+                      action
+                      :on-change="handleChange"
+                      :auto-upload="false"
+                      :multiple="false"
+                    >
+                      <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
+                    </el-upload>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="4" style="float:right;">
+                  <el-button type="primary" plain  icon="el-icon-upload2" @click="batchUpdate()">开始更新</el-button>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col>
+                  <el-input type="textarea" :rows="6" v-model="importMessage"></el-input>
+                </el-col>
+              </el-row>
+            </el-form>
+          </div>
+        </div>
+      </template>
+    </el-dialog>
     <template v-slot:header>
       <el-dialog
         title="退回备注"
@@ -69,6 +108,9 @@
         </el-form-item>
         <el-form-item>
         <el-button type="primary" @click="pendNot">退回</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" size="small" plain  @click="batchUpdateVisible=true" >更新库位号</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click.native="exportData">{{
@@ -181,6 +223,10 @@ export default {
       pendNotVisible:false,
       AdvCondition:"",
       hiddenInput:"hidden",
+      batchUpdateVisible: false,
+      fileList:[],
+      importMessage:"",
+      loading: false
     };
   },
   props: {},
@@ -431,6 +477,35 @@ export default {
       };
       ExcelUtil.export(params);
     },
+
+    handleChange(file, fileList) {
+      this.fileList = fileList;
+    },
+    batchUpdate(){
+      let _self = this;
+      if (_self.fileList == null || _self.fileList.length == 0||_self.fileList[0].raw==null) {
+         _self.$message(_self.$t('application.PleaseSelect'));
+        return;
+      }
+      let formdata = new FormData();
+      let m = new Map();
+      formdata.append("excel", _self.fileList[0].raw);
+      _self.loading = true;
+      axios
+        .post("/dc/Archive/batchUpdate", formdata, {
+          "Content-Type": "multipart/form-data"
+        })
+        .then(function(response) {
+          _self.importMessage = response.data.data;
+          _self.loading = false;
+          _self.$message("更新成功!");
+          _self.$refs.mainDataGrid.loadGridData();
+        })
+        .catch(function(error) {
+          _self.$message("更新失败!");
+          console.log(error);
+        });
+    }
   },
   components: {
     DataLayout: DataLayout,

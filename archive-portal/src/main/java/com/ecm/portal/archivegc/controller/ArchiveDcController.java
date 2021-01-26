@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.text.Collator;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,6 +15,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ecm.common.util.DateUtils;
 import com.ecm.common.util.FileUtils;
 import com.ecm.common.util.JSONUtils;
 import com.ecm.core.ActionContext;
@@ -1232,5 +1239,113 @@ public class ArchiveDcController extends ControllerAbstract {
 		mp.put("code", ActionContext.SUCESS);
 		mp.put("message", "操作成功");
 		return mp;
+	}
+	/*
+	 * 移交入库Excel更新库位号
+	 */
+	@RequestMapping(value = "/dc/Archive/batchUpdate", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> batchUpdate(@RequestParam("excel") MultipartFile excel) throws Exception{
+		Map<String, Object> mp = new HashMap<String, Object>();
+		StringBuilder sb = new StringBuilder();
+		int sucessCount = 0;
+		int failedCount = 0;
+		sb.append("开始更新").append(DateUtils.currentDate("yyyy-MM-dd HH:mm:ss")).append("\r\n");
+		Workbook workbook = WorkbookFactory.create(excel.getInputStream());
+		Sheet sheet = workbook.getSheetAt(0);
+		if (excel.getInputStream() != null) {
+			excel.getInputStream().close();
+		}
+		try {
+
+			// 第一行字段名称
+			Map<Integer, String> attrNames = new HashMap<Integer, String>();
+			for (int i = 0; i <= sheet.getRow(1).getLastCellNum(); i++) {
+				if (sheet.getRow(0).getCell(i) != null
+						&& !StringUtils.isEmpty(sheet.getRow(0).getCell(i).getStringCellValue())) {
+					attrNames.put(i, sheet.getRow(0).getCell(i).getStringCellValue());
+				}else if(sheet.getRow(1).getCell(i) != null && !StringUtils.isEmpty(sheet.getRow(1).getCell(i).getStringCellValue())){
+					attrNames.put(i, sheet.getRow(1).getCell(i).getStringCellValue());
+				}
+			}
+
+
+			// 第二行为中文标签，第三行位值
+			for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+				try {
+					String id = sheet.getRow(i).getCell(0).getStringCellValue();
+					if (StringUtils.isEmpty(id)) {
+						continue;
+					}
+					EcmDocument doc = documentService.getObjectById(getToken(), id);
+					if (doc != null) {
+						for (int j =1; j <= sheet.getRow(i).getLastCellNum(); j++) {
+							String attrName = attrNames.get(j);
+							if ("C_LOCATION".equals(attrName)) {
+								String val =getCellValue(sheet.getRow(i).getCell(j));
+								doc.addAttribute("C_LOCATION", val);
+							}
+						}
+						documentService.updateObject(getToken(), doc, null);
+						sucessCount++;
+					} else {
+						sb.append("第").append(i + 1).append("行更新错误：").append(id).append("不存在\r\n");
+						;
+						failedCount++;
+					}
+
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					sb.append("第").append(i + 1).append("行更新错误：").append(ex.getMessage()).append("\r\n");
+					;
+					failedCount++;
+				}
+			}
+		} finally {
+			if (workbook != null) {
+				workbook.close();
+			}
+		}
+		sb.append("完成更新:").append(DateUtils.currentDate("yyyy-MM-dd HH:mm:ss")).append("\r\n");
+		sb.append("成功行数:").append(sucessCount).append("\r\n");
+		sb.append("错误行数:").append(failedCount).append("\r\n");
+		
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("data", sb.toString());
+		return mp;
+	}
+	private String getCellValue(Cell cell) {
+		String retVal = null;
+		if (cell == null) {
+			return null;
+		}
+		switch (cell.getCellType()) {
+		case BOOLEAN:
+			// 得到Boolean对象的方法
+			retVal = cell.getBooleanCellValue() + "";
+			break;
+		case NUMERIC:
+			// 先看是否是日期格式
+			if (DateUtil.isCellDateFormatted(cell)) {
+				// 读取日期格式
+				Date dt = cell.getDateCellValue();
+				retVal = DateUtils.DateToStr(dt, "yyyy");
+			} else {
+				DecimalFormat df = new DecimalFormat();
+				// 单元格的值,替换掉,
+				retVal = df.format(cell.getNumericCellValue()).replace(",", "");
+
+			}
+			break;
+		case FORMULA:
+			// 读取公式
+			retVal = cell.getCellFormula();
+			break;
+		case STRING:
+			// 读取String
+			retVal = cell.getRichStringCellValue().toString();
+			break;
+		}
+		return retVal;
 	}
 }

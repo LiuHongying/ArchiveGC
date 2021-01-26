@@ -1074,9 +1074,14 @@ export default {
         })
         .then(function(response) {
           let code=response.data.code;
+          let fileType
           if(code=='1'){
             let data=response.data.data;
-            let fileType=data[0].C_TO;
+            data.forEach(item => {
+              if(item.C_TO!=row.TYPE_NAME) {
+                fileType=item.C_TO;
+              }                 
+            })
             _self.newChildDoc = true;
             _self.newArchiveFileItem(fileType,row, response.data.copyInfo);
             //writeAudit(_self.parentId);
@@ -1254,7 +1259,12 @@ export default {
         _self
         .axios.post("/dc/getPrintArchiveGrid",selectedRows[0].TYPE_NAME)
         .then(function(response) {
+          _self.$refs.printVolumes.isBusiness= false
           if(response.data.code=='1'){
+            if(selectedRows[0].TYPE_NAME=='合同管理案卷'){    
+              _self.$refs.printVolumes.isBusiness = true
+            }
+            _self.$refs.printVolumes.selectedRows = selectedRows
             let printGridName=response.data.data.attributes.C_TO;
             _self.$refs.printVolumes.dialogQrcodeVisible = false
             _self.$refs.printVolumes.refreshDataGrid(selectedRows,
