@@ -64,13 +64,13 @@
 	              <router-link to="/user/changepassword">{{$t('route.changePassword')}}</router-link>
 	            </span>
 	          </el-menu-item>
-            <el-menu-item index="/ShopingCart">
+            <el-menu-item index="/ShopingCart"  v-if="!outUser">
               <i class="iconfont zisecm-group menu-white"></i>
               <span slot="title">
                 <router-link to="/ShopingCart">我的收藏</router-link>
               </span>
             </el-menu-item>
-            <el-menu-item index="/Subscription">
+            <el-menu-item index="/Subscription"  v-if="!outUser">
               <i class="iconfont zisecm-group menu-white"></i>
               <span slot="title">
                 <router-link to="/Subscription">我的订阅</router-link>
@@ -93,7 +93,8 @@ export default {
   data() {
     return {
       dataList: [],
-      clientPermission: 0
+      clientPermission: 0,
+      outUser:false,
     };
   },
   props: {
@@ -136,7 +137,17 @@ export default {
     loadMenu() {
       let _self = this;
       var m = new Map();
-      m.set("name", "TopMenu");
+      let user = this.currentUser();
+      user.roles.forEach(function(item){
+        if(item=='文印人员'){
+          _self.outUser = true
+        }
+      });
+      if(_self.outUser){
+        m.set("name", "OutUserMenu");
+      }else{
+        m.set("name", "TopMenu");
+      }
        //m.set("name","cnpeexchange");
       m.set("lang", _self.getLang());
       axios
