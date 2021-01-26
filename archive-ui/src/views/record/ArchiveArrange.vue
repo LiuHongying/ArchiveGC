@@ -503,7 +503,7 @@
                         showOptions="查看内容"
                         :isShowChangeList="true"
                         :isshowCustom="true"
-                        :optionWidth = "2"
+                        :optionWidth = "3"
                         gridViewName="ArrangeGrid"
                         @rowclick="beforeShowInnerFile"
                         @selectchange="selectChange"
