@@ -277,7 +277,7 @@
                           _self.loadGridData(_self.currentFolder);
                         })"
                         :title="$t('application.delete')+$t('application.document')"
-                      >{{$t('application.delete')+$t('application.document')}}</el-button> 
+                      >{{$t('application.delete')}}</el-button> 
                       </el-form-item>
                       <el-form-item>
                       <el-button
@@ -421,11 +421,11 @@
                           :loading="releaseLoading"
                           size="small"
                           icon="el-icon-right"
-                          @click="penddingStorage"
+                          @click="checkDC"
                           title="提交入库"
                         >提交入库</el-button>
                       </el-form-item>
-                      <el-form-item>
+                      <!-- <el-form-item>
                         <el-button
                           type="primary"
                           size="small"
@@ -446,11 +446,45 @@
                         plain
                         size="small"
                         @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
-                      </el-form-item>
+                      </el-form-item> -->
                       <el-form-item>
                       <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
                       </el-form-item>
-                     
+                      <el-form-item>
+                        <el-dropdown class="avatar-container right-menu-item" trigger="click">
+                          <div class="avatar-wrapper">
+                            <i class="el-icon-caret-bottom"></i>
+                            <span>更多</span>
+                          </div>
+                          <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item divided>
+                              <span @click="beforeModify()" style="display:block;">
+                                <i class="el-icon-s-tools"></i>
+                                修改
+                              </span>
+                            </el-dropdown-item>
+                            <el-dropdown-item divided>
+                              <span @click="batchUpdateVisible=true" style="display:block;">
+                                <i class="el-icon-s-tools"></i>
+                                更新
+                              </span>
+                            </el-dropdown-item>
+                             
+                            <el-dropdown-item divided>
+                              <span @click="exportData()" style="display:block;">
+                                <i class="el-icon-s-tools"></i>
+                                导出EXCEL
+                              </span>
+                            </el-dropdown-item>
+                            <el-dropdown-item divided>
+                              <span @click="SearchBusinessDC()" style="display:block;">
+                                <i class="el-icon-s-tools"></i>
+                                商务文件查询
+                              </span>
+                            </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </el-dropdown>
+                      </el-form-item>                      
                     </el-col>
                   </el-row>
                   </el-form>
@@ -467,9 +501,9 @@
                         :condition="mainParam.condition"
                         :folderId="mainParam.folderId"
                         showOptions="查看内容"
-                        :isShowChangeList="false"
-                        :isshowCustom="false"
-                        :optionWidth = "2"
+                        :isShowChangeList="true"
+                        :isshowCustom="true"
+                        :optionWidth = "3"
                         gridViewName="ArrangeGrid"
                         @rowclick="beforeShowInnerFile"
                         @selectchange="selectChange"
@@ -523,7 +557,6 @@
                         })">{{$t('application.delete')}}</el-button>
                     </el-form-item>
                       <el-form-item>
- 
                       <AddCondition ref="childAddCondition" v-model="childAddConds" :inputType="hiddenInput" :showFileType= false :typeName='childTypeName' @change="searchChildItem"></AddCondition>
                     </el-form-item>
                     </el-form>
@@ -742,6 +775,7 @@ export default {
       MFinput:"",
       childAddConds:'',
       childTypeName:'所有',
+      imageViewVisible:false,
       leftParam:{
         childUrl:'/dc/getDocuByRelationParentId',
         childCondition:"and a.NAME='irel_children' and b.IS_HIDDEN=0",
@@ -789,6 +823,12 @@ export default {
       }, 100);
   },
   methods: {
+     SearchBusinessDC() {
+      let href = this.$router.resolve({
+        path: "/record/selectbusinessDC",
+      });
+      window.open(href.href, "_blank");
+    },
     onChoiceChange(){
       if(this.Choice=='部分替换'){
       this.isMF = true}
@@ -1074,9 +1114,14 @@ export default {
         })
         .then(function(response) {
           let code=response.data.code;
+          let fileType
           if(code=='1'){
             let data=response.data.data;
-            let fileType=data[0].C_TO;
+            data.forEach(item => {
+              if(item.C_TO!=row.TYPE_NAME) {
+                fileType=item.C_TO;
+              }                 
+            })
             _self.newChildDoc = true;
             _self.newArchiveFileItem(fileType,row, response.data.copyInfo);
             //writeAudit(_self.parentId);
@@ -1254,7 +1299,12 @@ export default {
         _self
         .axios.post("/dc/getPrintArchiveGrid",selectedRows[0].TYPE_NAME)
         .then(function(response) {
+          _self.$refs.printVolumes.isBusiness= false
           if(response.data.code=='1'){
+            if(selectedRows[0].TYPE_NAME=='合同管理案卷'){    
+              _self.$refs.printVolumes.isBusiness = true
+            }
+            _self.$refs.printVolumes.selectedRows = selectedRows
             let printGridName=response.data.data.attributes.C_TO;
             _self.$refs.printVolumes.dialogQrcodeVisible = false
             _self.$refs.printVolumes.refreshDataGrid(selectedRows,
@@ -2244,7 +2294,6 @@ export default {
       let p=new Array();
       _self.selectedItems.forEach(e=>{
         p.push(e.ID);
-       
       });
       _self
           .axios({
@@ -2273,6 +2322,77 @@ export default {
             console.log(error);
           });
     },
+    checkDC(){
+      let _self = this
+      if (_self.selectedItems.length == 0) {
+        //  _self.$message("请选择一条卷盒数据！");
+        _self.$message({
+          showClose: true,
+          message: "请选择一条或多条数据！",
+          duration: 2000,
+          type: "warning"
+        });
+        return;
+      }
+      for(var i=0;i<_self.selectedItems.length;i++){
+         if(_self.selectedItems[i].C_BATCH_CODING2==null || _self.selectedItems[i].C_BATCH_CODING2.length == 0){
+           _self.$message({
+            showClose: true,
+            message: "请生成批次号后再提交！",
+            duration: 5000,
+            type: "warning"
+          });
+          return;
+        }
+      }
+      var m = [];
+      let error =""
+      let tab = _self.selectedItems;
+      var i;
+      for (i in tab) {
+        if(tab[i].C_ARCHIVE_CODING==null||tab[i].C_ARCHIVE_CODING==''){
+          let j=1
+          error +=j+'.'+tab[i].TITLE+'<br/>'
+          j++
+        }
+        if(tab[i].C_ARCHIVE_CODING!=null&&tab[i].C_ARCHIVE_CODING!='')
+        m.push(tab[i]["ID"]);
+      }
+      if(error.length!=0){
+        error += '上述文件的文档号为空，已跳过'
+        _self.$message({
+        dangerouslyUseHTMLString: true,
+        message: error,
+        type: 'warning'
+        })
+      }
+      if(m.length==0){
+        return
+      }
+      axios.post("/dc/Archive/checkDC",JSON.stringify(m),{
+        headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+        }
+      })
+      .then(function (response) {
+        let code = response.data.code;
+        if (code == 1) {
+          _self.penddingStorage()
+        } else {
+          _self.$message({
+            showClose: true,
+            message:response.data.message,
+            duration: 2000,
+            type: "warning",
+          });
+          return;
+        }
+      })
+      .catch(function (error) {
+        _self.$message(response.data.message);
+        console.log(error);
+      });
+    },
     moveToPreFilling(){
       let _self=this;
       if (_self.selectedItems.length == 0) {
@@ -2285,10 +2405,29 @@ export default {
         });
         return;
       }
-      let p=new Array();
-      _self.selectedItems.forEach(e=>{
-        p.push(e.ID);
-      });
+      var m = [];
+      let error =""
+      let tab = _self.selectedItems;
+      var i;
+      for (i in tab) {
+        if(tab[i].C_ARCHIVE_CODING==null||tab[i].C_ARCHIVE_CODING==''){
+          let j=1
+          error +=j+'.'+tab[i].TITLE+'<br/>'
+        }
+        if(tab[i].C_ARCHIVE_CODING!=null&&tab[i].C_ARCHIVE_CODING!='')
+        m.push(tab[i]["ID"]);
+      }
+      if(error.length!=0){
+        error += '上述文件的文档号为空，已跳过'
+        _self.$message({
+        dangerouslyUseHTMLString: true,
+        message: error,
+        type: 'warning'
+        })
+      }
+    if(m.length==0){
+        return
+      }
       _self
           .axios({
             headers: {
@@ -2296,7 +2435,7 @@ export default {
             },
             datatype: "json",
             method: "post",
-            data: JSON.stringify(p),
+            data: JSON.stringify(m),
             url: "/dc/moveToPreFiling"
           })
           .then(function(response) {

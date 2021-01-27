@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.text.Collator;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,6 +15,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.elasticsearch.common.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ecm.common.util.DateUtils;
 import com.ecm.common.util.FileUtils;
 import com.ecm.common.util.JSONUtils;
 import com.ecm.core.ActionContext;
@@ -41,6 +49,7 @@ import com.ecm.core.entity.EcmRelation;
 import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.exception.EcmException;
 import com.ecm.core.exception.NoPermissionException;
+import com.ecm.core.exception.SqlDeniedException;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
@@ -670,7 +679,7 @@ public class ArchiveDcController extends ControllerAbstract {
 			try {
 //				String id=obj.get("ID").toString();
 				EcmDocument doc = documentService.getObjectById(getToken(), id);
-				if ("设计文件".equals(doc.getTypeName())) {
+				if ("设计文件".equals(doc.getTypeName())||"科研文件".equals(doc.getTypeName())) {
 					String sql = "select parent_id from ecm_relation where child_id='" + id
 							+ "' and name='irel_children'";
 					List<Map<String, Object>> pdata = documentService.getMapList(getToken(), sql);
@@ -689,8 +698,9 @@ public class ArchiveDcController extends ControllerAbstract {
 							}
 						}
 						fetchInfo(getToken(), archiveObj);
+						doc.addAttribute("C_ARCHIVE_CODING", pdata.get(0).get("C_ARCHIVE_CODING").toString());
+						doc.addAttribute("C_STORE_CODING", pdata.get(0).get("C_STORE_CODING").toString());
 					}
-
 				}
 				doc.setStatus("待入库");
 
@@ -1194,4 +1204,231 @@ public class ArchiveDcController extends ControllerAbstract {
 
 	}
 
+	//检查同编码科研文件设计文件是否存在
+	@RequestMapping(value = "/dc/Archive/checkDC", method = RequestMethod.POST) // PostMapping("/dc/getDocumentCount")
+	@ResponseBody
+	public Map<String, Object> checkDC(@RequestBody String argStr) {
+		List<String> list = JSONUtils.stringToArray(argStr);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		for (String id : list) {
+			try {
+				EcmDocument doc = documentService.getObjectById(getToken(), id);
+				if ("设计文件".equals(doc.getTypeName())||"科研文件".equals(doc.getTypeName())) {
+					String coding= doc.getAttributeValue("CODING").toString();
+					String condition=" coding='"+coding+"' and IS_CURRENT=1 AND IS_RELEASED=1";
+					List<EcmDocument> currentObjs;
+					try {
+						currentObjs = documentService.getObjects(getToken(), condition);
+						if(currentObjs==null||currentObjs.size()<1) {
+							mp.put("code", ActionContext.FAILURE);
+							mp.put("message", "文件"+coding+"不能进行提交入库");
+							return mp;
+						}
+					} catch (SqlDeniedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			} catch (AccessDeniedException | EcmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("message", "操作失败");
+				return mp;
+			}
+		}
+		mp.put("code", ActionContext.SUCESS);
+		mp.put("message", "操作成功");
+		return mp;
+	}
+	/*
+	 * 移交入库Excel更新库位号
+	 */
+	@RequestMapping(value = "/dc/Archive/batchUpdate", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> batchUpdate(@RequestParam("excel") MultipartFile excel) throws Exception{
+		Map<String, Object> mp = new HashMap<String, Object>();
+		StringBuilder sb = new StringBuilder();
+		int sucessCount = 0;
+		int failedCount = 0;
+		sb.append("开始更新").append(DateUtils.currentDate("yyyy-MM-dd HH:mm:ss")).append("\r\n");
+		Workbook workbook = WorkbookFactory.create(excel.getInputStream());
+		Sheet sheet = workbook.getSheetAt(0);
+		if (excel.getInputStream() != null) {
+			excel.getInputStream().close();
+		}
+		try {
+
+			// 第一行字段名称
+			Map<Integer, String> attrNames = new HashMap<Integer, String>();
+			for (int i = 0; i <= sheet.getRow(1).getLastCellNum(); i++) {
+				if (sheet.getRow(0).getCell(i) != null
+						&& !StringUtils.isEmpty(sheet.getRow(0).getCell(i).getStringCellValue())) {
+					attrNames.put(i, sheet.getRow(0).getCell(i).getStringCellValue());
+				}else if(sheet.getRow(1).getCell(i) != null && !StringUtils.isEmpty(sheet.getRow(1).getCell(i).getStringCellValue())){
+					attrNames.put(i, sheet.getRow(1).getCell(i).getStringCellValue());
+				}
+			}
+
+
+			// 第二行为中文标签，第三行位值
+			for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+				try {
+					String id = sheet.getRow(i).getCell(0).getStringCellValue();
+					if (StringUtils.isEmpty(id)) {
+						continue;
+					}
+					EcmDocument doc = documentService.getObjectById(getToken(), id);
+					if (doc != null) {
+						for (int j =1; j <= sheet.getRow(i).getLastCellNum(); j++) {
+							String attrName = attrNames.get(j);
+							if ("C_LOCATION".equals(attrName)) {
+								String val =getCellValue(sheet.getRow(i).getCell(j));
+								doc.addAttribute("C_LOCATION", val);
+							}
+						}
+						documentService.updateObject(getToken(), doc, null);
+						sucessCount++;
+					} else {
+						sb.append("第").append(i + 1).append("行更新错误：").append(id).append("不存在\r\n");
+						;
+						failedCount++;
+					}
+
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					sb.append("第").append(i + 1).append("行更新错误：").append(ex.getMessage()).append("\r\n");
+					;
+					failedCount++;
+				}
+			}
+		} finally {
+			if (workbook != null) {
+				workbook.close();
+			}
+		}
+		sb.append("完成更新:").append(DateUtils.currentDate("yyyy-MM-dd HH:mm:ss")).append("\r\n");
+		sb.append("成功行数:").append(sucessCount).append("\r\n");
+		sb.append("错误行数:").append(failedCount).append("\r\n");
+		
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("data", sb.toString());
+		return mp;
+	}
+	private String getCellValue(Cell cell) {
+		String retVal = null;
+		if (cell == null) {
+			return null;
+		}
+		switch (cell.getCellType()) {
+		case BOOLEAN:
+			// 得到Boolean对象的方法
+			retVal = cell.getBooleanCellValue() + "";
+			break;
+		case NUMERIC:
+			// 先看是否是日期格式
+			if (DateUtil.isCellDateFormatted(cell)) {
+				// 读取日期格式
+				Date dt = cell.getDateCellValue();
+				retVal = DateUtils.DateToStr(dt, "yyyy");
+			} else {
+				DecimalFormat df = new DecimalFormat();
+				// 单元格的值,替换掉,
+				retVal = df.format(cell.getNumericCellValue()).replace(",", "");
+
+			}
+			break;
+		case FORMULA:
+			// 读取公式
+			retVal = cell.getCellFormula();
+			break;
+		case STRING:
+			// 读取String
+			retVal = cell.getRichStringCellValue().toString();
+			break;
+		}
+		return retVal;
+	}
+	
+	
+	/**
+	 *   批量添加文件
+	 * 
+	 * @param metaData
+	 * @param uploadFile
+	 * @return
+	 */
+	@RequestMapping(value = "/dc/newDocumentAddBatch", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> addBatchDocument(String metaData, MultipartFile[] uploadFile) {
+		
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			String folderId = args.get("folderId").toString();
+			if("".equals(folderId)) {
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("message","没有选择文件夹");
+				return mp;
+			}
+			if (uploadFile != null&&uploadFile.length>0) {
+				execAddDocument(args,uploadFile, folderId);
+				mp.put("code", ActionContext.SUCESS);
+			}
+		} catch (Exception ex) {
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", ex.getMessage());
+		}
+		return mp;
+	}
+	
+	public void execAddDocument(Map<String, Object> args,MultipartFile[] uploadFile,String folderId) throws Exception {
+	
+		for (MultipartFile multipartFile : uploadFile) {
+			EcmContent en = null;
+			EcmDocument doc = new EcmDocument();
+		
+			EcmFolder folder= folderService.getObjectById(getToken(), folderId);
+			doc.setAclName(folder.getAclName());
+		
+			doc.setAttributes(args);
+			doc.setStatus("新建");
+			doc.setFolderId(folderId);
+			String name = multipartFile.getOriginalFilename();
+			doc.setName(name.substring(0,name.lastIndexOf(".")));
+
+			en = new EcmContent();
+			en.setName(multipartFile.getOriginalFilename());
+			en.setContentSize(multipartFile.getSize());
+			en.setFormatName(FileUtils.getExtention(multipartFile.getOriginalFilename()));
+			en.setInputStream(multipartFile.getInputStream());	
+			String id = documentService.newObject(getToken(), doc, en);
+		}
+	}
+	
+	
+	/**
+	 * 获取所有表单
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/admin/getDocumentPermitById", method = RequestMethod.POST)
+	public Map<String, Object> getDocumentPermitById(@RequestBody String docId) {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			int permit = documentService.getPermit(getToken(), docId);
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("permit", permit);
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", ex.getMessage());
+			mp.put("permit", 1);
+		}
+		return mp;
+	}
+	
+		
 }

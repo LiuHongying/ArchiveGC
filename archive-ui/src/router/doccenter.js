@@ -33,11 +33,11 @@ export const dcRouter = [
 			meta: {
 				requireAuth: true,
 				permit: 1,
-				title:'recordReport'
+				title:'报表'
 			},
 			path: '/record/recordReport',
 			component: () => import('@/views/record/RecordReport.vue'),
-			name: '报表',
+			name: '报表'
 		},
 		{
 			meta: {

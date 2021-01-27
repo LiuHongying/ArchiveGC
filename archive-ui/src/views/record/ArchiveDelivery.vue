@@ -158,7 +158,7 @@
           <el-button type="primary"
           plain
           size="small" icon="el-icon-delete"  @click="onDeleteTransfer()">{{$t('application.delete')}}</el-button>
-  
+          
       </el-col>
       <el-col :span="4" class="topbar-input">
         <el-input
@@ -209,7 +209,7 @@
            plain
             size="small"
           icon="el-icon-printer"
-          @click="beforePrint(selectRow,'PrintVolumeOrder','文件清单')"
+          @click="beforePrint(selectRow,'PrintDelivery','文件清单')"
         >打印清单</el-button>
          <el-button
           type="primary"
@@ -218,6 +218,7 @@
           icon="el-icon-delete"
           @click="onDeleleItem()"
         >{{$t('application.delete')}}</el-button>
+        <el-button type="primary" size="small" plain  @click="SearchBusinessDC()" >商务文件查询</el-button>
       </el-col>
     </el-row>
     <template v-slot:main="{layout}">
@@ -2105,6 +2106,7 @@ export default {
         _self.propertyVisible = true;
         _self.$nextTick(()=>{
           _self.$refs.ShowProperty.loadFormInfo();
+          _self.loadInfo = true;
         });
     },
     // 新建文件夹事件
@@ -2441,7 +2443,14 @@ export default {
     searchItem() {
       this.loadGridData();
       // this.loadPageInfo();
-    }
+    },
+    // 商务文件查询
+    SearchBusinessDC() {
+      let href = this.$router.resolve({
+        path: "/record/selectbusinessDC",
+      });
+      window.open(href.href, "_blank");
+    },
   },
   components: {
     DataLayout: DataLayout,

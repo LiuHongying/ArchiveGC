@@ -40,11 +40,15 @@ export default {
     /**
      * 跳转至权限提醒页
      */
-    if(!this.validataPermission()){
-        let _self=this;
-        _self.$nextTick(()=>{
-            _self.$router.push({ path: '/NoPermission' })
-        })
+    try {
+      if(!this.validataPermission()){
+          let _self=this;
+          _self.$nextTick(()=>{
+              _self.$router.push({ path: '/NoPermission' })
+          })
+      }
+    } catch (error) {
+      
     }
   }
 }

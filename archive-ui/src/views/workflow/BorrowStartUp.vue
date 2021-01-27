@@ -110,8 +110,8 @@
       butt: false,
       workflowFileList: [],
       saveButt: false,
-      departmentLeader:'部门领导',
-      companyLeader:'公司领导',
+      departmentLeader:'部门领导角色',
+      companyLeader:'公司领导角色',
       reviewer1:'',
       reviewer2:'',
       reviewer3:'',
@@ -121,7 +121,8 @@
       flag: false,
       dialogVisible:false,
       isLimited:true,
-      isCurrentCompany:false
+      isCurrentCompany:false,
+      isCore:false
                 }
             },
             props:{
@@ -144,6 +145,7 @@
                     });
             },
             checkLevel(){
+                this.isCore = false
                 this.getBorrowType()
                 let _self = this
                 _self.isCurrentCompany=true
@@ -159,7 +161,12 @@
                             _self.isLimited=true       //找到了，借阅文件包含商密，将在下一步进行判断
                         }
                     })
-                } 
+                }
+                  this.workflowFileList.forEach(element => {
+                        if(element.C_SECURITY_LEVEL=='核心商密'){
+                        _self.isCore = true       
+                        }
+                    })
             },
             getTypeResult(){
                  let _self = this
@@ -227,8 +234,13 @@
                     axios.post("/dc/countDocuments", JSON.stringify(m))
                                         .then(function (response) {
                         let code = response.data.code
+                        if(_self.reviewer3==''&&_self.isCore==true){            //不管是不是查阅，都得选公司领导
+                        _self.$message("所选借阅文件包含核心商密文件,需要选择公司领导!")
+                        _self.butt = false
+                        return
+                        }
                         if(code==1){
-                        if(_self.reviewer3==''&&_self.isLimited==true){
+                        if((_self.reviewer3==''&&_self.isLimited==true)){
                             _self.$message("需要选择公司领导!")
                             _self.butt = false
                             return

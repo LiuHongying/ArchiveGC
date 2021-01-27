@@ -40,7 +40,7 @@
             type="primary"
             size="small"
             icon="el-icon-printer"
-            @click="beforePrint(selectedItems,'FormDcGrid')"
+            @click="beforePrint(selectedItems,'FormDcGridUnSort')"
             title="打印清单"
             >打印清单</el-button>
         </el-form-item>
