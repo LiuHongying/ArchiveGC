@@ -116,6 +116,7 @@
                       v-model="taskForm[approver.performerPolicy]"
                       v-bind:inputValue="taskForm[approver.performerPolicy]"
                       v-bind:roleName="approver.roleName"
+                      v-bind:isRepeat="approver.isMulti"
                     ></UserSelectInput>
                     <!-- :buttonType = "formEnableType != 'TodoTask'" -->
                   </el-form-item>
