@@ -304,6 +304,7 @@ export default {
       axios.post(url,JSON.stringify(mp)).then(function(response){
             if(response.data.code==1) {
               _self.$message({showClose: true,message:'删除成功',duration: 2000,type: "Success"});
+              _self.$emit("loadMainListConfig");
               _self.selectedName = "";
               _self.configId = "";
               _self.tables.target.data = [];
