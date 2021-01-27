@@ -52,7 +52,7 @@ public class MoveFileToReorganizeListener implements TaskListener{
 //			String sql="select child_id as ID from ecm_relation where name='irel_children' and parent_id='"+formId+"'"
 //					+ " union select child_id as ID from ecm_relation where parent_id in(select child_id from ecm_relation"
 //					+ " where name='irel_children' and parent_id ='"+formId+"')";
-			String sql="select CHILD_ID from ecm_relation where name='irel_parent' and parent_id='"+formId+"' " + 
+			String sql="select CHILD_ID as ID  from ecm_relation where name='irel_parent' and parent_id='"+formId+"' " + 
 					"	union " + 
 					"	select child_id as ID from ecm_relation where name='irel_children' "
 					+ " and parent_id in(select CHILD_ID from ecm_relation where name='irel_parent' and parent_id='"+formId+"')";
