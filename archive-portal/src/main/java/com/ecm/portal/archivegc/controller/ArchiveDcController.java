@@ -20,6 +20,7 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.elasticsearch.common.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1348,4 +1349,84 @@ public class ArchiveDcController extends ControllerAbstract {
 		}
 		return retVal;
 	}
+	
+	
+	/**
+	 *   批量添加文件
+	 * 
+	 * @param metaData
+	 * @param uploadFile
+	 * @return
+	 */
+	@RequestMapping(value = "/dc/newDocumentAddBatch", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> addBatchDocument(String metaData, MultipartFile[] uploadFile) {
+		
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			String folderId = args.get("folderId").toString();
+			if("".equals(folderId)) {
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("message","没有选择文件夹");
+				return mp;
+			}
+			if (uploadFile != null&&uploadFile.length>0) {
+				execAddDocument(args,uploadFile, folderId);
+				mp.put("code", ActionContext.SUCESS);
+			}
+		} catch (Exception ex) {
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", ex.getMessage());
+		}
+		return mp;
+	}
+	
+	public void execAddDocument(Map<String, Object> args,MultipartFile[] uploadFile,String folderId) throws Exception {
+	
+		for (MultipartFile multipartFile : uploadFile) {
+			EcmContent en = null;
+			EcmDocument doc = new EcmDocument();
+		
+			EcmFolder folder= folderService.getObjectById(getToken(), folderId);
+			doc.setAclName(folder.getAclName());
+		
+			doc.setAttributes(args);
+			doc.setStatus("新建");
+			doc.setFolderId(folderId);
+
+			en = new EcmContent();
+			en.setName(multipartFile.getOriginalFilename());
+			en.setContentSize(multipartFile.getSize());
+			en.setFormatName(FileUtils.getExtention(multipartFile.getOriginalFilename()));
+			en.setInputStream(multipartFile.getInputStream());	
+			String id = documentService.newObject(getToken(), doc, en);
+		}
+	}
+	
+	
+	/**
+	 * 获取所有表单
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/admin/getDocumentPermitById", method = RequestMethod.POST)
+	public Map<String, Object> getDocumentPermitById(@RequestBody String docId) {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			int permit = documentService.getPermit(getToken(), docId);
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("permit", permit);
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", ex.getMessage());
+			mp.put("permit", 1);
+		}
+		return mp;
+	}
+	
+		
 }
