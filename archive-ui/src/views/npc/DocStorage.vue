@@ -487,14 +487,15 @@
           <el-button v-if="permit>=4" type="primary" @click.native="exportData" icon="el-icon-download">{{$t("application.ExportExcel")}}</el-button>
           </el-col>
           <el-col :span="2">
-          <el-button v-if="permit>=9"
+          <el-button v-if="permitdoc>=9"
                 type="primary"
                 icon="el-icon-top-right"
                 @click="moveItem()"
                 >{{ $t("application.move") }}</el-button>
           </el-col>
+          <!--
           <el-col :span="2">
-          <el-button  v-if="permit>=9"
+          <el-button  v-if="permitdoc>=9"
                 type="primary"
                 icon="el-icon-upload2"
                 @click="showUpdateFile(0)"
@@ -502,13 +503,14 @@
               >
           </el-col>
           <el-col :span="2">
-           <el-button  v-if="permit>=7"
+           <el-button  v-if="permitdoc>=7"
                 type="primary"
                 icon="el-icon-upload2"
                 @click="showUpdateFile(1)"
                 >{{ $t("application.transcript") }}</el-button
               >
           </el-col>
+          -->
           <el-col :span="3">
           <template v-if="isFileAdmin">
                 <!-- `checked` 为 true显示卷宗 或 false不显示卷宗 -->
@@ -697,6 +699,7 @@ export default {
       folderDialogVisible:false,
       clientPermission: 0,
       permit:1,
+      permitdoc:1,
     };
   },
   created() {
@@ -1342,7 +1345,22 @@ export default {
     },
     rowClick(row) {
       this.currentId = row.ID;
-      
+      let _self = this;
+      _self.loading = true;
+
+      axios
+        .post("/admin/getDocumentPermitById", row.ID)
+        .then(function (response) {
+          _self.permitdoc =  response.data.permit;
+          //console.log(_self.dataList);
+          _self.loading = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.loading = false;
+        });
+  
+
     },
     renderContent: function (h, { node, data, store }) {
       if (data.extended) {

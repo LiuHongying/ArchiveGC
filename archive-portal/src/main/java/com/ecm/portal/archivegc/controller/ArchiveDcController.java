@@ -1394,6 +1394,8 @@ public class ArchiveDcController extends ControllerAbstract {
 			doc.setAttributes(args);
 			doc.setStatus("新建");
 			doc.setFolderId(folderId);
+			String name = multipartFile.getOriginalFilename();
+			doc.setName(name.substring(0,name.lastIndexOf(".")));
 
 			en = new EcmContent();
 			en.setName(multipartFile.getOriginalFilename());
@@ -1403,5 +1405,30 @@ public class ArchiveDcController extends ControllerAbstract {
 			String id = documentService.newObject(getToken(), doc, en);
 		}
 	}
+	
+	
+	/**
+	 * 获取所有表单
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/admin/getDocumentPermitById", method = RequestMethod.POST)
+	public Map<String, Object> getDocumentPermitById(@RequestBody String docId) {
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			int permit = documentService.getPermit(getToken(), docId);
+			mp.put("code", ActionContext.SUCESS);
+			mp.put("permit", permit);
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", ex.getMessage());
+			mp.put("permit", 1);
+		}
+		return mp;
+	}
+	
 		
 }
