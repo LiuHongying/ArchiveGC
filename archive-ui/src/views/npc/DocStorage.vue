@@ -484,7 +484,7 @@
                 >
           </el-col>
           <el-col :span="3"> 
-          <el-button v-if="permitdoc>=4" type="primary" @click.native="exportData" icon="el-icon-download">{{$t("application.ExportExcel")}}</el-button>
+          <el-button v-if="permit>=4" type="primary" @click.native="exportData" icon="el-icon-download">{{$t("application.ExportExcel")}}</el-button>
           </el-col>
           <el-col :span="2">
           <el-button v-if="permitdoc>=9"
