@@ -1394,6 +1394,8 @@ public class ArchiveDcController extends ControllerAbstract {
 			doc.setAttributes(args);
 			doc.setStatus("新建");
 			doc.setFolderId(folderId);
+			String name = multipartFile.getOriginalFilename();
+			doc.setName(name.substring(0,name.lastIndexOf(".")));
 
 			en = new EcmContent();
 			en.setName(multipartFile.getOriginalFilename());
