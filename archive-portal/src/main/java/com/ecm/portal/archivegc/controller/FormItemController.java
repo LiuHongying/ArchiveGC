@@ -152,6 +152,7 @@ public class FormItemController extends ControllerAbstract{
 			String typeName="";
 			String configName = "";
 			String configContent = "";
+			String attrsStr = "";
 			if(p.get("typeName")!=null&&!"".equals(p.get("typeName"))) {
 				typeName=p.get("typeName").toString();
 			}else {
@@ -173,6 +174,7 @@ public class FormItemController extends ControllerAbstract{
 				mp.put("message", "配置信息为空");
 				return mp;
 			}
+			attrsStr = (String) p.get("attrsStr");
 			EcmDocument document=new EcmDocument();
 			EcmFolder folder = new EcmFolder();
 			String folderId = "";
@@ -187,6 +189,7 @@ public class FormItemController extends ControllerAbstract{
 			document.setFolderId(folderId);
 			document.setTypeName("用户列表配置");
 			document.setName(configName);
+			document.addAttribute("C_COMMENT", attrsStr);
 			document.setSubType(typeName);
 			document.addAttribute("ITEM_CONTENT", configContent);
 			String newObjId= documentService.newObject(getToken(), document);

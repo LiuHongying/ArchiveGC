@@ -13,7 +13,7 @@
         <EcmCustomColumns
           ref="ecmCustomColumns"
           :gridViewName="gridViewName"
-          @loadUserListConfig="showCustomListConfig"
+          @loadMainListConfig = "refreshMainConfigList"
           @onClose="onCloseCustom" @onCancel="editColumn=false"
         >
         </EcmCustomColumns>
@@ -453,7 +453,7 @@ export default {
     this.gridviewInfo.isCustom = false;
     this.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     //this.loadCustomName();
-    this.loadCustomListConfig()
+    this.loadCustomListConfig();
     if(this.isLoadGridInfo){
       this.loadGridInfo();
     }
@@ -463,12 +463,15 @@ export default {
   },
   methods: {
     //Matthew changes on 2021年1月26日15:48:46
-    showCustomListConfig(val){
-      let _self = this;
-      _self.gridviewInfo.isCustom = true;
-      _self.columnList = val;
-      _self.loadGridData();
+    refreshMainConfigList(){
+      this.loadCustomListConfig();
     },
+    // showCustomListConfig(val){
+    //   let _self = this;
+    //   _self.gridviewInfo.isCustom = true;
+    //   _self.columnList = val;
+    //   _self.loadGridData();
+    // },
     loadCustomListConfig(){
       let _self = this;
       let url = "/archive/getConfigList";
@@ -489,7 +492,7 @@ export default {
       let url = "/archive/getConfigById";
       axios.post(url,JSON.stringify(m)).then(function(response){
             if(response.data.code==1) {
-              _self.gridviewInfo.gridviewName = item.name;
+              _self.gridviewInfo.gridviewName = item.id+"_CUSTOM";
               _self.gridviewInfo.isCustom = true;
             _self.columnList = JSON.parse(response.data.data);
             _self.loadGridData();
