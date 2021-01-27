@@ -33,16 +33,7 @@
             </el-select>
           </el-form-item>
              <!-- end -->
-             <el-form-item>
-                <el-button type="primary" @click="saveListConfig">{{$t('application.saveNewListConfig')}}</el-button>
-                <!-- <el-button @click="createGridView">{{$t('application.new')}}</el-button>
-                <el-button @click="deleteGridView">{{$t('application.delete')}}</el-button> -->
-             </el-form-item>
-          </el-form>
-        </el-row>
-        <el-row>
-          <el-form size="small" label-width="100" inline>
-            <el-form-item label="配置列表">
+          <el-form-item label="配置列表">
               <el-select v-model="selectedName" @change="refreshConfig(selectedName)">
                 <!-- Matthew changes on 2021年1月26日15:08:48 -->
                 <!-- <el-option v-for="item in customNames" :key="item.name" :label="item.description" :value="item.name" @click.native="onSelectChange(item)"></el-option> -->
@@ -51,7 +42,7 @@
               </el-select>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="useConfig">{{$t('application.useConfig')}}</el-button>
+              <!-- <el-button type="primary" @click="useConfig">{{$t('application.useConfig')}}</el-button> -->
               <el-button type="success" @click="updateConfig">{{$t('application.updateConfig')}}</el-button>
               <el-button type="danger" @click="deleteListConfig">{{$t('application.deleteListConfig')}}</el-button>
             </el-form-item>
@@ -126,6 +117,7 @@
     </el-main>
     <el-footer style="text-align: right;">
       <!-- <el-button @click="saveCustomColumn">{{$t('application.save')}}</el-button> -->
+      <el-button type="primary" @click="saveListConfig">{{$t('application.saveNewListConfig')}}</el-button>
       <el-button @click="cancelCustomColumn">{{$t('application.cancel')}}</el-button>
     </el-footer>
   </el-container>
@@ -198,6 +190,7 @@ export default {
     useConfig(){
       let _self = this;
       _self.$emit("loadUserListConfig", _self.tables.target.data);
+      _self.cancelCustomColumn();
     },
     refreshConfig(item){
       let _self = this;
@@ -229,8 +222,10 @@ export default {
         return;
       }
       var screenConfigArr = [];
+      var attrsStr = "";
       for(var i =0;i<_self.tables.target.data.length;i++){
         let currentData = _self.tables.target.data[i]
+        attrsStr=attrsStr+currentData.attrName+","
         let dataMap = {
           "id":currentData.id,
           "attrName":currentData.attrName,
@@ -255,11 +250,13 @@ export default {
           let m = new Map();
           m.set('configName',_self.selectedName);
           m.set('typeName',typeName);
-          m.set('configContent',configContent)
+          m.set('configContent',configContent);
+          m.set('attrsStr',attrsStr)
           let url = "/archive/customListConfig"
           axios.post(url,JSON.stringify(m)).then(function(response){
             if(response.data.code==1) {
               _self.$message({showClose: true,message:_self.$t('message.saveSuccess'),duration: 2000,type: "Success"});
+              _self.$emit("loadMainListConfig");
               _self.refreshConfigList(_self.selectedTypeName)
             }
           })
@@ -267,7 +264,7 @@ export default {
     },
     updateConfig(){
       let _self = this;
-      if(_self.tables.target.data.length<1){
+      if(_self.tables.target.data.length<1||_self.configId == ""){
         _self.$message({ message: '没有选择项，无法更新', type: 'warning' })
         return;
       }
@@ -300,12 +297,16 @@ export default {
     },
     deleteListConfig(){
       let mp = new Map();
+      let _self = this;
       let url = "/archive/deleteOrUpdateConfig";
       mp.set("id",_self.configId);
       mp.set("aciton","delete");
       axios.post(url,JSON.stringify(mp)).then(function(response){
             if(response.data.code==1) {
               _self.$message({showClose: true,message:'删除成功',duration: 2000,type: "Success"});
+              _self.selectedName = "";
+              _self.configId = "";
+              _self.tables.target.data = [];
               _self.refreshConfigList(_self.selectedTypeName)
             }
           })
