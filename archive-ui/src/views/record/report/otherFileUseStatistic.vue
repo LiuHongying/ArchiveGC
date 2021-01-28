@@ -62,7 +62,7 @@
 <script>
 import DataLayout from "@/components/ecm-data-layout";
 export default {
-  name: "fileRecWorkFlow",
+  name: "otherFileUseWorkFlow",
   data() {
     return {
       spanArr: [],
@@ -189,7 +189,7 @@ export default {
       m.set("quarterSelect", _self.value);
 
       axios
-        .post("/dms/record/fileReceiveStatistic", JSON.stringify(m))
+        .post("/dms/record/openFileWorkStatistic", JSON.stringify(m))
         .then(function (response) {
           _self.tables.mainTable.data = response.data.data;
           console.log(_self.tables.mainTable.data);
@@ -200,71 +200,8 @@ export default {
         });
     },
 
-    getSpanArr() {
-      let _self = this;
-
-      for (var i = 0; i < _self.tables.mainTable.data.length; i++) {
-        if (i === 0) {
-          _self.spanArr.push(1);
-          _self.pos = 0;
-        } else {
-          if (_self.tables.mainTable.data[i].prop) {
-            _self.spanArr[_self.pos] += 1;
-            _self.spanArr.push(0);
-          } else {
-            _self.spanArr.push(1);
-            _self.pos = i;
-          }
-        }
-        console.log(_self.spanArr);
-      }
-    },
-
-    objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-      const _row = this.spanArr[rowIndex];
-      const _col = _row > 0 ? 1 : 0;
-      return {
-        rowspan: _row,
-        colspan: _col,
-      };
-    },
   },
 };
 </script>
 <style scoped>
-.el-table thead.is-group tr:first-of-type th:first-of-type:before {
-  content: "利用方式";
-  text-align: center;
-  position: absolute;
-  width: 152px;
-  height: 1px;
-  bottom: 30px;
-  right: 0;
-}
-
-.el-table thead.is-group tr:first-of-type th:first-of-type:after {
-  content: "日期";
-  text-align: center;
-  position: absolute;
-  width: 152px;
-  top: 10px;
-  left: 0;
-}
-
-.el-table thead.is-group tr:first-of-type th:first-of-type .cell {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 152px;
-  height: 1px;
-  background-color: #ebeef5;
-  display: block;
-  text-align: center;
-  transform: rotate(38deg); /*旋转*/
-  transform-origin: top left;
-  -ms-transform: rotate(38deg);
-  -ms-transform-origin: top left;
-  -webkit-transform: rotate(38deg);
-  -webkit-transform-origin: top left;
-}
 </style>
