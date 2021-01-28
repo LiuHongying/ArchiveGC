@@ -153,6 +153,7 @@ public class FormItemController extends ControllerAbstract{
 			String configName = "";
 			String configContent = "";
 			String attrsStr = "";
+			String labelStr = "";
 			if(p.get("typeName")!=null&&!"".equals(p.get("typeName"))) {
 				typeName=p.get("typeName").toString();
 			}else {
@@ -175,6 +176,7 @@ public class FormItemController extends ControllerAbstract{
 				return mp;
 			}
 			attrsStr = (String) p.get("attrsStr");
+			labelStr = (String) p.get("labelStr");
 			EcmDocument document=new EcmDocument();
 			EcmFolder folder = new EcmFolder();
 			String folderId = "";
@@ -192,6 +194,7 @@ public class FormItemController extends ControllerAbstract{
 			document.addAttribute("C_COMMENT", attrsStr);
 			document.setSubType(typeName);
 			document.addAttribute("ITEM_CONTENT", configContent);
+			document.setTitle(labelStr);
 			String newObjId= documentService.newObject(getToken(), document);
 			mp.put("code", ActionContext.SUCESS);
 			mp.put("id", newObjId);

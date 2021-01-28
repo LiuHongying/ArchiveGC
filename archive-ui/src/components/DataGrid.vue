@@ -528,6 +528,7 @@ export default {
       axios.post(url,JSON.stringify(m)).then(function(response){
             if(response.data.code==1) {
               _self.gridviewInfo.gridviewName = item.id+"_CUSTOM";
+              _self.$emit("changeGridName", _self.gridviewInfo.gridviewName);
               _self.gridviewInfo.isCustom = true;
             _self.columnList = JSON.parse(response.data.data);
             _self.loadGridData();

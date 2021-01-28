@@ -507,6 +507,7 @@
                         gridViewName="ArrangeGrid"
                         @rowclick="beforeShowInnerFile"
                         @selectchange="selectChange"
+                        @changeGridName="changeDataGridName"
                         :showBatchCheck="true"
                       ></DataGrid>
                     </el-col>
@@ -782,6 +783,7 @@ export default {
       },
       loadInfo:false,
       volumeInArchiveGridName:"",
+      innerGridName:""
     };
   },
   
@@ -929,11 +931,20 @@ export default {
           console.log('(*￣︶￣)')
       }
     },
+    changeDataGridName(val){
+      this.innerGridName = val;
+    },
     exportData() {
       let _self = this;
+      var gridViewName = "";
+      if(_self.innerGridName!=""){
+        gridViewName = _self.innerGridName;
+      }else{
+        gridViewName = _self.$refs.mainDataGrid.gridViewName;
+      }
       let params = {
         URL: "/file/exportFolderPath",
-        gridName: _self.$refs.mainDataGrid.gridViewName,
+        gridName: gridViewName,
         folderId: _self.currentFolder.id,
         orderBy: "MODIFIED_DATE desc",
         condition: _self.$refs.mainDataGrid.condition,
@@ -941,7 +952,6 @@ export default {
         pageIndex: _self.currentPage - 1,
         lang: "zh-cn",
       };
-      console.log(params);
       ExcelUtil.export4Cnpe(params);
     },
     // 水平分屏事件

@@ -223,9 +223,11 @@ export default {
       }
       var screenConfigArr = [];
       var attrsStr = "";
+      var labelStr = "";
       for(var i =0;i<_self.tables.target.data.length;i++){
         let currentData = _self.tables.target.data[i]
         attrsStr=attrsStr+currentData.attrName+","
+        labelStr=labelStr+currentData.label+","
         let dataMap = {
           "id":currentData.id,
           "attrName":currentData.attrName,
@@ -252,6 +254,7 @@ export default {
           m.set('typeName',typeName);
           m.set('configContent',configContent);
           m.set('attrsStr',attrsStr)
+          m.set('labelStr',labelStr)
           let url = "/archive/customListConfig"
           axios.post(url,JSON.stringify(m)).then(function(response){
             if(response.data.code==1) {
