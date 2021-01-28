@@ -85,7 +85,27 @@ Vue.prototype.getObjectById=function(id,callback){
             }
           });
 }
-
+//根据ACL获取权限
+Vue.prototype.getPermission=function(aclName,callback){
+  let _self=this;
+  axios
+        .post("/acl/getPermission", aclName)
+        .then(function(response) {
+          let result = response.data;
+          if (result.code == 1) {
+            if(callback){
+              callback(result.permission);
+            }
+          }else{
+            _self.$message({
+              showClose: true,
+              message: response.data.message,
+              duration: 2000,
+              type: "warning"
+            });
+          }
+        });
+}
 Vue.prototype.sqlStringFilter = function(keyString){
 	if(keyString && keyString.length>0){
     keyString = keyString.replace(new RegExp("'","gm"),"''");//.replace(new RegExp("(","gm"),"").replace(new RegExp(")","gm"),"");

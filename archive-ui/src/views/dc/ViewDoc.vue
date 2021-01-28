@@ -231,7 +231,9 @@ export default {
       },
       judgePrint:{
         printPermit:""
-      }
+      },
+      defaultUrl:"/dc/getDocument",
+      npicUrl:"/cd/dc/getDocumentNpic"
     }
   },
   created(){
@@ -248,10 +250,15 @@ export default {
   mounted(){
     var _self = this;
     this.docId = this.$route.query.id;
+    let sysCode=this.$route.query.sysCode;
+    let url=this.defaultUrl;
+    if(sysCode&&sysCode=='npic'){
+      url=this.npicUrl;
+    }
     var user = sessionStorage.getItem("access-user");
     this.user = JSON.parse(user);
     this.token = sessionStorage.getItem("access-token");
-    axios.post("/dc/getDocument",this.docId).then(function(response) {
+    axios.post(url,this.docId).then(function(response) {
         _self.docObj=response.data.data;
         _self.doc.permit = response.data.permit;
         _self.doc.hasPdf = response.data.hasPdf;
