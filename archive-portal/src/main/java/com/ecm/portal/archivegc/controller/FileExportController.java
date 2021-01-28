@@ -1,5 +1,7 @@
 package com.ecm.portal.archivegc.controller;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import com.ecm.common.util.ExcelUtil;
 import com.ecm.common.util.JSONUtils;
 import com.ecm.core.ActionContext;
 import com.ecm.core.cache.manager.CacheManagerOper;
+import com.ecm.core.entity.EcmDocument;
 import com.ecm.core.entity.EcmFolder;
 import com.ecm.core.entity.EcmGridView;
 import com.ecm.core.entity.EcmGridViewItem;
@@ -80,21 +83,46 @@ public class FileExportController extends ControllerAbstract{
 	        filename += createdate + ".xlsx";
 			sheetname = fileName[fileName.length-1];
 			
-			EcmGridView gv = CacheManagerOper.getEcmGridViews().get(gridName);
-			List<EcmGridViewItem> list = gv.getGridViewItems(lang);
-			
-			String[] titleName = new String[list.size()];
-			String[] titleCNName = new String[list.size()];
-			titleName[0]="ID";
-			titleCNName[0]="ID";
-			
-			for (int i = 1; i < list.size(); i++) {
-				titleName[i] = list.get(i-1).getAttrName();
-				titleCNName[i] = list.get(i - 1).getLabel();
+			//Matthew changes on 2021年1月28日14:11:28
+			StringBuffer condition = new StringBuffer("");
+			String[] titleName = null;
+			String[] titleCNName = null;
+			if (gridName.contains("_CUSTOM")) {
+				String gridConfigId = gridName.replace("_CUSTOM", "");
+				EcmDocument dc = documentService.getObjectById(getToken(), gridConfigId);
+				//获取中文title
+				String labels = dc.getTitle();
+				//获取属性
+				String attrs = (String) dc.getAttributeValue("C_COMMENT");
+				String[] titles = attrs.split(",");
+				String[] cnTitles = labels.split(",");
+				String[] id = {"ID"};
+				titleName = new String[titles.length+1];
+				System.arraycopy(id, 0, titleName, 0, id.length);
+				System.arraycopy(titles, 0, titleName, id.length, titles.length);
+				titleCNName = new String [cnTitles.length+1];
+				System.arraycopy(id, 0, titleCNName, 0, id.length);
+				System.arraycopy(cnTitles, 0, titleCNName, id.length, cnTitles.length);
+				datalist.add(titleCNName);
+				condition.append("( 1=1 ) ");
+			}else {
+				EcmGridView gv = CacheManagerOper.getEcmGridViews().get(gridName);
+				List<EcmGridViewItem> list = gv.getGridViewItems(lang);
+				
+				titleName = new String[list.size()];
+				titleCNName = new String[list.size()];
+				titleName[0]="ID";
+				titleCNName[0]="ID";
+				
+				for (int i = 1; i < list.size(); i++) {
+					titleName[i] = list.get(i-1).getAttrName();
+					titleCNName[i] = list.get(i - 1).getLabel();
+				}
+				datalist.add(titleCNName);
+				condition.append("(" + gv.getCondition() + ") ");
 			}
-			datalist.add(titleCNName);
+			//end
 			
-			StringBuffer condition = new StringBuffer("(" + gv.getCondition() + ") ");
 			if(!StringUtils.isEmpty(cond)) {
 				condition.append(" AND (" +cond+") ");
 			}

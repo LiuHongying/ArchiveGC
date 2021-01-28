@@ -18,7 +18,23 @@
         >
         </EcmCustomColumns>
       </el-dialog>
-
+      <!-- Matthew changes on 2021年1月27日17:50:47 -->
+      <el-dialog 
+        title="自定义列表"
+        :visible.sync="showConfigList"
+        :append-to-body="true"
+        width="30%"
+        style="height:300px">
+        <el-form>
+          <el-form-item label="选择配置">
+            <el-select v-model="configName">
+              <el-option v-for="item in customList" :key="item.id" :label="item.name" :value="item.id" @click.native="changeConfig(item)"></el-option>
+            </el-select>
+            <el-button type="primary" @click="useConfig">应用</el-button>
+          </el-form-item>
+        </el-form>
+      </el-dialog>
+      <!-- end -->
       <el-dialog
         v-dialogDrag
         :append-to-body="true"
@@ -232,7 +248,7 @@
               :title="$t('application.selectStr')"
             ></el-button>
             <template v-if="isShowChangeList">
-              <el-dropdown trigger="click" style="overflow: visible">
+              <!-- <el-dropdown trigger="click" style="overflow: visible">
                 <el-button
                   type="primary"
                   plain
@@ -248,7 +264,13 @@
                     >{{ item.name }}</el-dropdown-item
                   >
                 </el-dropdown-menu>
-              </el-dropdown>
+              </el-dropdown> -->
+              <el-button
+              icon="el-icon-more"
+              size="small"
+              @click="showCustomConfig"
+              :title="$t('application.selectList')"
+            ></el-button>
             </template>
             <el-button
               v-if="isshowCustom"
@@ -341,6 +363,9 @@ export default {
   data() {
     return {
       rkey: 0,
+      showConfigList: false,
+      configName: "",
+      configItem:{},
       refreshCustomView: true,
       inputColumn: false,
       customNames: [],
@@ -466,6 +491,16 @@ export default {
     refreshMainConfigList(){
       this.loadCustomListConfig();
     },
+    showCustomConfig(){
+      this.showConfigList = true;
+    },
+    changeConfig(item){
+      this.configItem = item
+    },
+    useConfig(){
+      this.showConfigInfo(this.configItem);
+      this.showConfigList= false;
+    },
     // showCustomListConfig(val){
     //   let _self = this;
     //   _self.gridviewInfo.isCustom = true;
@@ -493,6 +528,7 @@ export default {
       axios.post(url,JSON.stringify(m)).then(function(response){
             if(response.data.code==1) {
               _self.gridviewInfo.gridviewName = item.id+"_CUSTOM";
+              _self.$emit("changeGridName", _self.gridviewInfo.gridviewName);
               _self.gridviewInfo.isCustom = true;
             _self.columnList = JSON.parse(response.data.data);
             _self.loadGridData();
