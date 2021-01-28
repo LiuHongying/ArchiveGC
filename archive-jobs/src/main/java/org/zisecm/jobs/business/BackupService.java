@@ -98,7 +98,7 @@ public class BackupService {
 		
 	    }
 	    
-	    @Scheduled(cron = "0 0/30 * * * ?")
+	    @Scheduled(cron = "0/5 * * * * ?")
 	    public void backup() {
 	    	System.out.println("-----"+new Date()+"-------job开始---------");
 	    	IEcmSession ecmSession = null;
@@ -131,7 +131,7 @@ public class BackupService {
 					String ecmDocId= documentService.newObject(ecmSession.getToken(), ecmDoc);
 //					exportExcel(obj.get("TITLE").toString()+"/"+obj.get("CODING")+"\\"+obj.get("CODING")+".xlsx",
 //							typeName, boxes);
-					
+
 					if("卷盒".equals(typeName)) {
 						List<Map<String,Object>> expboxes=new ArrayList<>();
 						for(int j=0;j<boxes.size();j++) {
