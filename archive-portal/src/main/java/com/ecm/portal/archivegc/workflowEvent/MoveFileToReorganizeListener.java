@@ -23,6 +23,11 @@ import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
 import com.ecm.icore.service.IEcmSession;
 import com.ecm.portal.archivegc.utils.EcmSessionFactory;
+/**
+ * 移交提交的案卷和卷内文件提交至整编库
+ * @author Administrator
+ *
+ */
 @Component(value="moveFileToReorganizeListener")
 public class MoveFileToReorganizeListener implements TaskListener{
 	private Logger log=LoggerFactory.getLogger(this.getClass());
@@ -49,13 +54,13 @@ public class MoveFileToReorganizeListener implements TaskListener{
 			IEcmSession session=EcmSessionFactory.getWorkflowSession(env, authService);
 			String token=session.getToken();
 			String formId= task.getVariable("formId").toString();
-//			String sql="select child_id as ID from ecm_relation where name='irel_children' and parent_id='"+formId+"'"
-//					+ " union select child_id as ID from ecm_relation where parent_id in(select child_id from ecm_relation"
-//					+ " where name='irel_children' and parent_id ='"+formId+"')";
-			String sql="select CHILD_ID as ID  from ecm_relation where name='irel_parent' and parent_id='"+formId+"' " + 
-					"	union " + 
-					"	select child_id as ID from ecm_relation where name='irel_children' "
-					+ " and parent_id in(select CHILD_ID from ecm_relation where name='irel_parent' and parent_id='"+formId+"')";
+			String sql="select child_id as ID from ecm_relation where name='irel_children' and parent_id='"+formId+"'"
+					+ " union select child_id as ID from ecm_relation where parent_id in(select child_id from ecm_relation"
+					+ " where name='irel_children' and parent_id ='"+formId+"')";
+//			String sql="select CHILD_ID as ID  from ecm_relation where name='irel_parent' and parent_id='"+formId+"' " + 
+//					"	union " + 
+//					"	select child_id as ID from ecm_relation where name='irel_children' "
+//					+ " and parent_id in(select CHILD_ID from ecm_relation where name='irel_parent' and parent_id='"+formId+"')";
 			try {
 				List<Map<String,Object>> objList= documentService.getMapList(token, sql);
 				for (Map<String, Object> map : objList) {
