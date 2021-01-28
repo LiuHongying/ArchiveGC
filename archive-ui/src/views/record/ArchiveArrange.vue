@@ -251,9 +251,6 @@
                       >批量导入</el-button>
                       </el-form-item>
                       <el-form-item>
-                        <AddToArchive :folderId="currentFolder.id" :archiveObjects="selectedItems" @savesuccess='searchItem' ></AddToArchive>
-                      </el-form-item>
-                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
@@ -460,13 +457,13 @@
                             <el-dropdown-item divided>
                               <el-button @click="beforeModify()" style="display:block;width:117px" type="primary" plain size="small"> 
                                 <i class="el-icon-s-tools"></i>
-                                修改
+                                批量修改
                               </el-button>
                             </el-dropdown-item>
                             <el-dropdown-item divided>
                               <el-button @click="batchUpdateVisible=true" style="display:block;width:117px" type="primary" plain size="small">
                                 <i class="el-icon-upload"></i>
-                                更新
+                                批量更新
                               </el-button>
                             </el-dropdown-item>
                              
@@ -482,21 +479,22 @@
                                 商务文件查询
                               </el-button>
                             </el-dropdown-item>
-                          <el-dropdown-item divided>
+                          
+                      <el-dropdown-item divided>
+                        <AddToArchive :folderId="currentFolder.id" :archiveObjects="selectedItems" @savesuccess='searchItem' ></AddToArchive>
+                      </el-dropdown-item>
+                      <el-dropdown-item divided>
                           <el-button  @click="logicallyDel(selectedItems,function(){
                           let _self=this;
                           if(_self.$refs.leftDataGrid){
                               _self.$refs.leftDataGrid.itemDataList = [];
                             }
                           _self.loadGridData(_self.currentFolder);
-                        })"style="display:block; width:117px" type="primary" plain size="small" >
+                        })" style="display:block; width:117px" type="warning" plain size="small" >
                         <i class="el-icon-document-delete" ></i>
-                        删除
+                        删 除
                           </el-button>
                           </el-dropdown-item>
-                      <el-dropdown-item divided>
-                        <AddToArchive :folderId="currentFolder.id" :archiveObjects="selectedItems" @savesuccess='searchItem' ></AddToArchive>
-                      </el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
                       </el-form-item>                      
