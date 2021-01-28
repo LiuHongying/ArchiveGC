@@ -193,7 +193,7 @@ public class ArchiveOAController extends ControllerAbstract {
 			return mp;
 		}
 		//请求是否已经过期，限时12分钟
-		if(Long.valueOf(d.getTime())-timestamp>1200000) {
+		if(Long.valueOf(d.getTime())-timestamp>60000) {
 			msg = "fail";
 			returnCode = String.valueOf(ActionContext.FAILURE);
 			returnData.put("message", "链接超时");
