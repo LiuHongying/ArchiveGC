@@ -3,6 +3,9 @@ package com.ecm.portal.archivegc.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.io.BufferedOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.Collator;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -13,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -38,6 +44,7 @@ import com.ecm.common.util.DateUtils;
 import com.ecm.common.util.FileUtils;
 import com.ecm.common.util.JSONUtils;
 import com.ecm.core.ActionContext;
+import com.ecm.core.AuditContext;
 import com.ecm.core.cache.manager.CacheManagerOper;
 import com.ecm.core.dao.EcmFolderMapper;
 import com.ecm.core.entity.EcmContent;
@@ -50,6 +57,7 @@ import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.exception.EcmException;
 import com.ecm.core.exception.NoPermissionException;
 import com.ecm.core.exception.SqlDeniedException;
+import com.ecm.core.service.ContentService;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
@@ -98,7 +106,11 @@ public class ArchiveDcController extends ControllerAbstract {
 
 	@Autowired
 	private MountFileService mountFileService;
+	
 
+	@Autowired
+	private ContentService contentService;
+	
 	@RequestMapping(value = "/dc/getEcmDefTypes", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> getEcmDefTypes(@RequestBody String argStr) throws Exception {
@@ -1139,29 +1151,25 @@ public class ArchiveDcController extends ControllerAbstract {
 	 */
 	@RequestMapping(value = "/dc/newDocumentSaveDso", method = RequestMethod.POST)
 	@ResponseBody
-	public String newDocumentSaveDso(@RequestParam(value = "id", required = false) String id,
+	public String newDocumentSaveDso(@RequestParam(value = "id", required = false) String id,@RequestParam(value = "format", required = false) String format,
 			@RequestParam(value = "file") MultipartFile uploadFile) {
 		String retStr = "0";
 		try {
-			Map<String, Object> args = new HashMap();
-			args.put("ID", id);
 			EcmContent en = null;
-			EcmDocument doc = new EcmDocument();
-			doc.setAttributes(args);
+		
 			if (uploadFile != null) {
 				en = new EcmContent();
-				en.setName(uploadFile.getOriginalFilename());
+			//	en.setName(uploadFile.getOriginalFilename()); 在后续步骤需要反查 名称，上传的文件名称是临时文件名
 				en.setContentSize(uploadFile.getSize());
-				en.setFormatName(FileUtils.getExtention(uploadFile.getOriginalFilename()));
+				en.setFormatName(format); //FileUtils.getExtention(uploadFile.getOriginalFilename())
 				en.setInputStream(uploadFile.getInputStream());
 			}
-			// String objId = documentService.creatOrUpdateObject(getToken(), doc, en);//
+			
 			// WORD在线编辑保存
-			// WORD在线编辑保存
-			// String objId = documentService.checkInUpgradeContent(getToken(), id, en);
-//					if( StringUtils.isNotEmpty(objId)) {
-//						retStr = "1"; 
-//					}
+			 String objId = documentService.checkInUpgradeContent(getToken(), id, en);
+			 if( StringUtils.isNotEmpty(objId)) {
+				retStr = "1"; 
+			 }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1431,4 +1439,6 @@ public class ArchiveDcController extends ControllerAbstract {
 	}
 	
 		
+	
+	
 }
