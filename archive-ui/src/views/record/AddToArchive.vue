@@ -56,7 +56,7 @@
         </slot>
       </div>
     </el-dialog>
-    <el-button icon="el-icon-plus" @click="show" type="primary" plain size="small">
+    <el-button icon="el-icon-plus" @click="show" type="primary" plain size="small" style="width:117px">
       添加至案卷
     </el-button>
   </span>

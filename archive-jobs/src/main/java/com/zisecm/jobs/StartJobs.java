@@ -1,4 +1,4 @@
-package org.zisecm.jobs;
+package com.zisecm.jobs;
 
 import javax.sql.DataSource;
 
@@ -19,7 +19,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 
 @SpringBootApplication
 @ComponentScan({ "com.ecm.sso.*","com.ecm.core.dao", "com.ecm.core.db", "com.ecm.core.entity", "com.ecm.core.service",
-		"com.ecm.core.cache.*", "com.ecm.core.util",  "org.zisecm.jobs.business","org.zisecm.jobs.*" })
+		"com.ecm.core.cache.*", "com.ecm.core.util",  "com.zisecm.jobs.business","com.zisecm.jobs.*" })
 @MapperScan("com.ecm.core.dao")
 @EnableTransactionManagement
 @EnableScheduling

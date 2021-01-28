@@ -460,7 +460,6 @@ export default {
       // });
       // //console.log(href);
       // window.open(href.href, "_blank");
-      debugger
     let _self = this;
     this.token = sessionStorage.getItem("access-token");
     axios.post("/dc/getDocument",id).then(function(response) {
@@ -470,14 +469,28 @@ export default {
         _self.doc.format=_self.docObj.FORMAT_NAME;
         let getfileUrl =  _self.axios.defaults.baseURL+"/dc/getContent?id="+_self.doc.id+"&token="+sessionStorage.getItem('access-token')+"&format="+_self.doc.format;
      
-      var urlStr = "./static/dsoframeviewerh5/dsoframe.html?file="+encodeURIComponent(getfileUrl);
-      var win = window.open("","_blank");
-      win.open(urlStr,"_self");
-      }).catch(function(error) {
-        console.log(error);
-    });
+        
+            axios.post("/dc/checkOut",id).then(function(response) {
+                if (response.data.code == 1) {
+                  _self.approvalUserList = response.data.data;
+                    var urlStr = "./static/dsoframeviewerh5/dsoframe.html?file="+encodeURIComponent(getfileUrl);
+                    var win = window.open("","_blank");
+                    win.open(urlStr,"_self");
+                } else {
+                  _self.$message({
+                    showClose: true,
+                    message: response.data.message,
+                    duration: 2000,
+                    type: "warning"
+                  });
+                  return;
+                }
+              });
 
-     
+        }).catch(function(error) {
+          console.log(error);
+      });
+
 
     },
 
