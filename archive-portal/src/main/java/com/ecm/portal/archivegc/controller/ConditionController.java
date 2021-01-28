@@ -66,6 +66,7 @@ public class ConditionController extends ControllerAbstract {
 			for(int i = 0; i < conditionList.size(); i++) {
 				projMap = new HashMap<String, Object>();
 				projMap.put("Name", conditionList.get(i).get("NAME"));
+				projMap.put("id", conditionList.get(i).get("ID"));
 				projMap.put("Condition", conditionList.get(i).get("ITEM_CONTENT"));
 				outList.add(projMap);
 			}
@@ -75,6 +76,20 @@ public class ConditionController extends ControllerAbstract {
 			mp.put("code", ActionContext.FAILURE);
 		}
 		
+		return mp;
+	}
+	@PostMapping("delete")
+	@ResponseBody
+	public Map<String, Object> deletCondition(@RequestBody String argStr) throws Exception{
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Map<String, Object> args = JSONUtils.stringToMap(argStr);
+		try {
+			String id = args.get("id").toString();
+			documentService.deleteObjectById(getToken(), id);
+			mp.put("code", ActionContext.SUCESS);
+		} catch (AccessDeniedException e) {
+			mp.put("code", ActionContext.TIME_OUT);
+		}
 		return mp;
 	}
 	

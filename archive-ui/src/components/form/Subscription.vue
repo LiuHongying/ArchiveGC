@@ -28,12 +28,15 @@
             v-for="item in dataList" 
             :key="item.Condition"
             :label="item.Name"
-            :value="item.Condition"></el-option>
+            :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search1()" icon="el-icon-search"
-            >查询</el-button
+          <el-button type="primary" @click="search1()" icon="el-icon-search">查询</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="deleteCondition()"
+            >删除所选查询条件</el-button
           >
         </el-form-item>
         <el-form-item>
@@ -133,7 +136,6 @@ export default {
       saveDialogVisible: false,
       svalue:"",
       dataList:[],
-
     };
   },
 
@@ -177,8 +179,14 @@ export default {
     },
     search1(){
       let _self = this
+      let cond
       if (_self.svalue != "" && _self.svalue != undefined) {
-        _self.$refs.scriptionGrid.condition=_self.svalue;
+        _self.dataList.forEach(function (item) {
+          if(item.id==_self.svalue){
+            cond=item.Condition
+          }
+      });
+        _self.$refs.scriptionGrid.condition=cond;
         _self.$refs.scriptionGrid.currentPage = 1;
         _self.$refs.scriptionFileGrid.itemDataList=[];
         _self.$refs.scriptionGrid.loadGridInfo();
@@ -234,6 +242,49 @@ export default {
         .catch(function (error) {
           console.log(error);
         });
+    },
+    deleteCondition(){
+      let _self = this
+      if (_self.svalue != "" && _self.svalue != undefined) {
+        var map = new Map();
+        map.set("id",_self._self.svalue);
+        axios
+          .post("/condition/delete", JSON.stringify(map))
+          .then(function (response) {
+            let code = response.data.code;
+            if(code == 1){
+              _self.$message({
+                showClose: true,
+                message:"删除成功",
+                duration: 2000,
+                type: "success",
+              });
+              _self.laodSelect()
+              _self.svalue=""
+              _self.$refs.scriptionGrid.itemDataList=[];
+              _self.$refs.scriptionFileGrid.itemDataList=[];
+
+            } else {
+              _self.$message({
+                showClose: true,
+                message: "删除失败",
+                duration: 2000,
+                type: "warning",
+              });
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      }
+      else{
+        _self.$message({
+          showClose: true,
+          message: "请选择查询条件",
+          duration: 2000,
+          type: "warning",
+        });
+      }
     },
   },
 
