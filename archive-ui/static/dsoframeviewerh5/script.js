@@ -411,17 +411,19 @@ function OpenLocalWord() {
  function saveToWeb(){
    
     var url = GetQueryValue('file'); // 当前文件
+   
     var vars = url.split("&"); 
     var arrvars = vars[0].split("=");
     var curId = arrvars[1];
+    var format = url.substring(url.lastIndexOf("=")+1);
     oframe = document.getElementById("oframe");
     if (oframe.HttpInit()) {
         oframe.HttpAddPostString("id", curId);
+        oframe.HttpAddPostString("format", format);
         oframe.HttpAddPostCurrFile("file", "");
-        var savedId = oframe.HttpPost(rootPath + "/zisecm/dc/newDocumentSaveDso");
-        if(savedId!=""){
+        var retStr = oframe.HttpPost(rootPath + "/zisecm/dc/newDocumentSaveDso");
+        if(retStr=1){
             alert("上传成功");
-            return savedId;
         }else{
             alert("上传失败");
         }

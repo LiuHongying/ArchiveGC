@@ -22,6 +22,11 @@ import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
 import com.ecm.icore.service.IEcmSession;
 import com.ecm.portal.archivegc.utils.EcmSessionFactory;
+/**
+ * 将库房中的案卷（合装文件）移交至整编库
+ * @author Administrator
+ *
+ */
 @Component(value="moveReorganizeListener")
 public class MoveReorganizeListener implements TaskListener{
 	private Logger log=LoggerFactory.getLogger(this.getClass());
