@@ -1326,7 +1326,7 @@ export default {
         .then(function(response) {
           _self.$refs.printVolumes.isBusiness= false
           if(response.data.code=='1'){
-            if(selectedRows[0].TYPE_NAME=='合同管理案卷'){    
+            if(selectedRows[0].C_ARC_CLASSIC=='商务管理'){    
               _self.$refs.printVolumes.isBusiness = true
             }
             _self.$refs.printVolumes.selectedRows = selectedRows
