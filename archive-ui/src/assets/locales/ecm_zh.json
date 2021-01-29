@@ -565,7 +565,8 @@
     "haveReaded":"已阅",
     "Mysender":"我的分发",
     "Approving":"待批示",
-    "DistributeManagement":"分发管理"
+    "DistributeManagement":"分发管理",
+    "DocInfo":"文档信息"
 },
 "message": {
     "conditionS":"条件选择",
