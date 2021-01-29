@@ -157,14 +157,14 @@
                 <br/>
                 <table class="sub-table" cellspacing="0">
                     <tr class="sub-table-tr">
-                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;">立卷人</td>
+                       <td class="sub-table-tdNull" style="padding:5px;width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;">立卷人</td>
                        <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;"></td>
-                       <td class="sub-table-tdNull" style="width:12.5%">立卷日期</td>
-                       <td class="sub-table-tdNull" style="width:12.5%"></td>
-                       <td class="sub-table-tdNull" style="width:12.5%">检查人</td>
-                       <td class="sub-table-tdNull" style="width:12.5%"></td>
-                       <td class="sub-table-tdNull" style="width:12.5%">检查日期</td>
-                       <td class="sub-table-tdNull" style="border-right:0px;width:12.5%"></td>
+                       <td class="sub-table-tdNull" style="padding:5px;width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;">立卷日期</td>
+                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;"></td>
+                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;">检查人</td>
+                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;"></td>
+                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;">检查日期</td>
+                       <td class="sub-table-tdNull" style="border-right:0px;width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;"></td>
                     </tr>
                 </table>
             </td>

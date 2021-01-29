@@ -807,6 +807,7 @@ export default {
       let _self = this;
       _self.loading = true;
       var m = new Map();
+      console.log("loadGridInfo gridViewName:" + _self.gridViewName);
       m.set("gridName", _self.gridViewName);
       m.set("lang", _self.currentLanguage);
       _self

@@ -517,7 +517,6 @@
                         :isShowChangeList="true"
                         :isshowCustom="true"
                         :optionWidth = "3"
-                        gridViewName="ArrangeGrid"
                         @rowclick="beforeShowInnerFile"
                         @selectchange="selectChange"
                         @changeGridName="changeDataGridName"
@@ -1869,8 +1868,16 @@ export default {
         key = key + " and "+_self.AddConds
       }
       _self.mainParam.condition=key;
-      _self.mainParam.folderId=indata.id
+      _self.mainParam.folderId=indata.id;
+      var lastGridView = _self.$refs.mainDataGrid.gridViewName;
+      console.log("lastGridView:" + lastGridView);
+      _self.$refs.mainDataGrid.gridViewName = indata.gridView;
+       console.log("newGridView:" + indata.gridView);
       _self.$nextTick(()=>{
+        if(lastGridView != indata.gridView){
+           _self.$refs.mainDataGrid.loadGridInfo();
+           
+        }
          _self.$refs.mainDataGrid.loadGridData();
          _self.$refs.leftDataGrid.itemDataList = [];
       });
