@@ -1872,6 +1872,7 @@ export default {
       var lastGridView = _self.$refs.mainDataGrid.gridViewName;
       console.log("lastGridView:" + lastGridView);
       _self.$refs.mainDataGrid.gridViewName = indata.gridView;
+      _self.$refs.mainDataGrid.gridviewInfo.gridviewName = indata.gridView;
        console.log("newGridView:" + indata.gridView);
       _self.$nextTick(()=>{
         if(lastGridView != indata.gridView){
