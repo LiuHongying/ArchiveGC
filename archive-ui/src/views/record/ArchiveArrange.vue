@@ -590,8 +590,9 @@
                         :isshowSelection="true"
                         :folderId="mainParam.folderId"
                         showOptions="查看内容"
-                        :isShowChangeList="false"
-                        :optionWidth = "2"
+                        :isShowChangeList="true"
+                        :isshowCustom="true"
+                        :optionWidth = "3"
                         @selectchange="selectInnerChange"
                         :showBatchCheck="true"
                       ></DataGrid>
