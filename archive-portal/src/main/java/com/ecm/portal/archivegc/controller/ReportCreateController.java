@@ -29,7 +29,7 @@ import com.ecm.portal.controller.ControllerAbstract;
 public class ReportCreateController extends ControllerAbstract {
 	private final SimpleDateFormat shortSdf = new SimpleDateFormat("yyyy-MM-dd");
 	private final SimpleDateFormat longHourSdf = new SimpleDateFormat();
-	private final SimpleDateFormat longSdf = new SimpleDateFormat("yyyy-MM-dd"); 
+	private final SimpleDateFormat longSdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
 	
 	@Autowired
 	private DocumentService documentService;
@@ -161,10 +161,8 @@ public class ReportCreateController extends ControllerAbstract {
 		Map<String, Object> args = JSONUtils.stringToMap(argStr);
 			
 		try {
-			
-			
-			String startDate = this.getStrValue(args, "startDate");
-			String endDate = this.getStrValue(args, "endDate");
+			String startDate = getStrValue(args, "startDate") + " 00:00:00";
+			String endDate = getStrValue(args, "endDate") + " 23:59:59";
 			
 			String timeCheck = new String();
 			
@@ -181,48 +179,24 @@ public class ReportCreateController extends ControllerAbstract {
 				timeCheck = setSQLTimeEmp();
 			}
 			
-			String sqlStatistic = "select distinct eag.EXCUTE_DATE, eag.USER_NAME," + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where eag2.ACTION_NAME = '著录' and eag2.USER_NAME = eag.USER_NAME and ed2.C_ARC_CLASSIC IS NOT NULL) as workstorcount, " + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.C_ITEM_TYPE = '设计文件修改单' and eag2.USER_NAME = eag.USER_NAME and ed2.C_ARC_CLASSIC IS NOT NULL) as workstjorcount, " + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where eag2.ACTION_NAME = '质检' and eag2.USER_NAME = eag.USER_NAME and ed2.C_ARC_CLASSIC IS NOT NULL) as workgetcount, " + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.Status = '作废' and eag2.USER_NAME = eag.USER_NAME and ed2.C_ARC_CLASSIC IS NOT NULL) as workgetjicount " + 
-					"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
-					"where ed.C_ARC_CLASSIC IS NOT NULL " + timeCheck + " order by EXCUTE_DATE, USER_NAME";
+			String sqlStatistic = "select USER_NAME,ymd," + 
+					"sum(iszl) as workstorcount,sum(iszf) as workgetcount,sum(ismodify) as workstjorcount,sum(iszj) as workgetjicount " + 
+					"from (select eag.ID,eag.USER_NAME,DATE_FORMAT(eag.EXCUTE_DATE, '%Y-%m-%d') as ymd," + 
+					"	  if(eag.ACTION_NAME = '著录',1,0) iszl,if(ed.STATUS='作废',1,0) iszf," + 
+					"	  if(ed.C_ITEM_TYPE = '设计文件修改单',1,0) ismodify," + 
+					"	  if(eag.ACTION_NAME ='质检',1,0) iszj " + 
+					"	  from ecm_audit_general eag,ecm_document ed " + 
+					"	  where ed.id=eag.DOC_ID "+ timeCheck +" ) tt  " + 
+					"group by USER_NAME ,ymd order by ymd desc";
 			
 			List<Map<String, Object>> listWorkStatistic = documentService.getMapList(getToken(), sqlStatistic);
-			List<Map<String, Object>> resultList = new ArrayList<>();
-			Set<String> onlyKeys = new HashSet<String>();
-			//1 type
-			for(int i = 0; i<listWorkStatistic.size(); i++) {
-				Map<String, Object> item = listWorkStatistic.get(i);
-				String key = item.get("ymd").toString()+item.get("user_name").toString();
-				if(!onlyKeys.contains(key)) {
-					onlyKeys.add(key);
-					resultList.add(item);
-				}
-			}
-			
-			for (Map<String, Object> item : resultList) {
-				
-			}
-			
-			//2 type
-			for (int i = listWorkStatistic.size()-1; i >=0 ; i--) {
-				Map<String, Object> item = listWorkStatistic.get(i);
-				String key = item.get("ymd").toString()+item.get("user_name").toString();
-				if(onlyKeys.contains(key)) {
-					listWorkStatistic.remove(i);
-				}else {
-					onlyKeys.add(key);					
-				}
-			}
 				
 			for(int i = 0; i<listWorkStatistic.size(); i++) {
 				Map<String, Object> item = listWorkStatistic.get(i);
 				Map<String, Object> projMap = new HashMap<String, Object>();	
 				String wfName = (item.get("USER_NAME")!=null)?(String)item.get("USER_NAME"):"";
 				projMap.put("wfName", wfName);
-				Number wfMonth =  getSponsorFor(listWorkStatistic, "month1", i);
+				String wfMonth =  (item.get("ymd")!=null)?(String)item.get("ymd"):"";
 				projMap.put("wfMonth", wfMonth);
 				Number receFiles = getSponsorFor(listWorkStatistic, "workstorcount", i);
 				projMap.put("receFiles", receFiles);
@@ -234,9 +208,6 @@ public class ReportCreateController extends ControllerAbstract {
 				projMap.put("storeDoc", storeDoc);
 				outList.add(projMap);
 			}
-			
-			
-			
 			
 			mp.put("data", outList);
 			mp.put("code", ActionContext.SUCESS);

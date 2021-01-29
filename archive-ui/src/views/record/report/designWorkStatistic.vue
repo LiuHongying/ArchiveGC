@@ -6,7 +6,7 @@
           <el-date-picker
             v-model="startDate"
             type="date"
-            :placeholder="$t('application.startDate')"
+            placeholder="开始时间"
             value-format="yyyy-MM-dd"
           ></el-date-picker>
         </el-form-item>
@@ -14,7 +14,7 @@
           <el-date-picker
             v-model="endDate"
             type="date"
-            :placeholder="$t('application.startDate')"
+            placeholder="结束时间"
             value-format="yyyy-MM-dd"
           ></el-date-picker>
         </el-form-item>

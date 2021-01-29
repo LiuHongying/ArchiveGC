@@ -109,7 +109,7 @@ export default {
         {
           id: "4-0",
           label: "档案作废",
-          component: "",
+          component: "fileRemoveWorkFlow",
           children: "",
         },
         {
