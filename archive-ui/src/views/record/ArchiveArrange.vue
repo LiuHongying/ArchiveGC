@@ -511,7 +511,6 @@
                         v-bind:tableHeight="(layout.height-startHeight)*(topPercent)/100-topbarHeight"
                         :isshowOption="true"
                         :isshowSelection="true"
-                        gridViewName="ArrangeGrid"
                         :condition="mainParam.condition"
                         :folderId="mainParam.folderId"
                         showOptions="查看内容"
