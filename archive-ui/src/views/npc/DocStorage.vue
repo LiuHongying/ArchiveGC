@@ -100,6 +100,35 @@
           >{{$t('application.start')+$t('application.Import')}}</el-button>
         </div>
       </el-dialog>
+      <!-- 批量上传文件 -->
+      <el-dialog
+        :title="$t('application.Import')"
+        :visible.sync="batchImportdialogVisible"
+        width="70%"
+        :close-on-click-modal="false"
+      >
+        <el-form size="mini" :label-width="formLabelWidth" v-loading="uploading">
+          <div style="height:200px;overflow-y:scroll; overflow-x:scroll;">
+            <el-upload
+              :limit="100"
+              :file-list="fileListDoc"
+              action
+              :on-change="handleChangeDoc"
+              :auto-upload="false"
+              :multiple="true"
+            >
+              <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
+            </el-upload>
+          </div>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="batchImportdialogVisible = false">{{$t('application.cancel')}}</el-button>
+          <el-button
+            type="primary"
+            @click="uploadDataBatch()"
+          >{{$t('application.start')+$t('application.Import')}}</el-button>
+        </div>
+      </el-dialog>
       <el-dialog
         :title="uploadType == 0 ? '更新主文件' : '更新格式副本'"
         :visible.sync="udialogVisible"
@@ -325,6 +354,7 @@
             <el-row style="padding-top: 10px; padding-bottom: 10px">
               <el-col style="text-align: left">
                 <el-tooltip
+                  v-if="permit>=7"
                   class="item"
                   effect="dark"
                   :content="$t('application.newFolder')"
@@ -338,6 +368,7 @@
                   ></el-button>
                 </el-tooltip>
                 <el-tooltip
+                  v-if="permit>=7"
                   class="item"
                   effect="dark"
                   :content="$t('application.edit') + $t('application.folder')"
@@ -346,6 +377,7 @@
                   <el-button type="primary" icon="el-icon-info" circle @click="onEditFolder()"></el-button>
                 </el-tooltip>
                 <el-tooltip
+                  v-if="permit>=8"
                   class="item"
                   effect="dark"
                   :content="$t('application.delete') + $t('application.folder')"
@@ -354,6 +386,7 @@
                   <el-button type="danger" icon="el-icon-delete" circle @click="onDeleleFolder()"></el-button>
                 </el-tooltip>
                 <el-tooltip
+                  v-if="permit>=8"
                   class="item"
                   effect="dark"
                   :content="$t('application.move') + $t('application.folder')"
@@ -361,7 +394,13 @@
                 >
                   <el-button type="primary" icon="el-icon-top-right" circle @click="moveFolder()"></el-button>
                 </el-tooltip>
-                <el-tooltip class="item" effect="dark" content="授权" placement="top">
+                <el-tooltip
+                  v-if="permit>=9"
+                  class="item"
+                  effect="dark"
+                  content="授权"
+                  placement="top"
+                >
                   <ACLManagement
                     style="display: inline-block;margin-left:10px;"
                     @grantSuccess="refreshFolderData"
@@ -430,15 +469,19 @@
                 </template>
               </el-col>
               <el-col :span="3">
+                <!--  <el-button v-if="permit>=7" type="primary" icon="el-icon-upload2" @click="batchDialogVisible=true">批量导入</el-button> -->
                 <el-button
+                  el-button
+                  v-if="permit>=7"
                   type="primary"
                   icon="el-icon-upload2"
-                  @click="batchDialogVisible=true"
+                  @click="addBatchUploadFile('/dc/newDocumentAddBatch')"
                 >批量导入</el-button>
               </el-col>
 
               <el-col :span="3">
                 <el-button
+                  v-if="permit>=7"
                   type="primary"
                   plain
                   size="medium"
@@ -449,6 +492,7 @@
               <el-col :span="2">
                 <el-button
                   icon="el-icon-delete"
+                  v-if="permit>=9"
                   type="warning"
                   @click="
                     onDeleleItem(selectedItemList, [$refs.mainDataGrid])
@@ -457,6 +501,7 @@
               </el-col>
               <el-col :span="3">
                 <el-button
+                  v-if="permit>=4"
                   type="primary"
                   @click.native="exportData"
                   icon="el-icon-download"
@@ -464,25 +509,30 @@
               </el-col>
               <el-col :span="2">
                 <el-button
+                  v-if="permitdoc>=9"
                   type="primary"
                   icon="el-icon-top-right"
                   @click="moveItem()"
                 >{{ $t("application.move") }}</el-button>
               </el-col>
-              <el-col :span="2">
-                <el-button
-                  type="primary"
-                  icon="el-icon-upload2"
-                  @click="showUpdateFile(0)"
-                >{{ $t("application.update") }}</el-button>
-              </el-col>
-              <el-col :span="2">
-                <el-button
-                  type="primary"
-                  icon="el-icon-upload2"
-                  @click="showUpdateFile(1)"
-                >{{ $t("application.transcript") }}</el-button>
-              </el-col>
+              <!--
+          <el-col :span="2">
+          <el-button  v-if="permitdoc>=9"
+                type="primary"
+                icon="el-icon-upload2"
+                @click="showUpdateFile(0)"
+                >{{ $t("application.update") }}</el-button
+              >
+          </el-col>
+          <el-col :span="2">
+           <el-button  v-if="permitdoc>=7"
+                type="primary"
+                icon="el-icon-upload2"
+                @click="showUpdateFile(1)"
+                >{{ $t("application.transcript") }}</el-button
+              >
+          </el-col>
+              -->
               <el-col :span="3">
                 <template v-if="isFileAdmin">
                   <!-- `checked` 为 true显示卷宗 或 false不显示卷宗 -->
@@ -497,6 +547,7 @@
             <el-row style="margin-top:5px;">
               <el-col :span="3">
                 <el-button
+                  v-if="permit>=7"
                   type="primary"
                   icon="el-icon-files"
                   @click="beforeUploadFile('/dc/addAttachment')"
@@ -505,15 +556,15 @@
               <el-col :span="2">
                 <ACLManagement :ids="selectIds">授权</ACLManagement>
               </el-col>
-              <el-col :span="3">
-                <CreateDocNoAttach typeName="图纸文件审批单">新建文件2</CreateDocNoAttach>
-              </el-col>
+              <!-- <el-col :span="3">
+            <CreateDocNoAttach style="position:relative;" typeName="图纸文件审批单">新建文件2</CreateDocNoAttach>
+              </el-col>-->
             </el-row>
             <el-row :style="'height:'+layout.height-startHeight+80">
               <DataGrid
                 ref="mainDataGrid"
                 key="main"
-                data-url="/dc/getDocumentsByPermission"
+                data-url="/dc/getDocuments"
                 v-bind:tableHeight="(layout.height-startHeight-75)"
                 v-bind:isshowOption="true"
                 v-bind:isshowSelection="true"
@@ -644,6 +695,7 @@ export default {
       },
       newFileList: [],
       fileList: [],
+      fileListDoc: [],
       workflow: {},
       gridViewTrans: "",
       idTrans: "",
@@ -659,6 +711,7 @@ export default {
       udialogVisible: false,
       uploading: false,
       importdialogVisible: false,
+      batchImportdialogVisible: false,
       uploadUrl: "",
       condition: "",
       selectIds: [],
@@ -675,6 +728,9 @@ export default {
       },
       folderDialogVisible: false,
       clientPermission: 0,
+      permit: 1,
+      permitdoc: 1
+      systemPermission:0,
       userPermission:0
     };
   },
@@ -866,6 +922,7 @@ export default {
         .post("/admin/getFolder", _self.pid)
         .then(function(response) {
           _self.dataList = response.data.data;
+          _self.permit = response.data.permit;
           //console.log(_self.dataList);
           _self.loading = false;
         })
@@ -972,6 +1029,62 @@ export default {
           console.log(error);
         });
     },
+
+    getFormDataDoc() {
+      let _self = this;
+
+      let formdata = new FormData();
+
+      var data = {};
+      data["folderId"] = _self.currentFolder.id;
+      (data["TYPE_NAME"] = this.currentFolder.typeName),
+        formdata.append("metaData", JSON.stringify(data));
+      _self.fileListDoc.forEach(function(file) {
+        //console.log(file.name);
+        formdata.append("uploadFile", file.raw, file.name);
+      });
+      return formdata;
+    },
+
+    //批量上传文件
+    uploadDataBatch() {
+      let _self = this;
+      debugger;
+      let formdata = _self.getFormDataDoc();
+
+      console.log("UploadData getData");
+      console.log(formdata);
+      _self.uploading = true;
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          datatype: "json",
+          method: "post",
+          data: formdata,
+          url: _self.uploadUrl
+        })
+        .then(function(response) {
+          _self.batchImportdialogVisible = false;
+          // _self.refreshData();
+          _self.uploading = false;
+          // _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
+          _self.$message({
+            showClose: true,
+            message:
+              _self.$t("application.Import") + _self.$t("message.success"),
+            duration: 2000,
+            type: "success"
+          });
+
+          _self.$refs.mainDataGrid.loadGridData();
+        })
+        .catch(function(error) {
+          _self.uploading = false;
+          console.log(error);
+        });
+    },
     beforeUploadFile(uploadpath) {
       let _self = this;
       if (_self.selectedItems == undefined || _self.selectedItems.length == 0) {
@@ -988,11 +1101,31 @@ export default {
       _self.fileList = [];
       _self.importdialogVisible = true;
     },
+
+    addBatchUploadFile(uploadpath) {
+      let _self = this;
+      if (!this.currentFolder || !this.currentFolder.id) {
+        // _self.$message('请选择一条文件数据');
+        _self.$message({
+          showClose: true,
+          message: _self.$t("message.pleaseSelectFolder"),
+          duration: 2000,
+          type: "warning"
+        });
+        return;
+      }
+      _self.uploadUrl = uploadpath;
+      _self.fileList = [];
+      _self.batchImportdialogVisible = true;
+    },
     handleFileChange(file, fileList) {
       this.uploadFile = file;
     },
     handleChange(file, fileList) {
       this.fileList = fileList;
+    },
+    handleChangeDoc(file, fileListDoc) {
+      this.fileListDoc = fileListDoc;
     },
     updateNewFile() {
       let _self = this;
@@ -1249,6 +1382,20 @@ export default {
     },
     rowClick(row) {
       this.currentId = row.ID;
+      let _self = this;
+      _self.loading = true;
+
+      axios
+        .post("/admin/getDocumentPermitById", row.ID)
+        .then(function(response) {
+          _self.permitdoc = response.data.permit;
+          //console.log(_self.dataList);
+          _self.loading = false;
+        })
+        .catch(function(error) {
+          console.log(error);
+          _self.loading = false;
+        });
     },
     renderContent: function(h, { node, data, store }) {
       if (data.extended) {
@@ -1289,7 +1436,7 @@ export default {
       _self.typeName = indata.typeName;
       _self.getPermission(indata.aclName,function(permission){
         if(_self.systemPermission>permission){
-          _self.userPermission=systemPermission;
+          _self.userPermission=_self.systemPermission;
         }else{
           _self.userPermission=permission;
         }
@@ -1300,6 +1447,7 @@ export default {
           .post("/admin/getFolder", indata.id)
           .then(function(response) {
             indata.children = response.data.data;
+            _self.permit = response.data.permit;
             //console.log(JSON.stringify(indata));
             indata.extended = true;
             _self.loading = false;

@@ -554,7 +554,8 @@
     "haveReaded":"Have readed",
     "Mysender":"My distributes",
     "Approving":"Approving",
-    "DistributeManagement":"DistributeManagement"
+    "DistributeManagement":"DistributeManagement",
+    "DocInfo":"Document info"
 },
 "message": {
     "conditionS":"Select Condition",

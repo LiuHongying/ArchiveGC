@@ -6,13 +6,7 @@
       v-loading="loading"
       :visible.sync="dialogVisible">
       <el-form :model="form">
-        <el-row>
-            <el-col v-if="!isEdit" :span="24">
-              <el-form-item label="添加到子文件夹及文件" label-width="200px">
-                <el-checkbox v-model="isBatch"></el-checkbox>
-              </el-form-item>
-            </el-col>
-        </el-row>
+        
         <el-row>
             <el-col v-if="!isEdit" :span="24">
               <el-form-item :label="$t('field.type')" :label-width="formLabelWidth">
@@ -57,7 +51,7 @@
         <el-button type="primary" @click="saveItem(form)">{{$t('application.ok')}}</el-button>
       </div>
     </el-dialog>
-    <el-dialog title="删除权限" 
+    <!-- <el-dialog title="删除权限" 
       :append-to-body="true"
       :close-on-click-modal="false"
       v-loading="loading"
@@ -75,7 +69,7 @@
         <el-button @click="deleteDialogVisible = false">{{$t('application.cancel')}}</el-button>
         <el-button type="primary" @click="onDelete()">{{$t('application.ok')}}</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
     <el-row>
       <el-col :span="6">
         <el-input
@@ -199,7 +193,7 @@ export default {
     name:{//Acl 名称
       type:String , default: null
     },
-    folderId:{//文件夹ID
+    docId:{//文件ID
       type:String , default: null
     },
     permission:{//权限，9: 修改权限
@@ -228,6 +222,9 @@ export default {
     },
     loadAcl(){
       let _self = this;
+      if(_self.name==''){
+        return;
+      }
       console.log("acl name:"+_self.name);
       axios.post("/acl/getAclByName",_self.name).then(function(response){
         console.log(response.data.data);
@@ -259,14 +256,12 @@ export default {
       let _self = this;
       _self.loading = true;
       var permit = new Object();
-      permit.parentId = _self.folderId;
+      permit.parentId = _self.docId;
       permit.targetName = inData.targetName;
       permit.targetType = inData.targetType;
       permit.permission = inData.permission;
-      let url = "/folder/grantPermit";
-      if(_self.isBatch){
-         url = "/folder/batchGrantPermit";
-      }
+      let url = "/dc/grantPermit";
+      
       //console.log(name);
       axios.post(url,permit).then(function(response){
         if(response.data.code == 1){
@@ -283,25 +278,38 @@ export default {
     },
     delItem(inData){
       let _self = this;
+      _self.currentItem = inData;
        if(_self.currentItem.targetName == "owner" || _self.currentItem.targetName =="everyone"){
         _self.$message("owner和everyon不允许删除！");
         return;
       }
-      _self.currentItem = inData;
-      _self.deleteDialogVisible = true;
+      _self.$confirm(
+            "是否要删除此权限？",
+            _self.$t("application.info"),
+            {
+                confirmButtonText: "是",
+                cancelButtonText: "否",
+                type: "warning"
+            }
+            )
+            .then(() => {
+                _self.onDelete();
+            })
+            .catch(() => {
+                
+            });
+      
     },
     onDelete(){
       let _self = this;
       _self.loading = true;
       var permit = new Object();
-      permit.parentId = _self.folderId;
+      permit.parentId = _self.docId;
       permit.targetName = _self.currentItem.targetName;
       permit.targetType = _self.currentItem.targetType;
       permit.permission = _self.currentItem.permit;
-      let url = "/folder/revokePermit";
-      if(_self.isBatch){
-         url = "/folder/batchRevokePermit";
-      }
+      let url = "/dc/revokePermit";
+      
       //console.log(name);
       axios.post(url,permit).then(function(response){
         if(response.data.code == 1){
