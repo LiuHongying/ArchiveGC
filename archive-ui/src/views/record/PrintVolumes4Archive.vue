@@ -60,7 +60,7 @@ export default {
       if(this.Choice=='通用打印'){
       this.condition = ""
       //this.$refs.PrintVolumesGrid.condition = ''
-      this.refreshDataGrid(this.selectedRows,"ArrangeInnerGridBusiness")
+      this.refreshDataGrid(this.selectedRows,"ArrangeInnerGridPrint")
       }
     },
     refreshDataGrid(objs,gridName){
