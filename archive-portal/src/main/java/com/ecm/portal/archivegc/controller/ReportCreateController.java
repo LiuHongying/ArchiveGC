@@ -46,8 +46,8 @@ public class ReportCreateController extends ControllerAbstract {
 		try {
 			Map<String, Object> projMap = new HashMap<String, Object>();
 			
-			String startDate = this.getStrValue(args, "startDate");
-			String endDate = this.getStrValue(args, "endDate");
+			String startDate = getStrValue(args, "startDate") + " 00:00:00";
+			String endDate = getStrValue(args, "endDate") + " 23:59:59";
 			
 			String timeCheck = new String();
 			
@@ -64,13 +64,16 @@ public class ReportCreateController extends ControllerAbstract {
 				timeCheck = setSQLTimeEmp();
 			}
 			// todo 
-			String sqlStatistic = "select distinct year(EXCUTE_DATE) as year1, month(EXCUTE_DATE) as month1, USER_NAME, TYPE_NAME," + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where eag2.ACTION_NAME = '接收' and ed2.C_ITEM_TYPE = '案卷' and ed2.TYPE_NAME = ed.TYPE_NAME and eag2.USER_NAME = eag.USER_NAME and ed2.C_ARC_CLASSIC IS NOT NULL) as workstorcount, " + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where eag2.ACTION_NAME = '接收' and ed2.C_ITEM_TYPE = '文件' and ed2.TYPE_NAME = ed.TYPE_NAME and eag2.USER_NAME = eag.USER_NAME and ed2.C_ARC_CLASSIC IS NOT NULL) as workstjorcount, " + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where eag2.ACTION_NAME = '入库' and ed2.C_ITEM_TYPE = '案卷' and ed2.TYPE_NAME = ed.TYPE_NAME and eag2.USER_NAME = eag.USER_NAME and ed2.C_ARC_CLASSIC IS NOT NULL) as workgetcount, " + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where eag2.ACTION_NAME = '入库' and ed2.C_ITEM_TYPE = '文件' and ed2.TYPE_NAME = ed.TYPE_NAME and eag2.USER_NAME = eag.USER_NAME and ed2.C_ARC_CLASSIC IS NOT NULL) as workgetjicount " + 
-					"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
-					"where ed.C_ARC_CLASSIC IS NOT NULL and (eag.ACTION_NAME = '入库' or eag.ACTION_NAME = '接收') " + timeCheck + " order by USER_NAME, month1, TYPE_NAME ";
+			String sqlStatistic = "select USER_NAME,TYPE_NAME,ymd," + 
+					"sum(iszl) as workstorcount,sum(iszf) as workgetcount,sum(ismodify) as workstjorcount,sum(iszj) as workgetjicount " + 
+					"from (select eag.ID,eag.USER_NAME,ed.TYPE_NAME,DATE_FORMAT(eag.EXCUTE_DATE, '%Y-%m-%d') as ymd," + 
+					"	  if(eag.ACTION_NAME = '接收' and  ed.C_ITEM_TYPE = '案卷',1,0) iszl," + 
+					"	  if(eag.ACTION_NAME = '接收' and  ed.C_ITEM_TYPE = '文件',1,0) iszf," + 
+					"	  if(eag.ACTION_NAME = '入库' and  ed.C_ITEM_TYPE = '案卷',1,0) ismodify," + 
+					"	  if(eag.ACTION_NAME = '入库' and  ed.C_ITEM_TYPE = '文件',1,0) iszj " + 
+					"	  from ecm_audit_general eag,ecm_document ed " + 
+					"	  where ed.id=eag.DOC_ID "+ timeCheck +" ) tt  " + 
+					"group by USER_NAME,TYPE_NAME,ymd order by ymd desc";
 			
 			List<Map<String, Object>> listWorkStatistic = documentService.getMapList(getToken(), sqlStatistic);
 			
@@ -78,7 +81,7 @@ public class ReportCreateController extends ControllerAbstract {
 				projMap = new HashMap<String, Object>();
 				String wfName = (listWorkStatistic.get(i).get("USER_NAME")!=null)?(String)listWorkStatistic.get(i).get("USER_NAME"):"";
 				projMap.put("wfName", wfName);
-				Number wfMonth =  getSponsorFor(listWorkStatistic, "month1", i);
+				String wfMonth = (listWorkStatistic.get(i).get("ymd")!=null)?(String)listWorkStatistic.get(i).get("ymd"):"";
 				projMap.put("wfMonth", wfMonth);
 				String wfType =  (listWorkStatistic.get(i).get("TYPE_NAME")!=null)?(String)listWorkStatistic.get(i).get("TYPE_NAME"):"";
 				projMap.put("wfType", wfType);
@@ -183,7 +186,7 @@ public class ReportCreateController extends ControllerAbstract {
 					"sum(iszl) as workstorcount,sum(iszf) as workgetcount,sum(ismodify) as workstjorcount,sum(iszj) as workgetjicount " + 
 					"from (select eag.ID,eag.USER_NAME,DATE_FORMAT(eag.EXCUTE_DATE, '%Y-%m-%d') as ymd," + 
 					"	  if(eag.ACTION_NAME = '著录',1,0) iszl,if(ed.STATUS='作废',1,0) iszf," + 
-					"	  if(ed.C_ITEM_TYPE = '设计文件修改单',1,0) ismodify," + 
+					"	  if(ed.TYPE_NAME = '设计文件修改单',1,0) ismodify," + 
 					"	  if(eag.ACTION_NAME ='质检',1,0) iszj " + 
 					"	  from ecm_audit_general eag,ecm_document ed " + 
 					"	  where ed.id=eag.DOC_ID "+ timeCheck +" ) tt  " + 
