@@ -2,11 +2,11 @@
   <div>
     <div id="print" ref="print" style="height:95%;width:95%;">
         <div style="text-align:center; font-size: 20px;font-family: Arial, 宋体, Helvetica, sans-serif;">备考表</div>
-     <table class="table" style="border: 1px solid #212121;">
+     <table class="table" style="border: 1px solid #000000;">
          <tr>
              <td>档案号：{{archiveCode}}</td>
          </tr>
-        <tr style="border-top: 1px solid #212121;">
+        <tr style="border-top: 1px solid #000000;">
             <td>
                 互见号：
                 <br/>
@@ -23,148 +23,51 @@
             </td>
             
         </tr>
-        <tr style="border-top: 1px solid #212121;">
+        <tr style="border-top: 1px solid #000000;">
             <td style="text-align: center;">
                 变更记录<br>
             </td>
         </tr>
-        <tr style="border-top: 1px solid #212121;">
+        <tr style="border-top: 1px solid #000000;">
             <td>
                 <table class="sub-table" cellspacing="0">
                     <tr>
-                        <td rowspan="2" style="border-right: 1px solid #212121;text-align:center;">序 号</td>
-                        <td rowspan="2" style="border-right: 1px solid #212121;text-align:center;">日 期</td>
-                        <td rowspan="2" style="border-right: 1px solid #212121;text-align:center;">原页数</td>
-                        <td colspan="2" style="border-right: 1px solid #212121;text-align:center;">变动页数</td>
-                        <td rowspan="2" style="border-right: 1px solid #212121;text-align:center;">现页数</td>
-                        <td rowspan="2" style="border-right: 1px solid #212121;text-align:center;">更改文件号</td>
-                        <td rowspan="2" style="border-right: 1px solid #212121;text-align:center;">更改者</td>
-                        <td rowspan="2" style="text-align:center;">备注</td>
+                        <td rowspan="2" style="border-right: 1px solid #000000;text-align:center;border-bottom: 1px solid #000000;width:50px">序 号</td>
+                        <td rowspan="2" style="border-right: 1px solid #000000;text-align:center;border-bottom: 1px solid #000000;">日 期</td>
+                        <td rowspan="2" style="border-right: 1px solid #000000;text-align:center;border-bottom: 1px solid #000000;">原页数</td>
+                        <td colspan="2" style="border-right: 1px solid #000000;text-align:center;border-bottom: 1px solid #000000;">变动页数</td>
+                        <td rowspan="2" style="border-right: 1px solid #000000;text-align:center;border-bottom: 1px solid #000000;">现页数</td>
+                        <td rowspan="2" style="border-right: 1px solid #000000;text-align:center;border-bottom: 1px solid #000000;">更改文件号</td>
+                        <td rowspan="2" style="border-right: 1px solid #000000;text-align:center;border-bottom: 1px solid #000000;">更改者</td>
+                        <td rowspan="2" style="text-align:center;border-bottom: 1px solid #000000;">备注</td>
                     </tr>
                     <tr>
-                        <td style="border-top: 1px solid #212121;text-align:center;">增 加</td>
-                        <td style="border-top: 1px solid #212121;
-                         border-left: 1px solid #212121;
-                          border-right: 1px solid #212121; text-align:center;">减 少</td>
+                        <td style="text-align:center;border-right: 1px solid #000000;border-bottom: 1px solid #000000;">增 加</td>
+                        <td style="border-right: 1px solid #000000; text-align:center;;border-bottom: 1px solid #000000;">减 少</td>
                     </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
+                     <tr v-for="idx in emptyRowCount" :key="idx">
+                        <td class="sub-table-tdNull bottom-cell" >&nbsp;</td>
+                        <td class="sub-table-tdNull bottom-cell">&nbsp;</td>
+                        <td class="sub-table-tdNull bottom-cell">&nbsp;</td>
+                        <td class="sub-table-tdNull bottom-cell">&nbsp;</td>
+                        <td class="sub-table-tdNull bottom-cell">&nbsp;</td>
+                        <td class="sub-table-tdNull bottom-cell">&nbsp;</td>
+                        <td class="sub-table-tdNull bottom-cell">&nbsp;</td>
+                        <td class="sub-table-tdNull bottom-cell">&nbsp;</td>
+                        <td class="sub-table-tdNull bottom-cell-end">&nbsp;</td>
                     </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;"></td>
-                    </tr>
-                    <tr>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-bottom:1px solid #212121;"></td>
-                        <td class="sub-table-tdNull" style="border-right:0px;border-bottom:1px solid #212121;"></td>
-                    </tr>
+                    
                 </table>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
                 <table class="sub-table" cellspacing="0">
                     <tr class="sub-table-tr">
-                       <td class="sub-table-tdNull" style="padding:5px;width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;">立卷人</td>
-                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;"></td>
-                       <td class="sub-table-tdNull" style="padding:5px;width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;">立卷日期</td>
-                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;"></td>
-                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;">检查人</td>
-                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;"></td>
-                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;">检查日期</td>
-                       <td class="sub-table-tdNull" style="border-right:0px;width:12.5%;border-right: 1px solid #212121;border-top:1px solid #212121;text-align:center;"></td>
+                       <td class="sub-table-tdNull" style="padding:5px;width:12.5%;border-right: 1px solid #000000;text-align:center;">立卷人</td>
+                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #000000;text-align:center;"></td>
+                       <td class="sub-table-tdNull" style="padding:5px;width:12.5%;border-right: 1px solid #000000;text-align:center;">立卷日期</td>
+                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #000000;text-align:center;"></td>
+                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #000000;text-align:center;">检查人</td>
+                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #000000;text-align:center;"></td>
+                       <td class="sub-table-tdNull" style="width:12.5%;border-right: 1px solid #000000;text-align:center;">检查日期</td>
+                       <td class="sub-table-tdNull" style="border-right:0px;width:12.5%;text-align:center;"></td>
                     </tr>
                 </table>
             </td>
@@ -187,7 +90,8 @@ export default {
   data() {
     return {
       archiveCode: "",
-      innerDataList: []
+      innerDataList: [],
+      emptyRowCount: 30
     };
   },
   mounted() {
@@ -233,7 +137,16 @@ li {
 a {
   color: #42b983;
 }
-/* .table-a table{border:1px solid #212121}  */
+.bottom-cell {
+  border-bottom:1px solid #000000;
+  border-right:1px solid #000000;
+  padding:10px;
+}
+.bottom-cell-end {
+  border-bottom:1px solid #000000;
+  padding:10px;
+}
+/* .table-a table{border:1px solid #000000}  */
 .v-auto-out .auto-in {
 position: absolute;
 top: 50%;
@@ -280,9 +193,9 @@ border-right: 1px solid gray; */
 border-top: 1px solid #000000; 
 border-left: 1px solid #000000;
 border-right: 1px solid #000000;
-/* border:1px solid #212121; */
+/* border:1px solid #000000; */
 text-align: center;vertical-align: middle;}
 .sub-table-td1 {display: table-cell; height: 100%;
-/* border-left: 1px solid #212121; */
+/* border-left: 1px solid #000000; */
 text-align: center;vertical-align: middle;}
 </style>
