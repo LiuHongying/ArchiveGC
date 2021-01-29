@@ -729,7 +729,7 @@ export default {
       folderDialogVisible: false,
       clientPermission: 0,
       permit: 1,
-      permitdoc: 1
+      permitdoc: 1,
       systemPermission:0,
       userPermission:0
     };
