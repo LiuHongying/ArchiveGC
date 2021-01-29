@@ -33,7 +33,18 @@
 </template>
 <script>
 import DataLayout from "@/components/ecm-data-layout";
-import { workFlowMonth, avWorkFlow, srWorkFlow, otherFileFlow, designWorkFlow, commercialWorkFlow } from "./report/";
+import {
+  workFlowMonth,
+  avWorkFlow,
+  srWorkFlow,
+  otherFileFlow,
+  designWorkFlow,
+  commercialWorkFlow,
+  fileRecWorkFlow,
+  fileUpdateWorkFlow,
+  fileRemoveWorkFlow,
+  otherFileUseWorkFlow
+} from "./report/";
 export default {
   name: "RecordReport",
   data() {
@@ -86,13 +97,13 @@ export default {
         {
           id: "2-0",
           label: "档案接收",
-          component: "",
+          component: "fileRecWorkFlow",
           children: "",
         },
         {
           id: "3-0",
           label: "档案升版",
-          component: "",
+          component: "fileUpdateWorkFlow",
           children: "",
         },
         {
@@ -104,7 +115,7 @@ export default {
         {
           id: "5-0",
           label: "非密档案利用情况",
-          component: "",
+          component: "otherFileUseWorkFlow",
           children: "",
         },
       ],
@@ -125,9 +136,13 @@ export default {
     otherFileFlow: otherFileFlow,
     designWorkFlow: designWorkFlow,
     commercialWorkFlow: commercialWorkFlow,
+    fileRecWorkFlow: fileRecWorkFlow,
+    fileUpdateWorkFlow: fileUpdateWorkFlow,
+    fileRemoveWorkFlow: fileRemoveWorkFlow,
+    otherFileUseWorkFlow: otherFileUseWorkFlow,
   },
 
-  created(){
+  created() {
     this.leftPercent = this.getStorageNumber(this.leftStorageName, 20);
   },
 

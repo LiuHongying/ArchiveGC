@@ -60,12 +60,6 @@ export default {
           data: [],
           columns: [
             {
-              prop: "avType",
-              label: "文件类型",
-              fixed: true,
-              width: 110,
-            },
-            {
               prop: "wfMonth",
               label: "日期",
               fixed: true,

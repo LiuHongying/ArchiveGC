@@ -251,9 +251,6 @@
                       >批量导入</el-button>
                       </el-form-item>
                       <el-form-item>
-                        <AddToArchive :folderId="currentFolder.id" :archiveObjects="selectedItems" @savesuccess='searchItem' ></AddToArchive>
-                      </el-form-item>
-                      <el-form-item>
                       <el-button
                         type="primary"
                         plain
@@ -263,7 +260,7 @@
                         @click="beforeMount(selectedItems,true);"
                       >挂载文件</el-button>
                       </el-form-item>
-                      <el-form-item>
+                      <!-- <el-form-item>
                       <el-button
                         type="warning"
                         plain
@@ -278,7 +275,7 @@
                         })"
                         :title="$t('application.delete')+$t('application.document')"
                       >{{$t('application.delete')}}</el-button> 
-                      </el-form-item>
+                      </el-form-item> -->
                       <el-form-item>
                       <el-button
                         type="primary"
@@ -458,30 +455,46 @@
                           </div>
                           <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item divided>
-                              <span @click="beforeModify()" style="display:block;">
+                              <el-button @click="beforeModify()" style="display:block;width:117px" type="primary" plain size="small"> 
                                 <i class="el-icon-s-tools"></i>
-                                修改
-                              </span>
+                                批量修改
+                              </el-button>
                             </el-dropdown-item>
                             <el-dropdown-item divided>
-                              <span @click="batchUpdateVisible=true" style="display:block;">
-                                <i class="el-icon-s-tools"></i>
-                                更新
-                              </span>
+                              <el-button @click="batchUpdateVisible=true" style="display:block;width:117px" type="primary" plain size="small">
+                                <i class="el-icon-upload"></i>
+                                批量更新
+                              </el-button>
                             </el-dropdown-item>
                              
                             <el-dropdown-item divided>
-                              <span @click="exportData()" style="display:block;">
-                                <i class="el-icon-s-tools"></i>
+                              <el-button @click="exportData()" style="display:block;width:117px" type="primary" plain size="small"> 
+                                <i class="el-icon-download"></i>
                                 导出EXCEL
-                              </span>
+                              </el-button>
                             </el-dropdown-item>
                             <el-dropdown-item divided>
-                              <span @click="SearchBusinessDC()" style="display:block;">
-                                <i class="el-icon-s-tools"></i>
+                              <el-button @click="SearchBusinessDC()" style="display:block;width:117px" type="primary" plain size="small"> 
+                                <i class="el-icon-search"></i>
                                 商务文件查询
-                              </span>
+                              </el-button>
                             </el-dropdown-item>
+                          
+                      <el-dropdown-item divided>
+                        <AddToArchive :folderId="currentFolder.id" :archiveObjects="selectedItems" @savesuccess='searchItem' ></AddToArchive>
+                      </el-dropdown-item>
+                      <el-dropdown-item divided>
+                          <el-button  @click="logicallyDel(selectedItems,function(){
+                          let _self=this;
+                          if(_self.$refs.leftDataGrid){
+                              _self.$refs.leftDataGrid.itemDataList = [];
+                            }
+                          _self.loadGridData(_self.currentFolder);
+                        })" style="display:block; width:117px" type="warning" plain size="small" >
+                        <i class="el-icon-document-delete" ></i>
+                        删 除
+                          </el-button>
+                          </el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
                       </el-form-item>                      
@@ -507,6 +520,7 @@
                         gridViewName="ArrangeGrid"
                         @rowclick="beforeShowInnerFile"
                         @selectchange="selectChange"
+                        @changeGridName="changeDataGridName"
                         :showBatchCheck="true"
                       ></DataGrid>
                     </el-col>
@@ -576,8 +590,9 @@
                         :isshowSelection="true"
                         :folderId="mainParam.folderId"
                         showOptions="查看内容"
-                        :isShowChangeList="false"
-                        :optionWidth = "2"
+                        :isShowChangeList="true"
+                        :isshowCustom="true"
+                        :optionWidth = "3"
                         @selectchange="selectInnerChange"
                         :showBatchCheck="true"
                       ></DataGrid>
@@ -782,6 +797,7 @@ export default {
       },
       loadInfo:false,
       volumeInArchiveGridName:"",
+      innerGridName:""
     };
   },
   
@@ -929,11 +945,20 @@ export default {
           console.log('(*￣︶￣)')
       }
     },
+    changeDataGridName(val){
+      this.innerGridName = val;
+    },
     exportData() {
       let _self = this;
+      var gridViewName = "";
+      if(_self.innerGridName!=""){
+        gridViewName = _self.innerGridName;
+      }else{
+        gridViewName = _self.$refs.mainDataGrid.gridViewName;
+      }
       let params = {
         URL: "/file/exportFolderPath",
-        gridName: _self.$refs.mainDataGrid.gridViewName,
+        gridName: gridViewName,
         folderId: _self.currentFolder.id,
         orderBy: "MODIFIED_DATE desc",
         condition: _self.$refs.mainDataGrid.condition,
@@ -941,7 +966,6 @@ export default {
         pageIndex: _self.currentPage - 1,
         lang: "zh-cn",
       };
-      console.log(params);
       ExcelUtil.export4Cnpe(params);
     },
     // 水平分屏事件
@@ -1301,7 +1325,7 @@ export default {
         .then(function(response) {
           _self.$refs.printVolumes.isBusiness= false
           if(response.data.code=='1'){
-            if(selectedRows[0].TYPE_NAME=='合同管理案卷'){    
+            if(selectedRows[0].C_ARC_CLASSIC=='商务管理'){    
               _self.$refs.printVolumes.isBusiness = true
             }
             _self.$refs.printVolumes.selectedRows = selectedRows

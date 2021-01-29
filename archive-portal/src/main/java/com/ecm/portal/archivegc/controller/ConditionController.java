@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecm.common.util.JSONUtils;
 import com.ecm.core.ActionContext;
 import com.ecm.core.entity.EcmDocument;
+import com.ecm.core.entity.EcmFolder;
+import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.service.DocumentService;
+import com.ecm.core.service.FolderService;
 import com.ecm.portal.controller.ControllerAbstract;
 
 @RestController
@@ -27,36 +27,46 @@ public class ConditionController extends ControllerAbstract {
 	@Autowired
 	private DocumentService documentService;
 	
+	@Autowired
+	private FolderService folderService;
+	
 	@PostMapping("save")
 	@ResponseBody
-	public void saveCondition(@RequestBody String argStr) throws Exception{
-		Map<String, Object> conditionMap = JSONUtils.stringToMap(argStr);
-		
-		EcmDocument doc = documentService.getObjectById(getToken(), conditionMap.get("Id").toString());
-		doc.addAttribute("CREATOR", conditionMap.get("User").toString());
-		doc.addAttribute("NAME", conditionMap.get("Name").toString());
-		doc.addAttribute("ITEM_CONTENT", conditionMap.get("Condition").toString());
-		documentService.updateObject(getToken(), doc);
-	}
-	
-	@PostMapping("load")
-	@ResponseBody
-	public Map<String, Object> loadCondition(HttpServletRequest request, HttpServletResponse response, @RequestBody String argStr) throws Exception{
+	public Map<String, Object> saveCondition(@RequestBody String argStr) throws Exception{
 		Map<String, Object> mp = new HashMap<String, Object>();
-		Map<String, Object> args = JSONUtils.stringToMap(argStr);
+		Map<String, Object> conditionMap = JSONUtils.stringToMap(argStr);
+		EcmDocument doc = new EcmDocument();
+		EcmFolder fld;
+		try {
+			fld = folderService.getObjectByPath(getToken(), "/表单/订阅单");
+			doc.setFolderId(fld.getId());
+			doc.setAclName(fld.getAclName());
+			doc.addAttribute("NAME", conditionMap.get("Name").toString());
+			doc.addAttribute("ITEM_CONTENT", conditionMap.get("Condition").toString());
+			doc.addAttribute("TYPE_NAME", "订阅单");
+			String id = documentService.newObject(getToken(), doc, null);
+			mp.put("code", ActionContext.SUCESS);
+		} catch (AccessDeniedException e) {
+			mp.put("code", ActionContext.TIME_OUT);
+		}
+		return mp;
+	}
+	@ResponseBody
+	@RequestMapping("load")
+	public Map<String, Object> loadCondition() throws Exception{
+		Map<String, Object> mp = new HashMap<String, Object>();
 		List<Map<String, Object> > outList = new ArrayList<Map<String, Object>>();
 		Map<String, Object> projMap = new HashMap<String, Object>();
 		
-		String loginName= args.get("User").toString();
-				
-		String searchCondition = " select * from ecm_document ed where CREATOR = '" + loginName + "' and IS_RELEASED = 1 and STATUS='已入库' and IS_HIDDEN=0 ";
-		
+		String loginName= this.getSession().getCurrentUser().getUserName();
+		EcmFolder fld=folderService.getObjectByPath(getToken(), "/表单/订阅单");
+		String searchCondition = " select * from ecm_document ed where CREATOR = '" + loginName + "' and FOLDER_ID='"+fld.getId()+"'";
 		try {
 			List<Map<String,Object>> conditionList =documentService.getMapList(getToken(), searchCondition);
 			for(int i = 0; i < conditionList.size(); i++) {
 				projMap = new HashMap<String, Object>();
-				projMap.put("ID", conditionList.get(i).get("ID"));
 				projMap.put("Name", conditionList.get(i).get("NAME"));
+				projMap.put("id", conditionList.get(i).get("ID"));
 				projMap.put("Condition", conditionList.get(i).get("ITEM_CONTENT"));
 				outList.add(projMap);
 			}
@@ -66,6 +76,20 @@ public class ConditionController extends ControllerAbstract {
 			mp.put("code", ActionContext.FAILURE);
 		}
 		
+		return mp;
+	}
+	@PostMapping("delete")
+	@ResponseBody
+	public Map<String, Object> deletCondition(@RequestBody String argStr) throws Exception{
+		Map<String, Object> mp = new HashMap<String, Object>();
+		Map<String, Object> args = JSONUtils.stringToMap(argStr);
+		try {
+			String id = args.get("id").toString();
+			documentService.deleteObjectById(getToken(), id);
+			mp.put("code", ActionContext.SUCESS);
+		} catch (AccessDeniedException e) {
+			mp.put("code", ActionContext.TIME_OUT);
+		}
 		return mp;
 	}
 	
