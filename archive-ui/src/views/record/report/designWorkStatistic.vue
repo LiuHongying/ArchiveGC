@@ -35,7 +35,7 @@
         v-loading="loading"
         :height="layout.height"
       >
-        <el-table-column type="index" width="30" fixed></el-table-column>
+        <el-table-column type="index" width="40" fixed></el-table-column>
         <el-table-column
           v-for="item in tables.mainTable.columns"
           :key="item.prop"
