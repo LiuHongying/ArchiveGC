@@ -191,7 +191,7 @@
                   :label="citem.label"
                   :prop="citem.attrName"
                   :min-width="citem.width"
-                  :sortable="citem.allowOrderby"
+                  :sortable="sortBackData?'custom':citem.allowOrderby"
                   :key="idx + '_C'"
                 >
                   <template slot-scope="scope">
@@ -214,7 +214,7 @@
                   :label="citem.label"
                   :width="citem.width"
                   :prop="citem.attrName"
-                  :sortable="citem.allowOrderby"
+                  :sortable="sortBackData?'custom':citem.allowOrderby"
                   :key="idx + '_C'"
                 >
                   <template slot-scope="scope">
@@ -1113,9 +1113,18 @@ export default {
       if(column.column.order == null){
         this.orderBy = "";
       }else if(column.column.order == "ascending"){
-        this.orderBy = column.column.property +' ASC'
+        if(column.column.property == "C_STORE_CODING"){
+          this.orderBy = "(" +column.column.property +'+0) ASC'
+        }else{
+          this.orderBy = column.column.property +' ASC'
+        }
+        
       }else{
-        this.orderBy = column.column.property +' DESC'
+        if(column.column.property == "C_STORE_CODING"){
+          this.orderBy ="(" + column.column.property +'+0) DESC'
+        }else{
+           this.orderBy = column.column.property +' DESC'
+        }
       }
       console.log("orderBy:"+this.orderBy);
       if(this.sortBackData){
