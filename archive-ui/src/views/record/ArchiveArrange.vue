@@ -521,6 +521,7 @@
                         @selectchange="selectChange"
                         @changeGridName="changeDataGridName"
                         :showBatchCheck="true"
+                        :sortBackData="true"
                       ></DataGrid>
                     </el-col>
                   </el-row>

@@ -406,6 +406,7 @@ export default {
       currentDocIndex: 0,
       prevButtonDisabled:true,
       nextButtonDisabled:true,
+      orderBy:""
     };
   },
   props: {
@@ -436,6 +437,7 @@ export default {
     folderId:{type:String,default:""},//目录ID
     isLoadGridInfo: { type: Boolean, default: true },
     showBatchCheck: { type: Boolean, default: false },
+    sortBackData: { type: Boolean, default: false },//后台排序
     extparam:{type:Map,default:null}
   },
   watch: {
@@ -608,7 +610,12 @@ export default {
       }
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", _self.currentPage - 1);
-      m.set("orderBy", "");
+      if(_self.sortBackData){
+        m.set("orderBy", _self.orderBy);
+      }else{
+        m.set("orderBy", "");
+      }
+      
       axios
         .post(this.dataUrl, JSON.stringify(m))
         .then(function (response) {
@@ -1103,10 +1110,17 @@ export default {
       console.log(JSON.stringify(column));
       console.log(column.column.property);
       console.log(column.column.order); //ascending, descending
-      this.orderBy =
-        column.column.property + column.column.order == "ascending"
-          ? " ASC"
-          : " DESC";
+      if(column.column.order == null){
+        this.orderBy = "";
+      }else if(column.column.order == "ascending"){
+        this.orderBy = column.column.property +' ASC'
+      }else{
+        this.orderBy = column.column.property +' DESC'
+      }
+      console.log("orderBy:"+this.orderBy);
+      if(this.sortBackData){
+        this.loadGridData();
+      }
     },
     rowClick(row) {
       this.selectedRow = row;
