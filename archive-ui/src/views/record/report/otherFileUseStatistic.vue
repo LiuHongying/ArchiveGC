@@ -1,7 +1,7 @@
 <template>
   <DataLayout>
     <template v-slot:header style="height: auto">
-      <el-form :inline="true">
+      <el-form :inline="true" :size="fomrSize">
         <el-form-item>
           <el-date-picker
             v-model="yearS"
@@ -14,8 +14,7 @@
             <el-option
               v-for="item in options"
               :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-bind="item"
             >
             </el-option>
           </el-select>
@@ -31,15 +30,13 @@
       <el-table
         ref="mainTable"
         :data="tables.mainTable.data"
-        :span-method="objectSpanMethod"
         border
         stripe
-        size="mini"
+        :size="fomrSize"
         v-loading="loading"
         :height="layout.height"
       >
-        <el-table-column type="index" width="30" fixed></el-table-column>
-        <el-table-column width="120" prop="date"></el-table-column>
+        <el-table-column type="index" width="50"></el-table-column>
         <template v-for="item in tables.mainTable.columns">
           <el-table-column
             v-if="item.displayNum == '0'"
@@ -66,6 +63,8 @@ export default {
     return {
       spanArr: [],
       yearS: "",
+      loading: false,
+      fomrSize: 'small',
 
       tables: {
         mainTable: {
@@ -75,134 +74,96 @@ export default {
               prop: "fileType",
               label: "文件类型",
               displayNum: "0",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "typeClass",
               label: "类别",
               displayNum: "0",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "unitType",
               label: "单位",
               displayNum: "0",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitMonth1",
               label: "一月",
               displayNum: "1",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitMonth2",
               label: "二月",
               displayNum: "1",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitMonth3",
               label: "三月",
               displayNum: "1",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitQuarter",
               label: "第一季度",
               displayNum: "1",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitMonth1",
               label: "四月",
               displayNum: "2",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitMonth2",
               label: "五月",
               displayNum: "2",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitMonth3",
               label: "六月",
               displayNum: "2",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitQuarter",
               label: "第二季度",
               displayNum: "2",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitMonth1",
               label: "七月",
               displayNum: "3",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitMonth2",
               label: "八月",
               displayNum: "3",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitMonth3",
               label: "九月",
               displayNum: "3",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitQuarter",
               label: "第三季度",
               displayNum: "3",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitMonth1",
               label: "十月",
               displayNum: "4",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitMonth2",
               label: "十一月",
               displayNum: "4",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitMonth3",
               label: "十二月",
               displayNum: "4",
-              fixed: true,
-              width: 110,
             },
             {
               prop: "drawCountSuitQuarter",
               label: "第四季度",
               displayNum: "4",
-              fixed: true,
-              width: 110,
             },
           ],
         },
@@ -239,7 +200,7 @@ export default {
       let _self = this;
       _self.loading = true;
 
-      var m = new Map();
+      let m = new Map();
       m.set("yearSelect", _self.yearS);
       m.set("quarterSelect", _self.value);
 
@@ -247,7 +208,6 @@ export default {
         .post("/dms/record/openFileWorkStatistic", JSON.stringify(m))
         .then(function (response) {
           _self.tables.mainTable.data = response.data.data;
-          console.log(_self.tables.mainTable.data);
           _self.loading = false;
         })
         .catch(function (error) {
