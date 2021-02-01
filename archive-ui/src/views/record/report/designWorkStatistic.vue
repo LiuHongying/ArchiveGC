@@ -90,6 +90,12 @@ export default {
               width: 110,
             },
             {
+              prop: "reTCDoc",
+              label: "两卡",
+              fixed: true,
+              width: 110,
+            },
+            {
               prop: "storeDoc",
               label: "作废",
               fixed: true,
