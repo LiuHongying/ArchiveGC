@@ -72,7 +72,7 @@ public class ReportCreateController extends ControllerAbstract {
 					"	  if(eag.ACTION_NAME = '入库' and  ed.C_ITEM_TYPE = '案卷',1,0) ismodify," + 
 					"	  if(eag.ACTION_NAME = '入库' and  ed.C_ITEM_TYPE = '文件',1,0) iszj " + 
 					"	  from ecm_audit_general eag,ecm_document ed " + 
-					"	  where ed.id=eag.DOC_ID "+ timeCheck +" ) tt  " + 
+					"	  where ed.id=eag.DOC_ID and ed.C_ARC_CLASSIC is not null "+ timeCheck +" ) tt  " + 
 					"group by USER_NAME,TYPE_NAME,ymd order by ymd desc";
 			
 			List<Map<String, Object>> listWorkStatistic = documentService.getMapList(getToken(), sqlStatistic);
@@ -182,15 +182,16 @@ public class ReportCreateController extends ControllerAbstract {
 				timeCheck = setSQLTimeEmp();
 			}
 			
-			String sqlStatistic = "select USER_NAME,ymd," + 
-					"sum(iszl) as workstorcount,sum(iszf) as workgetcount,sum(ismodify) as workstjorcount,sum(iszj) as workgetjicount " + 
-					"from (select eag.ID,eag.USER_NAME,DATE_FORMAT(eag.EXCUTE_DATE, '%Y-%m-%d') as ymd," + 
+			String sqlStatistic = "select USER_NAME,TYPE_NAME,ymd," + 
+					"sum(iszl) as workstorcount,sum(iszf) as workgetcount, sum(isliangka) as workTCcount,sum(ismodify) as workstjorcount,sum(iszj) as workgetjicount " + 
+					"from (select eag.ID,eag.USER_NAME,ed.TYPE_NAME,DATE_FORMAT(eag.EXCUTE_DATE, '%Y-%m-%d') as ymd," + 
 					"	  if(eag.ACTION_NAME = '著录',1,0) iszl,if(ed.STATUS='作废',1,0) iszf," + 
 					"	  if(ed.TYPE_NAME = '设计文件修改单',1,0) ismodify," + 
-					"	  if(eag.ACTION_NAME ='质检',1,0) iszj " + 
+					"	  if(eag.ACTION_NAME ='质检',1,0) iszj, "+ 
+					"     if(ed.C_COMMENT like '%两卡%', 1, 0) isliangka" + 
 					"	  from ecm_audit_general eag,ecm_document ed " + 
-					"	  where ed.id=eag.DOC_ID "+ timeCheck +" ) tt  " + 
-					"group by USER_NAME ,ymd order by ymd desc";
+					"	  where ed.id=eag.DOC_ID and ed.C_ARC_CLASSIC is not null "+ timeCheck +" ) tt  " + 
+					"group by USER_NAME,TYPE_NAME ,ymd order by ymd desc";
 			
 			List<Map<String, Object>> listWorkStatistic = documentService.getMapList(getToken(), sqlStatistic);
 				
@@ -205,6 +206,8 @@ public class ReportCreateController extends ControllerAbstract {
 				projMap.put("receFiles", receFiles);
 				Number receDoc = getSponsorFor(listWorkStatistic, "workstjorcount", i);
 				projMap.put("receDoc", receDoc);
+				Number reTCDoc = getSponsorFor(listWorkStatistic, "workTCcount", i);
+				projMap.put("reTCDoc", reTCDoc);
 				Number storeFiles = getSponsorFor(listWorkStatistic, "workgetcount", i);
 				projMap.put("storeFiles", storeFiles);
 				Number storeDoc = getSponsorFor(listWorkStatistic, "workgetjicount", i);
@@ -1242,6 +1245,9 @@ public class ReportCreateController extends ControllerAbstract {
 			List<Map<String, Object>> listFileSuit = documentService.getMapList(getToken(), sqlFileSuit);
 			List<Map<String, Object>> listFileVolume = documentService.getMapList(getToken(), sqlFileVolume);
 			
+			projMap.put("fileType", "设计");
+			projMap.put("typeClass", "图纸");
+			projMap.put("unitType", "套");
 			Number drawCountSuitMonth1 = getSponsorT(listDrawingSuit, "month1");
 			projMap.put("drawCountSuitMonth1", drawCountSuitMonth1);
 			Number drawCountSuitMonth2 = getSponsorT(listDrawingSuit, "month2");
@@ -1254,38 +1260,47 @@ public class ReportCreateController extends ControllerAbstract {
 			outList.add(projMap);
 			
 			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "设计");
+			projMap.put("typeClass", "图纸");
+			projMap.put("unitType", "张");
 			Number drawCountSheetMonth1 = getSponsorT(listDrawingSheet, "month1");
-			projMap.put("drawCountSheetMonth1", drawCountSheetMonth1);
+			projMap.put("drawCountSuitMonth1", drawCountSheetMonth1);
 			Number drawCountSheetMonth2 = getSponsorT(listDrawingSheet, "month2");
-			projMap.put("drawCountSheetMonth2", drawCountSheetMonth2);
+			projMap.put("drawCountSuitMonth2", drawCountSheetMonth2);
 			Number drawCountSheetMonth3 = getSponsorT(listDrawingSheet, "month3");
-			projMap.put("drawCountSheetMonth3", drawCountSheetMonth3);
+			projMap.put("drawCountSuitMonth3", drawCountSheetMonth3);
 			Number drawCountSheetQuarter = getSponsorT(listDrawingSheet, "quarterCount");
-			projMap.put("drawCountSheetQuarter", drawCountSheetQuarter);
+			projMap.put("drawCountSuitQuarter", drawCountSheetQuarter);
 			
 			outList.add(projMap);
 			
 			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "设计");
+			projMap.put("typeClass", "文件");
+			projMap.put("unitType", "套");
 			Number fileCountSuitMonth1 = getSponsorT(listFileSuit, "month1");
-			projMap.put("fileCountSuitMonth1", fileCountSuitMonth1);
+			projMap.put("drawCountSuitMonth1", fileCountSuitMonth1);
 			Number fileCountSuitMonth2 = getSponsorT(listFileSuit, "month2");
-			projMap.put("fileCountSuitMonth2", fileCountSuitMonth2);
+			projMap.put("drawCountSuitMonth2", fileCountSuitMonth2);
 			Number fileCountSuitMonth3 = getSponsorT(listFileSuit, "month3");
-			projMap.put("fileCountSuitMonth3", fileCountSuitMonth3);
+			projMap.put("drawCountSuitMonth3", fileCountSuitMonth3);
 			Number fileCountSuitQuarter = getSponsorT(listFileSuit, "quarterCount");
-			projMap.put("fileCountSuitQuarter", fileCountSuitQuarter);
+			projMap.put("drawCountSuitQuarter", fileCountSuitQuarter);
 			
 			outList.add(projMap);
 			
 			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "设计");
+			projMap.put("typeClass", "文件");
+			projMap.put("unitType", "张");
 			Number fileCountVolumeMonth1 = getSponsorT(listFileVolume, "month1");
-			projMap.put("fileCountVolumeMonth1", fileCountVolumeMonth1);
+			projMap.put("drawCountSuitMonth1", fileCountVolumeMonth1);
 			Number fileCountVolumeMonth2 = getSponsorT(listFileVolume, "month2");
-			projMap.put("fileCountVolumeMonth2", fileCountVolumeMonth2);
+			projMap.put("drawCountSuitMonth2", fileCountVolumeMonth2);
 			Number fileCountVolumeMonth3 = getSponsorT(listFileVolume, "month3");
-			projMap.put("fileCountVolumeMonth3", fileCountVolumeMonth3);
+			projMap.put("drawCountSuitMonth3", fileCountVolumeMonth3);
 			Number fileCountVolumeQuarter = getSponsorT(listFileVolume, "quarterCount");
-			projMap.put("fileCountVolumeQuarter", fileCountVolumeQuarter);
+			projMap.put("drawCountSuitQuarter", fileCountVolumeQuarter);
 			
 			outList.add(projMap);
 			                    
@@ -1356,6 +1371,9 @@ public class ReportCreateController extends ControllerAbstract {
 				List<Map<String, Object>> listFileSuit = documentService.getMapList(getToken(), sqlFileSuit);
 				List<Map<String, Object>> listFileVolume = documentService.getMapList(getToken(), sqlFileVolume);
 				
+				projMap.put("fileType", "设计");
+				projMap.put("typeClass", "图纸");
+				projMap.put("unitType", "套");
 				Number drawCountSuitMonth1 = getSponsorT(listDrawingSuit, "month1");
 				projMap.put("drawCountSuitMonth1", drawCountSuitMonth1);
 				Number drawCountSuitMonth2 = getSponsorT(listDrawingSuit, "month2");
@@ -1368,38 +1386,47 @@ public class ReportCreateController extends ControllerAbstract {
 				outList.add(projMap);
 				
 				projMap = new HashMap<String, Object>(); 
+				projMap.put("fileType", "设计");
+				projMap.put("typeClass", "图纸");
+				projMap.put("unitType", "张");
 				Number drawCountSheetMonth1 = getSponsorT(listDrawingSheet, "month1");
-				projMap.put("drawCountSheetMonth1", drawCountSheetMonth1);
+				projMap.put("drawCountSuitMonth1", drawCountSheetMonth1);
 				Number drawCountSheetMonth2 = getSponsorT(listDrawingSheet, "month2");
-				projMap.put("drawCountSheetMonth2", drawCountSheetMonth2);
+				projMap.put("drawCountSuitMonth2", drawCountSheetMonth2);
 				Number drawCountSheetMonth3 = getSponsorT(listDrawingSheet, "month3");
-				projMap.put("drawCountSheetMonth3", drawCountSheetMonth3);
+				projMap.put("drawCountSuitMonth3", drawCountSheetMonth3);
 				Number drawCountSheetQuarter = getSponsorT(listDrawingSheet, "quarterCount");
-				projMap.put("drawCountSheetQuarter", drawCountSheetQuarter);
+				projMap.put("drawCountSuitQuarter", drawCountSheetQuarter);
 				
 				outList.add(projMap);
 				
 				projMap = new HashMap<String, Object>(); 
+				projMap.put("fileType", "设计");
+				projMap.put("typeClass", "文件");
+				projMap.put("unitType", "套");
 				Number fileCountSuitMonth1 = getSponsorT(listFileSuit, "month1");
-				projMap.put("fileCountSuitMonth1", fileCountSuitMonth1);
+				projMap.put("drawCountSuitMonth1", fileCountSuitMonth1);
 				Number fileCountSuitMonth2 = getSponsorT(listFileSuit, "month2");
-				projMap.put("fileCountSuitMonth2", fileCountSuitMonth2);
+				projMap.put("drawCountSuitMonth2", fileCountSuitMonth2);
 				Number fileCountSuitMonth3 = getSponsorT(listFileSuit, "month3");
-				projMap.put("fileCountSuitMonth3", fileCountSuitMonth3);
+				projMap.put("drawCountSuitMonth3", fileCountSuitMonth3);
 				Number fileCountSuitQuarter = getSponsorT(listFileSuit, "quarterCount");
-				projMap.put("fileCountSuitQuarter", fileCountSuitQuarter);
+				projMap.put("drawCountSuitQuarter", fileCountSuitQuarter);
 				
 				outList.add(projMap);
 				
 				projMap = new HashMap<String, Object>(); 
+				projMap.put("fileType", "设计");
+				projMap.put("typeClass", "文件");
+				projMap.put("unitType", "册");
 				Number fileCountVolumeMonth1 = getSponsorT(listFileVolume, "month1");
-				projMap.put("fileCountVolumeMonth1", fileCountVolumeMonth1);
+				projMap.put("drawCountSuitMonth1", fileCountVolumeMonth1);
 				Number fileCountVolumeMonth2 = getSponsorT(listFileVolume, "month2");
-				projMap.put("fileCountVolumeMonth2", fileCountVolumeMonth2);
+				projMap.put("drawCountSuitMonth2", fileCountVolumeMonth2);
 				Number fileCountVolumeMonth3 = getSponsorT(listFileVolume, "month3");
-				projMap.put("fileCountVolumeMonth3", fileCountVolumeMonth3);
+				projMap.put("drawCountSuitMonth3", fileCountVolumeMonth3);
 				Number fileCountVolumeQuarter = getSponsorT(listFileVolume, "quarterCount");
-				projMap.put("fileCountVolumeQuarter", fileCountVolumeQuarter);
+				projMap.put("drawCountSuitQuarter", fileCountVolumeQuarter);
 				
 				outList.add(projMap);
 				                    
@@ -1446,14 +1473,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> borrowSuitCountStatistic = documentService.getMapList(getToken(), borrowSuitCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "借阅");
+			projMap.put("unitType", "套");
 			Number borrowSuitMonth1 = getSponsorT(borrowSuitCountStatistic, "month1");
-			projMap.put("borrowSuitMonth1", borrowSuitMonth1);
+			projMap.put("drawCountSuitMonth1", borrowSuitMonth1);
 			Number borrowSuitMonth2 = getSponsorT(borrowSuitCountStatistic, "month2");
-			projMap.put("borrowSuitMonth2", borrowSuitMonth2);
+			projMap.put("drawCountSuitMonth2", borrowSuitMonth2);
 			Number borrowSuitMonth3 = getSponsorT(borrowSuitCountStatistic, "month3");
-			projMap.put("borrowSuitMonth3", borrowSuitMonth3);
+			projMap.put("drawCountSuitMonth3", borrowSuitMonth3);
 			Number borrowSuitQuarter = getSponsorT(borrowSuitCountStatistic, "quarterCount");
-			projMap.put("borrowSuitQuarter", borrowSuitQuarter);
+			projMap.put("drawCountSuitQuarter", borrowSuitQuarter);
 			
 			outList.add(projMap);
 			
@@ -1468,14 +1498,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> borrowSheetCountStatistic = documentService.getMapList(getToken(), borrowSheetCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "借阅");
+			projMap.put("unitType", "册");
 			Number borrowSheetMonth1 = getSponsorT(borrowSheetCountStatistic, "month1");
-			projMap.put("borrowSheetMonth1", borrowSheetMonth1);
+			projMap.put("drawCountSuitMonth1", borrowSheetMonth1);
 			Number borrowSheetMonth2 = getSponsorT(borrowSheetCountStatistic, "month2");
-			projMap.put("borrowSheetMonth2", borrowSheetMonth2);
+			projMap.put("drawCountSuitMonth2", borrowSheetMonth2);
 			Number borrowSheetMonth3 = getSponsorT(borrowSheetCountStatistic, "month3");
-			projMap.put("borrowSheetMonth3", borrowSheetMonth3);
+			projMap.put("drawCountSuitMonth3", borrowSheetMonth3);
 			Number borrowSheetQuarter = getSponsorT(borrowSheetCountStatistic, "quarterCount");
-			projMap.put("borrowSheetQuarter", borrowSheetQuarter);
+			projMap.put("drawCountSuitQuarter", borrowSheetQuarter);
 			
 			outList.add(projMap);
 			
@@ -1490,14 +1523,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> borrowPersonCountStatistic = documentService.getMapList(getToken(), borrowPersonCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "借阅");
+			projMap.put("unitType", "人次");
 			Number borrowPersonMonth1 = getSponsorT(borrowPersonCountStatistic, "month1");
-			projMap.put("borrowPersonMonth1", borrowPersonMonth1);
+			projMap.put("drawCountSuitMonth1", borrowPersonMonth1);
 			Number borrowPersonMonth2 = getSponsorT(borrowPersonCountStatistic, "month2");
-			projMap.put("borrowPersonMonth2", borrowPersonMonth2);
+			projMap.put("drawCountSuitMonth2", borrowPersonMonth2);
 			Number borrowPersonMonth3 = getSponsorT(borrowPersonCountStatistic, "month3");
-			projMap.put("borrowPersonMonth3", borrowPersonMonth3);
+			projMap.put("drawCountSuitMonth3", borrowPersonMonth3);
 			Number borrowPersonQuarter = getSponsorT(borrowPersonCountStatistic, "quarterCount");
-			projMap.put("borrowPersonQuarter", borrowPersonQuarter);
+			projMap.put("drawCountSuitQuarter", borrowPersonQuarter);
 			
 			outList.add(projMap);
 			
@@ -1512,14 +1548,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> borrowBackSuitCountStatistic = documentService.getMapList(getToken(), borrowBackSuitCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "借阅归还");
+			projMap.put("unitType", "套");
 			Number borrowBackSuitMonth1 = getSponsorT(borrowBackSuitCountStatistic, "month1");
-			projMap.put("borrowBackSuitMonth1", borrowBackSuitMonth1);
+			projMap.put("drawCountSuitMonth1", borrowBackSuitMonth1);
 			Number borrowBackSuitMonth2 = getSponsorT(borrowBackSuitCountStatistic, "month2");
-			projMap.put("borrowBackSuitMonth2", borrowBackSuitMonth2);
+			projMap.put("drawCountSuitMonth2", borrowBackSuitMonth2);
 			Number borrowBackSuitMonth3 = getSponsorT(borrowBackSuitCountStatistic, "month3");
-			projMap.put("borrowBackSuitMonth3", borrowBackSuitMonth3);
+			projMap.put("drawCountSuitMonth3", borrowBackSuitMonth3);
 			Number borrowBackSuitQuarter = getSponsorT(borrowBackSuitCountStatistic, "quarterCount");
-			projMap.put("borrowBackSuitQuarter", borrowBackSuitQuarter);
+			projMap.put("drawCountSuitQuarter", borrowBackSuitQuarter);
 			
 			outList.add(projMap);
 			
@@ -1534,14 +1573,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> borrowBackSheetCountStatistic = documentService.getMapList(getToken(), borrowBackSheetCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "借阅归还");
+			projMap.put("unitType", "册");
 			Number borrowBackSheetMonth1 = getSponsorT(borrowBackSheetCountStatistic, "month1");
-			projMap.put("borrowBackSheetMonth1", borrowBackSheetMonth1);
+			projMap.put("drawCountSuitMonth1", borrowBackSheetMonth1);
 			Number borrowBackSheetMonth2 = getSponsorT(borrowBackSheetCountStatistic, "month2");
-			projMap.put("borrowBackSheetMonth2", borrowBackSheetMonth2);
+			projMap.put("drawCountSuitMonth2", borrowBackSheetMonth2);
 			Number borrowBackSheetMonth3 = getSponsorT(borrowBackSheetCountStatistic, "month3");
-			projMap.put("borrowBackSheetMonth3", borrowBackSheetMonth3);
+			projMap.put("drawCountSuitMonth3", borrowBackSheetMonth3);
 			Number borrowBackSheetQuarter = getSponsorT(borrowBackSheetCountStatistic, "quarterCount");
-			projMap.put("borrowBackSheetQuarter", borrowBackSheetQuarter);
+			projMap.put("drawCountSuitQuarter", borrowBackSheetQuarter);
 			
 			outList.add(projMap);
 			
@@ -1556,14 +1598,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> borrowBackPersonCountStatistic = documentService.getMapList(getToken(), borrowBackPersonCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "借阅归还");
+			projMap.put("unitType", "人次");
 			Number borrowBackPersonMonth1 = getSponsorT(borrowBackPersonCountStatistic, "month1");
-			projMap.put("borrowBackPersonMonth1", borrowBackPersonMonth1);
+			projMap.put("drawCountSuitMonth1", borrowBackPersonMonth1);
 			Number borrowBackPersonMonth2 = getSponsorT(borrowBackPersonCountStatistic, "month2");
-			projMap.put("borrowBackPersonMonth2", borrowBackPersonMonth2);
+			projMap.put("drawCountSuitMonth2", borrowBackPersonMonth2);
 			Number borrowBackPersonMonth3 = getSponsorT(borrowBackPersonCountStatistic, "month3");
-			projMap.put("borrowBackPersonMonth3", borrowBackPersonMonth3);
+			projMap.put("drawCountSuitMonth3", borrowBackPersonMonth3);
 			Number borrowBackPersonQuarter = getSponsorT(borrowBackPersonCountStatistic, "quarterCount");
-			projMap.put("borrowPersonQuarter", borrowBackPersonQuarter);
+			projMap.put("drawCountSuitQuarter", borrowBackPersonQuarter);
 			
 			outList.add(projMap);
 			
@@ -1578,14 +1623,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> copySuitCountStatistic = documentService.getMapList(getToken(), copySuitCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "复制调出");
+			projMap.put("unitType", "套");
 			Number copySuitMonth1 = getSponsorT(copySuitCountStatistic, "month1");
-			projMap.put("copySuitMonth1", copySuitMonth1);
+			projMap.put("drawCountSuitMonth1", copySuitMonth1);
 			Number copySuitMonth2 = getSponsorT(copySuitCountStatistic, "month2");
-			projMap.put("copySuitMonth2", copySuitMonth2);
+			projMap.put("drawCountSuitMonth2", copySuitMonth2);
 			Number copySuitMonth3 = getSponsorT(copySuitCountStatistic, "month3");
-			projMap.put("copySuitMonth3", copySuitMonth3);
+			projMap.put("drawCountSuitMonth3", copySuitMonth3);
 			Number copySuitQuarter = getSponsorT(copySuitCountStatistic, "quarterCount");
-			projMap.put("copySuitQuarter", copySuitQuarter);
+			projMap.put("drawCountSuitQuarter", copySuitQuarter);
 			
 			outList.add(projMap);
 			
@@ -1600,14 +1648,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> copySheetCountStatistic = documentService.getMapList(getToken(), copySheetCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "复制调出");
+			projMap.put("unitType", "册");
 			Number copySheetMonth1 = getSponsorT(copySheetCountStatistic, "month1");
-			projMap.put("copySheetMonth1", copySheetMonth1);
+			projMap.put("drawCountSuitMonth1", copySheetMonth1);
 			Number copySheetMonth2 = getSponsorT(copySheetCountStatistic, "month2");
-			projMap.put("copySheetMonth2", copySheetMonth2);
+			projMap.put("drawCountSuitMonth2", copySheetMonth2);
 			Number copySheetMonth3 = getSponsorT(copySheetCountStatistic, "month3");
-			projMap.put("copySheetMonth3", copySheetMonth3);
+			projMap.put("drawCountSuitMonth3", copySheetMonth3);
 			Number copySheetQuarter = getSponsorT(copySheetCountStatistic, "quarterCount");
-			projMap.put("copySheetQuarter", copySheetQuarter);
+			projMap.put("drawCountSuitQuarter", copySheetQuarter);
 			
 			outList.add(projMap);
 			
@@ -1622,14 +1673,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> copyPageCountStatistic = documentService.getMapList(getToken(), copyPageCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "复制调出");
+			projMap.put("unitType", "张");
 			Number copyPageMonth1 = getSponsorT(copyPageCountStatistic, "month1");
-			projMap.put("copyPageMonth1", copyPageMonth1);
+			projMap.put("drawCountSuitMonth1", copyPageMonth1);
 			Number copyPageMonth2 = getSponsorT(copyPageCountStatistic, "month2");
-			projMap.put("copyPageMonth2", copyPageMonth2);
+			projMap.put("drawCountSuitMonth2", copyPageMonth2);
 			Number copyPageMonth3 = getSponsorT(copyPageCountStatistic, "month3");
-			projMap.put("copyPageMonth3", copyPageMonth3);
+			projMap.put("drawCountSuitMonth3", copyPageMonth3);
 			Number copyPageQuarter = getSponsorT(copyPageCountStatistic, "quarterCount");
-			projMap.put("copyPageQuarter", copyPageQuarter);
+			projMap.put("drawCountSuitQuarter", copyPageQuarter);
 			
 			outList.add(projMap);
 			
@@ -1644,14 +1698,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> copyPersonCountStatistic = documentService.getMapList(getToken(), copyPersonCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "复制调出");
+			projMap.put("unitType", "人次");
 			Number copyPersonMonth1 = getSponsorT(copyPersonCountStatistic, "month1");
-			projMap.put("copyPersonMonth1", copyPersonMonth1);
+			projMap.put("drawCountSuitMonth1", copyPersonMonth1);
 			Number copyPersonMonth2 = getSponsorT(copyPersonCountStatistic, "month2");
-			projMap.put("copyPersonMonth2", copyPersonMonth2);
+			projMap.put("drawCountSuitMonth2", copyPersonMonth2);
 			Number copyPersonMonth3 = getSponsorT(copyPersonCountStatistic, "month3");
-			projMap.put("copyPersonMonth3", copyPersonMonth3);
+			projMap.put("drawCountSuitMonth3", copyPersonMonth3);
 			Number copyPersonQuarter = getSponsorT(copyPersonCountStatistic, "quarterCount");
-			projMap.put("copyPersonQuarter", copyPersonQuarter);
+			projMap.put("drawCountSuitQuarter", copyPersonQuarter);
 			
 			outList.add(projMap);
 			
@@ -1666,14 +1723,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> copyBackSuitCountStatistic = documentService.getMapList(getToken(), copyBackSuitCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "复制归还");
+			projMap.put("unitType", "套");
 			Number copyBackSuitMonth1 = getSponsorT(copyBackSuitCountStatistic, "month1");
-			projMap.put("copyBackSuitMonth1", copyBackSuitMonth1);
+			projMap.put("drawCountSuitMonth1", copyBackSuitMonth1);
 			Number copyBackSuitMonth2 = getSponsorT(copyBackSuitCountStatistic, "month2");
-			projMap.put("copyBackSuitMonth2", copyBackSuitMonth2);
+			projMap.put("drawCountSuitMonth2", copyBackSuitMonth2);
 			Number copyBackSuitMonth3 = getSponsorT(copyBackSuitCountStatistic, "month3");
-			projMap.put("copyBackSuitMonth3", copyBackSuitMonth3);
+			projMap.put("drawCountSuitMonth3", copyBackSuitMonth3);
 			Number copyBackSuitQuarter = getSponsorT(copyBackSuitCountStatistic, "quarterCount");
-			projMap.put("copyBackSuitQuarter", copyBackSuitQuarter);
+			projMap.put("drawCountSuitQuarter", copyBackSuitQuarter);
 			
 			outList.add(projMap);
 			
@@ -1688,14 +1748,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> copyBackSheetCountStatistic = documentService.getMapList(getToken(), copyBackSheetCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "复制归还");
+			projMap.put("unitType", "册");
 			Number copyBackSheetMonth1 = getSponsorT(copyBackSheetCountStatistic, "month1");
-			projMap.put("copyBackSheetMonth1", copyBackSheetMonth1);
+			projMap.put("drawCountSuitMonth1", copyBackSheetMonth1);
 			Number copyBackSheetMonth2 = getSponsorT(copyBackSheetCountStatistic, "month2");
-			projMap.put("copyBackSheetMonth2", copyBackSheetMonth2);
+			projMap.put("drawCountSuitMonth2", copyBackSheetMonth2);
 			Number copyBackSheetMonth3 = getSponsorT(copyBackSheetCountStatistic, "month3");
-			projMap.put("copyBackSheetMonth3", copyBackSheetMonth3);
+			projMap.put("drawCountSuitMonth3", copyBackSheetMonth3);
 			Number copyBackSheetQuarter = getSponsorT(copyBackSheetCountStatistic, "quarterCount");
-			projMap.put("copyBackSheetQuarter", copyBackSheetQuarter);
+			projMap.put("drawCountSuitQuarter", copyBackSheetQuarter);
 			
 			outList.add(projMap);
 			
@@ -1710,14 +1773,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> copyBackPageCountStatistic = documentService.getMapList(getToken(), copyBackPageCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "复制归还");
+			projMap.put("unitType", "张");
 			Number copyBackPageMonth1 = getSponsorT(copyBackPageCountStatistic, "month1");
-			projMap.put("copyBackPageMonth1", copyBackPageMonth1);
+			projMap.put("drawCountSuitMonth1", copyBackPageMonth1);
 			Number copyBackPageMonth2 = getSponsorT(copyBackPageCountStatistic, "month2");
-			projMap.put("copyBackPageMonth2", copyBackPageMonth2);
+			projMap.put("drawCountSuitMonth2", copyBackPageMonth2);
 			Number copyBackPageMonth3 = getSponsorT(copyBackPageCountStatistic, "month3");
-			projMap.put("copyBackPageMonth3", copyBackPageMonth3);
+			projMap.put("drawCountSuitMonth3", copyBackPageMonth3);
 			Number copyBackPageQuarter = getSponsorT(copyBackPageCountStatistic, "quarterCount");
-			projMap.put("copyBackPageQuarter", copyBackPageQuarter);
+			projMap.put("drawCountSuitQuarter", copyBackPageQuarter);
 			
 			outList.add(projMap);
 			
@@ -1732,14 +1798,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> copyBackPersonCountStatistic = documentService.getMapList(getToken(), copyBackPersonCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "复制归还");
+			projMap.put("unitType", "人次");
 			Number copyBackPersonMonth1 = getSponsorT(copyBackPersonCountStatistic, "month1");
-			projMap.put("copyBackPersonMonth1", copyBackPersonMonth1);
+			projMap.put("drawCountSuitMonth1", copyBackPersonMonth1);
 			Number copyBackPersonMonth2 = getSponsorT(copyBackPersonCountStatistic, "month2");
-			projMap.put("copyBackPersonMonth2", copyBackPersonMonth2);
+			projMap.put("drawCountSuitMonth2", copyBackPersonMonth2);
 			Number copyBackPersonMonth3 = getSponsorT(copyBackPersonCountStatistic, "month3");
-			projMap.put("copyBackPersonMonth3", copyBackPersonMonth3);
+			projMap.put("drawCountSuitMonth3", copyBackPersonMonth3);
 			Number copyBackPersonQuarter = getSponsorT(copyBackPersonCountStatistic, "quarterCount");
-			projMap.put("copyBackPersonQuarter", copyBackPersonQuarter);
+			projMap.put("drawCountSuitQuarter", copyBackPersonQuarter);
 			
 			outList.add(projMap);
 			
@@ -1754,14 +1823,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> changeSuitCountStatistic = documentService.getMapList(getToken(), changeSuitCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "调改");
+			projMap.put("unitType", "套");
 			Number changeSuitMonth1 = getSponsorT(changeSuitCountStatistic, "month1");
-			projMap.put("changeSuitMonth1", changeSuitMonth1);
+			projMap.put("drawCountSuitMonth1", changeSuitMonth1);
 			Number changeSuitMonth2 = getSponsorT(changeSuitCountStatistic, "month2");
-			projMap.put("changeSuitMonth2", changeSuitMonth2);
+			projMap.put("drawCountSuitMonth2", changeSuitMonth2);
 			Number changeSuitMonth3 = getSponsorT(changeSuitCountStatistic, "month3");
-			projMap.put("changeSuitMonth3", changeSuitMonth3);
+			projMap.put("drawCountSuitMonth3", changeSuitMonth3);
 			Number changeSuitQuarter = getSponsorT(changeSuitCountStatistic, "quarterCount");
-			projMap.put("changeSuitQuarter", changeSuitQuarter);
+			projMap.put("drawCountSuitQuarter", changeSuitQuarter);
 			
 			outList.add(projMap);
 			
@@ -1776,36 +1848,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> changeSheetCountStatistic = documentService.getMapList(getToken(), changeSheetCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "调改");
+			projMap.put("unitType", "册");
 			Number changeSheetMonth1 = getSponsorT(changeSheetCountStatistic, "month1");
-			projMap.put("changeSheetMonth1", changeSheetMonth1);
+			projMap.put("drawCountSuitMonth1", changeSheetMonth1);
 			Number changeSheetMonth2 = getSponsorT(changeSheetCountStatistic, "month2");
-			projMap.put("changeSheetMonth2", changeSheetMonth2);
+			projMap.put("drawCountSuitMonth2", changeSheetMonth2);
 			Number changeSheetMonth3 = getSponsorT(changeSheetCountStatistic, "month3");
-			projMap.put("changeSheetMonth3", changeSheetMonth3);
+			projMap.put("drawCountSuitMonth3", changeSheetMonth3);
 			Number changeSheetQuarter = getSponsorT(changeSheetCountStatistic, "quarterCount");
-			projMap.put("changeSheetQuarter", changeSheetQuarter);
-			
-			outList.add(projMap);
-			
-			projMap = new HashMap<String, Object>();
-			String changePageCount = "select distinct b.TYPE_NAME, b.C_STORE_STATUS , " + 
-					"(select sum(ed.C_PAGE_COUNT) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '科研文件修改单'"+ conditionDate1 +") as month1," + 
-					"(select sum(ed.C_PAGE_COUNT) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '科研文件修改单'"+ conditionDate2 +") as month2," + 
-					"(select sum(ed.C_PAGE_COUNT) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '科研文件修改单'"+ conditionDate3 +") as month3," + 
-					"(select sum(ed.C_PAGE_COUNT) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '科研文件修改单'"+ conditionDate +") as quarterCount  " + 
-					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.TYPE_NAME = '科研文件修改单'";
-			
-			List<Map<String, Object>> changePageCountStatistic = documentService.getMapList(getToken(), changePageCount);
-			
-			Number changePageMonth1 = getSponsorT(changePageCountStatistic, "month1");
-			projMap.put("changePageMonth1", changePageMonth1);
-			Number changePageMonth2 = getSponsorT(changePageCountStatistic, "month2");
-			projMap.put("changePageMonth2", changePageMonth2);
-			Number changePageMonth3 = getSponsorT(changePageCountStatistic, "month3");
-			projMap.put("changePageMonth3", changePageMonth3);
-			Number changePageQuarter = getSponsorT(changePageCountStatistic, "quarterCount");
-			projMap.put("changePageQuarter", changePageQuarter);
+			projMap.put("drawCountSuitQuarter", changeSheetQuarter);
 			
 			outList.add(projMap);
 			
@@ -1820,14 +1873,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> changePersonCountStatistic = documentService.getMapList(getToken(), changePersonCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "调改");
+			projMap.put("unitType", "人次");
 			Number changePersonMonth1 = getSponsorT(changePersonCountStatistic, "month1");
-			projMap.put("changePersonMonth1", changePersonMonth1);
+			projMap.put("drawCountSuitMonth1", changePersonMonth1);
 			Number changePersonMonth2 = getSponsorT(changePersonCountStatistic, "month2");
-			projMap.put("changePersonMonth2", changePersonMonth2);
+			projMap.put("drawCountSuitMonth2", changePersonMonth2);
 			Number changePersonMonth3 = getSponsorT(changePersonCountStatistic, "month3");
-			projMap.put("changePersonMonth3", changePersonMonth3);
+			projMap.put("drawCountSuitMonth3", changePersonMonth3);
 			Number changePersonQuarter = getSponsorT(changePersonCountStatistic, "quarterCount");
-			projMap.put("changePersonQuarter", changePersonQuarter);
+			projMap.put("drawCountSuitQuarter", changePersonQuarter);
 			
 			outList.add(projMap);
 			
@@ -1842,14 +1898,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> changeBackSuitCountStatistic = documentService.getMapList(getToken(), changeBackSuitCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "调改归还");
+			projMap.put("unitType", "套");
 			Number changeBackSuitMonth1 = getSponsorT(changeBackSuitCountStatistic, "month1");
-			projMap.put("changeBackSuitMonth1", changeBackSuitMonth1);
+			projMap.put("drawCountSuitMonth1", changeBackSuitMonth1);
 			Number changeBackSuitMonth2 = getSponsorT(changeBackSuitCountStatistic, "month2");
-			projMap.put("changeBackSuitMonth2", changeBackSuitMonth2);
+			projMap.put("drawCountSuitMonth2", changeBackSuitMonth2);
 			Number changeBackSuitMonth3 = getSponsorT(changeBackSuitCountStatistic, "month3");
-			projMap.put("changeBackSuitMonth3", changeBackSuitMonth3);
+			projMap.put("drawCountSuitMonth3", changeBackSuitMonth3);
 			Number changeBackSuitQuarter = getSponsorT(changeBackSuitCountStatistic, "quarterCount");
-			projMap.put("changeBackSuitQuarter", changeBackSuitQuarter);
+			projMap.put("drawCountSuitQuarter", changeBackSuitQuarter);
 			
 			outList.add(projMap);
 			
@@ -1864,14 +1923,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> changeBackSheetCountStatistic = documentService.getMapList(getToken(), changeBackSheetCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "调改归还");
+			projMap.put("unitType", "册");
 			Number changeBackSheetMonth1 = getSponsorT(changeBackSheetCountStatistic, "month1");
-			projMap.put("changeBackSheetMonth1", changeBackSheetMonth1);
+			projMap.put("drawCountSuitMonth1", changeBackSheetMonth1);
 			Number changeBackSheetMonth2 = getSponsorT(changeBackSheetCountStatistic, "month2");
-			projMap.put("changeBackSheetMonth2", changeBackSheetMonth2);
+			projMap.put("drawCountSuitMonth2", changeBackSheetMonth2);
 			Number changeBackSheetMonth3 = getSponsorT(changeBackSheetCountStatistic, "month3");
-			projMap.put("changeBackSheetMonth3", changeBackSheetMonth3);
+			projMap.put("drawCountSuitMonth3", changeBackSheetMonth3);
 			Number changeBackSheetQuarter = getSponsorT(changeBackSheetCountStatistic, "quarterCount");
-			projMap.put("changeBackSheetQuarter", changeBackSheetQuarter);
+			projMap.put("drawCountSuitQuarter", changeBackSheetQuarter);
 			
 			outList.add(projMap);
 			
@@ -1886,14 +1948,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> changeBackPageCountStatistic = documentService.getMapList(getToken(), changeBackPageCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "调改归还");
+			projMap.put("unitType", "张");
 			Number changeBackPageMonth1 = getSponsorT(changeBackPageCountStatistic, "month1");
-			projMap.put("changeBackPageMonth1", changeBackPageMonth1);
+			projMap.put("drawCountSuitMonth1", changeBackPageMonth1);
 			Number changeBackPageMonth2 = getSponsorT(changeBackPageCountStatistic, "month2");
-			projMap.put("changeBackPageMonth2", changeBackPageMonth2);
+			projMap.put("drawCountSuitMonth2", changeBackPageMonth2);
 			Number changeBackPageMonth3 = getSponsorT(changeBackPageCountStatistic, "month3");
-			projMap.put("changeBackPageMonth3", changeBackPageMonth3);
+			projMap.put("drawCountSuitMonth3", changeBackPageMonth3);
 			Number changeBackPageQuarter = getSponsorT(changeBackPageCountStatistic, "quarterCount");
-			projMap.put("changeBackPageQuarter", changeBackPageQuarter);
+			projMap.put("drawCountSuitQuarter", changeBackPageQuarter);
 			
 			outList.add(projMap);
 			
@@ -1908,14 +1973,17 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object>> changeBackPersonCountStatistic = documentService.getMapList(getToken(), changeBackPersonCount);
 			
+			projMap.put("fileType", "实体");
+			projMap.put("typeClass", "调改");
+			projMap.put("unitType", "人次");
 			Number changeBackPersonMonth1 = getSponsorT(changeBackPersonCountStatistic, "month1");
-			projMap.put("changeBackPersonMonth1", changeBackPersonMonth1);
+			projMap.put("drawCountSuitMonth1", changeBackPersonMonth1);
 			Number changeBackPersonMonth2 = getSponsorT(changeBackPersonCountStatistic, "month2");
-			projMap.put("changeBackPersonMonth2", changeBackPersonMonth2);
+			projMap.put("drawCountSuitMonth2", changeBackPersonMonth2);
 			Number changeBackPersonMonth3 = getSponsorT(changeBackPersonCountStatistic, "month3");
-			projMap.put("changeBackPersonMonth3", changeBackPersonMonth3);
+			projMap.put("drawCountSuitMonth3", changeBackPersonMonth3);
 			Number changeBackPersonQuarter = getSponsorT(changeBackPersonCountStatistic, "quarterCount");
-			projMap.put("changeBackPersonQuarter", changeBackPersonQuarter);
+			projMap.put("drawCountSuitQuarter", changeBackPersonQuarter);
 			
 			outList.add(projMap);
 			

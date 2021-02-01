@@ -40,21 +40,20 @@
       >
         <el-table-column type="index" width="30" fixed></el-table-column>
         <el-table-column width="120" prop="date"></el-table-column>
-        <template v-for="item in tables.mainTable.columns"   >
+        <template v-for="item in tables.mainTable.columns">
           <el-table-column
-          v-if="item.displayNum == '0'"
-          :key="item.prop" 
-          v-bind="item"
-        >
-        </el-table-column>
-        <el-table-column
-          v-else-if="item.displayNum == value"
-          :key="item.prop" 
-          v-bind="item"
-        >
-        </el-table-column>
+            v-if="item.displayNum == '0'"
+            :key="item.prop"
+            v-bind="item"
+          >
+          </el-table-column>
+          <el-table-column
+            v-else-if="item.displayNum == value"
+            :key="item.prop"
+            v-bind="item"
+          >
+          </el-table-column>
         </template>
-        
       </el-table>
     </template>
   </DataLayout>
@@ -149,6 +148,62 @@ export default {
               fixed: true,
               width: 110,
             },
+            {
+              prop: "drawCountSuitMonth1",
+              label: "七月",
+              displayNum: "3",
+              fixed: true,
+              width: 110,
+            },
+            {
+              prop: "drawCountSuitMonth2",
+              label: "八月",
+              displayNum: "3",
+              fixed: true,
+              width: 110,
+            },
+            {
+              prop: "drawCountSuitMonth3",
+              label: "九月",
+              displayNum: "3",
+              fixed: true,
+              width: 110,
+            },
+            {
+              prop: "drawCountSuitQuarter",
+              label: "第三季度",
+              displayNum: "3",
+              fixed: true,
+              width: 110,
+            },
+            {
+              prop: "drawCountSuitMonth1",
+              label: "十月",
+              displayNum: "4",
+              fixed: true,
+              width: 110,
+            },
+            {
+              prop: "drawCountSuitMonth2",
+              label: "十一月",
+              displayNum: "4",
+              fixed: true,
+              width: 110,
+            },
+            {
+              prop: "drawCountSuitMonth3",
+              label: "十二月",
+              displayNum: "4",
+              fixed: true,
+              width: 110,
+            },
+            {
+              prop: "drawCountSuitQuarter",
+              label: "第四季度",
+              displayNum: "4",
+              fixed: true,
+              width: 110,
+            },
           ],
         },
       },
@@ -199,72 +254,8 @@ export default {
           console.log(error);
         });
     },
-
-    getSpanArr() {
-      let _self = this;
-
-      for (var i = 0; i < _self.tables.mainTable.data.length; i++) {
-        if (i === 0) {
-          _self.spanArr.push(1);
-          _self.pos = 0;
-        } else {
-          if (_self.tables.mainTable.data[i].prop) {
-            _self.spanArr[_self.pos] += 1;
-            _self.spanArr.push(0);
-          } else {
-            _self.spanArr.push(1);
-            _self.pos = i;
-          }
-        }
-        console.log(_self.spanArr);
-      }
-    },
-
-    objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-      const _row = this.spanArr[rowIndex];
-      const _col = _row > 0 ? 1 : 0;
-      return {
-        rowspan: _row,
-        colspan: _col,
-      };
-    },
   },
 };
 </script>
 <style scoped>
-.el-table thead.is-group tr:first-of-type th:first-of-type:before {
-  content: "利用方式";
-  text-align: center;
-  position: absolute;
-  width: 152px;
-  height: 1px;
-  bottom: 30px;
-  right: 0;
-}
-
-.el-table thead.is-group tr:first-of-type th:first-of-type:after {
-  content: "日期";
-  text-align: center;
-  position: absolute;
-  width: 152px;
-  top: 10px;
-  left: 0;
-}
-
-.el-table thead.is-group tr:first-of-type th:first-of-type .cell {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 152px;
-  height: 1px;
-  background-color: #ebeef5;
-  display: block;
-  text-align: center;
-  transform: rotate(38deg); /*旋转*/
-  transform-origin: top left;
-  -ms-transform: rotate(38deg);
-  -ms-transform-origin: top left;
-  -webkit-transform: rotate(38deg);
-  -webkit-transform-origin: top left;
-}
 </style>
