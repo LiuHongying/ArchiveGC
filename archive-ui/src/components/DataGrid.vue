@@ -13,6 +13,7 @@
         <EcmCustomColumns
           ref="ecmCustomColumns"
           :gridViewName="gridViewName"
+          :archiveInfo="archiveMap"
           @loadMainListConfig = "refreshMainConfigList"
           @onClose="onCloseCustom" @onCancel="editColumn=false"
         >
@@ -400,8 +401,12 @@ export default {
       propertiesData: [],
       gridviewInfo: {
         gridviewName: "",
+        //档案类目名称
+        archiveTypeName: "",
         isCustom: false,
+        currentFolder: []
       },
+      archiveMap:{},
       timer: null,
       currentDocIndex: 0,
       prevButtonDisabled:true,
@@ -480,7 +485,6 @@ export default {
     this.gridviewInfo.isCustom = false;
     this.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     //this.loadCustomName();
-    this.loadCustomListConfig();
     if(this.isLoadGridInfo){
       this.loadGridInfo();
     }
@@ -491,7 +495,7 @@ export default {
   methods: {
     //Matthew changes on 2021年1月26日15:48:46
     refreshMainConfigList(){
-      this.loadCustomListConfig();
+      this.loadCustomListConfig(this.gridviewInfo.gridviewName);
     },
     showCustomConfig(){
       this.showConfigList = true;
@@ -509,13 +513,15 @@ export default {
     //   _self.columnList = val;
     //   _self.loadGridData();
     // },
-    loadCustomListConfig(){
+    loadCustomListConfig(val){
       let _self = this;
       let url = "/archive/getConfigList";
       let mp = new Map()
+      mp.set("C_FROM",val)
       axios.post(url,JSON.stringify(mp)).then(function(response){
             if (response.data.code == 1) {
             _self.customList = response.data.data;
+            _self.customList.push({"name":"默认","id":_self.gridviewInfo.currentFolder.gridView})
             _self.gridviewInfo.gridviewName = _self.gridViewName;
             _self.gridviewInfo.isCustom = false;
           }
@@ -526,16 +532,36 @@ export default {
       let _self = this;
       var m = new Map();
       m.set("id", id);
-      let url = "/archive/getConfigById";
+      m.set("gridName", id);
+      m.set("lang", _self.currentLanguage);
+      let url="";
+      if(item.name=="默认"){
+        url = "/dc/getEcmCustomGridViewInfo";
+      }else{
+        url = "/archive/getConfigById";
+      }
       axios.post(url,JSON.stringify(m)).then(function(response){
             if(response.data.code==1) {
-              _self.gridviewInfo.gridviewName = item.id+"_CUSTOM";
+              if(item.name=="默认"){
+                _self.gridviewInfo.gridviewName = item.id;
+                _self.columnList = response.data.customGridInfo;
+              }else{
+                _self.gridviewInfo.gridviewName = item.id+"_CUSTOM";
+                _self.columnList = JSON.parse(response.data.data);
+              }
               _self.$emit("changeGridName", _self.gridviewInfo.gridviewName);
               _self.gridviewInfo.isCustom = true;
-            _self.columnList = JSON.parse(response.data.data);
             _self.loadGridData();
             }
           })
+    },
+    getOutFolder(folder){
+      let _self = this;
+      _self.gridviewInfo.currentFolder = folder;
+      var archiveInfo = new Map();
+      archiveInfo.set("C_FROM",folder.gridView)
+      archiveInfo.set("archiveType",folder.name)
+      _self.archiveMap = archiveInfo;
     },
     //end
     //上一个文档
@@ -815,6 +841,8 @@ export default {
       _self.loading = true;
       var m = new Map();
       console.log("loadGridInfo gridViewName:" + _self.gridViewName);
+      _self.configName = "";
+      _self.loadCustomListConfig(_self.gridviewInfo.gridviewName);
       m.set("gridName", _self.gridViewName);
       m.set("lang", _self.currentLanguage);
       _self

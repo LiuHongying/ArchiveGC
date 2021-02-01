@@ -5,7 +5,7 @@
         <!-- Matthew changes on 2021年1月25日17:07:23 -->
           <el-form size="small" label-width="100" inline>
             <el-form-item
-            :label="$t('application.fileType')"
+            label="档案类目"
           >
             <el-select
               name="selectName"
@@ -138,6 +138,9 @@ export default {
       default:function(){
         return []
       }
+    },
+    archiveInfo:{
+      type:Map
     }
   },
   data(){
@@ -175,6 +178,8 @@ export default {
     }
   },
   mounted(){
+    this.selectedClassic = this.archiveInfo.get("archiveType")
+    this.getTypeNameByClassic(this.archiveInfo.get("archiveType"))
     this.getClassicNames("ClassicNames");
     //this.loadCustomName()
     this.loadSysColumnInfo()
@@ -255,6 +260,7 @@ export default {
           m.set('configContent',configContent);
           m.set('attrsStr',attrsStr)
           m.set('labelStr',labelStr)
+          m.set('cfrom',_self.archiveInfo.get("C_FROM"))
           let url = "/archive/customListConfig"
           axios.post(url,JSON.stringify(m)).then(function(response){
             if(response.data.code==1) {
