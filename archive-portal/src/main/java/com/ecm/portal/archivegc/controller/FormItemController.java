@@ -53,10 +53,18 @@ public class FormItemController extends ControllerAbstract{
 		Map<String, Object> mp = new HashMap<String, Object>();
 		Map<String,Object> p= JSONUtils.stringToMap(param);
 		try {
-			StringBuilder sb = new StringBuilder("select id,name from ecm_document where ");
+			StringBuilder sb = new StringBuilder("select id,name,c_from from ecm_document where ");
 			sb.append(" creator='").append(this.getSession().getCurrentUser().getUserName()).append("'");
 			if(p.get("typeName")!=null) {
 				sb.append(" and sub_type ='").append(p.get("typeName")).append("'");
+			}
+			if (p.get("C_FROM")!=null) {
+				String cfrom = (String) p.get("C_FROM");
+				if (cfrom.contains("_CUSTOM")) {
+					EcmDocument ecmDocument = documentService.getObjectById(getToken(), cfrom.replace("_CUSTOM", ""));
+					cfrom = (String) ecmDocument.getAttributeValue("C_FROM");
+				}
+				sb.append(" and C_FROM ='").append(cfrom).append("'");
 			}
 			sb.append(" and type_name = '用户列表配置' ");
 			sb.append(" ORDER BY CREATION_DATE DESC");
@@ -154,6 +162,7 @@ public class FormItemController extends ControllerAbstract{
 			String configContent = "";
 			String attrsStr = "";
 			String labelStr = "";
+			String cFrom = "";
 			if(p.get("typeName")!=null&&!"".equals(p.get("typeName"))) {
 				typeName=p.get("typeName").toString();
 			}else {
@@ -177,6 +186,7 @@ public class FormItemController extends ControllerAbstract{
 			}
 			attrsStr = (String) p.get("attrsStr");
 			labelStr = (String) p.get("labelStr");
+			cFrom = (String) p.get("cfrom");
 			EcmDocument document=new EcmDocument();
 			EcmFolder folder = new EcmFolder();
 			String folderId = "";
@@ -194,6 +204,7 @@ public class FormItemController extends ControllerAbstract{
 			document.addAttribute("C_COMMENT", attrsStr);
 			document.setSubType(typeName);
 			document.addAttribute("ITEM_CONTENT", configContent);
+			document.addAttribute("C_FROM", cFrom);
 			document.setTitle(labelStr);
 			String newObjId= documentService.newObject(getToken(), document);
 			mp.put("code", ActionContext.SUCESS);

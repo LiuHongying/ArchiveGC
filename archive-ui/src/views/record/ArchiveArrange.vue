@@ -946,6 +946,7 @@ export default {
       }
     },
     changeDataGridName(val){
+      localStorage.setItem(this.currentFolder.gridView, val);
       this.innerGridName = val;
     },
     exportData() {
@@ -1873,7 +1874,17 @@ export default {
       var lastGridView = _self.$refs.mainDataGrid.gridViewName;
       console.log("lastGridView:" + lastGridView);
       _self.$refs.mainDataGrid.gridViewName = indata.gridView;
-      _self.$refs.mainDataGrid.gridviewInfo.gridviewName = indata.gridView;
+      //Matthew changes on 2021年2月1日18:07:35
+      var currentCustomConfig = localStorage.getItem(indata.gridView);
+      if(currentCustomConfig==null||currentCustomConfig==undefined){
+        _self.innerGridName = indata.gridView;
+        _self.$refs.mainDataGrid.gridviewInfo.gridviewName = indata.gridView;
+      }else{
+        _self.innerGridName = currentCustomConfig;
+        _self.$refs.mainDataGrid.gridviewInfo.gridviewName = currentCustomConfig;
+        _self.$refs.mainDataGrid.showConfigInfo({"id":currentCustomConfig.replace("_CUSTOM",""),"name":currentCustomConfig})
+      }
+      _self.$refs.mainDataGrid.gridviewInfo.archiveTypeName = indata.name
        console.log("newGridView:" + indata.gridView);
       _self.$nextTick(()=>{
         if(lastGridView != indata.gridView){
@@ -1914,8 +1925,8 @@ export default {
       let _self = this;
       _self.selectRow = [];
       _self.selectedFileId = "";
-
       _self.currentFolder = indata;
+      _self.$refs.mainDataGrid.getOutFolder(_self.currentFolder)
       //console.log(JSON.stringify(indata));
       // 没有加载，逐级加载
       if (indata.extended == false) {
