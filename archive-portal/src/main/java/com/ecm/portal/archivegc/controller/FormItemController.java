@@ -88,10 +88,14 @@ public class FormItemController extends ControllerAbstract{
 			String id = (String) p.get("id");
 			if("update".equals(action)) {
 				String itemContent = (String) p.get("configContent");
+				String attrsStr = (String) p.get("attrsStr");
+				String labelStr = (String) p.get("labelStr");
 				EcmDocument document = documentService.getObjectById(getToken(), id);
 				Map<String, Object> map = new HashMap<String, Object>();
 				map.put("ID", document.getId());
 				map.put("ITEM_CONTENT", itemContent);
+				map.put("C_COMMENT", attrsStr);
+				map.put("TITLE", labelStr);
 				documentService.updateObject(getToken(), map);
 				mp.put("code", ActionContext.SUCESS);
 			}else if("delete".equals(action)) {

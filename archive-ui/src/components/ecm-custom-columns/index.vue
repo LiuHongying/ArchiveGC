@@ -278,8 +278,12 @@ export default {
         return;
       }
       var screenConfigArr = [];
+      var attrsStr = "";
+      var labelStr = "";
       for(var i =0;i<_self.tables.target.data.length;i++){
         let currentData = _self.tables.target.data[i]
+        attrsStr=attrsStr+currentData.attrName+","
+        labelStr=labelStr+currentData.label+","
         let dataMap = {
           "id":currentData.id,
           "attrName":currentData.attrName,
@@ -296,6 +300,8 @@ export default {
       let url = "/archive/deleteOrUpdateConfig";
       mp.set("id",_self.configId);
       mp.set("configContent",configContent);
+      mp.set('attrsStr',attrsStr)
+      mp.set('labelStr',labelStr)
       mp.set("aciton","update");
       axios.post(url,JSON.stringify(mp)).then(function(response){
             if(response.data.code==1) {
