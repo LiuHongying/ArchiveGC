@@ -133,6 +133,7 @@
           </el-form>
           <el-row>
             <el-table
+            ref="table"
               :height="tableHeight"
               :data="itemDataList"
               border
@@ -391,6 +392,10 @@ export default {
     folderPath:{typr:String,default:"/档案库"}
   },
   methods: {
+    init(){
+    this.selectedItemList = []
+    this.$refs.table.clearSelection()
+    },
     changeType:function(){
         var nowDate = new Date().getTime();
         if(this.DCtype=="到期文档"){

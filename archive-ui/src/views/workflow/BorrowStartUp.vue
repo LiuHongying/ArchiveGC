@@ -135,6 +135,9 @@
                 console.log(this.currentUser().department)
             },
             methods:{
+            clean(){
+                this.$refs.workflowFile.clean()
+            },
             getBorrowType(){            //获取当前借阅类型
                 let _self = this
                 let ecmFormItems = this.$refs.ShowProperty.dataList[0].ecmFormItems
@@ -390,6 +393,7 @@
                 },
                 closePage(){
                     this.$emit("closedialog", this.flag);
+                    this.$refs.workflowFile.clean()
                 },
                 // 保存文档
                 saveItem()

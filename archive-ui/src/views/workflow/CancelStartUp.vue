@@ -117,6 +117,9 @@
             mounted(){
             },
             methods:{
+            clean(){
+                this.$refs.workflowFile.clean()
+            },
             getParentIdResult(val){
             this.parentId = val
             this.isCreated = true
