@@ -6,12 +6,13 @@
           :title="dialogtitle"
           append-to-body
           :visible.sync="dialogVisable"
-          @close="dialogVisable = false"
+          @close="closePage"
           width="90%"
           :close-on-click-modal="false"
           v-dialogDrag
         >
           <component
+            ref="comp"
             :is="dialogComponent"
             :workflowObj="workflow"
             :typeName="workflow.FORMNAME"
@@ -480,6 +481,10 @@ export default {
     },
     closeDialog(val) {
       this.dialogVisable = val;
+    },
+    closePage() {
+      this.$refs.comp.clean()
+      this.dialogVisable = false
     },
     //获取待办任务列表，最多五条
     getToDoList() {

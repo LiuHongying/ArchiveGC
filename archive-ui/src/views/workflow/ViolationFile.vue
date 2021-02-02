@@ -22,7 +22,7 @@
             <el-button type="primary" v-on:click="searchItem">{{$t('application.SearchData')}}</el-button>
           </el-form-item>
         </el-form>
-        <selectDC @selectchange="fileSelect"  :conditionFile="searchFileCondition"></selectDC>
+        <selectDC ref="select" @selectchange="fileSelect"  :conditionFile="searchFileCondition"></selectDC>
         <div slot="footer" class="dialog-footer">
             <el-button @click="saveFileToWorkflow" :loading="butt">{{$t('application.save')}}</el-button>
             <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
@@ -145,6 +145,18 @@ export default {
     this.searchItem()
   },
   methods: {
+    clean(){
+      this.selectedRemoveFiles = []
+      this.cost = 0;
+      this.selectedFiles = []
+      this.$refs.select.init()
+      this.$emit('getCost',this.cost)
+      let j = 0
+      for(let i = 0;i<this.$refs.fileList.itemDataList.length;i++){
+        this.$refs.fileList.itemDataList.splice(i, 1);
+        i--
+      }
+    },
     beforeAddFile() {
       let _self=this;
       this.getEcmcfgActive(_self.workflowObj.ID,"start",function(ecmCfgActivity){
@@ -264,6 +276,7 @@ export default {
 
     },
     saveFileToWorkflow(){
+      console.log(this.selectedFiles)
         let _self=this;
         this.checkCost()
         if(_self.$refs.fileList.itemDataList==null){

@@ -22,7 +22,7 @@
             <el-button type="primary" v-on:click="searchItem">{{$t('application.SearchData')}}</el-button>
           </el-form-item>
         </el-form>
-    <selectDC @selectchange="selectedChooseDC"  :conditionFile="searchFileCondition"></selectDC>
+    <selectDC ref="select" @selectchange="selectedChooseDC"  :conditionFile="searchFileCondition"></selectDC>
         <div slot="footer" class="dialog-footer">
             <el-button @click="saveFileToWorkflow" :loading="butt">{{$t('application.save')}}</el-button>
             <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
@@ -142,6 +142,17 @@ export default {
     this.searchItem()
   },
   methods: {
+    clean(){
+      this.selectedRemoveFiles = []
+      this.cost = 0;
+      this.selectedFiles = []
+      this.$refs.select.init()
+      let j = 0
+      for(let i = 0;i<this.$refs.fileList.itemDataList.length;i++){
+        this.$refs.fileList.itemDataList.splice(i, 1);
+        i--
+      }
+    },
         selectedChooseDC(val) {
       this.selectedFiles = val;
     },

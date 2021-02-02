@@ -123,6 +123,9 @@
                 console.log(this.currentUser().department)
             },
             methods:{
+            clean(){
+                this.$refs.workflowFile.clean()
+            },
             open(){
                 this.dialogVisible=true
             },

@@ -68,6 +68,9 @@
                 // this.getWorkflows();
             },
             methods:{
+            clean(){
+                this.$refs.workflowFile.clean()
+            },
                 loadFormInfo(){
                     this.$refs.ShowProperty.myTypeName=this.workflowObj.FORMNAME;
                     this.$refs.ShowProperty.loadFormInfo();
