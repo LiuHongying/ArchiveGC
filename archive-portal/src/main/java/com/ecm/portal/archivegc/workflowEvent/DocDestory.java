@@ -1,5 +1,6 @@
 package com.ecm.portal.archivegc.workflowEvent;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +49,8 @@ public class DocDestory implements JavaDelegate {
 				Map<String,Object> docMap = doc.getAttributes(); 
 				//docMap.put("ACL_NAME","acl_destory");
 				docMap.put("STATUS", "已销毁");
-				docMap.put("IS_RELEASED",0);
+				docMap.put("C_DESTROY_DATE", new Date());
+				//docMap.put("IS_RELEASED",0);
 				documentService.updateObject(ecmSession.getToken(), docMap);		//先把当前文件的状态改了
 				if(docMap.get("C_ITEM_TYPE")!=null) {			//要是当前文件是案卷，就连着案卷内的挂载文件一起删
 					type = docMap.get("C_ITEM_TYPE").toString();
@@ -61,7 +63,8 @@ public class DocDestory implements JavaDelegate {
 						Map<String,Object> AJmap = AJ.getAttributes();
 						//AJmap.put("ACL_NAME","acl_destory");
 						AJmap.put("STATUS", "已销毁");
-						AJmap.put("IS_RELEASED",0);
+						AJmap.put("C_DESTROY_DATE", new Date());
+						//AJmap.put("IS_RELEASED",0);
 						documentService.updateObject(ecmSession.getToken(), AJmap);		//更新案卷内关联文件的属性
 						}
 					}
