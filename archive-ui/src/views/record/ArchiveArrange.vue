@@ -946,7 +946,6 @@ export default {
       }
     },
     changeDataGridName(val){
-      localStorage.setItem(this.currentFolder.gridView, val);
       this.innerGridName = val;
     },
     exportData() {
@@ -1876,25 +1875,28 @@ export default {
       _self.mainParam.condition=key;
       _self.mainParam.folderId=indata.id;
       var lastGridView = _self.$refs.mainDataGrid.gridViewName;
-      console.log("lastGridView:" + lastGridView);
       _self.$refs.mainDataGrid.gridViewName = indata.gridView;
       //Matthew changes on 2021年2月1日18:07:35
       var currentCustomConfig = localStorage.getItem(indata.gridView);
       if(currentCustomConfig==null||currentCustomConfig==undefined){
         _self.innerGridName = indata.gridView;
         _self.$refs.mainDataGrid.gridviewInfo.gridviewName = indata.gridView;
+        _self.$refs.mainDataGrid.showConfigInfo({"id":indata.gridView,"name":"默认"})
       }else{
         _self.innerGridName = currentCustomConfig;
-        _self.$refs.mainDataGrid.gridviewInfo.gridviewName = currentCustomConfig;
+        if(currentCustomConfig.indexOf("_CUSTOM")>-1){
         _self.$refs.mainDataGrid.showConfigInfo({"id":currentCustomConfig.replace("_CUSTOM",""),"name":currentCustomConfig})
-      }
-       console.log("newGridView:" + indata.gridView);
-      _self.$nextTick(()=>{
-        if(lastGridView != indata.gridView){
-           _self.$refs.mainDataGrid.loadGridInfo();
-           
+        }else{
+        _self.$refs.mainDataGrid.showConfigInfo({"id":currentCustomConfig,"name":"默认"})
         }
-         _self.$refs.mainDataGrid.loadGridData();
+        _self.$refs.mainDataGrid.gridviewInfo.gridviewName = currentCustomConfig;
+      }
+      _self.$nextTick(()=>{
+        // if(lastGridView != indata.gridView){
+        //    _self.$refs.mainDataGrid.loadGridInfo();
+           
+        // }
+        //  _self.$refs.mainDataGrid.loadGridData();
          _self.$refs.leftDataGrid.itemDataList = [];
       },500);
       

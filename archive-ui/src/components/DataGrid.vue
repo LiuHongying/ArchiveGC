@@ -502,6 +502,11 @@ export default {
       this.configItem = item
     },
     useConfig(){
+      if(this.configItem.name=="默认"){
+      localStorage.setItem(this.gridviewInfo.currentFolder.gridView, this.configItem.id);
+      }else{
+      localStorage.setItem(this.gridviewInfo.currentFolder.gridView, this.configItem.id+"_CUSTOM");
+      }
       this.showConfigInfo(this.configItem);
       this.showConfigList= false;
     },
@@ -547,6 +552,11 @@ export default {
                 _self.gridviewInfo.gridviewName = item.id+"_CUSTOM";
                 _self.columnList = JSON.parse(response.data.data);
               }
+              _self.columnList.forEach((element) => {
+                if (element.visibleType == 1) {
+                  _self.showFields.push(element.attrName);
+                }
+              });
               _self.$emit("changeGridName", _self.gridviewInfo.gridviewName);
               _self.gridviewInfo.isCustom = true;
             _self.loadGridData();
@@ -555,6 +565,8 @@ export default {
     },
     getOutFolder(folder){
       let _self = this;
+      _self.configName = "";
+      _self.loadCustomListConfig(folder.gridView);
       _self.gridviewInfo.currentFolder = folder;
       var archiveInfo = new Map();
       archiveInfo.set("C_FROM",folder.gridView)
@@ -825,8 +837,6 @@ export default {
               type: "Success",
             });
           }
-          // _self.loadGridInfo();
-          // _self.loadCustomName();
           _self.editColumn = false;
         })
         .catch(function (error) {
@@ -838,9 +848,6 @@ export default {
       let _self = this;
       _self.loading = true;
       var m = new Map();
-      console.log("loadGridInfo gridViewName:" + _self.gridViewName);
-      _self.configName = "";
-      _self.loadCustomListConfig(_self.gridviewInfo.gridviewName);
       m.set("gridName", _self.gridViewName);
       m.set("lang", _self.currentLanguage);
       _self
