@@ -1888,7 +1888,6 @@ export default {
         _self.$refs.mainDataGrid.gridviewInfo.gridviewName = currentCustomConfig;
         _self.$refs.mainDataGrid.showConfigInfo({"id":currentCustomConfig.replace("_CUSTOM",""),"name":currentCustomConfig})
       }
-      _self.$refs.mainDataGrid.gridviewInfo.archiveTypeName = indata.name
        console.log("newGridView:" + indata.gridView);
       _self.$nextTick(()=>{
         if(lastGridView != indata.gridView){

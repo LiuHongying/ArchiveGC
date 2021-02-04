@@ -401,8 +401,6 @@ export default {
       propertiesData: [],
       gridviewInfo: {
         gridviewName: "",
-        //档案类目名称
-        archiveTypeName: "",
         isCustom: false,
         currentFolder: []
       },
