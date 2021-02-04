@@ -1282,6 +1282,10 @@ export default {
       _self.PreparationTablePrintVisible = true;
 
       setTimeout(()=>{
+        _self.$refs.PreparationTablePrint.isBusinessArchive = false;
+        if(selectedRows[0].TYPE_NAME && selectedRows[0].TYPE_NAME=='科研案卷'){
+          _self.$refs.PreparationTablePrint.isBusinessArchive = true;
+        }
         _self.$refs.PreparationTablePrint.refreshArchiveObj(selectedRows); 
       },100);
 
@@ -1326,16 +1330,16 @@ export default {
         .then(function(response) {
           _self.$refs.printVolumes.isBusiness= false
           if(response.data.code=='1'){
-            if(selectedRows[0].C_ARC_CLASSIC=='商务管理'){    
+            if(selectedRows[0].C_ARC_CLASSIC && selectedRows[0].C_ARC_CLASSIC=='商务管理'){    
               _self.$refs.printVolumes.isBusiness = true
             }
-            _self.$refs.printVolumes.selectedRows = selectedRows
-            let printGridName=response.data.data.attributes.C_TO;
-            _self.$refs.printVolumes.dialogQrcodeVisible = false
+            _self.$refs.printVolumes.selectedRows = selectedRows;
+            let printGridName = gridName;//response.data.data.attributes.C_TO;
+            _self.$refs.printVolumes.dialogQrcodeVisible = false;
             _self.$refs.printVolumes.refreshDataGrid(selectedRows,
             printGridName); 
           }else{
-            _self.$refs.printVolumes.dialogQrcodeVisible = false
+            _self.$refs.printVolumes.dialogQrcodeVisible = false;
              _self.$refs.printVolumes.refreshDataGrid(selectedRows,
             gridName); 
           }
