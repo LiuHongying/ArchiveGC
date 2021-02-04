@@ -101,6 +101,11 @@ export default {
               fixed: true,
               width: 110,
             },
+            {
+              label: "备注",
+              fixed: true,
+              width: 110,
+            },
           ],
         },
       },

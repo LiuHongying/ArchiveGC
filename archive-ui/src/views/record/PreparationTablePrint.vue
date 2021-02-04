@@ -4,7 +4,9 @@
     <el-container style="width:100%;height:540px;overflow:auto;">
       <div id='print' ref='print' style="height:100%;width:100%;">
          <div v-for="(item,idx) in archiveObjects" :key="'divk'+idx" :style="'width:'+divWidth+';padding:5px;'">
-           <PreparationTableForm :ref="'printForm'+idx" :archiveId="item.ID"></PreparationTableForm>
+           
+           <PreparationTableFormKY v-if="isBusinessArchive" :ref="'printForm'+idx" :archiveId="item.ID"></PreparationTableFormKY>
+           <PreparationTableForm v-else :ref="'printForm'+idx" :archiveId="item.ID"></PreparationTableForm>
            <div v-if="idx < archiveObjects.length-1" style="page-break-before:always;"></div>
          </div>
       </div>
@@ -15,17 +17,20 @@
 <script type="text/javascript">
 import Print from "@/plugins/print";
 import PreparationTableForm from '@/views/record/PreparationTableForm.vue'
+import PreparationTableFormKY from '@/views/record/PreparationTableFormKY.vue'
 import Vue from "vue";
 Vue.use(Print);
 export default {
   name: "PrintPreparationTable",
   components: { 
-     PreparationTableForm:PreparationTableForm
+     PreparationTableForm:PreparationTableForm,
+     PreparationTableFormKY: PreparationTableFormKY
   },
   data() {
     return {
       archiveObjects: [],
       currentLanguage: "zh-cn",
+      isBusinessArchive : false
     };
   },
   mounted() {

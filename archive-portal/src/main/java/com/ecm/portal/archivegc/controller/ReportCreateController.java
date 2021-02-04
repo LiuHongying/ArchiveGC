@@ -649,33 +649,33 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			for(int i=0; i<typeMapList.size(); i++) {
 				String sqlCriminalSuit = "select distinct b.C_ARC_CLASSIC, " + 
-						"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
-						"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
-						"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
-						"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount " + 
+						"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
+						"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
+						"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
+						"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount " + 
 						"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-						"where b.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '是'";
+						"where b.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +")";
 				String sqlCriminalVolume = "select distinct b.C_ARC_CLASSIC, " + 
-						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '是'"+ conditionDate1 +") as month1," + 
-						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '是'"+ conditionDate2 +") as month2," + 
-						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '是'"+ conditionDate3 +") as month3," + 
-						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '是'"+ conditionDate +") as quarterCount  " + 
+						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '有'"+ conditionDate1 +") as month1," + 
+						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '有'"+ conditionDate2 +") as month2," + 
+						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '有'"+ conditionDate3 +") as month3," + 
+						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '有'"+ conditionDate +") as quarterCount  " + 
 						"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-						"where b.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.C_INCLUDE_PAPER = '是'";
+						"where b.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +")";
 				String sqlCriminalItem = "select distinct b.C_ARC_CLASSIC, " + 
 						"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
 						"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
 						"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
 						"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
 						"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-						"where b.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.CONTENT_SIZE > 0";
+						"where b.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +")";
 				String sqlCriminalGM = "select distinct b.C_ARC_CLASSIC, " + 
 						"(select sum(ed.CONTENT_SIZE) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
 						"(select sum(ed.CONTENT_SIZE) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
 						"(select sum(ed.CONTENT_SIZE) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
 						"(select sum(ed.CONTENT_SIZE) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
 						"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-						"where b.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +") and b.CONTENT_SIZE > 0";
+						"where b.TYPE_NAME IN ("+ typeMapList.get(i).get("type") +")";
 				
 				List<Map<String, Object>> listCriminalSuit = documentService.getMapList(getToken(), sqlCriminalSuit);
 				List<Map<String, Object>> listCriminalVolume = documentService.getMapList(getToken(), sqlCriminalVolume);
@@ -748,33 +748,33 @@ public class ReportCreateController extends ControllerAbstract {
 			}
 			
 			String sqlChangeSuit = "select distinct b.TYPE_NAME, " + 
-					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
-					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
-					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
-					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '是'";
+					"where b.TYPE_NAME = '设计变更'";
 			String sqlChangeVolume = "select distinct b.TYPE_NAME, " + 
-					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '是'"+ conditionDate1 +") as month1," + 
-					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '是'"+ conditionDate2 +") as month2," + 
-					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '是'"+ conditionDate3 +") as month3," + 
-					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '是'"+ conditionDate +") as quarterCount  " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '有'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '有'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '有'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '有'"+ conditionDate +") as quarterCount  " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '是'";
+					"where b.TYPE_NAME = '设计变更'";
 			String sqlChangeItem = "select distinct b.TYPE_NAME, " + 
 					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
 					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
 					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
 					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.TYPE_NAME = '设计变更' and b.CONTENT_SIZE > 0";
+					"where b.TYPE_NAME = '设计变更'";
 			String sqlChangeGM = "select distinct b.TYPE_NAME, " + 
 					"(select sum(ed.CONTENT_SIZE) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
 					"(select sum(ed.CONTENT_SIZE) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
 					"(select sum(ed.CONTENT_SIZE) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
 					"(select sum(ed.CONTENT_SIZE) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.TYPE_NAME = '设计变更' and b.CONTENT_SIZE > 0";
+					"where b.TYPE_NAME = '设计变更'";
 			
 			List<Map<String, Object>> listChangeSuit = documentService.getMapList(getToken(), sqlChangeSuit);
 			List<Map<String, Object>> listChangeVolume = documentService.getMapList(getToken(), sqlChangeVolume);
@@ -849,41 +849,41 @@ public class ReportCreateController extends ControllerAbstract {
 			Map<String, Object> classMap = new HashMap<String, Object>();
 			classMap.put("type", "设备管理");
 			classMap.put("name", "设备文件");
-			classMapList.add(typeMap);
+			classMapList.add(classMap);
 			typeMap = new HashMap<String, Object>();
 			classMap.put("type", "商务管理");
 			classMap.put("name", "商务文件");
-			classMapList.add(typeMap);
+			classMapList.add(classMap);
 			
 			for(int i=0; i<classMapList.size(); i++) {
 				String sqlCriminalSuit = "select distinct b.C_ARC_CLASSIC, " + 
-						"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
-						"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
-						"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
-						"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount " + 
+						"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
+						"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
+						"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
+						"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount " + 
 						"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-						"where b.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '是'";
+						"where b.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"'";
 				String sqlCriminalVolume = "select distinct b.C_ARC_CLASSIC, " + 
-						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '是'"+ conditionDate1 +") as month1," + 
-						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '是'"+ conditionDate2 +") as month2," + 
-						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '是'"+ conditionDate3 +") as month3," + 
-						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '是'"+ conditionDate +") as quarterCount  " + 
+						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '有'"+ conditionDate1 +") as month1," + 
+						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '有'"+ conditionDate2 +") as month2," + 
+						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '有'"+ conditionDate3 +") as month3," + 
+						"(select sum(ed.C_VOLUME_COUNT) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '有'"+ conditionDate +") as quarterCount  " + 
 						"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-						"where b.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.C_INCLUDE_PAPER = '是'";
+						"where b.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"'";
 				String sqlCriminalItem = "select distinct b.C_ARC_CLASSIC, " + 
 						"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
 						"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
 						"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
 						"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
 						"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-						"where b.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.CONTENT_SIZE > 0";
+						"where b.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"'";
 				String sqlCriminalGM = "select distinct b.C_ARC_CLASSIC, " + 
 						"(select sum(ed.CONTENT_SIZE) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
 						"(select sum(ed.CONTENT_SIZE) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
 						"(select sum(ed.CONTENT_SIZE) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
 						"(select sum(ed.CONTENT_SIZE) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
 						"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-						"where b.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"' and b.CONTENT_SIZE > 0";
+						"where b.C_ARC_CLASSIC = '"+ classMapList.get(i).get("type") +"'";
 				
 				List<Map<String, Object>> listCriminalSuit = documentService.getMapList(getToken(), sqlCriminalSuit);
 				List<Map<String, Object>> listCriminalVolume = documentService.getMapList(getToken(), sqlCriminalVolume);
@@ -956,33 +956,33 @@ public class ReportCreateController extends ControllerAbstract {
 			}
 			
 			String sqlChangeSuitParty = "select distinct b.C_ARC_CLASSIC, " + 
-					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
-					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
-					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
-					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '是'";
+					"where b.C_ARC_CLASSIC = '党群行政'";
 			String sqlChangeVolumeParty = "select distinct b.C_ARC_CLASSIC, " + 
-					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '是'"+ conditionDate1 +") as month1," + 
-					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '是'"+ conditionDate2 +") as month2," + 
-					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '是'"+ conditionDate3 +") as month3," + 
-					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '是'"+ conditionDate +") as quarterCount  " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '有'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '有'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '有'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '有'"+ conditionDate +") as quarterCount  " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.C_ARC_CLASSIC = '党群行政' and b.C_INCLUDE_PAPER = '是'";
+					"where b.C_ARC_CLASSIC = '党群行政'";
 			String sqlChangeItemParty = "select distinct b.C_ARC_CLASSIC, " + 
 					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
 					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
 					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
 					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.C_ARC_CLASSIC = '党群行政' and b.CONTENT_SIZE > 0";
+					"where b.C_ARC_CLASSIC = '党群行政'";
 			String sqlChangeGMParty = "select distinct b.C_ARC_CLASSIC, " + 
 					"(select sum(ed.CONTENT_SIZE) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
 					"(select sum(ed.CONTENT_SIZE) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
 					"(select sum(ed.CONTENT_SIZE) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
 					"(select sum(ed.CONTENT_SIZE) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '党群行政' and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.C_ARC_CLASSIC = '党群行政' and b.CONTENT_SIZE > 0";
+					"where b.C_ARC_CLASSIC = '党群行政'";
 			
 			List<Map<String, Object>> listChangeSuitParty = documentService.getMapList(getToken(), sqlChangeSuitParty);
 			List<Map<String, Object>> listChangeVolumeParty = documentService.getMapList(getToken(), sqlChangeVolumeParty);
@@ -1054,33 +1054,33 @@ public class ReportCreateController extends ControllerAbstract {
 			outList.add(projMap);
 			
 			String sqlChangeSuitPeriod = "select distinct b.C_ARC_CLASSIC, " + 
-					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
-					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
-					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
-					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '是' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.C_ARC_CLASSIC = '科技与信息' and b.TYPE_NAME='其他' and b.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '是'";
+					"where b.C_ARC_CLASSIC = '科技与信息'";
 			String sqlChangeVolumePeriod = "select distinct b.C_ARC_CLASSIC, " + 
-					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '是'"+ conditionDate1 +") as month1," + 
-					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID wh    ere ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '是'"+ conditionDate2 +") as month2," + 
-					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '是'"+ conditionDate3 +") as month3," + 
-					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '是'"+ conditionDate +") as quarterCount  " + 
+					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '有'"+ conditionDate1 +") as month1," + 
+					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '有'"+ conditionDate2 +") as month2," + 
+					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '有'"+ conditionDate3 +") as month3," + 
+					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '有'"+ conditionDate +") as quarterCount  " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.C_ARC_CLASSIC = '科技与信息' and b.TYPE_NAME='其他' and b.SUB_TYPE='公司刊物' and b.C_INCLUDE_PAPER = '是'";
+					"where b.C_ARC_CLASSIC = '科技与信息'";
 			String sqlChangeItemPeriod = "select distinct b.C_ARC_CLASSIC, " + 
-					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
 					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
 					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
 					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.C_ARC_CLASSIC = '科技与信息' and b.TYPE_NAME='其他' and b.SUB_TYPE='公司刊物' and b.CONTENT_SIZE > 0";
+					"where b.C_ARC_CLASSIC = '科技与信息'";
 			String sqlChangeGMPeriod = "select distinct b.C_ARC_CLASSIC, " + 
 					"(select sum(ed.CONTENT_SIZE) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
 					"(select sum(ed.CONTENT_SIZE) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
 					"(select sum(ed.CONTENT_SIZE) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
 					"(select sum(ed.CONTENT_SIZE) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '科技与信息' and ed.TYPE_NAME='其他' and ed.SUB_TYPE='公司刊物' and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.C_ARC_CLASSIC = '科技与信息' and b.TYPE_NAME='其他' and b.SUB_TYPE='公司刊物' and b.CONTENT_SIZE > 0";
+					"where b.C_ARC_CLASSIC = '科技与信息'";
 			
 			List<Map<String, Object>> listChangeSuitPeriod = documentService.getMapList(getToken(), sqlChangeSuitPeriod);
 			List<Map<String, Object>> listChangeVolumePeriod = documentService.getMapList(getToken(), sqlChangeVolumePeriod);
@@ -1152,12 +1152,12 @@ public class ReportCreateController extends ControllerAbstract {
 			outList.add(projMap);
 			
 			String sqlChangeVolumeCemmercial = "select distinct b.C_ARC_CLASSIC, " + 
-					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '财务会计' and ed.TYPE_NAME='财务会计文件' and b.C_INCLUDE_PAPER = '是'"+ conditionDate1 +") as month1," + 
-					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '财务会计' and ed.TYPE_NAME='财务会计文件' and b.C_INCLUDE_PAPER = '是'"+ conditionDate2 +") as month2," + 
-					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '财务会计' and ed.TYPE_NAME='财务会计文件' and b.C_INCLUDE_PAPER = '是'"+ conditionDate3 +") as month3," + 
-					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '财务会计' and ed.TYPE_NAME='财务会计文件' and b.C_INCLUDE_PAPER = '是'"+ conditionDate +") as quarterCount  " + 
+					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '财务会计' and ed.TYPE_NAME='财务会计文件' and b.C_INCLUDE_PAPER = '有'"+ conditionDate1 +") as month1," + 
+					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '财务会计' and ed.TYPE_NAME='财务会计文件' and b.C_INCLUDE_PAPER = '有'"+ conditionDate2 +") as month2," + 
+					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '财务会计' and ed.TYPE_NAME='财务会计文件' and b.C_INCLUDE_PAPER = '有'"+ conditionDate3 +") as month3," + 
+					"(select sum(ed.C_VOLUME_COUNT) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '财务会计' and ed.TYPE_NAME='财务会计文件' and b.C_INCLUDE_PAPER = '有'"+ conditionDate +") as quarterCount  " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.C_ARC_CLASSIC = '财务会计' and b.TYPE_NAME='财务会计文件' and b.C_INCLUDE_PAPER = '是'";
+					"where b.C_ARC_CLASSIC = '财务会计'";
 			
 			List<Map<String, Object>> listChangeSuitCemmercial = documentService.getMapList(getToken(), sqlChangeVolumeCemmercial);
 			
@@ -1544,7 +1544,7 @@ public class ReportCreateController extends ControllerAbstract {
 					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_STORE_STATUS = '在库' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
 					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_STORE_STATUS = '在库' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount  " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
-					"where b.TYPE_NAME = '借阅单' and b.C_STORE_STATUS = '在库'";
+					"where b.TYPE_NAME = '借阅单'";
 			
 			List<Map<String, Object>> borrowBackSuitCountStatistic = documentService.getMapList(getToken(), borrowBackSuitCount);
 			
@@ -2001,16 +2001,38 @@ public class ReportCreateController extends ControllerAbstract {
 		return (args.containsKey(key) && args.get(key)!=null)?args.get(key).toString():"";
 	}
 	
+	private boolean isValidateList(List<Map<String,Object>> list) {
+		if(list!=null && list.size()>0) {
+			return true;
+		}else {
+			return false;
+		}
+	}
 	private Number getSponsorT(List<Map<String, Object>> list, String key) {
-		return (list.get(0).get(key)!=null)?(Number)list.get(0).get(key):0;
+		Number a = 0;
+		if(isValidateList(list)) {
+			a =  (list.get(0).get(key)!=null)?(Number)list.get(0).get(key):0;
+		}
+
+		return a;
 	}
 	
 	private Number getSponsorTN(List<Map<String, Object>> list, String key) {
-		return (list.get(0).get(key)!=null)?(Number)list.get(0).get(key):0;
+		Number a = 0;
+		if(isValidateList(list)) {
+			a =  (list.get(0).get(key)!=null)?(Number)list.get(0).get(key):0;
+		}
+
+		return a;	
 	}
 	
 	private Number getSponsorFor(List<Map<String, Object>> list, String key, int i) {
-		return (list.get(i).get(key)!=null)?(Number)list.get(i).get(key):0;
+		Number a = 0;
+		if(isValidateList(list)) {
+			a =  (list.get(i).get(key)!=null)?(Number)list.get(i).get(key):0;
+		}
+
+		return a;
 	}
 	
 	private String setSQLTimeSE(String key1, String key2) {

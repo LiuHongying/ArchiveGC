@@ -165,7 +165,7 @@
                   size="medium"
                   icon="el-icon-folder-add"
                   @click="addToShopingCart()"
-                  >添加到收藏</el-button
+                  >收藏</el-button
                 >
               </el-form-item>
               <el-form-item>
@@ -645,6 +645,7 @@ export default {
       _self.PreparationTablePrintVisible = true;
 
       setTimeout(() => {
+         _self.$refs.PreparationTablePrint.isBusinessArchive = true;
         _self.$refs.PreparationTablePrint.refreshArchiveObj(selectedRows);
       }, 100);
     },
