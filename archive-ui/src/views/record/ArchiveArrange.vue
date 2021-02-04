@@ -484,13 +484,7 @@
                         <AddToArchive :folderId="currentFolder.id" :archiveObjects="selectedItems" @savesuccess='searchItem' ></AddToArchive>
                       </el-dropdown-item>
                       <el-dropdown-item divided>
-                          <el-button  @click="logicallyDel(selectedItems,function(){
-                          let _self=this;
-                          if(_self.$refs.leftDataGrid){
-                              _self.$refs.leftDataGrid.itemDataList = [];
-                            }
-                          _self.loadGridData(_self.currentFolder);
-                        })" style="display:block; width:117px" type="warning" plain size="small" >
+                          <el-button  @click="onMenuRemoveItem(selectedItems)" style="display:block; width:117px" type="warning" plain size="small" >
                         <i class="el-icon-document-delete" ></i>
                         删 除
                           </el-button>
@@ -565,10 +559,7 @@
                           plain
                           @click="beforeInnerModify()"
                     >修改</el-button>
-                    <el-button type="warning" plain size="small" title="删除"  @click="logicallyDel(selectedInnerItems,function(){
-                          let _self=this;
-                          _self.showInnerFile(_selft.selectedRow);
-                        })">{{$t('application.delete')}}</el-button>
+                    <el-button type="warning" plain size="small" title="删除"  @click="onRemoveFileInVol(selectedInnerItems)">{{$t('application.delete')}}</el-button>
                     </el-form-item>
                       <el-form-item>
                       <AddCondition ref="childAddCondition" v-model="childAddConds" :inputType="hiddenInput" :showFileType= false :typeName='childTypeName' @change="searchChildItem"></AddCondition>
@@ -2791,6 +2782,22 @@ export default {
           console.log(error);
         });
     },
+    onMenuRemoveItem(selectedItems){
+      let _self=this;
+      this.logicallyDel(selectedItems,function(){
+         
+        if(_self.$refs.leftDataGrid){
+            _self.$refs.leftDataGrid.itemDataList = [];
+          }
+        _self.loadGridData(_self.currentFolder);
+      })
+    },
+    onRemoveFileInVol(selectedItems){
+       let _self=this;
+      this.logicallyDel(selectedItems,function(){
+         _self.showInnerFile(_selft.selectedRow);
+      })
+    }
   }
 };
 </script>
