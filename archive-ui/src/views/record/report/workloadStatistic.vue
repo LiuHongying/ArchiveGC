@@ -1,6 +1,28 @@
 <template>
   <DataLayout>
     <template v-slot:header>
+      <el-dialog title="年度档案统计" :visible.sync="dialogVisible" width="30%">
+        <span>
+          <el-main
+            v-loading="loading"
+            element-loading-spinner="el-icon-loading"
+          >
+            <el-form>
+              <el-form-item>
+                <el-date-picker
+                  v-model="yearS"
+                  type="year"
+                  placeholder="选择年份"
+                ></el-date-picker>
+              </el-form-item>
+            </el-form>
+          </el-main>
+        </span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="exportAll()">确认 </el-button>
+        </span>
+      </el-dialog>
       <el-form :inline="true">
         <el-form-item>
           <span>月度工作量统计</span>
@@ -20,6 +42,11 @@
             :placeholder="$t('application.startDate')"
             value-format="yyyy-MM-dd"
           ></el-date-picker>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="dialogVisible = true"
+            >年度档案统计</el-button
+          >
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleReport()">{{
@@ -64,38 +91,39 @@
           </template>
           <template slot="paneR">
             <el-row>
-            <el-form :inline="true">
-              <el-form-item>
-                <span>季度工作量统计</span>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="handleReportQuarter()">{{
-                  $t("application.SearchData")
-                }}</el-button>
-              </el-form-item>
-            </el-form>
+              <el-form :inline="true">
+                <el-form-item>
+                  <span>季度工作量统计</span>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="handleReportQuarter()">{{
+                    $t("application.SearchData")
+                  }}</el-button>
+                </el-form-item>
+              </el-form>
             </el-row>
             <el-row>
-            <el-table
-              ref="sonTable"
-              :data="tables.sonTable.data"
-              border
-              stripe
-              size="mini"
-              v-loading="loading"
-              :height="
-                ((layout.height - startHeight) * topPercent) / 100 -
-                topbarHeight
-              "
-            >
-              <el-table-column type="index" width="30" fixed> </el-table-column>
-              <el-table-column
-                v-for="item in tables.sonTable.columns"
-                :key="item.prop"
-                v-bind="item"
+              <el-table
+                ref="sonTable"
+                :data="tables.sonTable.data"
+                border
+                stripe
+                size="mini"
+                v-loading="loading"
+                :height="
+                  ((layout.height - startHeight) * topPercent) / 100 -
+                  topbarHeight
+                "
               >
-              </el-table-column>
-            </el-table>
+                <el-table-column type="index" width="30" fixed>
+                </el-table-column>
+                <el-table-column
+                  v-for="item in tables.sonTable.columns"
+                  :key="item.prop"
+                  v-bind="item"
+                >
+                </el-table-column>
+              </el-table>
             </el-row>
           </template>
         </split-pane>
@@ -111,7 +139,10 @@ export default {
     return {
       startDate: "",
       endDate: "",
+      yearS: "",
       loading: false,
+      dialogVisible: false,
+
       tables: {
         mainTable: {
           data: [],
@@ -253,7 +284,7 @@ export default {
         });
     },
 
-    handleReportQuarter(){
+    handleReportQuarter() {
       let _self = this;
       _self.loading = true;
 
@@ -270,6 +301,61 @@ export default {
         .catch(function (error) {
           console.log(error);
         });
+    },
+
+    exportAll() {
+      let _self = this;
+      
+      if(_self.yearS == ""){
+        _self.$message({ showClose: true, message: "年份选择不能为空！", duration: 5000, type: "warning"});
+        return;
+      }
+      _self.loading = true;
+
+      var fileDate = new Date();
+      let fileDateStr =
+        fileDate.getFullYear() +
+        "" +
+        fileDate.getMonth() +
+        "" +
+        fileDate.getDate();
+
+      var m = new Map();
+      m.set("yearSelect", _self.yearS);
+      m.set("fileName", "Report_Annual_" + fileDateStr + ".xlsx");
+      m.set("sheetName", "年度档案统计");
+      
+      axios
+        .post("/report/annual", JSON.stringify(m), {
+          responseType: "blob",
+        })
+        .then(function (res) {
+          console.log(res);
+          let fileName = res.headers["content-disposition"]
+            .split(";")[1]
+            .split("=")[1]
+            .replace(/\"/g, "");
+          let type = res.headers["content-type"];
+          let blob = new Blob([res.data], { type: type });
+          // IE
+          if (window.navigator.msSaveBlob) {
+            window.navigator.msSaveBlob(blob, fileName);
+          } else {
+            var link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+            //释放内存
+            window.URL.revokeObjectURL(link.href);
+          }
+          _self.loading = false;
+          _self.dialogVisible = false;
+        })
+        .catch(function (error) {
+          console.log(error);
+          _self.dialogVisible = false;
+        });
+      
     },
   },
 
