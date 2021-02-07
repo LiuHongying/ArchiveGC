@@ -104,7 +104,7 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 //			  if(Boolean.parseBoolean(isSendEmai)) {
 //			  sendMailOfProcessEnd(ecmSession,execution); } }
 			// 作废流程处理
-			if ("start".equals(execution.getEventName())) {
+			if ("start".equals(execution.getEventName())&& execution.getVariable("processName").equals("设计文件作废流程")) {
 				
 				try {
 					Map<String, Object> varMap = execution.getVariables();
