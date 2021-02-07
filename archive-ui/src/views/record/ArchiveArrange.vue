@@ -5,7 +5,7 @@
         <el-row style="padding:15px">
         <span>选择修改字段</span>
         <el-select v-model="resChoice" @change="onModifyChange" >
-          <div v-for="item in objectSrc">
+          <div v-for="item in objectSrc" :key="item.id">
               <el-option :label="item.label" :value="item.id"></el-option>
           </div>
           </el-select>
@@ -13,7 +13,7 @@
         <el-row style="padding:15px">
         <span>选择操作类型</span>
         <el-select @change="onChoiceChange" v-model="Choice" >
-          <div v-for="items in modifyOption">
+          <div v-for="items in modifyOption" :key="items">
               <el-option :label="items" :value="items"></el-option>
           </div>
           </el-select>
@@ -1918,11 +1918,16 @@ export default {
     },
     // 文件夹节点点击事件
     handleNodeClick(indata) {
+      let archiveType = indata.name
+      let gridView = this.currentFolder.gridView
       let _self = this;
       _self.selectRow = [];
       _self.selectedFileId = "";
       _self.currentFolder = indata;
-      _self.$refs.mainDataGrid.getOutFolder(_self.currentFolder)
+      if(gridView == undefined || gridView==''){
+        return
+      }
+      _self.$refs.mainDataGrid.loadArchiveInfo(archiveType,gridView)
       //console.log(JSON.stringify(indata));
       // 没有加载，逐级加载
       if (indata.extended == false) {
