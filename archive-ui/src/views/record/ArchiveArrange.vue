@@ -2058,6 +2058,7 @@ export default {
     },
     // 文件夹节点点击事件
     handleNodeClick(indata) {
+      this.currentFolder = indata
       let archiveType = indata.name
       let gridView = this.currentFolder.gridView
       let _self = this;
@@ -2069,8 +2070,12 @@ export default {
       if(gridView == undefined || gridView==''){
         return
       }
+      _self.$refs.mainDataGrid.gridviewInfo.gridviewName=gridView
       _self.$refs.mainDataGrid.loadArchiveInfo(archiveType,gridView)
+
+      _self.$refs.leftDataGrid.gridviewInfo.gridviewName=gridView
       _self.$refs.leftDataGrid.loadArchiveInfo(archiveType,gridView)
+
       //console.log(JSON.stringify(indata));
       // 没有加载，逐级加载
       if (indata.extended == false) {

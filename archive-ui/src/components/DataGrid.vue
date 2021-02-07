@@ -568,7 +568,7 @@ export default {
       _self.configName=''
       _self.loadCustomListConfig(gridView)
       _self.gridviewInfo.currentFolder.gridView = gridView
-      var archiveInfo = new Map();
+      let archiveInfo = new Map();
       archiveInfo.set("C_FROM",gridView)
       archiveInfo.set("archiveType",archiveType)
       _self.archiveMap = archiveInfo;
@@ -576,6 +576,8 @@ export default {
          _self.$refs.ecmCustomColumns.loadArchiveInfo()
       })
       
+      this.refreshMainConfigList()
+      this.loadGridInfo()
     },
     //end
     //上一个文档
