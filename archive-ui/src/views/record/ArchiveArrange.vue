@@ -1934,7 +1934,7 @@ export default {
         _self.loading = true;
         let mp=new Map();
         mp.set("folderId",indata.id);
-        mp.set("condition"," and(IS_HIDDEN=0 and IS_CHILD=0)");
+        mp.set("condition"," and (IS_HIDDEN=0 and IS_CHILD=0)");
         _self
           .axios({
             headers: {
