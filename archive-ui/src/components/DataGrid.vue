@@ -563,15 +563,15 @@ export default {
             }
           })
     },
-    getOutFolder(folder){
-      let _self = this;
-      _self.configName = "";
-      _self.loadCustomListConfig(folder.gridView);
-      _self.gridviewInfo.currentFolder = folder;
+    loadArchiveInfo(archiveType,gridView){
+      let _self = this
+      _self.configName=''
+      _self.loadCustomListConfig(gridView)
+      _self.gridviewInfo.currentFolder.gridView = gridView
       var archiveInfo = new Map();
-      archiveInfo.set("C_FROM",folder.gridView)
-      archiveInfo.set("archiveType",folder.name)
-      _self.archiveMap = archiveInfo;
+        archiveInfo.set("C_FROM",gridView)
+        archiveInfo.set("archiveType",archiveType)
+        _self.archiveMap = archiveInfo;
     },
     //end
     //上一个文档
