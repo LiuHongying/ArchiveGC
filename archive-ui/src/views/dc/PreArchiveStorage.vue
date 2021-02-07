@@ -26,6 +26,7 @@
             }}</el-button>
           </el-header>
           <el-tree
+            ref="ecmFolderTree"
             :props="defaultProps"
             :data="dataList"
             node-key="id"
@@ -408,6 +409,7 @@ export default {
       pageSize: 20,
       judgement: "",
       currentFolder: [],
+      currentTreeNode:null,
       tables: {
         main: {
           gridViewName: "GeneralPre",
@@ -811,11 +813,15 @@ export default {
       this.selectedItems = val;
     },
 
-    handleNodeClick(indata) {
+    handleNodeClick(indata,node,current) {
       let _self = this;
       _self.selectRow = [];
       _self.selectedFileId = "";
-
+      let gridView = indata.gridView
+      let archiveType = "科技与信息"
+      _self.$refs.mainDataGrid.loadArchiveInfo(archiveType,gridView)
+      _self.$refs.relevantFileDataGrid.loadArchiveInfo(archiveType,gridView)
+      
       _self.currentFolder = indata;
       _self.loading = true;
       axios
