@@ -126,7 +126,7 @@ export default {
     //文档模糊查询
     search() {
       let _self = this;
-      let key="((IS_CURRENT=1 AND STATUS='作废') OR (C_STORE_STATUS<>'已作废' AND IS_CURRENT=0 AND C_INCLUDE_PAPER='有')) AND IS_RELEASED=1 AND TYPE_NAME='设计文件'";
+      let key="((IS_CURRENT=1 AND STATUS='作废') OR (IS_CURRENT=0 AND C_INCLUDE_PAPER='有')) AND C_STORE_STATUS<>'已作废' AND IS_RELEASED=1 AND TYPE_NAME='设计文件'";
       if(_self.inputValueNum!=''&&_self.inputValueNum!=undefined){
         key+="and (CODING LIKE '%"+_self.inputValueNum+"%' OR TITLE LIKE '%"+_self.inputValueNum+"%')";
       }
