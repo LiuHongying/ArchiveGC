@@ -409,7 +409,8 @@ export default {
       currentDocIndex: 0,
       prevButtonDisabled:true,
       nextButtonDisabled:true,
-      orderBy:""
+      orderBy:"",
+      cachePrefix:""
     };
   },
   props: {
@@ -497,15 +498,18 @@ export default {
     },
     showCustomConfig(){
       this.showConfigList = true;
+      this.$nextTick(function(){
+        this.refreshMainConfigList();
+      },100);
     },
     changeConfig(item){
       this.configItem = item
     },
     useConfig(){
       if(this.configItem.name=="默认"){
-      localStorage.setItem(this.gridviewInfo.currentFolder.gridView, this.configItem.id);
+        localStorage.setItem(this.cachePrefix+this.gridviewName, this.configItem.id);
       }else{
-      localStorage.setItem(this.gridviewInfo.currentFolder.gridView, this.configItem.id+"_CUSTOM");
+        localStorage.setItem(this.cachePrefix+this.gridviewName, this.configItem.id+"_CUSTOM");
       }
       this.showConfigInfo(this.configItem);
       this.showConfigList= false;
@@ -522,14 +526,32 @@ export default {
       let mp = new Map()
       mp.set("C_FROM",val)
       axios.post(url,JSON.stringify(mp)).then(function(response){
+        _self.customList = [];
             if (response.data.code == 1) {
             _self.customList = response.data.data;
-            _self.customList.push({"name":"默认","id":_self.gridviewInfo.currentFolder.gridView})
-            _self.gridviewInfo.gridviewName = _self.gridViewName;
+            _self.customList.push({"name":"默认","id":_self.gridViewName})
+            //_self.gridviewInfo.gridviewName = _self.gridViewName;
             _self.gridviewInfo.isCustom = false;
           }
           })
     },
+
+    loadCustomGridInfo(initGridName){
+      let _self = this;
+      _self.gridViewName = initGridName;
+      var currentCustomConfig = localStorage.getItem(_self.cachePrefix + initGridName);
+      if(currentCustomConfig==null || currentCustomConfig==undefined){
+        _self.gridviewInfo.gridviewName = initGridName;
+        _self.showConfigInfo({"id":initGridName,"name":"默认"})
+      }else{
+        if(currentCustomConfig.indexOf("_CUSTOM")>-1){
+          _self.showConfigInfo({"id":currentCustomConfig.replace("_CUSTOM",""),"name":currentCustomConfig})
+        }else{
+          _self.showConfigInfo({"id":currentCustomConfig,"name":"默认"})
+        }
+      }
+    },
+
     showConfigInfo(item){
       let id = item.id;
       let _self = this;
@@ -546,11 +568,13 @@ export default {
       axios.post(url,JSON.stringify(m)).then(function(response){
             if(response.data.code==1) {
               if(item.name=="默认"){
+                _self.gridviewInfo.isCustom = false;
                 _self.gridviewInfo.gridviewName = item.id;
                 _self.columnList = response.data.customGridInfo;
               }else{
                 _self.gridviewInfo.gridviewName = item.id+"_CUSTOM";
                 _self.columnList = JSON.parse(response.data.data);
+                _self.gridviewInfo.isCustom = true;
               }
               _self.columnList.forEach((element) => {
                 if (element.visibleType == 1) {
@@ -558,8 +582,7 @@ export default {
                 }
               });
               _self.$emit("changeGridName", _self.gridviewInfo.gridviewName);
-              _self.gridviewInfo.isCustom = true;
-            _self.loadGridData();
+              _self.loadGridData();
             }
           })
     },
@@ -567,15 +590,15 @@ export default {
       let _self = this
       _self.configName=''
       _self.loadCustomListConfig(gridView)
-      _self.gridviewInfo.currentFolder.gridView = gridView
       var archiveInfo = new Map();
       archiveInfo.set("C_FROM",gridView)
       archiveInfo.set("archiveType",archiveType)
       _self.archiveMap = archiveInfo;
-      this.$nextTick(function(){
-         _self.$refs.ecmCustomColumns.loadArchiveInfo()
-      })
-      
+      if(_self.$refs.ecmCustomColumns){
+        _self.$nextTick(function(){
+          _self.$refs.ecmCustomColumns.loadArchiveInfo();
+        },100);
+      }
     },
     //end
     //上一个文档
@@ -971,8 +994,9 @@ export default {
       let _self = this;
       _self.editColumn = true;
       _self.$nextTick(() => {
+        _self.$refs.ecmCustomColumns.loadArchiveInfo();
         _self.leftData = _self.generateData();
-      });
+      },100);
     },
     generateData() {
       let _self = this;
