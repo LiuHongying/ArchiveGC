@@ -1,5 +1,27 @@
 <template>
   <DataLayout>
+          <el-dialog :title="$t('application.Import')" :visible.sync="importdialog4AttachVisible" width="70%" :close-on-click-modal="false">
+          <el-form size="mini" :label-width="formLabelWidth" v-loading='uploading'>
+              <div style="height:200px;overflow-y:scroll; overflow-x:scroll;">
+              <el-upload
+                  :limit="100"
+                  :file-list="files4Attach"
+                  action
+                  :on-change="handleChange4Attach"
+                  :auto-upload="false"
+                  :multiple="true"
+              >
+                  <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
+              </el-upload>
+              </div>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+              <el-button @click="importdialog4AttachVisible = false">{{$t('application.cancel')}}</el-button>
+              <el-button type="primary" @click="uploadAttachData()">{{$t('application.start')+$t('application.Import')}}</el-button>
+          </div>
+      </el-dialog>
+
+
     <el-dialog :title="$t('message.Batch')+' '+$t('application.Import')+$t('application.document')" :visible.sync="batchDialogVisible" width="80%" >
         <BatchImport ref="BatchImport" templateUrl="/import/getImportTemplatesCommon"  @onImported="onBatchImported" width="100%" v-bind:deliveryId="selectedOneTransfer.ID"></BatchImport>
         <div slot="footer" class="dialog-footer">
@@ -211,6 +233,12 @@
           icon="el-icon-printer"
           @click="beforePrint(selectRow,'PrintDelivery','文件清单')"
         >打印清单</el-button>
+
+          <el-button 
+          plain
+          size="small"
+           type="primary" @click="beforeUploadAttach('/exchange/doc/addAttachment')">添加附件</el-button>
+
          <el-button
           type="primary"
           plain
@@ -317,6 +345,12 @@
                         >格式副本</el-button> -->
                         <el-button type="primary" plain size="small" title="上移" @click="onMoveUp()">上移</el-button>
                         <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
+                        <el-button 
+                          plain
+                          size="small"
+                          type="primary" 
+                          @click="beforeUploadInnerAttach('/exchange/doc/addAttachment')">添加附件
+                          </el-button>
                       </el-row>
                       <el-row>
                         <el-col :span="24">
@@ -370,9 +404,12 @@ export default {
   name: "ArchiveDelivery",
   data() {
     return {
+      files4Attach:[],
+      isAttach:false,
+      isInnerAttach:false,
       leftStorageName: 'ArchiveDeliveryWidth',
       leftPercent: 20,
-
+      importdialog4AttachVisible:false,
       // 本地存储高度名称
       topStorageName: 'ArchiveDeliveryHeight',
       // 非split pan 控制区域高度
@@ -482,7 +519,9 @@ export default {
       classicNames:[],
       selectedClassic:"",
       parentId:"",
-      butt:false
+      butt:false,
+      AttachParentID:"",
+      InnerAttachParentID:""
     };
   },
   watch: {
@@ -515,6 +554,46 @@ export default {
         }, 300);
   },
   methods: {
+        beforeUploadInnerAttach(uploadpath){
+        let _self=this;
+        this.isInnerAttach=true
+        this.isAttach=false
+        if(this.InnerAttachParentID==undefined||this.InnerAttachParentID==""){
+            // _self.$message('请选择一条文件数据');
+            _self.$message({
+                    showClose: true,
+                    message: _self.$t('message.PleaseSelectOneFile'),
+                    duration: 2000,
+                    type: "warning"
+                });
+            return;
+        }
+        _self.uploadUrl=uploadpath;
+        _self.files4Attach=[];
+        _self.importdialog4AttachVisible=true;
+                      
+        },
+
+        beforeUploadAttach(uploadpath){
+        let _self=this;
+        this.isAttach=true
+        this.isInnerAttach=false
+        if(this.AttachParentID==undefined||this.AttachParentID==""){
+            // _self.$message('请选择一条文件数据');
+            _self.$message({
+                    showClose: true,
+                    message: _self.$t('message.PleaseSelectOneFile'),
+                    duration: 2000,
+                    type: "warning"
+                });
+            return;
+        }
+        _self.uploadUrl=uploadpath;
+        _self.files4Attach=[];
+        _self.importdialog4AttachVisible=true;
+            
+      },
+
     // 水平分屏事件
     onHorizontalSplitResize(leftPercent){
       // 左边百分比*100
@@ -945,12 +1024,14 @@ export default {
 
     selectOneFile(row) {
       this.selectedFileItem=row;
+      this.InnerAttachParentID = row.ID
       // let _self = this;
       // if (_self.selectRow) {
       //   _self.selectedFileId = row.ID;
       // }
     },
     beforeShowInnerFile(row){
+      this.AttachParentID = row.ID
       this.selectedFileItem=[];
       this.innerCurrentPage=1;
       this.showInnerFile(row);
@@ -1426,6 +1507,8 @@ export default {
         });
     },
     beforeLoadGridData(row){
+      this.AttachParentID=""
+      this.InnerAttachParentID=""
       this.innerDataList=[];
       this.selectedFileItem=[];
       this.selectRow=[];
@@ -2322,6 +2405,38 @@ export default {
     handleChange(file, fileList) {
       this.fileList = fileList;
     },
+    handleChange4Attach(file,fileList){
+      this.files4Attach = fileList
+    },
+    getForm4AttachData() {
+      let _self = this;
+      let formdata = new FormData();
+      var data = {};
+      data["ID"] = _self.selectedItems.ID;
+      formdata.append("metaData", JSON.stringify(data));
+      _self.files4Attach.forEach(function(file) {
+        formdata.append("uploadFile", file.raw, file.name);
+      });
+      return formdata;
+    },
+    getForm4InnerAttachData() {
+      let _self = this;
+      let formdata = new FormData();
+      var data = {};
+      data["ID"] = _self.selectedInnerItems.ID;
+      formdata.append("metaData", JSON.stringify(data));
+      _self.fileList.forEach(function(file) {
+        //console.log(file.name);
+        formdata.append("uploadFile", file.raw, file.name);
+      });
+      return formdata;
+    },
+
+
+
+
+
+
     getFormData() {
       let _self = this;
       let formdata = new FormData();
@@ -2337,7 +2452,7 @@ export default {
     //上传文件
     uploadData() {
       let _self = this;
-      let formdata = _self.getFormData();
+      let formdata = _self.getFormData()
       console.log("UploadData getData");
       console.log(formdata);
       _self.uploading=true;
@@ -2355,6 +2470,62 @@ export default {
           _self.importdialogVisible = false;
           // _self.refreshData();
           _self.uploading=false;
+          // _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
+          _self.$message({
+                showClose: true,
+                message: _self.$t('application.Import')+_self.$t('message.success'),
+                duration: 2000,
+                type: 'success'
+              });
+        })
+        .catch(function(error) {
+          _self.uploading=false;
+          console.log(error);
+        });
+    },
+    uploadAttachData() {
+      let _self = this;
+      let formdata = new FormData()
+      var data = {}
+      let ids = []
+      if(_self.isAttach==true){
+      // for(let i = 0;i<_self.selectedItems.length;i++){
+      //   ids[i] = _self.selectedItems[i].ID 
+      // }
+      data["parentDocId"] = _self.AttachParentID
+      formdata.append("metaData", JSON.stringify(data));
+      _self.files4Attach.forEach(function(file) {
+        formdata.append("uploadFile", file.raw, file.name);
+      });
+      }
+      else if(_self.isInnerAttach==true){
+      // for(let i = 0;i<_self.selectedInnerItems.length;i++){
+      //   ids[i] = _self.selectedInnerItems[i].ID 
+      // }
+      data["parentDocId"] = _self.InnerAttachParentID
+      formdata.append("metaData", JSON.stringify(data));
+      _self.files4Attach.forEach(function(file) {
+        formdata.append("uploadFile", file.raw, file.name);
+      });
+      }
+      console.log(ids);
+      _self.uploading=true;
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          datatype: "json",
+          method: "post",
+          data: formdata,
+          url: _self.uploadUrl
+        })
+        .then(function(response) {
+          _self.importdialog4AttachVisible = false;
+          // _self.refreshData();
+          _self.uploading = false;
+          _self.isAttach = false
+          _self.isInnerAttach = false
           // _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
           _self.$message({
                 showClose: true,
