@@ -178,8 +178,7 @@ export default {
     }
   },
   mounted(){
-    this.selectedClassic = this.archiveInfo.get("archiveType")
-    this.getTypeNameByClassic(this.archiveInfo.get("archiveType"))
+    this.loadArchiveInfo()
     this.getClassicNames("ClassicNames");
     //this.loadCustomName()
     this.loadSysColumnInfo()
@@ -191,6 +190,10 @@ export default {
       }
   },
   methods:{
+    loadArchiveInfo(){
+      this.selectedClassic = this.archiveInfo.get("archiveType")
+      this.getTypeNameByClassic(this.archiveInfo.get("archiveType"))
+    },
     //Matthew changes on 2021年1月25日17:09:23
     useConfig(){
       let _self = this;

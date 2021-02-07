@@ -569,9 +569,13 @@ export default {
       _self.loadCustomListConfig(gridView)
       _self.gridviewInfo.currentFolder.gridView = gridView
       var archiveInfo = new Map();
-        archiveInfo.set("C_FROM",gridView)
-        archiveInfo.set("archiveType",archiveType)
-        _self.archiveMap = archiveInfo;
+      archiveInfo.set("C_FROM",gridView)
+      archiveInfo.set("archiveType",archiveType)
+      _self.archiveMap = archiveInfo;
+      this.$nextTick(function(){
+         _self.$refs.ecmCustomColumns.loadArchiveInfo()
+      })
+      
     },
     //end
     //上一个文档
