@@ -554,7 +554,7 @@ export default {
           key+=" and "
         }
         if(_self.conditionDC==""||_self.conditionDC==undefined){
-          _self.conditionDC="C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+_self.conditionFile
+          _self.conditionDC="C_INCLUDE_PAPER='有' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+_self.conditionFile
         }
         key +=_self.conditionDC
       }
@@ -599,7 +599,7 @@ export default {
           key+=" and "
         }
         if(_self.conditionDC==""||_self.conditionDC==undefined){
-          _self.conditionDC="C_INCLUDE_PAPER='是' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+_self.conditionFile
+          _self.conditionDC="C_INCLUDE_PAPER='有' and IS_RELEASED=1 AND IS_CHILD=0 AND IS_CURRENT=1"+_self.conditionFile
         }
         key +=_self.conditionDC
       }
