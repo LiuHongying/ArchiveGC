@@ -496,6 +496,83 @@ public class DocController  extends ControllerAbstract  {
 		return mp;
 	}
 	
+	@RequestMapping(value = "addAttachment", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> addAttachment(String metaData, MultipartFile[] uploadFile) {
+		
+		Map<String, Object> args = JSONUtils.stringToMap(metaData);
+		Map<String, Object> mp = new HashMap<String, Object>();
+		try {
+			
+			String parentId = args.get("parentDocId").toString();
+			if("".equals(parentId)) {
+				mp.put("code", ActionContext.FAILURE);
+				mp.put("message","没有主文件ID");
+				return mp;
+			}
+			if (uploadFile != null&&uploadFile.length>0) {
+				execAddAttachment(args,uploadFile);
+				mp.put("code", ActionContext.SUCESS);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			mp.put("code", ActionContext.FAILURE);
+			mp.put("message", ex.getMessage());
+		}
+		return mp;
+	}
+	
+	public void execAddAttachment(Map<String, Object> args,MultipartFile[] uploadFile) throws Exception {
+		String parentId = args.get("parentDocId").toString();
+		
+		for (MultipartFile multipartFile : uploadFile) {
+			
+			EcmDocument doc = new EcmDocument();
+			args.put("TYPE_NAME", "附件");
+			doc.setAttributes(args);
+			String fileName=multipartFile.getOriginalFilename();
+			fileName=fileName.substring(0,fileName.lastIndexOf(".")<0
+					?fileName.length():fileName.lastIndexOf("."));
+			doc.setName(fileName);
+			
+			Object fid= args.get("folderId");
+			String folderId="";
+			if(fid==null) {
+				folderId= folderPathService.getFolderId(getToken(), doc.getAttributes(), "3");
+			}else {
+				folderId=fid.toString();
+			}
+			EcmFolder folder= folderService.getObjectById(getToken(), folderId);
+			doc.setFolderId(folderId);
+			doc.setAclName(folder.getAclName());
+			
+			EcmContent en = new EcmContent();
+			en.setName(multipartFile.getOriginalFilename());
+			en.setContentSize(multipartFile.getSize());
+			en.setInputStream(multipartFile.getInputStream());
+//			documentService.addRendition(getToken(), parentId, en);
+			
+			String relationName="irel_children";
+			relationName=args.get("relationName")!=null
+					&&!"".equals(args.get("relationName").toString())
+					?args.get("relationName").toString():"irel_children";
+			String id = documentService.newObject(getToken(),doc,en);//创建文件和内容
+			//----------------创建关系--------------
+			EcmRelation relation=new EcmRelation();
+			relation.setParentId(parentId);
+			
+			relation.setChildId(id);
+			relation.setName(relationName);
+			try {
+				relationService.newObject(getToken(), relation);
+			} catch (EcmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				throw e;
+			}
+			//----------------end创建关系-------------------
+		}
+	}
 	
 	
 	@RequestMapping(value = "addAttachment4Copy", method = RequestMethod.POST)
