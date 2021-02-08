@@ -445,6 +445,8 @@ export default {
     _self.loading = true;
     _self.topPercent = 65;
     _self.$refs.mainDataGrid.loadArchiveInfo("科技与信息","GeneralPre");
+    _self.$refs.relevantFileDataGrid.cachePrefix = "PreArchive";
+    _self.$refs.relevantFileDataGrid.gridviewInfo.gridviewName = "ArrangeInnerGrid";
     _self.$refs.relevantFileDataGrid.loadArchiveInfo("科技与信息","ArrangeInnerGrid");
     if (_self.inputFolder != "" && _self.inputFolder != undefined) {
       var m = new Map();
@@ -470,6 +472,8 @@ export default {
         .post("/admin/getPreArchivesFolder", 0)
         .then(function (response) {
           _self.dataList = response.data.data;
+          _self.$refs.mainDataGrid.loadCustomGridInfo("GeneralPre");
+          _self.$refs.relevantFileDataGrid.loadCustomGridInfo("ArrangeInnerGrid");
           _self.handleNodeClick(_self.dataList[0]);
           _self.loading = false;
         })

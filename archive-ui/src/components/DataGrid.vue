@@ -507,9 +507,9 @@ export default {
     },
     useConfig(){
       if(this.configItem.name=="默认"){
-        localStorage.setItem(this.cachePrefix+this.gridviewName, this.configItem.id);
+        localStorage.setItem(this.cachePrefix+this.gridViewName, this.configItem.id);
       }else{
-        localStorage.setItem(this.cachePrefix+this.gridviewName, this.configItem.id+"_CUSTOM");
+        localStorage.setItem(this.cachePrefix+this.gridViewName, this.configItem.id+"_CUSTOM");
       }
       this.showConfigInfo(this.configItem);
       this.showConfigList= false;
