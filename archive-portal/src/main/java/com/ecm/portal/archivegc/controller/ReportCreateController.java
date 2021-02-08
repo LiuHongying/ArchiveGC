@@ -64,16 +64,16 @@ public class ReportCreateController extends ControllerAbstract {
 				timeCheck = setSQLTimeEmp();
 			}
 			// todo 
-			String sqlStatistic = "select USER_NAME,TYPE_NAME,ymd," + 
+			String sqlStatistic = "select * from (select USER_NAME,TYPE_NAME,ymd," + 
 					"sum(iszl) as workstorcount,sum(iszf) as workgetcount,sum(ismodify) as workstjorcount,sum(iszj) as workgetjicount " + 
 					"from (select eag.ID,eag.USER_NAME,ed.TYPE_NAME,DATE_FORMAT(eag.EXCUTE_DATE, '%Y-%m-%d') as ymd," + 
-					"	  if(eag.ACTION_NAME = '接收' and  ed.C_ITEM_TYPE = '案卷',1,0) iszl," + 
-					"	  if(eag.ACTION_NAME = '接收' and  ed.C_ITEM_TYPE = '文件',1,0) iszf," + 
+					"	  if(eag.ACTION_NAME = '整编' and  ed.C_ITEM_TYPE = '案卷',1,0) iszl," + 
+					"	  if(eag.ACTION_NAME = '整编' and  ed.C_ITEM_TYPE = '文件',1,0) iszf," + 
 					"	  if(eag.ACTION_NAME = '入库' and  ed.C_ITEM_TYPE = '案卷',1,0) ismodify," + 
 					"	  if(eag.ACTION_NAME = '入库' and  ed.C_ITEM_TYPE = '文件',1,0) iszj " + 
 					"	  from ecm_audit_general eag,ecm_document ed " + 
 					"	  where ed.id=eag.DOC_ID and ed.C_ARC_CLASSIC is not null "+ timeCheck +" ) tt  " + 
-					"group by USER_NAME,TYPE_NAME,ymd order by ymd desc";
+					"group by USER_NAME,TYPE_NAME,ymd order by ymd desc) ss where (workstorcount >0 or workgetcount >0 or workstjorcount>0 or workgetjicount>0)";
 			
 			List<Map<String, Object>> listWorkStatistic = documentService.getMapList(getToken(), sqlStatistic);
 			
@@ -182,16 +182,16 @@ public class ReportCreateController extends ControllerAbstract {
 				timeCheck = setSQLTimeEmp();
 			}
 			
-			String sqlStatistic = "select USER_NAME,TYPE_NAME,ymd," + 
+			String sqlStatistic = "select * from (select USER_NAME,TYPE_NAME,ymd," + 
 					"sum(iszl) as workstorcount,sum(iszf) as workgetcount, sum(isliangka) as workTCcount,sum(ismodify) as workstjorcount,sum(iszj) as workgetjicount " + 
 					"from (select eag.ID,eag.USER_NAME,ed.TYPE_NAME,DATE_FORMAT(eag.EXCUTE_DATE, '%Y-%m-%d') as ymd," + 
-					"	  if(eag.ACTION_NAME = '著录',1,0) iszl,if(ed.STATUS='作废',1,0) iszf," + 
+					"	  if(eag.ACTION_NAME = '整编',1,0) iszl,if(ed.STATUS='作废',1,0) iszf," + 
 					"	  if(ed.TYPE_NAME = '设计文件修改单',1,0) ismodify," + 
 					"	  if(eag.ACTION_NAME ='质检',1,0) iszj, "+ 
 					"     if(ed.C_COMMENT like '%两卡%', 1, 0) isliangka" + 
 					"	  from ecm_audit_general eag,ecm_document ed " + 
 					"	  where ed.id=eag.DOC_ID and ed.C_ARC_CLASSIC is not null "+ timeCheck +" ) tt  " + 
-					"group by USER_NAME,TYPE_NAME ,ymd order by ymd desc";
+					"group by USER_NAME,TYPE_NAME ,ymd order by ymd desc) ss where (workstorcount >0 or workgetcount >0 or workTCcount>0 or workstjorcount>0 or workgetjicount>0) ";
 			
 			List<Map<String, Object>> listWorkStatistic = documentService.getMapList(getToken(), sqlStatistic);
 				
@@ -239,13 +239,13 @@ public class ReportCreateController extends ControllerAbstract {
 			Map<String, Object> projMap = new HashMap<String, Object>(); 
 			
 			String sqlPreArchive = "select distinct b.C_ARC_CLASSIC," + 
-					"(select count(*) from ecm_audit_general a2 left join ecm_document b2 on a2.DOC_ID = b2.ID where b2.TYPE_NAME in ('合同管理案卷','合同管理文件') and (a2.EXCUTE_DATE between '"+ startDate +"' and '"+ endDate+"')) as changeCountStored " + 
+					"(select count(*) from ecm_audit_general a2 left join ecm_document b2 on a2.DOC_ID = b2.ID where a2.ACTION_NAME = '入库' and b2.TYPE_NAME in ('合同管理案卷','合同管理文件') and (a2.EXCUTE_DATE between '"+ startDate +"' and '"+ endDate+"')) as changeCountStored " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID where b.C_ARC_CLASSIC = '商务管理'";
 			String sqlStored = "select distinct b.STATUS," + 
-					"(select count(*) from ecm_audit_general a2 left join ecm_document b2 on a2.DOC_ID = b2.ID where b2.TYPE_NAME in ('招标文件案卷','招标文件','投标文件案卷','投标文件') and (a2.EXCUTE_DATE between '"+ startDate +"' and '"+ endDate+"')) as changeCountStored " + 
+					"(select count(*) from ecm_audit_general a2 left join ecm_document b2 on a2.DOC_ID = b2.ID where a2.ACTION_NAME = '入库' and b2.TYPE_NAME in ('招标文件案卷','招标文件','投标文件案卷','投标文件') and (a2.EXCUTE_DATE between '"+ startDate +"' and '"+ endDate+"')) as changeCountStored " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID where b.C_ARC_CLASSIC = '商务管理'";
 			String sqlOther = "select distinct b.STATUS," + 
-					"(select count(*) from ecm_audit_general a2 left join ecm_document b2 on a2.DOC_ID = b2.ID where b2.TYPE_NAME not in ('合同管理案卷','合同管理文件','招标文件案卷','招标文件','投标文件案卷','投标文件') and (a2.EXCUTE_DATE between '"+ startDate +"' and '"+ endDate+"')) as changeCountStored " + 
+					"(select count(*) from ecm_audit_general a2 left join ecm_document b2 on a2.DOC_ID = b2.ID where a2.ACTION_NAME = '入库' and b2.TYPE_NAME not in ('合同管理案卷','合同管理文件','招标文件案卷','招标文件','投标文件案卷','投标文件') and (a2.EXCUTE_DATE between '"+ startDate +"' and '"+ endDate+"')) as changeCountStored " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID where b.C_ARC_CLASSIC = '商务管理'";
 			
 			List<Map<String, Object>> listPreArchive = documentService.getMapList(getToken(), sqlPreArchive);
@@ -292,36 +292,33 @@ public class ReportCreateController extends ControllerAbstract {
 		
 		String year = String.valueOf(Integer.parseInt(yearSelect.substring(0, 4)) + 1);
 		
+		String[] itemType = {"照片","录音","录像"};
+		
 		try {
-			Map<String, Object> projMap = new HashMap<String, Object>(); 
-			
-			String sqlQuarter = "select distinct TYPE_NAME, " + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-01-01' and '"+ year +"-03-31') and ed2.TYPE_NAME = ed.TYPE_NAME) as quarter1," + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-04-01' and '"+ year +"-06-30') and ed2.TYPE_NAME = ed.TYPE_NAME) as quarter2," + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-07-01' and '"+ year +"-09-30') and ed2.TYPE_NAME = ed.TYPE_NAME) as quarter3," + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-10-01' and '"+ year +"-12-31') and ed2.TYPE_NAME = ed.TYPE_NAME) as quarter4 " + 
-					"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
-					"where ed.TYPE_NAME in ('照片','录像','录音')";
-			
-			List<Map<String, Object>> listWorkStatistic = documentService.getMapList(getToken(), sqlQuarter);
-			
-			for(int i=0; i<listWorkStatistic.size(); i++) {
-				projMap = new HashMap<String, Object>();
-				String avType = (listWorkStatistic.get(i).get("TYPE_NAME")!=null)?(String)listWorkStatistic.get(i).get("TYPE_NAME"):"";
-				projMap.put("avType", avType);
-				Number quarterOne = getSponsorFor(listWorkStatistic, "quarter1", i);
+			for(String item: itemType) {
+				String sqlQuarter = "select distinct C_ARC_CLASSIC, " + 
+						"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-01-01' and '"+ year +"-03-31') and ed2.C_ARC_CLASSIC = ed.C_ARC_CLASSIC and ed2.SUB_TYPE = '"+ item +"') as quarter1," + 
+						"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-04-01' and '"+ year +"-06-30') and ed2.C_ARC_CLASSIC = ed.C_ARC_CLASSIC and ed2.SUB_TYPE = '"+ item +"') as quarter2," + 
+						"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-07-01' and '"+ year +"-09-30') and ed2.C_ARC_CLASSIC = ed.C_ARC_CLASSIC and ed2.SUB_TYPE = '"+ item +"') as quarter3," + 
+						"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-10-01' and '"+ year +"-12-31') and ed2.C_ARC_CLASSIC = ed.C_ARC_CLASSIC and ed2.SUB_TYPE = '"+ item +"') as quarter4 " + 
+						"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
+						"where C_ARC_CLASSIC = '特种介质'";
+				
+				List<Map<String, Object>> listWorkStatistic = documentService.getMapList(getToken(), sqlQuarter);
+				
+				Map<String, Object> projMap = new HashMap<String, Object>(); 
+				projMap.put("avType", item);
+				Number quarterOne = getSponsorT(listWorkStatistic, "quarter1");
 				projMap.put("quarterOne", quarterOne);
-				Number quarterTwo = getSponsorFor(listWorkStatistic, "quarter2", i);
+				Number quarterTwo = getSponsorT(listWorkStatistic, "quarter2");
 				projMap.put("quarterTwo", quarterTwo);
-				Number quarterThree = getSponsorFor(listWorkStatistic, "quarter3", i);
+				Number quarterThree = getSponsorT(listWorkStatistic, "quarter3");
 				projMap.put("quarterThree", quarterThree);
-				Number quarterFour = getSponsorFor(listWorkStatistic, "quarter4", i);
+				Number quarterFour = getSponsorT(listWorkStatistic, "quarter4");
 				projMap.put("quarterFour", quarterFour);
 				
 				outList.add(projMap);
 			}
-			
-			
 			
 			mp.put("data", outList);
 			mp.put("code", ActionContext.SUCESS);
@@ -355,9 +352,13 @@ public class ReportCreateController extends ControllerAbstract {
 					"(select count(*) from ecm_audit_general a2 left join ecm_document b2 on a2.DOC_ID = b2.ID where b2.TYPE_NAME = '科研文件' and b2.STATUS = b.STATUS and (a2.EXCUTE_DATE between '"+ startDate +"' and '"+ endDate+"')) as fileCountStored, " + 
 					"(select count(*) from ecm_audit_general a2 left join ecm_document b2 on a2.DOC_ID = b2.ID where b2.TYPE_NAME = '科研文件修改单' and b2.STATUS = b.STATUS and (a2.EXCUTE_DATE between '"+ startDate +"' and '"+ endDate+"')) as changeCountStored " + 
 					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID where b.STATUS in ('已入库')";
+			String sqlCD = "select distinct b.TYPE_NAME," + 
+					"(select count(*) from ecm_audit_general a2 left join ecm_document b2 on a2.DOC_ID = b2.ID where b2.TYPE_NAME = b.TYPE_NAME and b2.C_PROJECT_CODE is not null and (a2.EXCUTE_DATE between '"+ startDate +"' and '"+ endDate+"')) as cdCountStored " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID where b.TYPE_NAME = '科研文件'";
 			
 			List<Map<String, Object>> listPreArchive = documentService.getMapList(getToken(), sqlPreArchive);
 			List<Map<String, Object>> listStored = documentService.getMapList(getToken(), sqlStored);
+			List<Map<String, Object>> listCDStored = documentService.getMapList(getToken(), sqlCD);
 			
 			projMap.put("fileType", "预归档文件");
 			Number countPreScince = getSponsorTN(listPreArchive, "fileCountPre");
@@ -372,8 +373,14 @@ public class ReportCreateController extends ControllerAbstract {
 			projMap.put("fileCountPre", countStoredScince);
 			Number countStoredChange = getSponsorTN(listStored, "fileCountPre");
 			projMap.put("changeCountPre", countStoredChange);
-			
 			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>();
+			projMap.put("fileType", "科研光盘");
+			Number countCDStore = getSponsorT(listCDStored, "cdCountStored");
+			projMap.put("cdCountPre", countCDStore);
+			outList.add(projMap);
+			
 			mp.put("data", outList);
 			mp.put("code", ActionContext.SUCESS);
 		}catch(Exception ex) {
