@@ -2035,6 +2035,7 @@ export default {
     },
     // 文件夹节点点击事件
     handleNodeClick(indata) {
+      this.currentFolder = indata
       let archiveType = indata.name
       let gridView = this.currentFolder.gridView
       let _self = this;
