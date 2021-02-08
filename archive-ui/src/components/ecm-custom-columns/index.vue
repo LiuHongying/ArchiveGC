@@ -178,12 +178,12 @@ export default {
     }
   },
   mounted(){
-    this.selectedClassic = this.archiveInfo.get("archiveType")
-    this.getTypeNameByClassic(this.archiveInfo.get("archiveType"))
+    
     this.getClassicNames("ClassicNames");
+    this.loadArchiveInfo();
     //this.loadCustomName()
-    this.loadSysColumnInfo()
-    this.tables.source.data = this.sysColumnInfo
+    this.loadSysColumnInfo();
+    this.tables.source.data = this.sysColumnInfo;
   },
   watch: {
     '$store.state.app.language':function(nv,ov){
@@ -191,6 +191,12 @@ export default {
       }
   },
   methods:{
+    loadArchiveInfo(){
+      if( this.archiveInfo){
+        this.selectedClassic = this.archiveInfo.get("archiveType")
+        this.getTypeNameByClassic(this.archiveInfo.get("archiveType"))
+      }
+    },
     //Matthew changes on 2021年1月25日17:09:23
     useConfig(){
       let _self = this;
@@ -354,7 +360,6 @@ export default {
           for (i = 0; i < temp.length; i++) {
             _self.classicNames.push(temp[i].NAME);
           }
-          console.log(_self.contractors);
         })
         .catch(function(error) {
           console.log(error);
@@ -363,15 +368,17 @@ export default {
     getTypeNameByClassic(keyName) {
       let _self = this;
       _self.selectedTypeName = "";
-      _self.typeNames = [];
+     
       axios
         .post("/dc/getEcmDefTypes", keyName)
         .then(function(response) {
+           _self.typeNames = [];
           if (response.data.code == 1) {
             response.data.data.forEach(element => {
               _self.typeNames.push(element.name);
             });
           }
+          _self.typeNames.push("所有");
         })
         .catch(function(error) {
           console.log(error);

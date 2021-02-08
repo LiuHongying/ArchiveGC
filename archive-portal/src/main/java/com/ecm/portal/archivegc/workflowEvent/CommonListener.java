@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.Strings;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -102,6 +103,38 @@ public class CommonListener implements ExecutionListener, JavaDelegate, TaskList
 //			  if(isSendEmai!=null&&!"".equals(isSendEmai)) {
 //			  if(Boolean.parseBoolean(isSendEmai)) {
 //			  sendMailOfProcessEnd(ecmSession,execution); } }
+			// 作废流程处理
+			if ("start".equals(execution.getEventName())&& execution.getVariable("processName").equals("设计文件作废流程")) {
+				
+				try {
+					Map<String, Object> varMap = execution.getVariables();
+					String formId = varMap.get("formId").toString();
+					if(!StringUtils.isEmpty(formId)) {
+						EcmDocument ecmObject = documentService.getObjectById(ecmSession.getToken(), formId);
+						if(ecmObject!=null && ecmObject.getTypeName().equals("设计文件作废审批单")) {
+							String sql = "select * from ecm_relation where parent_id = '"+formId+"'";
+							List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);
+							for(Map<String,Object> mp : mps) {
+								String id = mp.get("CHILD_ID").toString();
+								EcmDocument child = documentService.getObjectById(ecmSession.getToken(), id);
+								Map<String,Object> childAttr = child.getAttributes();
+								childAttr.put("C_CANCEL_DATE",new Date());
+								childAttr.put("C_STORE_STATUS", "已作废");
+								childAttr.put("STATUS", "作废");
+								documentService.updateObject(ecmSession.getToken(), childAttr);
+							}
+						}
+					}
+					
+					
+				} catch (Exception e) {
+					// TODO: handle exception
+				} finally {
+					if (ecmSession != null) {
+						authService.logout(workflowSpecialUserName);
+					}
+				}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();

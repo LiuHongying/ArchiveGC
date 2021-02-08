@@ -26,6 +26,7 @@
             }}</el-button>
           </el-header>
           <el-tree
+            ref="ecmFolderTree"
             :props="defaultProps"
             :data="dataList"
             node-key="id"
@@ -397,7 +398,6 @@ export default {
       pieceNumVisible:false,
       pieceNum:"",//批次号
       dataList: [],
-      gridList: [],
       itemDataList: [],
       itemDataListFull: [],
       selectedItems: [],
@@ -408,6 +408,7 @@ export default {
       pageSize: 20,
       judgement: "",
       currentFolder: [],
+      currentTreeNode:null,
       tables: {
         main: {
           gridViewName: "GeneralPre",
@@ -415,7 +416,7 @@ export default {
           folderId: "",
         },
         relevantFileDataGrid: {
-          gridViewName: "GeneralPre",
+          gridViewName: "ArrangeInnerGrid",
           condition: " NAME='irel_children' and IS_HIDDEN=0 ",
           folderId: "",
         },
@@ -443,7 +444,10 @@ export default {
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
     _self.topPercent = 65;
-
+    _self.$refs.mainDataGrid.loadArchiveInfo("科技与信息","GeneralPre");
+    _self.$refs.relevantFileDataGrid.cachePrefix = "PreArchive";
+    _self.$refs.relevantFileDataGrid.gridviewInfo.gridviewName = "ArrangeInnerGrid";
+    _self.$refs.relevantFileDataGrid.loadArchiveInfo("科技与信息","ArrangeInnerGrid");
     if (_self.inputFolder != "" && _self.inputFolder != undefined) {
       var m = new Map();
       m.set("NAME", _self.inputFolder);
@@ -452,6 +456,9 @@ export default {
         .post("/admin/searchFolder", JSON.stringify(m))
         .then(function (response) {
           _self.dataList = response.data.data;
+          
+          _self.$refs.mainDataGrid.loadCustomGridInfo("GeneralPre");
+          _self.$refs.relevantFileDataGrid.loadCustomGridInfo("ArrangeInnerGrid");
           _self.loadGridInfo(_self.defaultData);
           _self.isExpand = true;
           _self.loading = false;
@@ -465,6 +472,8 @@ export default {
         .post("/admin/getPreArchivesFolder", 0)
         .then(function (response) {
           _self.dataList = response.data.data;
+          _self.$refs.mainDataGrid.loadCustomGridInfo("GeneralPre");
+          _self.$refs.relevantFileDataGrid.loadCustomGridInfo("ArrangeInnerGrid");
           _self.handleNodeClick(_self.dataList[0]);
           _self.loading = false;
         })
@@ -719,7 +728,6 @@ export default {
           .post("/admin/searchFolder", JSON.stringify(m))
           .then(function (response) {
             _self.dataList = response.data.data;
-            _self.loadGridInfo(_self.defaultData);
             _self.isExpand = true;
             _self.loading = false;
           })
@@ -732,7 +740,6 @@ export default {
           .post("/admin/getPreArchivesFolder", 0)
           .then(function (response) {
             _self.dataList = response.data.data;
-            _self.loadGridInfo(_self.defaultData);
             _self.loading = false;
           })
           .catch(function (error) {
@@ -740,30 +747,6 @@ export default {
             _self.loading = false;
           });
       }
-    },
-    // 加载表格样式
-    loadGridInfo(indata) {
-      let _self = this;
-      _self.loading = true;
-      var m = new Map();
-      m.set("gridName", indata.gridView);
-      m.set("lang", _self.currentLanguage);
-      axios
-        .post("/dc/getGridViewInfo", JSON.stringify(m))
-        .then(function (response) {
-          _self.showFields = [];
-          _self.gridList = response.data.data;
-          _self.gridList.forEach((element) => {
-            if (element.visibleType == 1) {
-              _self.showFields.push(element.attrName);
-            }
-          });
-          _self.loading = false;
-        })
-        .catch(function (error) {
-          console.log(error);
-          _self.loading = false;
-        });
     },
 
     loadGridData(indata) {
@@ -788,7 +771,6 @@ export default {
 
       _self.tables.main.condition = key;
       _self.tables.main.folderId = indata.id;
-      console.log(indata.id);
       _self.$nextTick(() => {
         _self.$refs.mainDataGrid.loadGridData();
         _self.$refs.relevantFileDataGrid.itemDataList = [];
@@ -811,11 +793,15 @@ export default {
       this.selectedItems = val;
     },
 
-    handleNodeClick(indata) {
+    handleNodeClick(indata,node,current) {
       let _self = this;
       _self.selectRow = [];
       _self.selectedFileId = "";
-
+      let gridView = indata.gridView
+      let archiveType = "科技与信息"
+      _self.$refs.mainDataGrid.loadArchiveInfo(archiveType,gridView)
+      _self.$refs.relevantFileDataGrid.loadArchiveInfo(archiveType,gridView)
+      
       _self.currentFolder = indata;
       _self.loading = true;
       axios
@@ -875,7 +861,6 @@ export default {
 
       _self.$refs.mainDataGrid.condition += key;
       _self.$refs.mainDataGrid.currentPage = 1;
-      _self.$refs.mainDataGrid.loadGridInfo();
       _self.$refs.mainDataGrid.loadGridData();
     },
 

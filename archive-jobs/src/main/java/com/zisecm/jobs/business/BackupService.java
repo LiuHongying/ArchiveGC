@@ -114,7 +114,7 @@ public class BackupService {
 					float sumsize=0;
 					String coding=obj.get("CODING").toString();
 					String condition= obj.get("C_DESC1").toString();//查询条件
-					//String condition = "TYPE_NAME='设计文件作废单' and coding = 'SJZF-2021-0010'";
+					//String condition = "TYPE_NAME='供应商管理案卷' and coding = 'TEST-01211018'";;
 					String path= obj.get("TITLE").toString();//路径
 					List<Map<String, Object>> boxes= 
 							documentService.getObjectMap(ecmSession.getToken(), " "+condition+" order by coding");
@@ -176,7 +176,6 @@ public class BackupService {
 										String fullPath = CacheManagerOper.getEcmStores().get(c.get("STORE_NAME").toString()).getStorePath();
 										File fil = new File(fullPath+c.get("FILE_PATH").toString());
 										fis = new BufferedInputStream(new FileInputStream(fil));
-										byte[] data=new byte[ fis.available()];
 										
 										
 										File outFile=new File(obj.get("TITLE").toString()
@@ -197,8 +196,12 @@ public class BackupService {
 										    }
 
 								        }
+										byte[] data = new byte[8 * 1024];
 										OutputStream out=new BufferedOutputStream(new FileOutputStream(outFile));
-										out.write(data);
+										int bytesRead;
+										while ((bytesRead = fis.read(data)) != -1) {
+											out.write(data, 0, bytesRead);
+										}
 										out.flush();
 										out.close();
 										fis.close();
@@ -290,7 +293,7 @@ public class BackupService {
 										String fullPath = CacheManagerOper.getEcmStores().get(c.get("STORE_NAME").toString()).getStorePath();
 										File fil = new File(fullPath+c.get("FILE_PATH").toString());
 										fis = new BufferedInputStream(new FileInputStream(fil));
-										byte[] data=new byte[ fis.available()];
+									
 										
 										
 										File outFile=new File(obj.get("TITLE").toString()
@@ -311,8 +314,12 @@ public class BackupService {
 										    }
 
 								        }
+										byte[] data = new byte[8 * 1024];
 										OutputStream out=new BufferedOutputStream(new FileOutputStream(outFile));
-										out.write(data);
+										int bytesRead;
+										while ((bytesRead = fis.read(data)) != -1) {
+											out.write(data, 0, bytesRead);
+										}
 										out.flush();
 										out.close();
 										fis.close();
@@ -498,7 +505,6 @@ public class BackupService {
 										String fullPath = CacheManagerOper.getEcmStores().get(c.get("STORE_NAME").toString()).getStorePath();
 										File fil = new File(fullPath+c.get("FILE_PATH").toString());
 										fis = new BufferedInputStream(new FileInputStream(fil));
-										byte[] data=new byte[ fis.available()];
 										
 										
 										File outFile=new File(obj.get("TITLE").toString()
@@ -519,8 +525,12 @@ public class BackupService {
 										    }
 
 								        }
+										byte[] data = new byte[8 * 1024];
 										OutputStream out=new BufferedOutputStream(new FileOutputStream(outFile));
-										out.write(data);
+										int bytesRead;
+										while ((bytesRead = fis.read(data)) != -1) {
+											out.write(data, 0, bytesRead);
+										}
 										out.flush();
 										out.close();
 										fis.close();
@@ -542,7 +552,6 @@ public class BackupService {
 										String fullPath = CacheManagerOper.getEcmStores().get(c.get("STORE_NAME").toString()).getStorePath();
 										File fil = new File(fullPath+c.get("FILE_PATH").toString());
 										fis = new BufferedInputStream(new FileInputStream(fil));
-										byte[] data=new byte[ fis.available()];
 										
 										
 										File outFile=new File(obj.get("TITLE").toString()
@@ -564,8 +573,12 @@ public class BackupService {
 										    }
 
 								        }
+										byte[] data = new byte[8 * 1024];
 										OutputStream out=new BufferedOutputStream(new FileOutputStream(outFile));
-										out.write(data);
+										int bytesRead;
+										while ((bytesRead = fis.read(data)) != -1) {
+											out.write(data, 0, bytesRead);
+										}
 										out.flush();
 										out.close();
 										fis.close();

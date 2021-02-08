@@ -27,7 +27,7 @@
                   v-bind:tableHeight="(layout.height-startHeight)*topPercent/100-topbarHeight"
                   v-bind:isshowOption="true" v-bind:isshowSelection ="true"
                   gridViewName="ThematicManagementGrid"
-                  condition="TYPE_NAME='专题' and STATUS='新建'"
+                  condition="TYPE_NAME='专题' and STATUS='已发布'"
                   :optionWidth = "2"
                   :isshowCustom="false"
                   :isEditProperty="false"

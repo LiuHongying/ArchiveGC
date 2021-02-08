@@ -1,11 +1,30 @@
 <template>
   <DataLayout>
-
+          <el-dialog :title="$t('application.Import')" :visible.sync="importdialog4AttachVisible" width="70%" :close-on-click-modal="false">
+          <el-form size="mini" :label-width="formLabelWidth" v-loading='uploading'>
+              <div style="height:200px;overflow-y:scroll; overflow-x:scroll;">
+              <el-upload
+                  :limit="100"
+                  :file-list="files4Attach"
+                  action
+                  :on-change="handleChange4Attach"
+                  :auto-upload="false"
+                  :multiple="true"
+              >
+                  <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
+              </el-upload>
+              </div>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+              <el-button @click="importdialog4AttachVisible = false">{{$t('application.cancel')}}</el-button>
+              <el-button type="primary" @click="uploadAttachData()">{{$t('application.start')+$t('application.Import')}}</el-button>
+          </div>
+      </el-dialog>
       <el-dialog :visible.sync="modifyVisible" style="width:80%">
         <el-row style="padding:15px">
         <span>选择修改字段</span>
         <el-select v-model="resChoice" @change="onModifyChange" >
-          <div v-for="item in objectSrc">
+          <div v-for="item in objectSrc" :key="item.id">
               <el-option :label="item.label" :value="item.id"></el-option>
           </div>
           </el-select>
@@ -13,7 +32,7 @@
         <el-row style="padding:15px">
         <span>选择操作类型</span>
         <el-select @change="onChoiceChange" v-model="Choice" >
-          <div v-for="items in modifyOption">
+          <div v-for="items in modifyOption" :key="items">
               <el-option :label="items" :value="items"></el-option>
           </div>
           </el-select>
@@ -422,6 +441,14 @@
                           title="提交入库"
                         >提交入库</el-button>
                       </el-form-item>
+                      <el-form-item>
+                      <el-button 
+                          plain
+                          size="small"
+                          type="primary" 
+                          @click="beforeUploadAttach('/exchange/doc/addAttachment')">添加附件
+                          </el-button>
+                      </el-form-item>
                       <!-- <el-form-item>
                         <el-button
                           type="primary"
@@ -551,6 +578,14 @@
                     </el-form-item>
                       <el-form-item>
                     <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
+                    <el-form-item>
+                    <el-button 
+                      plain
+                      size="small"
+                      type="primary" 
+                      @click="beforeUploadInnerAttach('/exchange/doc/addAttachment')">添加附件
+                      </el-button>
+                    </el-form-item>
                     </el-form-item>
                       <el-form-item>
                     <el-button
@@ -661,6 +696,9 @@ export default {
       // 底部除列表高度
       bottomHeight: 35,
       isExpand: false,
+      importdialog4AttachVisible:false,
+      AttachParentID:"",
+      InnerAttachParentID:"",
       rightTableHeight: (window.innerHeight - 150) / 2,
       asideHeight: window.innerHeight - 95,
       treeHight: window.innerHeight - 135,
@@ -748,6 +786,7 @@ export default {
       typeName:"",
       folderPath:"",
       parentId:"",
+      files4Attach:[],
       folderId:"",
       archiveStatus:"整编",
       extendMap:{},
@@ -830,6 +869,44 @@ export default {
       }, 100);
   },
   methods: {
+          beforeUploadInnerAttach(uploadpath){
+        let _self=this;
+        this.isInnerAttach=true
+        this.isAttach=false
+        if(this.InnerAttachParentID==undefined||this.InnerAttachParentID==""){
+            // _self.$message('请选择一条文件数据');
+            _self.$message({
+                    showClose: true,
+                    message: _self.$t('message.PleaseSelectOneFile'),
+                    duration: 2000,
+                    type: "warning"
+                });
+            return;
+        }
+        _self.uploadUrl=uploadpath;
+        _self.files4Attach=[];
+        _self.importdialog4AttachVisible=true;
+                      
+        },
+   beforeUploadAttach(uploadpath){
+        let _self=this;
+        this.isAttach=true
+        this.isInnerAttach=false
+        if(this.AttachParentID==undefined||this.AttachParentID==""){
+            // _self.$message('请选择一条文件数据');
+            _self.$message({
+                    showClose: true,
+                    message: _self.$t('message.PleaseSelectOneFile'),
+                    duration: 2000,
+                    type: "warning"
+                });
+            return;
+        }
+        _self.uploadUrl=uploadpath;
+        _self.files4Attach=[];
+        _self.importdialog4AttachVisible=true;
+            
+      },
      SearchBusinessDC() {
       let href = this.$router.resolve({
         path: "/record/selectbusinessDC",
@@ -1423,6 +1500,7 @@ export default {
     },
     selectOneFile(row) {
       let _self = this;
+      this.InnerAttachParentID = row.ID
       if (row != null) {
         _self.innerSelectedOne = row;
         _self.selectedFileId = row.ID;
@@ -1568,7 +1646,11 @@ export default {
           console.log(error);
         });
     },
+    handleChange4Attach(file,fileList){
+      this.files4Attach = fileList
+    },
     //下移
+    
     onMoveDown() {
       let _self = this;
       // if (_self.innerSelectedOne.ID == undefined) {
@@ -1612,6 +1694,63 @@ export default {
         .catch(function(error) {
           console.log(error);
           _self.loading = false;
+        });
+    },
+
+        uploadAttachData() {
+      let _self = this;
+      let formdata = new FormData()
+      var data = {}
+      let ids = []
+      if(_self.isAttach==true){
+      // for(let i = 0;i<_self.selectedItems.length;i++){
+      //   ids[i] = _self.selectedItems[i].ID 
+      // }
+      data["parentDocId"] = _self.AttachParentID
+      formdata.append("metaData", JSON.stringify(data));
+      _self.files4Attach.forEach(function(file) {
+        formdata.append("uploadFile", file.raw, file.name);
+      });
+      }
+      else if(_self.isInnerAttach==true){
+      // for(let i = 0;i<_self.selectedInnerItems.length;i++){
+      //   ids[i] = _self.selectedInnerItems[i].ID 
+      // }
+      data["parentDocId"] = _self.InnerAttachParentID
+      formdata.append("metaData", JSON.stringify(data));
+      _self.files4Attach.forEach(function(file) {
+        formdata.append("uploadFile", file.raw, file.name);
+      });
+      }
+      console.log(ids);
+      _self.uploading=true;
+      _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          datatype: "json",
+          method: "post",
+          data: formdata,
+          url: _self.uploadUrl
+        })
+        .then(function(response) {
+          _self.importdialog4AttachVisible = false;
+          // _self.refreshData();
+          _self.uploading = false;
+          _self.isAttach = false
+          _self.isInnerAttach = false
+          // _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
+          _self.$message({
+                showClose: true,
+                message: _self.$t('application.Import')+_self.$t('message.success'),
+                duration: 2000,
+                type: 'success'
+              });
+        })
+        .catch(function(error) {
+          _self.uploading=false;
+          console.log(error);
         });
     },
     handleChange(file, fileList) {
@@ -1715,6 +1854,7 @@ export default {
         });
     },
     beforeShowInnerFile(row) {
+      this.AttachParentID = row.ID
       // let keys = Object.keys(row)
       // console.log(row.TYPE_NAME)
       // this.getTypeNamesByMainList(row.TYPE_NAME)
@@ -1756,12 +1896,17 @@ export default {
         _self.selectRow = row;
       }
       _self.parentId=row.ID;
+      if(_self.$refs.leftDataGrid){
+        _self.$refs.leftDataGrid.cachePrefix = _self.currentFolder.gridView;
+        _self.$refs.leftDataGrid.loadCustomGridInfo("ArrangeInnerGrid");
+      }
       _self.$nextTick(()=>{
         if(_self.$refs.leftDataGrid){
              _self.$refs.leftDataGrid.itemDataList = [];
+             
              _self.$refs.leftDataGrid.loadGridData();
           }
-      });
+      },100);
       
     },
     renderContent: function(h, { node, data, store }) {
@@ -1865,33 +2010,10 @@ export default {
       }
       _self.mainParam.condition=key;
       _self.mainParam.folderId=indata.id;
-      var lastGridView = _self.$refs.mainDataGrid.gridViewName;
-      _self.$refs.mainDataGrid.gridViewName = indata.gridView;
-      //Matthew changes on 2021年2月1日18:07:35
-      var currentCustomConfig = localStorage.getItem(indata.gridView);
-      if(currentCustomConfig==null||currentCustomConfig==undefined){
-        _self.innerGridName = indata.gridView;
-        _self.$refs.mainDataGrid.gridviewInfo.gridviewName = indata.gridView;
-        _self.$refs.mainDataGrid.showConfigInfo({"id":indata.gridView,"name":"默认"})
-      }else{
-        _self.innerGridName = currentCustomConfig;
-        if(currentCustomConfig.indexOf("_CUSTOM")>-1){
-        _self.$refs.mainDataGrid.showConfigInfo({"id":currentCustomConfig.replace("_CUSTOM",""),"name":currentCustomConfig})
-        }else{
-        _self.$refs.mainDataGrid.showConfigInfo({"id":currentCustomConfig,"name":"默认"})
-        }
-        _self.$refs.mainDataGrid.gridviewInfo.gridviewName = currentCustomConfig;
-      }
-      _self.$nextTick(()=>{
-        // if(lastGridView != indata.gridView){
-        //    _self.$refs.mainDataGrid.loadGridInfo();
-           
-        // }
-        //  _self.$refs.mainDataGrid.loadGridData();
-         _self.$refs.leftDataGrid.itemDataList = [];
-      },500);
       
-      
+      _self.$refs.mainDataGrid.loadCustomGridInfo(indata.gridView);
+      //_self.$refs.leftDataGrid.cachePrefix = indata.gridView;
+      _self.$refs.leftDataGrid.itemDataList = [];
     },
     beforeInnerModify(){
       this.isInnerModify = true
@@ -1918,18 +2040,32 @@ export default {
     },
     // 文件夹节点点击事件
     handleNodeClick(indata) {
+      this.currentFolder = indata
+      let archiveType = indata.name
+      let gridView = this.currentFolder.gridView
       let _self = this;
+      this.AttachParentID=""
+      this.InnerAttachParentID=""
       _self.selectRow = [];
       _self.selectedFileId = "";
       _self.currentFolder = indata;
-      _self.$refs.mainDataGrid.getOutFolder(_self.currentFolder)
+      if(gridView == undefined || gridView==''){
+        return
+      }
+      _self.$refs.mainDataGrid.loadArchiveInfo(archiveType,gridView);
+      if(_self.$refs.leftDataGrid){
+        _self.$refs.leftDataGrid.cachePrefix = _self.currentFolder.gridView;
+        _self.$refs.leftDataGrid.gridviewInfo.gridviewName = "ArrangeInnerGrid";
+        _self.$refs.leftDataGrid.loadArchiveInfo(archiveType,"ArrangeInnerGrid");
+      }
+      
       //console.log(JSON.stringify(indata));
       // 没有加载，逐级加载
       if (indata.extended == false) {
         _self.loading = true;
         let mp=new Map();
         mp.set("folderId",indata.id);
-        mp.set("condition"," and(IS_HIDDEN=0 and IS_CHILD=0)");
+        mp.set("condition"," and (IS_HIDDEN=0 and IS_CHILD=0)");
         _self
           .axios({
             headers: {

@@ -26,14 +26,10 @@ public class CancelListener implements JavaDelegate {
 	private AuthService authService;
 	@Autowired
 	private Environment env;
-	@Autowired
-    private FolderPathService folderPathService;
+
 	@Autowired
 	private DocumentService documentService;
-	@Autowired
-	private FolderService folderService;
-	@Autowired
-	private RelationService relationService;
+
 	private final Logger logger = LoggerFactory.getLogger(DocCommitComplete.class);
 	@Override
 	public void execute(DelegateExecution execution) {
@@ -60,8 +56,8 @@ public class CancelListener implements JavaDelegate {
 				Date now = new Date();
 				String dateStr = df.format(now);
 				childAttr.put("C_COMMENT",dateStr+"作废");
-				childAttr.put("IS_RELEASED", "0");
-				childAttr.put("ACL_NAME", "acl_canceled");
+				//childAttr.put("IS_RELEASED", "0");
+				//childAttr.put("ACL_NAME", "acl_canceled");
 				childAttr.put("C_CANCEL_DATE",now);
 				childAttr.put("C_STORE_STATUS", "已作废");
 				documentService.updateObject(ecmSession.getToken(), childAttr);
