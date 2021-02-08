@@ -2048,7 +2048,7 @@ export default {
         return
       }
       _self.$refs.mainDataGrid.loadArchiveInfo(archiveType,gridView);
-      //_self.$refs.leftDataGrid.loadArchiveInfo(archiveType,gridView)
+      _self.$refs.leftDataGrid.loadArchiveInfo(archiveType,gridView)
       //console.log(JSON.stringify(indata));
       // 没有加载，逐级加载
       if (indata.extended == false) {
