@@ -113,8 +113,8 @@ public class BackupService {
 					float totalSize=Float.parseFloat(obj.get("C_PAGE_COUNT").toString()) ;
 					float sumsize=0;
 					String coding=obj.get("CODING").toString();
-					//String condition= obj.get("C_DESC1").toString();//查询条件
-					String condition = "TYPE_NAME='供应商管理案卷' and coding = 'TEST-01211018'";
+					String condition= obj.get("C_DESC1").toString();//查询条件
+					//String condition = "TYPE_NAME='供应商管理案卷' and coding = 'TEST-01211018'";;
 					String path= obj.get("TITLE").toString();//路径
 					List<Map<String, Object>> boxes= 
 							documentService.getObjectMap(ecmSession.getToken(), " "+condition+" order by coding");
@@ -172,15 +172,11 @@ public class BackupService {
 									//以上操作，不管有没有电子文件都会生成全部excel
 									//开始导出文件
 									for(Map<String,Object> c:contents) {
-										//InputStream fis = null;
+										InputStream fis = null;
 										String fullPath = CacheManagerOper.getEcmStores().get(c.get("STORE_NAME").toString()).getStorePath();
 										File fil = new File(fullPath+c.get("FILE_PATH").toString());
-										//fis = new BufferedInputStream(new FileInputStream(fil));
-										byte[] buffer = new byte[1024];
-										FileInputStream fis = null; //文件输入流
-										BufferedInputStream bis = null;
-										fis = new FileInputStream(fil); 
-										bis = new BufferedInputStream(fis);
+										fis = new BufferedInputStream(new FileInputStream(fil));
+										
 										
 										File outFile=new File(obj.get("TITLE").toString()
 												+"/"+obj.get("CODING")+"/"+recordNumStr+"/"+box.get("CODING").toString()+"\\"+c.get("CODING")+"."+c.get("FORMAT_NAME"));
@@ -200,14 +196,12 @@ public class BackupService {
 										    }
 
 								        }
-										OutputStream out=new BufferedOutputStream(new FileOutputStream(fil));
-							            int x = bis.read(buffer);
-							            while(x != -1){
-							                out.write(buffer);
-							                x = bis.read(buffer);
-							            }
-							            bis.close();
-							            fis.close();
+										byte[] data = new byte[8 * 1024];
+										OutputStream out=new BufferedOutputStream(new FileOutputStream(outFile));
+										int bytesRead;
+										while ((bytesRead = fis.read(data)) != -1) {
+											out.write(data, 0, bytesRead);
+										}
 										out.flush();
 										out.close();
 										fis.close();
@@ -289,21 +283,17 @@ public class BackupService {
 									exportExcel(obj.get("TITLE").toString()+"/"+obj.get("CODING")+"/"+recordNumStr
 											+"/"+box.get("CODING").toString()
 											+"\\"+recordCoding+"附件.xlsx",
-											"设计文件", fj);					//这个是测试阶段的gridname，对应附件可单独调typename
+											"设计文件", fj);
 
 									
 									int k = 1;
 									//开始导出文件
 									for(Map<String,Object> c:fj) {
-										//InputStream fis = null;
+										InputStream fis = null;
 										String fullPath = CacheManagerOper.getEcmStores().get(c.get("STORE_NAME").toString()).getStorePath();
 										File fil = new File(fullPath+c.get("FILE_PATH").toString());
-										//fis = new BufferedInputStream(new FileInputStream(fil));
-										byte[] buffer = new byte[1024];
-										FileInputStream fis = null; //文件输入流
-										BufferedInputStream bis = null;
-										fis = new FileInputStream(fil); 
-										bis = new BufferedInputStream(fis);
+										fis = new BufferedInputStream(new FileInputStream(fil));
+									
 										
 										
 										File outFile=new File(obj.get("TITLE").toString()
@@ -316,22 +306,20 @@ public class BackupService {
 										    } catch (IOException e) {
 										        // TODO Auto-generated catch block
 										    	File dir=new File(obj.get("TITLE").toString()
-														+"/"+obj.get("CODING")+"/"+recordNumStr+"/"+box.get("CODING").toString());
-										    	logger.error("请注意标题为："+obj.get("TITLE").toString()+" 的文件不存在!");
+														+"/"+obj.get("CODING")+"/"+recordNumStr+"\\"+box.get("CODING").toString());
+										    	//logger.error("请注意标题为："+obj.get("TITLE").toString()+" 的文件不存在!");
 												dir.mkdirs();
 												outFile.createNewFile();
-//										        e.printStackTrace();
+										        e.printStackTrace();
 										    }
 
 								        }
-										OutputStream out=new BufferedOutputStream(new FileOutputStream(fil));
-							            int x = bis.read(buffer);
-							            while(x != -1){
-							                out.write(buffer);
-							                x = bis.read(buffer);
-							            }
-							            bis.close();
-							            fis.close();
+										byte[] data = new byte[8 * 1024];
+										OutputStream out=new BufferedOutputStream(new FileOutputStream(outFile));
+										int bytesRead;
+										while ((bytesRead = fis.read(data)) != -1) {
+											out.write(data, 0, bytesRead);
+										}
 										out.flush();
 										out.close();
 										fis.close();
@@ -517,7 +505,6 @@ public class BackupService {
 										String fullPath = CacheManagerOper.getEcmStores().get(c.get("STORE_NAME").toString()).getStorePath();
 										File fil = new File(fullPath+c.get("FILE_PATH").toString());
 										fis = new BufferedInputStream(new FileInputStream(fil));
-										byte[] data=new byte[ fis.available()];
 										
 										
 										File outFile=new File(obj.get("TITLE").toString()
@@ -538,10 +525,14 @@ public class BackupService {
 										    }
 
 								        }
-										FileOutputStream downloadFile = new FileOutputStream(outFile);
-										downloadFile.write(data);
-										downloadFile.flush();
-										downloadFile.close();
+										byte[] data = new byte[8 * 1024];
+										OutputStream out=new BufferedOutputStream(new FileOutputStream(outFile));
+										int bytesRead;
+										while ((bytesRead = fis.read(data)) != -1) {
+											out.write(data, 0, bytesRead);
+										}
+										out.flush();
+										out.close();
 										fis.close();
 										
 									} 
@@ -561,7 +552,6 @@ public class BackupService {
 										String fullPath = CacheManagerOper.getEcmStores().get(c.get("STORE_NAME").toString()).getStorePath();
 										File fil = new File(fullPath+c.get("FILE_PATH").toString());
 										fis = new BufferedInputStream(new FileInputStream(fil));
-										byte[] data=new byte[ fis.available()];
 										
 										
 										File outFile=new File(obj.get("TITLE").toString()
@@ -583,8 +573,12 @@ public class BackupService {
 										    }
 
 								        }
+										byte[] data = new byte[8 * 1024];
 										OutputStream out=new BufferedOutputStream(new FileOutputStream(outFile));
-										out.write(data);
+										int bytesRead;
+										while ((bytesRead = fis.read(data)) != -1) {
+											out.write(data, 0, bytesRead);
+										}
 										out.flush();
 										out.close();
 										fis.close();
@@ -636,7 +630,7 @@ public class BackupService {
 					}
 					
 					
-				//	documentService.updateStatus(ecmSession.getToken(), obj.get("ID").toString(), "已完成"); //该记录已完成
+					documentService.updateStatus(ecmSession.getToken(), obj.get("ID").toString(), "已完成"); //该记录已完成
 					
 				}
 			} catch (Exception e) {
