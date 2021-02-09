@@ -2,8 +2,8 @@
   <DataLayout>
     <template v-slot:header style="height: auto">
       <el-form :inline="true">
-        <el-form-item> 
-            <el-date-picker
+        <el-form-item>
+          <el-date-picker
             v-model="yearS"
             type="year"
             placeholder="选择年"
@@ -12,6 +12,11 @@
         <el-form-item>
           <el-button type="primary" @click="handleReport()">{{
             $t("application.SearchData")
+          }}</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click.native="exportStatistic">{{
+            $t("application.ExportExcel")
           }}</el-button>
         </el-form-item>
       </el-form>
@@ -93,8 +98,6 @@ export default {
       let _self = this;
       _self.loading = true;
 
-
-
       var m = new Map();
       m.set("yearSelect", _self.yearS);
 
@@ -102,12 +105,37 @@ export default {
         .post("/dms/record/AudVidQuarterStatistic", JSON.stringify(m))
         .then(function (response) {
           _self.tables.mainTable.data = response.data.data;
-          console.log(_self.tables.mainTable.data)
+          console.log(_self.tables.mainTable.data);
           _self.loading = false;
         })
         .catch(function (error) {
           console.log(error);
         });
+    },
+
+    exportStatistic() {
+      let _self = this;
+
+      import("@/utils/Export2Excel").then((excel) => {
+        let tHeader = [];
+        let filterVal = [];
+        _self.tables.mainTable.columns.forEach(function (item) {
+          tHeader.push(item.label);
+          filterVal.push(item.prop);
+        });
+
+        const list = _self.tables.mainTable.data;
+        const data = this.formatJson(filterVal, list);
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "Report_AV_" + new Date().Format("yyyy-MM-dd"),
+        });
+      });
+    },
+
+    formatJson(filterVal, jsonData) {
+      return jsonData.map((v) => filterVal.map((j) => v[j]));
     },
   },
 };

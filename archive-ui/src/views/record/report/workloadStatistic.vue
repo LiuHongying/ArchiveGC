@@ -53,6 +53,11 @@
             $t("application.SearchData")
           }}</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click.native="exportMonth">{{
+            $t("application.ExportExcel")
+          }}</el-button>
+        </el-form-item>
       </el-form>
     </template>
     <template v-slot:main="{ layout }">
@@ -98,6 +103,11 @@
                 <el-form-item>
                   <el-button type="primary" @click="handleReportQuarter()">{{
                     $t("application.SearchData")
+                  }}</el-button>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click.native="exportQuarter">{{
+                    $t("application.ExportExcel")
                   }}</el-button>
                 </el-form-item>
               </el-form>
@@ -303,11 +313,62 @@ export default {
         });
     },
 
+    exportMonth() {
+      let _self = this;
+
+      import("@/utils/Export2Excel").then((excel) => {
+        let tHeader = [];
+        let filterVal = [];
+        _self.tables.mainTable.columns.forEach(function (item) {
+          tHeader.push(item.label);
+          filterVal.push(item.prop);
+        });
+
+        const list = _self.tables.mainTable.data;
+        const data = this.formatJson(filterVal, list);
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "WorkFlow_Month_" + new Date().Format("yyyy-MM-dd"),
+        });
+      });
+    },
+
+    exportQuarter() {
+      let _self = this;
+
+      import("@/utils/Export2Excel").then((excel) => {
+        let tHeader = [];
+        let filterVal = [];
+        _self.tables.sonTable.columns.forEach(function (item) {
+          tHeader.push(item.label);
+          filterVal.push(item.prop);
+        });
+
+        const list = _self.tables.sonTable.data;
+        const data = this.formatJson(filterVal, list);
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "WorkFlow_Quarter_" + new Date().Format("yyyy-MM-dd"),
+        });
+      });
+    },
+
+    formatJson(filterVal, jsonData) {
+      return jsonData.map((v) => filterVal.map((j) => v[j]));
+    },
+
     exportAll() {
       let _self = this;
-      
-      if(_self.yearS == ""){
-        _self.$message({ showClose: true, message: "年份选择不能为空！", duration: 5000, type: "warning"});
+
+      if (_self.yearS == "") {
+        _self.$message({
+          showClose: true,
+          message: "年份选择不能为空！",
+          duration: 5000,
+          type: "warning",
+        });
         return;
       }
       _self.loading = true;
@@ -324,7 +385,7 @@ export default {
       m.set("yearSelect", _self.yearS);
       m.set("fileName", "Report_Annual_" + fileDateStr + ".xlsx");
       m.set("sheetName", "年度档案统计");
-      
+
       axios
         .post("/report/annual", JSON.stringify(m), {
           responseType: "blob",
@@ -355,7 +416,6 @@ export default {
           console.log(error);
           _self.dialogVisible = false;
         });
-      
     },
   },
 

@@ -160,7 +160,7 @@ export default {
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "Report_Scientific_" + new Date().Format("yyyy-MM-dd"),
+          filename: "Report_Design_" + new Date().Format("yyyy-MM-dd"),
         });
       });
     },

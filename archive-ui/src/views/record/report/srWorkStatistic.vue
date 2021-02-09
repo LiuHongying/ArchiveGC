@@ -23,6 +23,11 @@
             $t("application.SearchData")
           }}</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click.native="exportStatistic">{{
+            $t("application.ExportExcel")
+          }}</el-button>
+        </el-form-item>
       </el-form>
     </template>
     <template v-slot:main="{ layout }">
@@ -111,6 +116,31 @@ export default {
         .catch(function (error) {
           console.log(error);
         });
+    },
+
+    exportStatistic() {
+      let _self = this;
+
+      import("@/utils/Export2Excel").then((excel) => {
+        let tHeader = [];
+        let filterVal = [];
+        _self.tables.mainTable.columns.forEach(function (item) {
+          tHeader.push(item.label);
+          filterVal.push(item.prop);
+        });
+
+        const list = _self.tables.mainTable.data;
+        const data = this.formatJson(filterVal, list);
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "Report_Scientific_" + new Date().Format("yyyy-MM-dd"),
+        });
+      });
+    },
+
+    formatJson(filterVal, jsonData) {
+      return jsonData.map((v) => filterVal.map((j) => v[j]));
     },
   },
 };
