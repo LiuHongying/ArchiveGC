@@ -23,6 +23,11 @@
             $t("application.SearchData")
           }}</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click.native="exportDataStatistic">{{
+            $t("application.ExportExcel")
+          }}</el-button>
+        </el-form-item>
       </el-form>
     </template>
     <template v-slot:main="{ layout }">
@@ -134,6 +139,34 @@ export default {
         .catch(function (error) {
           console.log(error);
         });
+    },
+
+    exportDataStatistic() {
+      let _self = this;
+
+      import("@/utils/Export2Excel").then((excel) => {
+        const tHeader = ["日期", "姓名","整编归档","文件修改", "质检", "两卡", "作废", "备注"];
+        const filterVal = [
+          "wfMonth",
+          "wfName",
+          "receFiles",
+          "receDoc",
+          "storeFiles",
+          "reTCDoc",
+          "storeDoc",
+        ];
+        const list = _self.tables.mainTable.data;
+        const data = this.formatJson(filterVal, list);
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "Report_Scientific_" + new Date().Format("yyyy-MM-dd"),
+        });
+      });
+    },
+
+    formatJson(filterVal, jsonData) {
+      return jsonData.map((v) => filterVal.map((j) => v[j]));
     },
   },
 };

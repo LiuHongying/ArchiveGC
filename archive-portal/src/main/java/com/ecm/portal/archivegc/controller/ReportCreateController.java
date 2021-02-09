@@ -188,7 +188,7 @@ public class ReportCreateController extends ControllerAbstract {
 					"	  if(eag.ACTION_NAME = '整编',1,0) iszl,if(ed.STATUS='作废',1,0) iszf," + 
 					"	  if(ed.TYPE_NAME = '设计文件修改单',1,0) ismodify," + 
 					"	  if(eag.ACTION_NAME ='质检',1,0) iszj, "+ 
-					"     if(ed.C_COMMENT like '%两卡%', 1, 0) isliangka" + 
+					"     if(ed.C_COMMENT like '%两卡%', 1, 0) isliangka " +
 					"	  from ecm_audit_general eag,ecm_document ed " + 
 					"	  where ed.id=eag.DOC_ID and ed.C_ARC_CLASSIC is not null "+ timeCheck +" ) tt  " + 
 					"group by USER_NAME,TYPE_NAME ,ymd order by ymd desc) ss where (workstorcount >0 or workgetcount >0 or workTCcount>0 or workstjorcount>0 or workgetjicount>0) ";
