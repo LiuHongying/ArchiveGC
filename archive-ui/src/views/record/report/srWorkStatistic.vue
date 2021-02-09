@@ -72,6 +72,12 @@ export default {
               width: 110,
             },
             {
+              prop: "cdCountPre",
+              label: "光盘个数(张)",
+              fixed: true,
+              width: 110,
+            },
+            {
               prop: "changeCountPre",
               label: "调改次数",
               fixed: true,

@@ -1896,12 +1896,17 @@ export default {
         _self.selectRow = row;
       }
       _self.parentId=row.ID;
+      if(_self.$refs.leftDataGrid){
+        _self.$refs.leftDataGrid.cachePrefix = _self.currentFolder.gridView;
+        _self.$refs.leftDataGrid.loadCustomGridInfo("ArrangeInnerGrid");
+      }
       _self.$nextTick(()=>{
         if(_self.$refs.leftDataGrid){
              _self.$refs.leftDataGrid.itemDataList = [];
+             
              _self.$refs.leftDataGrid.loadGridData();
           }
-      });
+      },100);
       
     },
     renderContent: function(h, { node, data, store }) {
@@ -2048,7 +2053,12 @@ export default {
         return
       }
       _self.$refs.mainDataGrid.loadArchiveInfo(archiveType,gridView);
-      _self.$refs.leftDataGrid.loadArchiveInfo(archiveType,gridView)
+      if(_self.$refs.leftDataGrid){
+        _self.$refs.leftDataGrid.cachePrefix = _self.currentFolder.gridView;
+        _self.$refs.leftDataGrid.gridviewInfo.gridviewName = "ArrangeInnerGrid";
+        _self.$refs.leftDataGrid.loadArchiveInfo(archiveType,"ArrangeInnerGrid");
+      }
+      
       //console.log(JSON.stringify(indata));
       // 没有加载，逐级加载
       if (indata.extended == false) {
