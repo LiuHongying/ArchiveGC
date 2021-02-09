@@ -33,6 +33,7 @@ export default {
       currentLanguage: "zh-cn",
       isBusiness:false,
       Choice:"通用打印",
+      condition:"and IS_HIDDEN=0",
       selectedRows:[]
     };
   },
@@ -48,17 +49,17 @@ export default {
     onChoiceChange(){
       let _self = this
       if(this.Choice=='商务文件移交单正本'){
-        this.condition = "and C_TYPE1='正本'"
+        this.condition = "and C_TYPE1='正本' and is_hidden=0"
         //this.$refs.PrintVolumesGrid.condition = "and C_TYPE1='正本'"
         this.refreshDataGrid(this.selectedRows,"BusinessFilePrintGrid")
       }
       if(this.Choice=='商务文件移交单副本'){
-        this.condition = "and C_TYPE1='副本'"
+        this.condition = "and C_TYPE1='副本' and is_hidden=0"
         // this.$refs.PrintVolumesGrid.condition = "and C_TYPE1='副本'"
         this.refreshDataGrid(this.selectedRows,"BusinessFilePrintGrid4Content")
       }
       if(this.Choice=='通用打印'){
-      this.condition = ""
+      this.condition = "and is_hidden=0"
       //this.$refs.PrintVolumesGrid.condition = ''
       this.refreshDataGrid(this.selectedRows,"ArrangeInnerGridPrint")
       }
