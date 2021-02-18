@@ -1299,7 +1299,7 @@ public class ReportCreateController extends ControllerAbstract {
 			projMap = new HashMap<String, Object>(); 
 			projMap.put("fileType", "设计");
 			projMap.put("typeClass", "文件");
-			projMap.put("unitType", "张");
+			projMap.put("unitType", "册");
 			Number fileCountVolumeMonth1 = getSponsorT(listFileVolume, "month1");
 			projMap.put("drawCountSuitMonth1", fileCountVolumeMonth1);
 			Number fileCountVolumeMonth2 = getSponsorT(listFileVolume, "month2");
@@ -1981,7 +1981,7 @@ public class ReportCreateController extends ControllerAbstract {
 			List<Map<String, Object>> changeBackPersonCountStatistic = documentService.getMapList(getToken(), changeBackPersonCount);
 			
 			projMap.put("fileType", "实体");
-			projMap.put("typeClass", "调改");
+			projMap.put("typeClass", "调改归还");
 			projMap.put("unitType", "人次");
 			Number changeBackPersonMonth1 = getSponsorT(changeBackPersonCountStatistic, "month1");
 			projMap.put("drawCountSuitMonth1", changeBackPersonMonth1);
@@ -1991,6 +1991,156 @@ public class ReportCreateController extends ControllerAbstract {
 			projMap.put("drawCountSuitMonth3", changeBackPersonMonth3);
 			Number changeBackPersonQuarter = getSponsorT(changeBackPersonCountStatistic, "quarterCount");
 			projMap.put("drawCountSuitQuarter", changeBackPersonQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>();
+			String sqlDigitalOlJ = "select distinct b.TYPE_NAME, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '案卷' and ed.SUB_TYPE not in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '案卷' and ed.SUB_TYPE not in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '案卷' and ed.SUB_TYPE not in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '案卷' and ed.SUB_TYPE not in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate +") as quarterCount  " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.TYPE_NAME = '借阅单'";
+			
+			List<Map<String, Object>> listDigitalOlJ = documentService.getMapList(getToken(), sqlDigitalOlJ);
+			
+			projMap.put("fileType", "电子");
+			projMap.put("typeClass", "在线");
+			projMap.put("unitType", "卷");
+			Number digitalOlJMonth1 = getSponsorT(listDigitalOlJ, "month1");
+			projMap.put("drawCountSuitMonth1", digitalOlJMonth1);
+			Number digitalOlJMonth2 = getSponsorT(listDigitalOlJ, "month2");
+			projMap.put("drawCountSuitMonth2", digitalOlJMonth2);
+			Number digitalOlJMonth3 = getSponsorT(listDigitalOlJ, "month3");
+			projMap.put("drawCountSuitMonth3", digitalOlJMonth3);
+			Number digitalOlJQuarter = getSponsorT(listDigitalOlJ, "quarterCount");
+			projMap.put("drawCountSuitQuarter", digitalOlJQuarter);
+			
+			outList.add(projMap);		
+			
+			projMap = new HashMap<String, Object>();
+			String sqlDigitalOlT = "select distinct b.TYPE_NAME, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '文件' and ed.SUB_TYPE not in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '文件' and ed.SUB_TYPE not in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '文件' and ed.SUB_TYPE not in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '文件' and ed.SUB_TYPE not in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate +") as quarterCount  " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.TYPE_NAME = '借阅单'";
+			
+			List<Map<String, Object>> listDigitalOlT = documentService.getMapList(getToken(), sqlDigitalOlT);
+			
+			projMap.put("fileType", "电子");
+			projMap.put("typeClass", "在线");
+			projMap.put("unitType", "件");
+			Number digitalOlTMonth1 = getSponsorT(listDigitalOlT, "month1");
+			projMap.put("drawCountSuitMonth1", digitalOlTMonth1);
+			Number digitalOlTMonth2 = getSponsorT(listDigitalOlT, "month2");
+			projMap.put("drawCountSuitMonth2", digitalOlTMonth2);
+			Number digitalOlTMonth3 = getSponsorT(listDigitalOlT, "month3");
+			projMap.put("drawCountSuitMonth3", digitalOlTMonth3);
+			Number digitalOlTQuarter = getSponsorT(listDigitalOlT, "quarterCount");
+			projMap.put("drawCountSuitQuarter", digitalOlTQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>();
+			String sqlDigitalOlP = "select distinct b.TYPE_NAME, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.SUB_TYPE not in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.SUB_TYPE not in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.SUB_TYPE not in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.SUB_TYPE not in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate +") as quarterCount  " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.TYPE_NAME = '借阅单'";
+			
+			List<Map<String, Object>> listDigitalOlP = documentService.getMapList(getToken(), sqlDigitalOlP);
+			
+			projMap.put("fileType", "电子");
+			projMap.put("typeClass", "在线");
+			projMap.put("unitType", "人次");
+			Number digitalOlPMonth1 = getSponsorT(listDigitalOlP, "month1");
+			projMap.put("drawCountSuitMonth1", digitalOlPMonth1);
+			Number digitalOlPMonth2 = getSponsorT(listDigitalOlP, "month2");
+			projMap.put("drawCountSuitMonth2", digitalOlPMonth2);
+			Number digitalOlPMonth3 = getSponsorT(listDigitalOlP, "month3");
+			projMap.put("drawCountSuitMonth3", digitalOlPMonth3);
+			Number digitalOlPQuarter = getSponsorT(listDigitalOlP, "quarterCount");
+			projMap.put("drawCountSuitQuarter", digitalOlPQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>();
+			String sqlDigitalOffJ = "select distinct b.TYPE_NAME, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '案卷' and ed.SUB_TYPE in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '案卷' and ed.SUB_TYPE in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '案卷' and ed.SUB_TYPE in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '案卷' and ed.SUB_TYPE in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate +") as quarterCount  " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.TYPE_NAME = '借阅单'";
+			
+			List<Map<String, Object>> listDigitalOffJ = documentService.getMapList(getToken(), sqlDigitalOffJ);
+			
+			projMap.put("fileType", "电子");
+			projMap.put("typeClass", "离线");
+			projMap.put("unitType", "卷");
+			Number digitalOffJMonth1 = getSponsorT(listDigitalOffJ, "month1");
+			projMap.put("drawCountSuitMonth1", digitalOffJMonth1);
+			Number digitalOffJMonth2 = getSponsorT(listDigitalOffJ, "month2");
+			projMap.put("drawCountSuitMonth2", digitalOffJMonth2);
+			Number digitalOffJMonth3 = getSponsorT(listDigitalOffJ, "month3");
+			projMap.put("drawCountSuitMonth3", digitalOffJMonth3);
+			Number digitalOffJQuarter = getSponsorT(listDigitalOffJ, "quarterCount");
+			projMap.put("drawCountSuitQuarter", digitalOffJQuarter);
+			
+			outList.add(projMap);		
+			
+			projMap = new HashMap<String, Object>();
+			String sqlDigitalOffT = "select distinct b.TYPE_NAME, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '文件' and ed.SUB_TYPE in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '文件' and ed.SUB_TYPE in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '文件' and ed.SUB_TYPE in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.C_ITEM_TYPE = '文件' and ed.SUB_TYPE in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate +") as quarterCount  " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.TYPE_NAME = '借阅单'";
+			
+			List<Map<String, Object>> listDigitalOffT = documentService.getMapList(getToken(), sqlDigitalOffT);
+			
+			projMap.put("fileType", "电子");
+			projMap.put("typeClass", "离线");
+			projMap.put("unitType", "件");
+			Number digitalOffTMonth1 = getSponsorT(listDigitalOffT, "month1");
+			projMap.put("drawCountSuitMonth1", digitalOffTMonth1);
+			Number digitalOffTMonth2 = getSponsorT(listDigitalOffT, "month2");
+			projMap.put("drawCountSuitMonth2", digitalOffTMonth2);
+			Number digitalOffTMonth3 = getSponsorT(listDigitalOffT, "month3");
+			projMap.put("drawCountSuitMonth3", digitalOffTMonth3);
+			Number digitalOffTQuarter = getSponsorT(listDigitalOffT, "quarterCount");
+			projMap.put("drawCountSuitQuarter", digitalOffTQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>();
+			String sqlDigitalOffP = "select distinct b.TYPE_NAME, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.SUB_TYPE in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.SUB_TYPE in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.SUB_TYPE in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '借阅单' and ed.SUB_TYPE in ('下载','打印') and ed.C_STORE_STATUS = '在库'"+ conditionDate +") as quarterCount  " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.TYPE_NAME = '借阅单'";
+			
+			List<Map<String, Object>> listDigitalOffP = documentService.getMapList(getToken(), sqlDigitalOffP);
+			
+			projMap.put("fileType", "电子");
+			projMap.put("typeClass", "离线");
+			projMap.put("unitType", "人次");
+			Number digitalOffPMonth1 = getSponsorT(listDigitalOffP, "month1");
+			projMap.put("drawCountSuitMonth1", digitalOffPMonth1);
+			Number digitalOffPMonth2 = getSponsorT(listDigitalOffP, "month2");
+			projMap.put("drawCountSuitMonth2", digitalOffPMonth2);
+			Number digitalOffPMonth3 = getSponsorT(listDigitalOffP, "month3");
+			projMap.put("drawCountSuitMonth3", digitalOffPMonth3);
+			Number digitalOffPQuarter = getSponsorT(listDigitalOffP, "quarterCount");
+			projMap.put("drawCountSuitQuarter", digitalOffPQuarter);
 			
 			outList.add(projMap);
 			
