@@ -50,9 +50,9 @@ export default {
   data() {
     return {
       // 本地存储高度名称
-      leftStorageName: "PreArchiveftHeight",
+      leftStorageName: "ArchiveReportHeight",
 
-      asideHeight: window.innerHeight - 100,
+      asideHeight: window.innerHeight - 120,
       treeHeight: window.innerHeight - 120,
       asideWidth: "100%",
 

@@ -797,10 +797,10 @@ export default {
       let _self = this;
       _self.selectRow = [];
       _self.selectedFileId = "";
-      let gridView = indata.gridView
-      let archiveType = "科技与信息"
-      _self.$refs.mainDataGrid.loadArchiveInfo(archiveType,gridView)
-      _self.$refs.relevantFileDataGrid.loadArchiveInfo(archiveType,gridView)
+      // let gridView = indata.gridView
+      // let archiveType = "科技与信息"
+      // _self.$refs.mainDataGrid.loadArchiveInfo(archiveType,gridView)
+      // _self.$refs.relevantFileDataGrid.loadArchiveInfo(archiveType,gridView)
       
       _self.currentFolder = indata;
       _self.loading = true;

@@ -264,6 +264,9 @@ public class ImportServiceGc extends EcmService {
 						
 						tempId = null;
 						String fileNameStr = getCellValue(sheet.getRow(i).getCell(0));
+						if(fileNameStr==null) {
+							fileNameStr = "";
+						}
 						String[] fileNames = fileNameStr.split(";");
 						for (int fileNameIndex = 0; fileNameIndex < fileNames.length; fileNameIndex++) {
 							// fileNameIndex==0表示第一个附件将其放入主件
@@ -776,7 +779,11 @@ TCR试验澄清关闭单
 
 	private UploadFile getUploadFile(String excelFileName, MultipartFile[] files, String uploadFolder,
 			int rowIndex, StringBuilder sb) throws Exception {
+		
 		UploadFile ufile = new UploadFile();
+		if(excelFileName==null || excelFileName.length()==0) {
+			return ufile;
+		}
 		excelFileName = excelFileName.substring(0,
 				excelFileName.lastIndexOf(".") > -1 ? excelFileName.lastIndexOf(".") : excelFileName.length());
 		String deskFileName = "";

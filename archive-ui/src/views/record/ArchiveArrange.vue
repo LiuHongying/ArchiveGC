@@ -441,14 +441,6 @@
                           title="提交入库"
                         >提交入库</el-button>
                       </el-form-item>
-                      <el-form-item>
-                      <el-button 
-                          plain
-                          size="small"
-                          type="primary" 
-                          @click="beforeUploadAttach('/exchange/doc/addAttachment')">添加附件
-                          </el-button>
-                      </el-form-item>
                       <!-- <el-form-item>
                         <el-button
                           type="primary"
@@ -481,6 +473,16 @@
                             <span>更多</span>
                           </div>
                           <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item divided>
+                              <el-button style="display:block;width:117px"
+                                plain
+                                size="small"
+                                type="primary" 
+                                @click="beforeUploadAttach('/exchange/doc/addAttachment')">
+                                <i class="el-icon-paperclip"></i>
+                                添加附件
+                              </el-button>
+                            </el-dropdown-item>
                             <el-dropdown-item divided>
                               <el-button @click="beforeModify()" style="display:block;width:117px" type="primary" plain size="small"> 
                                 <i class="el-icon-s-tools"></i>

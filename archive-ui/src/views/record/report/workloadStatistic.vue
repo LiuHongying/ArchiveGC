@@ -39,7 +39,7 @@
           <el-date-picker
             v-model="endDate"
             type="date"
-            :placeholder="$t('application.startDate')"
+            :placeholder="$t('application.endDate')"
             value-format="yyyy-MM-dd"
           ></el-date-picker>
         </el-form-item>
