@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<annuals>
+	<templates>
+		<template id="countYear">
+			select count(*) as countNumber from ecm_document ed where #{condition} and C_ARCHIVE_DATE between '#{year}-01-01 00:00:00' and '#{year}-12-31 23:59:59'
+		</template>
+		<template id="countYearW">
+			select count(*)/10000 as countNumber from ecm_document ed where #{condition} and C_ARCHIVE_DATE between '#{year}-01-01 00:00:00' and '#{year}-12-31 23:59:59'
+		</template>
+		<template id="sumYear">
+			select sum(countSign)/1073741824 as countNumber from (select TYPE_NAME , CONTENT_SIZE as countSign from ecm_document ed where CONTENT_SIZE  &gt; 0 and #{condition} and C_ARCHIVE_DATE between '#{year}-01-01 00:00:00' and '#{year}-12-31 23:59:59')  tt
+		</template>
+		<template id="countBeforeC">
+			select count(*) as countNumber from ecm_document ed where C_ARC_CLASSIC is not null and #{condition} and C_ARCHIVE_DATE &lt; '1949-10-01 14:00:00'
+		</template>
+		<template id="countAfterC">
+			select count(*) as countNumber from ecm_document ed where C_ARC_CLASSIC is not null and #{condition} and C_ARCHIVE_DATE between '1949-10-01 14:00:00' and '#{year}-12-31 23:59:59'
+		</template>
+		<template id="countThisYear">
+		
+			select count(*) as countNumber from ecm_document ed where #{condition} and C_ARCHIVE_DATE like '%#{thisyear}%'
+		</template>
+		<template id="sumThisYear">
+			select sum(countSign)/1073741824 as countNumber from (select TYPE_NAME , CONTENT_SIZE as countSign from ecm_document ed where CONTENT_SIZE > 0 and #{condition} and C_ARCHIVE_DATE like '%#{thisyear}%') tt
+		</template>
+	</templates>
+	<reports>
+		<report index="28" tmpl="countYear" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '案卷' and C_ARC_CLASSIC is not null"></report>
+		<report index="29" tmpl="countYear" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '文件' and C_ARC_CLASSIC is not null"></report>
+		<report index="32" tmpl="countYear" condition="C_RETENTION in ('永久','30年') and C_ITEM_TYPE = '案卷' and C_ARC_CLASSIC is not null"></report>
+		<report index="33" tmpl="countYear" condition="C_RETENTION in ('永久','30年') and C_ITEM_TYPE = '文件' and C_ARC_CLASSIC is not null"></report>
+		<report index="34" tmpl="countYear" condition="C_RETENTION = '永久' and C_ITEM_TYPE = '案卷' and C_ARC_CLASSIC is not null"></report>
+		<report index="35" tmpl="countYear" condition="C_RETENTION = '永久' and C_ITEM_TYPE = '文件' and C_ARC_CLASSIC is not null"></report>
+		<report index="36" tmpl="sumYear" condition="1=1"></report>
+		<report index="37" tmpl="sumYear" condition="TYPE_NAME = '照片' "></report>
+		<report index="38" tmpl="sumYear" condition="TYPE_NAME = '录像录音文件' "></report>
+		<report index="39" tmpl="countYear" condition="TYPE_NAME = '照片' and C_ARC_CLASSIC is not null"></report>
+		<report index="40" tmpl="countYear" condition="TYPE_NAME = '录像录音文件' and C_ARC_CLASSIC is not null"></report>
+		<report index="41" tmpl="countYearW" condition="TYPE_NAME = '微缩胶片' and C_ITEM_TYPE = '文件' and C_ARC_CLASSIC is not null"></report>
+		<report index="42" tmpl="countYear" condition="TYPE_NAME = '奖状等' and C_ITEM_TYPE = '文件' and C_ARC_CLASSIC is not null"></report>
+		<report index="43" tmpl="countYear" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '案卷' and CONTENT_SIZE > 0 and C_ARC_CLASSIC is not null"></report>
+		<report index="44" tmpl="sumYear" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '案卷' "></report>
+		<report index="45" tmpl="countYear" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '文件' and CONTENT_SIZE > 0 and C_ARC_CLASSIC is not null"></report>
+		<report index="46" tmpl="sumYear" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '文件' "></report>
+		<report index="47" tmpl="sumYear" condition="TYPE_NAME = '图片' "></report>
+		<report index="48" tmpl="sumYear" condition="TYPE_NAME = '录像录音文件' "></report>
+		<report index="49" tmpl="sumYear" condition="C_ARC_CLASSIC is not null and TYPE_NAME not in ('图片','录像录音文件') "></report>
+		<report index="50" tmpl="countBeforeC" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '案卷' "></report>
+		<report index="51" tmpl="countBeforeC" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '文件' "></report>
+		<report index="52" tmpl="countAfterC" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '案卷' "></report>
+		<report index="53" tmpl="countAfterC" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '文件' "></report>
+		<report index="57" tmpl="countThisYear" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '案卷' and C_ARC_CLASSIC is not null"></report>
+		<report index="58" tmpl="countThisYear" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '文件' and C_ARC_CLASSIC is not null "></report>
+		<report index="60" tmpl="sumThisYear" condition=" IS_RELEASED = 1 "></report>
+		<report index="61" tmpl="sumThisYear" condition="TYPE_NAME = '照片' and IS_RELEASED = 1 "></report>
+		<report index="62" tmpl="sumThisYear" condition="TYPE_NAME = '录像录音文件' and IS_RELEASED = 1 "></report>
+		<report index="63" tmpl="countThisYear" condition="TYPE_NAME = '照片' and IS_RELEASED = 1 and C_ARC_CLASSIC is not null "></report>
+		<report index="64" tmpl="countThisYear" condition="TYPE_NAME = '录像录音文件' and IS_RELEASED = 1 and C_ARC_CLASSIC is not null "></report>
+		<report index="65" tmpl="countThisYear" condition="TYPE_NAME = '奖状等' and IS_RELEASED = 1 and C_ARC_CLASSIC is not null "></report>
+		<report index="94" tmpl="countThisYear" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '案卷' and STATUS = '已销毁' and C_ARC_CLASSIC is not null "></report>
+		<report index="95" tmpl="countThisYear" condition="C_INCLUDE_PAPER = '有' and C_ITEM_TYPE = '文件' and STATUS = '已销毁' and C_ARC_CLASSIC is not null "></report>
+		<report index="96" tmpl="countThisYear" condition="TYPE_NAME = '照片' and STATUS = '已销毁' and C_ARC_CLASSIC is not null "></report>
+		<report index="97" tmpl="countThisYear" condition="TYPE_NAME = '录像录音文件' and STATUS = '已销毁' and C_ARC_CLASSIC is not null "></report>
+		<report index="98" tmpl="countThisYear" condition="ID in (select CHILD_ID from ecm_relation er where PARENT_ID in (select ID from ecm_document ed2)) "></report>
+		<report index="99" tmpl="countThisYear" condition="ID in (select CHILD_ID from ecm_relation er where PARENT_ID in (select ID from ecm_document ed2)) and C_ITEM_TYPE = '案卷' "></report>
+		<report index="100" tmpl="countThisYear" condition="ID in (select CHILD_ID from ecm_relation er where PARENT_ID in (select ID from ecm_document ed2 where TYPE_NAME in ('复制单','借阅单'))) "></report>
+		<report index="101" tmpl="countThisYear" condition="ID in (select CHILD_ID from ecm_relation er where PARENT_ID in (select ID from ecm_document ed2 where TYPE_NAME in ('复制单','借阅单'))) and C_ITEM_TYPE = '案卷' "></report>
+		<report index="102" tmpl="countThisYear" condition="ID in (select CHILD_ID from ecm_relation er where PARENT_ID in (select ID from ecm_document ed2 where TYPE_NAME in ('复制单','借阅单'))) "></report>
+		<report index="103" tmpl="countThisYear" condition="ID in (select CHILD_ID from ecm_relation er where PARENT_ID in (select ID from ecm_document ed2 where TYPE_NAME in ('复制单','借阅单'))) and C_ITEM_TYPE = '案卷'"></report>
+	</reports>
+</annuals>

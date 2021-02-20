@@ -406,13 +406,7 @@ public class ReportCreateController extends ControllerAbstract {
 		try {
 			Map<String, Object> projMap = new HashMap<String, Object>(); 
 			
-			String sqlQuarter = "select distinct TYPE_NAME, " + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-01-01' and '"+ year +"-03-31') and ed2.TYPE_NAME = ed.TYPE_NAME) as quarter1," + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-04-01' and '"+ year +"-06-30') and ed2.TYPE_NAME = ed.TYPE_NAME) as quarter2," + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-07-01' and '"+ year +"-09-30') and ed2.TYPE_NAME = ed.TYPE_NAME) as quarter3," + 
-					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-10-01' and '"+ year +"-12-31') and ed2.TYPE_NAME = ed.TYPE_NAME) as quarter4 " + 
-					"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
-					"where ed.TYPE_NAME in ('鉴定证书','设计变更','公司刊物','设备文件','行政文件','项目归档文件','参考资料')";
+			String[] filetypeS = {"鉴定证书","设计变更","公司刊物","设备文件","行政文件","项目归档文件","参考资料"};
 			
 			String sqlEngine = "select ed.C_ARC_CLASSIC, " + 
 					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-01-01' and '"+ year +"-03-31') and ed2.TYPE_NAME = ed.TYPE_NAME) as quarter1," + 
@@ -430,21 +424,29 @@ public class ReportCreateController extends ControllerAbstract {
 					"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
 					"where ed.C_ARC_CLASSIC = '工程建设' and ed.TYPE_NAME <> '工程管理案卷' and ed.TYPE_NAME <> '工程管理文件' ";
 			
-			List<Map<String, Object>> listWorkStatistic = documentService.getMapList(getToken(), sqlQuarter);
 			List<Map<String, Object>> listEngineStatistic = documentService.getMapList(getToken(), sqlEngine);
 			List<Map<String, Object>> listProcessStatistic = documentService.getMapList(getToken(), sqlProcess);
 			
-			for(int i=0; i<listWorkStatistic.size(); i++) {
+			for(String filetype :filetypeS) {
+				String sqlQuarter = "select distinct 'a' as aaa, " + 
+						"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-01-01' and '"+ year +"-03-31') and ed2.TYPE_NAME like '%"+ filetype +"%') as quarter1," + 
+						"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-04-01' and '"+ year +"-06-30') and ed2.TYPE_NAME like '%"+ filetype +"%') as quarter2," + 
+						"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-07-01' and '"+ year +"-09-30') and ed2.TYPE_NAME like '%"+ filetype +"%') as quarter3," + 
+						"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-10-01' and '"+ year +"-12-31') and ed2.TYPE_NAME like '%"+ filetype +"%') as quarter4 " + 
+						"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
+						"where ed.C_ARC_CLASSIC is not null ";
+				
+				List<Map<String, Object>> listWorkStatistic = documentService.getMapList(getToken(), sqlQuarter);
+				
 				projMap = new HashMap<String, Object>();
-				String fileType = (listWorkStatistic.get(i).get("TYPE_NAME")!=null)?(String)listWorkStatistic.get(i).get("TYPE_NAME"):"";
-				projMap.put("fileType", fileType);
-				Number quarterOne = getSponsorFor(listWorkStatistic, "quarter1", i);
+				projMap.put("fileType", filetype);
+				Number quarterOne = getSponsorT(listWorkStatistic, "quarter1");
 				projMap.put("quarterOne", quarterOne);
-				Number quarterTwo = getSponsorFor(listWorkStatistic, "quarter2", i);
+				Number quarterTwo = getSponsorT(listWorkStatistic, "quarter2");
 				projMap.put("quarterTwo", quarterTwo);
-				Number quarterThree = getSponsorFor(listWorkStatistic, "quarter3", i);
+				Number quarterThree = getSponsorT(listWorkStatistic, "quarter3");
 				projMap.put("quarterThree", quarterThree);
-				Number quarterFour = getSponsorFor(listWorkStatistic, "quarter4", i);
+				Number quarterFour = getSponsorT(listWorkStatistic, "quarter4");
 				projMap.put("quarterFour", quarterFour);
 				
 				outList.add(projMap);
@@ -653,6 +655,10 @@ public class ReportCreateController extends ControllerAbstract {
 			typeMap.put("type", "'系统竣工文件案卷','系统竣工文件'");
 			typeMap.put("name", "竣工文件");
 			typeMapList.add(typeMap);
+			typeMap = new HashMap<String, Object>();
+			typeMap.put("type", "'设备合同执行过程文件','设备监造文件','设备运输文件','设备仓储文件'");
+			typeMap.put("name", "设备文件");
+			typeMapList.add(typeMap);
 			
 			for(int i=0; i<typeMapList.size(); i++) {
 				String sqlCriminalSuit = "select distinct b.C_ARC_CLASSIC, " + 
@@ -754,6 +760,206 @@ public class ReportCreateController extends ControllerAbstract {
 				outList.add(projMap);
 			}
 			
+			
+			//两卡
+			String sqlLiangkaSuit = "select distinct b.TYPE_NAME, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.TYPE_NAME = '设计文件'";
+			String sqlLiangkaVolume = "select distinct b.TYPE_NAME, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.C_INCLUDE_PAPER = '有'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.C_INCLUDE_PAPER = '有'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.C_INCLUDE_PAPER = '有'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.C_INCLUDE_PAPER = '有'"+ conditionDate +") as quarterCount  " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.TYPE_NAME = '设计文件'";
+			String sqlLiangkaItem = "select distinct b.TYPE_NAME, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.TYPE_NAME = '设计文件'";
+			String sqlLiangkaGM = "select distinct b.TYPE_NAME, " + 
+					"(select sum(ed.CONTENT_SIZE) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
+					"(select sum(ed.CONTENT_SIZE) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
+					"(select sum(ed.CONTENT_SIZE) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
+					"(select sum(ed.CONTENT_SIZE) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计文件' and ed.C_COMMENT like '%两卡%' and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.TYPE_NAME = '设计文件'";
+			
+			List<Map<String, Object>> listLiangkaSuit = documentService.getMapList(getToken(), sqlLiangkaSuit);
+			List<Map<String, Object>> listLiangkaVolume = documentService.getMapList(getToken(), sqlLiangkaVolume);
+			List<Map<String, Object>> listLiangkaItem = documentService.getMapList(getToken(), sqlLiangkaItem);
+			List<Map<String, Object>> listLiangkaGM = documentService.getMapList(getToken(), sqlLiangkaGM);
+			
+			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "校审两卡");
+			projMap.put("typeClass", "实体");
+			projMap.put("unitType", "卷");
+			Number liangkaCountSuitMonth1 = getSponsorT(listLiangkaSuit, "month1");
+			projMap.put("drawCountSuitMonth1", liangkaCountSuitMonth1);
+			Number liangkaCountSuitMonth2 = getSponsorT(listLiangkaSuit, "month2");
+			projMap.put("drawCountSuitMonth2", liangkaCountSuitMonth2);
+			Number liangkaCountSuitMonth3 = getSponsorT(listLiangkaSuit, "month3");
+			projMap.put("drawCountSuitMonth3", liangkaCountSuitMonth3);
+			Number liangkaCountSuitQuarter = getSponsorT(listLiangkaSuit, "quarterCount");
+			projMap.put("drawCountSuitQuarter", liangkaCountSuitQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "校审两卡");
+			projMap.put("typeClass", "实体");
+			projMap.put("unitType", "件");
+			Number liangkaCountVolumeMonth1 = getSponsorT(listLiangkaVolume, "month1");
+			projMap.put("drawCountSuitMonth1", liangkaCountVolumeMonth1);
+			Number liangkaCountVolumeMonth2 = getSponsorT(listLiangkaVolume, "month2");
+			projMap.put("drawCountSuitMonth2", liangkaCountVolumeMonth2);
+			Number liangkaCountVolumeMonth3 = getSponsorT(listLiangkaVolume, "month3");
+			projMap.put("drawCountSuitMonth3", liangkaCountVolumeMonth3);
+			Number liangkaCountVolumeQuarter = getSponsorT(listLiangkaVolume, "quarterCount");
+			projMap.put("drawCountSuitQuarter", liangkaCountVolumeQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "校审两卡");
+			projMap.put("typeClass", "电子");
+			projMap.put("unitType", "件");
+			Number liangkaCountItemMonth1 = getSponsorT(listLiangkaItem, "month1");
+			projMap.put("drawCountSuitMonth1", liangkaCountItemMonth1);
+			Number liangkaCountItemMonth2 = getSponsorT(listLiangkaItem, "month2");
+			projMap.put("drawCountSuitMonth2", liangkaCountItemMonth2);
+			Number liangkaCountItemMonth3 = getSponsorT(listLiangkaItem, "month3");
+			projMap.put("drawCountSuitMonth3", liangkaCountItemMonth3);
+			Number liangkaCountItemQuarter = getSponsorT(listLiangkaItem, "quarterCount");
+			projMap.put("drawCountSuitQuarter", liangkaCountItemQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "校审两卡");
+			projMap.put("typeClass", "电子");
+			projMap.put("unitType", "GB/MB");
+			Number liangkaCountGMMonth1 = getSponsorT(listLiangkaGM, "month1");
+			double liangkaGMMonth1 = liangkaCountGMMonth1.doubleValue()/1048576.00;
+			projMap.put("drawCountSuitMonth1", liangkaGMMonth1);
+			Number liangkaCountGMMonth2 = getSponsorT(listLiangkaGM, "month2");
+			double liangkaGMMonth2 = liangkaCountGMMonth2.doubleValue()/1048576.00;
+			projMap.put("drawCountSuitMonth2", liangkaGMMonth2);
+			Number liangkaCountGMMonth3 = getSponsorT(listLiangkaGM, "month3");
+			double liangkaGMMonth3 = liangkaCountGMMonth3.doubleValue()/1048576.00;
+			projMap.put("drawCountSuitMonth3", liangkaGMMonth3);
+			Number liangkaCountGMQuarter = getSponsorT(listLiangkaGM, "quarterCount");
+			double liangkaGMQuarter = liangkaCountGMQuarter.doubleValue()/1048576.00;
+			projMap.put("drawCountSuitQuarter", liangkaGMQuarter);
+			
+			outList.add(projMap);
+			
+			//职能文件
+			String sqlZhinengSuit = "select distinct b.TYPE_NAME, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarterCount " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.C_ARC_CLASSIC = '经营管理'";
+			String sqlZhinengVolume = "select distinct b.TYPE_NAME, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.C_INCLUDE_PAPER = '有'"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.C_INCLUDE_PAPER = '有'"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.C_INCLUDE_PAPER = '有'"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.C_INCLUDE_PAPER = '有'"+ conditionDate +") as quarterCount  " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.C_ARC_CLASSIC = '经营管理'";
+			String sqlZhinengItem = "select distinct b.TYPE_NAME, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.C_ARC_CLASSIC = '经营管理'";
+			String sqlZhinengGM = "select distinct b.TYPE_NAME, " + 
+					"(select sum(ed.CONTENT_SIZE) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.CONTENT_SIZE > 0"+ conditionDate1 +") as month1," + 
+					"(select sum(ed.CONTENT_SIZE) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.CONTENT_SIZE > 0"+ conditionDate2 +") as month2," + 
+					"(select sum(ed.CONTENT_SIZE) as cesetMonth3 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.CONTENT_SIZE > 0"+ conditionDate3 +") as month3," + 
+					"(select sum(ed.CONTENT_SIZE) as cesetMonth from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.C_ARC_CLASSIC = '经营管理' and b.CONTENT_SIZE > 0"+ conditionDate +") as quarterCount  " + 
+					"from ecm_audit_general a left join ecm_document b on a.DOC_ID = b.ID " + 
+					"where b.C_ARC_CLASSIC = '经营管理'";
+			
+			List<Map<String, Object>> listZhinengSuit = documentService.getMapList(getToken(), sqlZhinengSuit);
+			List<Map<String, Object>> listZhinengVolume = documentService.getMapList(getToken(), sqlZhinengVolume);
+			List<Map<String, Object>> listZhinengItem = documentService.getMapList(getToken(), sqlZhinengItem);
+			List<Map<String, Object>> listZhinengGM = documentService.getMapList(getToken(), sqlZhinengGM);
+			
+			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "经营管理");
+			projMap.put("typeClass", "实体");
+			projMap.put("unitType", "卷");
+			Number ZhinengCountSuitMonth1 = getSponsorT(listZhinengSuit, "month1");
+			projMap.put("drawCountSuitMonth1", ZhinengCountSuitMonth1);
+			Number ZhinengCountSuitMonth2 = getSponsorT(listZhinengSuit, "month2");
+			projMap.put("drawCountSuitMonth2", ZhinengCountSuitMonth2);
+			Number ZhinengCountSuitMonth3 = getSponsorT(listZhinengSuit, "month3");
+			projMap.put("drawCountSuitMonth3", ZhinengCountSuitMonth3);
+			Number ZhinengCountSuitQuarter = getSponsorT(listZhinengSuit, "quarterCount");
+			projMap.put("drawCountSuitQuarter", ZhinengCountSuitQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "经营管理");
+			projMap.put("typeClass", "实体");
+			projMap.put("unitType", "件");
+			Number ZhinengCountVolumeMonth1 = getSponsorT(listZhinengVolume, "month1");
+			projMap.put("drawCountSuitMonth1", ZhinengCountVolumeMonth1);
+			Number ZhinengCountVolumeMonth2 = getSponsorT(listZhinengVolume, "month2");
+			projMap.put("drawCountSuitMonth2", ZhinengCountVolumeMonth2);
+			Number ZhinengCountVolumeMonth3 = getSponsorT(listZhinengVolume, "month3");
+			projMap.put("drawCountSuitMonth3", ZhinengCountVolumeMonth3);
+			Number ZhinengCountVolumeQuarter = getSponsorT(listZhinengVolume, "quarterCount");
+			projMap.put("drawCountSuitQuarter", ZhinengCountVolumeQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "经营管理");
+			projMap.put("typeClass", "电子");
+			projMap.put("unitType", "件");
+			Number ZhinengCountItemMonth1 = getSponsorT(listZhinengItem, "month1");
+			projMap.put("drawCountSuitMonth1", ZhinengCountItemMonth1);
+			Number ZhinengCountItemMonth2 = getSponsorT(listZhinengItem, "month2");
+			projMap.put("drawCountSuitMonth2", ZhinengCountItemMonth2);
+			Number ZhinengCountItemMonth3 = getSponsorT(listZhinengItem, "month3");
+			projMap.put("drawCountSuitMonth3", ZhinengCountItemMonth3);
+			Number ZhinengCountItemQuarter = getSponsorT(listZhinengItem, "quarterCount");
+			projMap.put("drawCountSuitQuarter", ZhinengCountItemQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "经营管理");
+			projMap.put("typeClass", "电子");
+			projMap.put("unitType", "GB/MB");
+			Number ZhinengCountGMMonth1 = getSponsorT(listZhinengGM, "month1");
+			double ZhinengGMMonth1 = ZhinengCountGMMonth1.doubleValue()/1048576.00;
+			projMap.put("drawCountSuitMonth1", ZhinengGMMonth1);
+			Number ZhinengCountGMMonth2 = getSponsorT(listZhinengGM, "month2");
+			double ZhinengGMMonth2 = ZhinengCountGMMonth2.doubleValue()/1048576.00;
+			projMap.put("drawCountSuitMonth2", ZhinengGMMonth2);
+			Number ZhinengCountGMMonth3 = getSponsorT(listZhinengGM, "month3");
+			double ZhinengGMMonth3 = ZhinengCountGMMonth3.doubleValue()/1048576.00;
+			projMap.put("drawCountSuitMonth3", ZhinengGMMonth3);
+			Number ZhinengCountGMQuarter = getSponsorT(listZhinengGM, "quarterCount");
+			double ZhinengGMQuarter = ZhinengCountGMQuarter.doubleValue()/1048576.00;
+			projMap.put("drawCountSuitQuarter", ZhinengGMQuarter);
+			
+			outList.add(projMap);
+			
+			//工程变更文件
 			String sqlChangeSuit = "select distinct b.TYPE_NAME, " + 
 					"(select count(*) as cesetMonth1 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as month1," + 
 					"(select count(*) as cesetMonth2 from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID where ed.TYPE_NAME = '设计变更' and b.C_INCLUDE_PAPER = '有' and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as month2," + 
@@ -852,12 +1058,110 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			outList.add(projMap);
 			
+			String sqlProcessh = "select ed.C_ARC_CLASSIC, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed.C_ITEM_TYPE = '案卷'"+ conditionDate1 +") as quarter1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed.C_ITEM_TYPE = '案卷'"+ conditionDate2 +") as quarter2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed.C_ITEM_TYPE = '案卷'"+ conditionDate3 +") as quarter3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed.C_ITEM_TYPE = '案卷'"+ conditionDate +") as quarter4 " + 
+					"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
+					"where ed.C_ARC_CLASSIC = '工程建设' and ed.TYPE_NAME <> '工程管理案卷' and ed.TYPE_NAME <> '工程管理文件' ";
+			String sqlProcessj = "select ed.C_ARC_CLASSIC, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed2.C_INCLUDE_PAPER = '有'"+ conditionDate1 +") as quarter1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed2.C_INCLUDE_PAPER = '有'"+ conditionDate2 +") as quarter2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed2.C_INCLUDE_PAPER = '有'"+ conditionDate3 +") as quarter3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed2.C_INCLUDE_PAPER = '有'"+ conditionDate +") as quarter4 " + 
+					"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
+					"where ed.C_ARC_CLASSIC = '工程建设' and ed.TYPE_NAME <> '工程管理案卷' and ed.TYPE_NAME <> '工程管理文件' ";
+			String sqlProcessdj = "select ed.C_ARC_CLASSIC, " + 
+					"(select count(*) as cesetMonth1 from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed2.CONTENT_SIZE > 0"+ conditionDate1 +") as quarter1," + 
+					"(select count(*) as cesetMonth2 from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed2.CONTENT_SIZE > 0"+ conditionDate2 +") as quarter2," + 
+					"(select count(*) as cesetMonth3 from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed2.CONTENT_SIZE > 0"+ conditionDate3 +") as quarter3," + 
+					"(select count(*) as cesetMonth from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed2.CONTENT_SIZE > 0"+ conditionDate +") as quarter4 " + 
+					"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
+					"where ed.C_ARC_CLASSIC = '工程建设' and ed.TYPE_NAME <> '工程管理案卷' and ed.TYPE_NAME <> '工程管理文件' ";
+			String sqlProcessdg = "select ed.C_ARC_CLASSIC, " + 
+					"(select sum(ed2.CONTENT_SIZE) as cesetMonth1 from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed2.CONTENT_SIZE > 0"+ conditionDate1 +") as quarter1," + 
+					"(select sum(ed2.CONTENT_SIZE) as cesetMonth2 from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed2.CONTENT_SIZE > 0"+ conditionDate2 +") as quarter2," + 
+					"(select sum(ed2.CONTENT_SIZE) as cesetMonth3 from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed2.CONTENT_SIZE > 0"+ conditionDate3 +") as quarter3," + 
+					"(select sum(ed2.CONTENT_SIZE) as cesetMonth from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where ed2.TYPE_NAME = ed.TYPE_NAME and ed2.CONTENT_SIZE > 0"+ conditionDate +") as quarter4 " + 
+					"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
+					"where ed.C_ARC_CLASSIC = '工程建设' and ed.TYPE_NAME <> '工程管理案卷' and ed.TYPE_NAME <> '工程管理文件' ";
+			
+			List<Map<String, Object>> listProcessSuit = documentService.getMapList(getToken(), sqlProcessh);
+			List<Map<String, Object>> listProcessVolume = documentService.getMapList(getToken(), sqlProcessj);
+			List<Map<String, Object>> listProcessItem = documentService.getMapList(getToken(), sqlProcessdj);
+			List<Map<String, Object>> listProcessGM = documentService.getMapList(getToken(), sqlProcessdg);
+			
+			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "工程过程文件");
+			projMap.put("typeClass", "实体");
+			projMap.put("unitType", "盒");
+			Number ProcessCountSuitMonth1 = getSponsorT(listProcessSuit, "month1");
+			projMap.put("drawCountSuitMonth1", ProcessCountSuitMonth1);
+			Number ProcessCountSuitMonth2 = getSponsorT(listProcessSuit, "month2");
+			projMap.put("drawCountSuitMonth2", ProcessCountSuitMonth2);
+			Number ProcessCountSuitMonth3 = getSponsorT(listProcessSuit, "month3");
+			projMap.put("drawCountSuitMonth3", ProcessCountSuitMonth3);
+			Number ProcessCountSuitQuarter = getSponsorT(listProcessSuit, "quarterCount");
+			projMap.put("drawCountSuitQuarter", ProcessCountSuitQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "工程过程文件");
+			projMap.put("typeClass", "实体");
+			projMap.put("unitType", "件");
+			Number ProcessCountVolumeMonth1 = getSponsorT(listProcessVolume, "month1");
+			projMap.put("drawCountSuitMonth1", ProcessCountVolumeMonth1);
+			Number ProcessCountVolumeMonth2 = getSponsorT(listProcessVolume, "month2");
+			projMap.put("drawCountSuitMonth2", ProcessCountVolumeMonth2);
+			Number ProcessCountVolumeMonth3 = getSponsorT(listProcessVolume, "month3");
+			projMap.put("drawCountSuitMonth3", ProcessCountVolumeMonth3);
+			Number ProcessCountVolumeQuarter = getSponsorT(listProcessVolume, "quarterCount");
+			projMap.put("drawCountSuitQuarter", ProcessCountVolumeQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "工程过程文件");
+			projMap.put("typeClass", "电子");
+			projMap.put("unitType", "件");
+			Number ProcessCountItemMonth1 = getSponsorT(listProcessItem, "month1");
+			projMap.put("drawCountSuitMonth1", ProcessCountItemMonth1);
+			Number ProcessCountItemMonth2 = getSponsorT(listProcessItem, "month2");
+			projMap.put("drawCountSuitMonth2", ProcessCountItemMonth2);
+			Number ProcessCountItemMonth3 = getSponsorT(listProcessItem, "month3");
+			projMap.put("drawCountSuitMonth3", ProcessCountItemMonth3);
+			Number ProcessCountItemQuarter = getSponsorT(listProcessItem, "quarterCount");
+			projMap.put("drawCountSuitQuarter", ProcessCountItemQuarter);
+			
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>(); 
+			projMap.put("fileType", "工程过程文件");
+			projMap.put("typeClass", "电子");
+			projMap.put("unitType", "GB/MB");
+			Number ProcessCountGMMonth1 = getSponsorT(listProcessGM, "month1");
+			double ProcessGMMonth1 = ProcessCountGMMonth1.doubleValue()/1048576.00;
+			projMap.put("drawCountSuitMonth1", ProcessGMMonth1);
+			Number ProcessCountGMMonth2 = getSponsorT(listProcessGM, "month2");
+			double ProcessGMMonth2 = ProcessCountGMMonth2.doubleValue()/1048576.00;
+			projMap.put("drawCountSuitMonth2", ProcessGMMonth2);
+			Number ProcessCountGMMonth3 = getSponsorT(listProcessGM, "month3");
+			double ProcessGMMonth3 = ProcessCountGMMonth3.doubleValue()/1048576.00;
+			projMap.put("drawCountSuitMonth3", ProcessGMMonth3);
+			Number ProcessCountGMQuarter = getSponsorT(listProcessGM, "quarterCount");
+			double ProcessGMQuarter = ProcessCountGMQuarter.doubleValue()/1048576.00;
+			projMap.put("drawCountSuitQuarter", ProcessGMQuarter);
+			
+			outList.add(projMap);
+			
 			List<Map<String, Object> > classMapList = new ArrayList<Map<String, Object>>();
 			Map<String, Object> classMap = new HashMap<String, Object>();
 			classMap.put("type", "设备管理");
 			classMap.put("name", "设备文件");
 			classMapList.add(classMap);
-			typeMap = new HashMap<String, Object>();
+			classMap = new HashMap<String, Object>();
 			classMap.put("type", "商务管理");
 			classMap.put("name", "商务文件");
 			classMapList.add(classMap);
