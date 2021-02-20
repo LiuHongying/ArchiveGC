@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<!-- 文件输出格式 -->
+	<property name="PATTERN" value="%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n" />
+	<!-- test文件路径 -->
+	<property name="TEST_FILE_PATH" value="c:/temp/test.log" />
+	<!-- pro文件路径 -->
+	<property name="PRO_FILE_PATH" value="c:/temp/zisecm.log" />
+	<!-- dev文件路径 -->
+	<property name="DEV_FILE_PATH" value="d:/loger/zisecm.log" />
+
+
+
+
+
+
+
+
+
+	<!-- 开发环境 -->
+	<springProfile name="dev">
+	<!-- 每天产生一个文件 -->
+		<appender name="DEV-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!--设置日志级别,过滤掉info日志,只输入error日志-->
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <pattern>
+                %msg%n
+            </pattern>
+        </encoder>
+			
+			<file>${DEV_FILE_PATH}</file>
+			
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			
+				<!-- 文件名称 -->
+				<fileNamePattern>${DEV_FILE_PATH}/info.%d{yyyy-MM-dd}.log</fileNamePattern>
+				<!-- 文件最大保存历史数量 -->
+				<MaxHistory>100</MaxHistory>
+			</rollingPolicy>
+			<layout class="ch.qos.logback.classic.PatternLayout">
+				<pattern>${PATTERN}</pattern>
+			</layout>
+		</appender>
+		<root level="error">
+			<appender-ref ref="DEV-FILE" />
+		</root>
+	
+		<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+			<encoder>
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+		</appender>		
+		<logger name="com.ecm.core.service" level="ERROR" />
+		<logger name="com.ecm.portal" level="ERROR" />
+		<logger name="com.ecm.cnpe.exchange" level="debug" />
+		<root level="info">
+			<appender-ref ref="CONSOLE" />
+		</root>
+	</springProfile>
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<!-- 测试环境 -->
+	<springProfile name="test">
+		<!-- 每天产生一个文件 -->
+		<appender name="TEST-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<!-- 文件路径 -->
+			<file>${TEST_FILE_PATH}</file>
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<!-- 文件名称 -->
+				<fileNamePattern>${TEST_FILE_PATH}/info.%d{yyyy-MM-dd}.log</fileNamePattern>
+				<!-- 文件最大保存历史数量 -->
+				<MaxHistory>100</MaxHistory>
+			</rollingPolicy>
+			<layout class="ch.qos.logback.classic.PatternLayout">
+				<pattern>${PATTERN}</pattern>
+			</layout>
+		</appender>
+		<root level="info">
+			<appender-ref ref="TEST-FILE" />
+		</root>
+		<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+			<encoder>
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+		</appender>
+		<logger name="com.ecm.core.service" level="info" />
+		<logger name="com.ecm.portal" level="info" />
+		<logger name="com.ecm.cnpe.exchange" level="info" />
+		<root level="error">
+			<appender-ref ref="CONSOLE" />
+		</root>
+	</springProfile>
+
+		
+	<!-- 生产环境 -->
+	<springProfile name="prod">
+		<!-- 每天产生一个文件 -->
+		<appender name="PROD-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		
+			<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!--设置日志级别,过滤掉info日志,只输入error日志-->
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <pattern>
+                %msg%n
+            </pattern>
+        </encoder>
+		
+		
+			<!-- 文件路径 -->
+			<file>${PRO_FILE_PATH}</file>
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<!-- 文件名称 -->
+				<fileNamePattern>${PRO_FILE_PATH}/info.%d{yyyy-MM-dd}.log</fileNamePattern>
+				<!-- 文件最大保存历史数量 -->
+				<MaxHistory>100</MaxHistory>
+			</rollingPolicy>
+			<layout class="ch.qos.logback.classic.PatternLayout">
+				<pattern>${PATTERN}</pattern>
+			</layout>
+		</appender>
+		<root level="info">
+			<appender-ref ref="PROD-FILE" />
+		</root>
+		<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+			<encoder>
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+		</appender>
+		<logger name="com.ecm.core.service" level="info" />
+		<logger name="com.ecm.portal" level="info" />
+		<logger name="com.ecm.cnpe.exchange" level="debug" />
+		<root level="info">
+			<appender-ref ref="CONSOLE" />
+		</root>
+	</springProfile>
+	
+</configuration>

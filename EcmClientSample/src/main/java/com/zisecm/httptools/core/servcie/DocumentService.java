@@ -31,22 +31,16 @@ import com.zisecm.httptools.core.entity.EcmRelation;
  *
  */
 public class DocumentService {
-	private EcmHttp ecmClient;
+
 	public DocumentService() {
-		ecmClient = new EcmHttp();
+		
 	}
 	/**
 	 * 查询文档
 	 */
-	public void queryDocument() {
+	public void queryDocument(CloseableHttpClient httpClient,String token,EcmHttp ecmClient) {
 		System.out.println("[METHOD]GetDocument");
 		HttpPost httpPost=null;
-		CloseableHttpClient httpClient = HttpClients.createDefault();
-		
-		String username = ecmClient.getConfig().getUsername();
-		String password = ecmClient.getConfig().getPassword();
-		//登录
-		String token = ecmClient.login(username, password, httpClient);
 		
 		String url = ecmClient.getConfig().getBaseurl()+"/dc/getDocuments";
 		httpPost=new HttpPost(url);
@@ -93,22 +87,21 @@ public class DocumentService {
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		//登出
-		ecmClient.logout(token, httpClient);
 	}
 	
 	/**
-	 * 新建文档
+	 * 
+	 * @param httpClient 连接
+	 * @param token 
+	 * @param ecmClient 配置
+	 * @param jsObj 元数据
+	 * @param stream 电子文件
+	 * @param fileName 电子文件名
+	 * @return
 	 */
-	public void newDocument() {
+	public String newDocument(CloseableHttpClient httpClient,String token,EcmHttp ecmClient,JSONObject jsObj,InputStream stream,String fileName) {
 		System.out.println("[METHOD]createDocument");
 		HttpPost httpPost=null;
-		CloseableHttpClient httpClient = HttpClients.createDefault();
-		
-		String username = ecmClient.getConfig().getUsername();
-		String password = ecmClient.getConfig().getPassword();
-		String token = ecmClient.login(username, password, httpClient);
-		
 		String url = ecmClient.getConfig().getBaseurl()+"/dc/newDocument";
 		httpPost=new HttpPost(url);
 		try {
@@ -119,16 +112,11 @@ public class DocumentService {
 			// 使用表单形式提交参数
 	        MultipartEntityBuilder fileBuilder = MultipartEntityBuilder.create();
 	        fileBuilder.setMode(HttpMultipartMode.RFC6532);
-	        InputStream stream = new FileInputStream("C:\\temp\\1.pdf");
-			String fileName = "1.pdf";
+	        
 			// file为提交参数名,stream为要上传的文件的文件流 inputStream，最后一个参数为上传文件名称
-	        fileBuilder.addBinaryBody("uploadFile", stream, ContentType.create("multipart/form-data"), fileName);
-	        JSONObject jsObj = new JSONObject();
-			jsObj.put("TYPE_NAME", "移交单");
-			jsObj.put("CODING", "TEST-009861");
-			jsObj.put("FOLDER_ID", "f665a97d6986400481079c98f7183b33");
-			jsObj.put("STATUS","新建");
-			jsObj.put("C_COMMENT","测试移交单");
+			if(stream!=null) {
+				fileBuilder.addBinaryBody("uploadFile", stream, ContentType.create("multipart/form-data"), fileName);
+			}
 			StringBody metaData = new StringBody(jsObj.toString(), ContentType.create("text/plain", Consts.UTF_8));
 			fileBuilder.addPart("metaData", metaData);
 	        HttpEntity fileEntity = fileBuilder.build();
@@ -149,6 +137,7 @@ public class DocumentService {
 	        		if(code==1) {
 	        			if(jsonResult.containsKey("id")) {
 	        				System.out.println(jsonResult.get("id"));
+	        				return jsonResult.getString("id");
 	        			}
 	        		}
 	        	}
@@ -157,21 +146,20 @@ public class DocumentService {
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		//登出
-		ecmClient.logout(token, httpClient);
+		return null;
 	}
 	/**
-	 * 添加附件
+	 * 
+	 * @param httpClient
+	 * @param token
+	 * @param ecmClient 客户端配置
+	 * @param stream 电子文件
+	 * @param fileName 电子文件名
+	 * @param parentId 父Id
 	 */
-	public void addAttachments() {
+	public void addAttachments(CloseableHttpClient httpClient,String token,EcmHttp ecmClient,InputStream stream,String fileName,String parentId) {
 		System.out.println("[METHOD]addAttachments");
 		HttpPost httpPost=null;
-		CloseableHttpClient httpClient = HttpClients.createDefault();
-		
-		String username = ecmClient.getConfig().getUsername();
-		String password = ecmClient.getConfig().getPassword();
-		String token = ecmClient.login(username, password, httpClient);
-		
 		String url = ecmClient.getConfig().getBaseurl()+"/dc/addAttachment";
 		httpPost=new HttpPost(url);
 		try {
@@ -182,12 +170,10 @@ public class DocumentService {
 			// 使用表单形式提交参数
 	        MultipartEntityBuilder fileBuilder = MultipartEntityBuilder.create();
 	        fileBuilder.setMode(HttpMultipartMode.RFC6532);
-	        InputStream stream = new FileInputStream("C:\\temp\\1.pdf");
-			String fileName = "1.pdf";
 			// file为提交参数名,stream为要上传的文件的文件流 inputStream，最后一个参数为上传文件名称
 	        fileBuilder.addBinaryBody("uploadFile", stream, ContentType.create("multipart/form-data"), fileName);
 	        JSONObject jsObj = new JSONObject();
-			jsObj.put("parentDocId", "6eb192a485bd45e5b5de5ac73aaf5ba5");
+			jsObj.put("parentDocId", parentId);
 			jsObj.put("TYPE_NAME", "附件");
 			jsObj.put("relationName", "附件");
 			StringBody metaData = new StringBody(jsObj.toString(), ContentType.create("text/plain", Consts.UTF_8));
@@ -216,21 +202,19 @@ public class DocumentService {
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		//登出
-		ecmClient.logout(token, httpClient);
 	}
 	/**
-	 * 新建关联关系
+	 * 创建关系
+	 * @param httpClient
+	 * @param token
+	 * @param ecmClient
+	 * @param parentId 父ID
+	 * @param childId 子ID
+ 	 * @param relationName 关系名称
 	 */
-	public void newRelation() {
+	public void newRelation(CloseableHttpClient httpClient,String token,EcmHttp ecmClient,String parentId,String childId,String relationName) {
 		System.out.println("[METHOD]newRelation");
 		HttpPost httpPost=null;
-		CloseableHttpClient httpClient = HttpClients.createDefault();
-		
-		String username = ecmClient.getConfig().getUsername();
-		String password = ecmClient.getConfig().getPassword();
-		String token = ecmClient.login(username, password, httpClient);
-		
 		String url = ecmClient.getConfig().getBaseurl()+"/dc/createRelation";
 		httpPost=new HttpPost(url);
 		try {
@@ -241,9 +225,9 @@ public class DocumentService {
 			httpPost.setConfig(timeoutConfig);
 			
 	        JSONObject jsObj = new JSONObject();
-			jsObj.put("childId", "86b26d3e6dfb457b8d433f43e8a5447f");
-			jsObj.put("parentId","6eb192a485bd45e5b5de5ac73aaf5ba5");
-			jsObj.put("name","111");
+			jsObj.put("childId", childId);
+			jsObj.put("parentId",parentId);
+			jsObj.put("name",relationName);
 			StringEntity strEntity=new StringEntity(jsObj.toJSONString());
 			httpPost.addHeader("Content-Type","application/json;charset=utf-8");
 			httpPost.addHeader("token", token);
@@ -273,7 +257,5 @@ public class DocumentService {
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		//登出
-		ecmClient.logout(token, httpClient);
 	}
 }
