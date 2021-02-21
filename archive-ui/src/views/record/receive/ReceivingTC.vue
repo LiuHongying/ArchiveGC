@@ -36,7 +36,6 @@
                   v-bind="tables.Delivery"
                   :tableHeight="layout.height-136"
                   showOptions="查看内容"
-                  v-bind:isshowPage="false"
                   @selectchange="selectDEChange"
                   @rowclick="onDataGridRowClick"
                 >
