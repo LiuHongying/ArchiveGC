@@ -34,7 +34,7 @@
                   ref="DeliveryDataGrid"
                   key="Delivery"
                   v-bind="tables.Delivery"
-                  :tableHeight="layout.height-136"
+                  :tableHeight="layout.height-165"
                   showOptions="查看内容"
                   @selectchange="selectDEChange"
                   @rowclick="onDataGridRowClick"
@@ -71,7 +71,7 @@
                 </el-form-item>
               </el-form>
             </el-row>
-            <el-row>
+            <el-row style="background:#FFFFFF;">
               <el-col :span="24">
                 <DataGrid
                   ref="Drawing"

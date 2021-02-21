@@ -142,7 +142,7 @@
           type="selection"
           width="40"
         ></el-table-column>
-        <el-table-column :label="$t('field.indexNumber')" key="#1" width="70">
+        <el-table-column :label="$t('field.indexNumber')" key="#1" width="50">
           <template slot-scope="scope">
             <slot name="sequee" :data="scope" :currentPage="currentPage" :pageSize="pageSize">
               <span>{{ (currentPage - 1) * pageSize + scope.$index + 1 }}</span>
