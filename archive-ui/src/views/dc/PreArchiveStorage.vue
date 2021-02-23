@@ -795,6 +795,7 @@ export default {
 
     handleNodeClick(indata,node,current) {
       let _self = this;
+      _self.advCondition = "";
       _self.selectRow = [];
       _self.selectedFileId = "";
       // let gridView = indata.gridView
@@ -856,7 +857,7 @@ export default {
       }
 
       if (_self.advCondition != undefined && _self.advCondition.length > 0) {
-        key += " and " + _self.advCondition;
+        key += " and (" + _self.advCondition+")";
       }
 
       _self.$refs.mainDataGrid.condition += key;

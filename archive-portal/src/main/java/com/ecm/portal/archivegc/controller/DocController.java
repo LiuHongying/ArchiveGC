@@ -469,11 +469,13 @@ public class DocController  extends ControllerAbstract  {
 			String newCondition = args.get("condition").toString();
 			String advCondition = args.get("advCondition")!=null?args.get("advCondition").toString():null;
 			if (!EcmStringUtils.isEmpty(newCondition)) {
-				condition.append(" and"+newCondition+ " and FOLDER_ID in (SELECT id from ecm_folder where folder_path like '"
-						+ ecmFolder.getFolderPath() + "%')");
+				condition.append(" and "+newCondition);
 			}
 			if(EcmStringUtils.isEmpty(advCondition)){
 				condition.append(" AND FOLDER_ID='").append(folderId.replace("'", "")).append("'");
+			}else {
+				condition.append(" AND (").append(advCondition).append(") and FOLDER_ID in (SELECT id from ecm_folder where folder_path like '"
+						+ ecmFolder.getFolderPath() + "%')");
 			}
 
 				List<Map<String, Object>> list = documentService.getObjectsByConditon(getToken(),
