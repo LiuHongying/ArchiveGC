@@ -1168,9 +1168,9 @@ export default {
       this.loadGridData();
     },
     sortchange(column) {
-      console.log(JSON.stringify(column));
-      console.log(column.column.property);
-      console.log(column.column.order); //ascending, descending
+      //console.log(JSON.stringify(column));
+      //console.log(column.column.property);
+      //console.log(column.column.order); //ascending, descending
       if(column.column.order == null){
         this.orderBy = "";
       }else if(column.column.order == "ascending"){
@@ -1201,9 +1201,20 @@ export default {
       }
       this.$emit("rowclick", row);
     },
-    dbclick(row) {
+    getCurrentIndex(row){
+      var i=0;
+      for(i=0;i<this.itemDataList.length;i++){
+        if(this.itemDataList[i].ID==row.ID){
+          return i;
+        }
+      }
+      return -1;
+    },
+    dbclick(row, column, event) {
+      this.showItemProperty(this.getCurrentIndex(row),row);
       this.$emit("dbclick", row);
     },
+
     selectChange(val) {
       this.selectedRows = val;
       this.$emit("selectchange", val);

@@ -249,6 +249,7 @@
                       </div>
                     </el-col>
                     <el-col :span="18" style="padding-left:10px;">
+                      <div style="min-width:400px;width:100%;">
                       <el-form-item>
                         <TypeSelectComment ref="TypeSelectComment" @afterSelecteType="newArchiveItem"></TypeSelectComment>
                       </el-form-item>
@@ -520,7 +521,8 @@
                           </el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
-                      </el-form-item>                      
+                      </el-form-item>  
+                      </div>                    
                     </el-col>
                   </el-row>
                   </el-form>
@@ -2008,7 +2010,7 @@ export default {
           key=key+" and status='"+_self.archiveStatus+"'";
         }
       if(_self.AddConds!=''){
-        key = key + " and "+_self.AddConds
+        key = key + " and ("+_self.AddConds+")";
       }
       _self.mainParam.condition=key;
       _self.mainParam.folderId=indata.id;
@@ -2042,12 +2044,13 @@ export default {
     },
     // 文件夹节点点击事件
     handleNodeClick(indata) {
-      this.currentFolder = indata
-      let archiveType = indata.name
-      let gridView = this.currentFolder.gridView
+      this.currentFolder = indata;
+      let archiveType = indata.name;
+      let gridView = this.currentFolder.gridView;
       let _self = this;
-      this.AttachParentID=""
-      this.InnerAttachParentID=""
+      this.AttachParentID="";
+      this.InnerAttachParentID="";
+      _self.AddConds="";
       _self.selectRow = [];
       _self.selectedFileId = "";
       _self.currentFolder = indata;

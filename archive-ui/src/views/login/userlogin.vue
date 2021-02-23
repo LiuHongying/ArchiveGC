@@ -11,8 +11,8 @@
         <i slot="prefix" class="icon-mima"></i>
       </el-input>
     </el-form-item>
-    <el-checkbox v-model="rememberInfo">{{$t("application.rememberLoginInfo")}}</el-checkbox>
     <el-form-item>
+      <el-checkbox v-model="rememberInfo">{{$t("application.rememberLoginInfo")}}</el-checkbox>
       <el-button type="primary" size="small" @click.native.prevent="handleLogin" class="login-submit">{{$t("application.login")}}</el-button>
     </el-form-item>
     <!--

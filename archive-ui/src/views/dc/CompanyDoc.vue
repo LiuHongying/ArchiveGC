@@ -727,6 +727,7 @@ export default {
     },
     handleNodeClick(indata) {
       let _self = this;
+      _self.AddConds = "";
       _self.disable = false;
       _self.exportAble = true;
       _self.currentFolder = indata;
@@ -807,8 +808,7 @@ export default {
         }
       }
       if (_self.AddConds != "") {
-        key +=
-          " and C_ITEM_TYPE = " + _self.radioValue + " and " + _self.AddConds;
+        m.set("advCondition", _self.AddConds);
       }
       _self.gridViewTrans = indata.gridView;
       _self.idTrans = indata.id;
@@ -842,6 +842,7 @@ export default {
       m.set("gridName", indata.gridView);
       m.set("folderId", indata.id);
       m.set("condition", key);
+      m.set("advCondition", _self.AddConds);
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", _self.currentPage - 1);
       m.set("orderBy", "MODIFIED_DATE desc");
