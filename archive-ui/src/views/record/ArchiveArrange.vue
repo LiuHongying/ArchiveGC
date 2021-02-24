@@ -228,13 +228,17 @@
                   <el-form inline="true">
                   <el-row>
                     <el-col :span="3" class="topbar-input">
+                      <el-row>
                       <el-input
                         v-model="inputkey"
                         :placeholder="$t('message.pleaseInput')+$t('application.keyword')"
                         @change="searchItem"
                         prefix-icon="el-icon-search"
                       ></el-input>
-                       
+                      </el-row>
+                      <el-row style="padding-top:10px;">
+                       <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
+                      </el-row>
                     </el-col>
                     <el-col :span="3" class="topbar-input">
                       <el-select v-model="archiveStatus" placeholder="请选择状态" @change="searchItem">
@@ -464,9 +468,6 @@
                         size="small"
                         @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
                       </el-form-item> -->
-                      <el-form-item>
-                      <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
-                      </el-form-item>
                       <el-form-item>
                         <el-dropdown class="avatar-container right-menu-item" trigger="click">
                           <div class="avatar-wrapper">

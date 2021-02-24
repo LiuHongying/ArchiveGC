@@ -144,7 +144,6 @@ export default {
   vertical-align: middle  !important;
   line-height: 0  !important;
 }
-
 .gutter{
   display:block;
 }

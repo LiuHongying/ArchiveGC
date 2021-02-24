@@ -479,7 +479,7 @@ export default {
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
-      topbarHeight: 55,
+      topbarHeight: 45,
       // 底部除列表高度
       bottomHeight: 35,
       AddConds: "",

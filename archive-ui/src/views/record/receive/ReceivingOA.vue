@@ -23,15 +23,15 @@
                   ></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="searchD()">{{
+                  <el-button type="primary" plain @click="searchD()">{{
                     $t("application.SearchData")
                   }}</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary">提交整编</el-button>
+                    <el-button type="primary" plain>提交整编</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="success" @click="beforeRejectDE()">驳回</el-button>
+                    <el-button type="success" plain @click="beforeRejectDE()">驳回</el-button>
                 </el-form-item>
               </el-form>
             </el-row>
@@ -60,17 +60,17 @@
                   ></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="search()">{{
+                  <el-button type="primary" plain @click="search()">{{
                     $t("application.SearchData")
                   }}</el-button>
                 </el-form-item>
                 <!-- 接收 -->
                 <el-form-item>
-                    <el-button type="success" @click="submit()">{{$t('application.Receive')}}</el-button>
+                    <el-button type="primary" plain @click="submit()">{{$t('application.Receive')}}</el-button>
                 </el-form-item>
                 <!-- 驳回 -->
                 <el-form-item>
-                    <el-button type="success" @click="beforeReject()">驳回</el-button>
+                    <el-button type="warning" plain @click="beforeReject()">驳回</el-button>
                 </el-form-item>
               </el-form>
             </el-row>

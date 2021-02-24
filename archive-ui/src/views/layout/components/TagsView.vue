@@ -1,7 +1,7 @@
 <template>
   <div class="tags-view-container">
     <ecm-scroll-pane class='tags-view-wrapper' ref='scrollPane'>
-      <router-link ref='tag' class="tags-view-item" :class="isActive(tag)?'active':''" v-for="tag in Array.from(visitedViews)"
+      <router-link ref='tag' class="tags-view-item" :class="isActive(tag)?'el-button--primary':''" v-for="tag in Array.from(visitedViews)"
         :to="tag.path" :key="tag.path" @contextmenu.prevent.native="openMenu(tag,$event)">
         {{generateTitle(tag.title)}}
         <span class='el-icon-close' @click.prevent.stop='closeSelectedTag(tag)'></span>
@@ -128,8 +128,6 @@ export default {
       height: 26px;
       line-height: 26px;
       border: 1px solid #d8dce5;
-      color: #495060;
-      background: #fff;
       padding: 0 8px;
       font-size: 14px;
       margin-left: 5px;
@@ -138,9 +136,7 @@ export default {
         margin-left: 15px;
       }
       &.active {
-        background-color: #409EFF;
         color: #fff;
-        border-color: #409EFF;
         &::before {
           content: '';
           background: #fff;

@@ -205,7 +205,7 @@
             </div>
             <el-row class="person-row">
             <el-col :span="8" v-if="!outUser">
-              <i style="font-size: 28px;color: #409EFF;" class="el-icon-star-off"></i>
+              <i style="font-size: 28px;" class="el-icon-star-off el-checkbox__label"></i>
               <el-link
                 :underline="false"
                 @click="$router.push('/ShopingCart')"
@@ -213,7 +213,7 @@
               >
             </el-col>
             <el-col :span="8">
-              <i style="font-size: 28px;color: #409EFF;" class="el-icon-user"></i>
+              <i style="font-size: 28px;" class="el-icon-user el-checkbox__label"></i>
               <el-link
                 :underline="false"
                 @click="$router.push(jumpPath.userCenter)"
@@ -221,7 +221,7 @@
               >
             </el-col>
             <el-col :span="8">
-              <i style="font-size: 28px;color: #409EFF;" class="el-icon-finished "></i>
+              <i style="font-size: 28px;" class="el-icon-finished el-checkbox__label"></i>
               <el-link
                 :underline="false"
                 @click="$router.push('/user/userroleinfo')"
