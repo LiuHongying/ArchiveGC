@@ -52,6 +52,15 @@
 
     </el-dialog>
 
+ <el-dialog :visible.sync="printVolumesVisible4Documents"  width="80%"
+    > <div>
+      <PrintVolumes4Docu
+        ref="PrintVolumes4Documents"
+      ></PrintVolumes4Docu>
+      </div>
+    </el-dialog>
+
+
     <el-dialog :visible.sync="printsVisible">
       <PrintPage ref="printPage" v-bind:archiveId="this.archiveId"></PrintPage>
     </el-dialog>
@@ -390,6 +399,12 @@
                                 打印备考表
                               </span>
                             </el-dropdown-item>
+                            <el-dropdown-item divided>
+                              <span @click="beforePrintDocuments(selectedItems,'BorrowPrintGrid','文件清单')" style="display:block;">
+                                <i class="el-icon-printer"></i>
+                                打印文件清单
+                              </span>
+                            </el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
                       </el-form-item>
@@ -663,7 +678,7 @@ import ExcelUtil from "@/utils/excel.js";
 import BatchUpdate from "@/views/record/BatchUpdate.vue" 
 import BatchFileMount from "@/views/record/BatchFileMount.vue" 
 import AddToArchive from "@/views/record/AddToArchive.vue"
-
+import PrintVolumes4Docu from "@/views/record/Print4Borrow";
 export default {
   name: "ArchiveArrange",
   components: {
@@ -683,7 +698,8 @@ export default {
     BatchImport:BatchImport,
     AddCondition:AddCondition,
     PrintCoverpage:PrintCoverpage,
-    AddToArchive:AddToArchive
+    AddToArchive:AddToArchive,
+    PrintVolumes4Docu:PrintVolumes4Docu,
   },
   data() {
     return {
@@ -711,6 +727,7 @@ export default {
       currentLanguage: this.getLang(),
       printsVisible: false,
       printVolumesVisible: false,
+      printVolumesVisible4Documents:false,
       archiveId: "",
       dataList: [],
       showFields: [],
@@ -1096,6 +1113,37 @@ export default {
         });
       }
     },
+    beforePrintDocuments(selectedRow,gridName,vtitle){
+      let _self=this;
+      let ids =[]
+      for(let i = 0;i < _self.selectedItems.length;i++){
+        ids[i] = _self.selectedItems[i].ID
+      }
+      console.log(_self.$refs.printVolumes)
+      //console.log(_self.selectedArchives[0].ID)
+      if(_self.selectedItems.length==0){
+        // _self.$message('请选择一条数据进行打印');
+        _self.$message({
+                showClose: true,
+                message: '请选择一条数据进行打印!',
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      _self.printVolumesVisible4Documents = true;
+
+      setTimeout(()=>{
+        _self.$refs.PrintVolumes4Documents.dialogQrcodeVisible = false
+        _self.$refs.PrintVolumes4Documents.getArchiveObj(ids,
+        gridName,
+        vtitle); 
+      },10);
+
+      _self.printGridName=gridName;
+      _self.printObjId=selectedRow.ID;
+    },
+
     //复制著录方法
     beforeCreateLevel1File(row,parentId){
       let _self=this;
