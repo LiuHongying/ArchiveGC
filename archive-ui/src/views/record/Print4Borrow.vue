@@ -86,6 +86,7 @@
                         <div class="sub-table-td1" style="width: 100%;height:100%;">
                             
                        <el-table
+                        ref='report-table'
                         :height="tableHeight"
                         :data="innerDataList"
                         style="width: 100%;border:1px solid #212121">
@@ -195,6 +196,7 @@
   　　　　</div>
 
   　　　　<button @click="printCode" v-print="'#print'">打印</button>
+          <button @click="exportExcel4Print(names)" v-print="'#print'">文件清单导出EXCEL</button>
   </div>
 </template>
 
@@ -202,6 +204,8 @@
 import Print from '@/plugins/print'
 import Vue from 'vue';
 import QRCode from 'qrcodejs2'// 引入qrcode
+import XLSX from 'xlsx'
+import FileSaver from 'file-saver'
 Vue.use(Print)
 export default {
    name: 'test',
@@ -218,7 +222,8 @@ export default {
       volumeTitle:"",
       showSingle:false,
       formType:"",
-      formCoding:""
+      formCoding:"",
+      names:"文件清单"
     };
   },
   mounted() {
@@ -237,6 +242,27 @@ export default {
     gridName:{type:String}
   },
   methods: {
+      exportExcel4Print(excelName) {
+       //excelName --设置导出的excel名称
+       //report-table --对应的要导出的el-table的ref名称
+      try {
+        const $e = this.$refs['report-table'].$el;
+        // 如果表格加了fixed属性，则导出的文件会生产两份一样的数据，所以可在这里判断一下
+        let $table = $e.querySelector('.el-table__fixed');
+        if (!$table) {
+          $table = $e;
+        }
+        // 为了返回单元格原始字符串，设置{ raw: true }
+        const wb = XLSX.utils.table_to_book($table, { raw: true });
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'array' });
+        FileSaver.saveAs(
+          new Blob([wbout], { type: 'application/octet-stream' }),
+          `${excelName}.xlsx`,
+        );
+      } catch (e) {
+        if (typeof console !== 'undefined') console.error(e);
+      }
+ },
 
       // 加载表格样式
     getTypes(type,coding){
@@ -298,6 +324,7 @@ export default {
     },
     getArchiveObj(id,gridName,volumeTitle){
       let _self=this;
+      console.log(11)
       // _self.showSingle=gridName=='PrintDelivery';
       _self.volumeTitle=volumeTitle;
       _self.archiveId=id[0];
