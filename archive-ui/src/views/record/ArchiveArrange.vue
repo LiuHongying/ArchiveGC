@@ -899,7 +899,7 @@ export default {
             // _self.$message('请选择一条文件数据');
             _self.$message({
                     showClose: true,
-                    message: _self.$t('message.PleaseSelectOneFile'),
+                    message: _self.$t("请选择一条文件数据！单击下方子表任意一行来选择要添加附件的文件数据"),
                     duration: 2000,
                     type: "warning"
                 });
