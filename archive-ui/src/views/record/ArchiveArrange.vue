@@ -264,7 +264,7 @@
                     <el-col :span="18" style="padding-left:10px;">
                       <div style="min-width:400px;width:100%;">
                       <el-form-item>
-                        <TypeSelectComment ref="TypeSelectComment" @afterSelecteType="newArchiveItem"></TypeSelectComment>
+                        <TypeSelectComment ref="TypeSelectComment" :currentFolder="currentFolder" @afterSelecteType="newArchiveItem"></TypeSelectComment>
                       </el-form-item>
                       <el-form-item>
                         <el-button
@@ -461,28 +461,6 @@
                           title="提交入库"
                         >提交入库</el-button>
                       </el-form-item>
-                      <!-- <el-form-item>
-                        <el-button
-                          type="primary"
-                          size="small"
-                          plain
-                          @click="beforeModify()"
-                        >修改</el-button>
-                       </el-form-item>
-                      <el-form-item>
-                        <el-button
-                          type="primary"
-                          size="small"
-                          plain
-                          @click="batchUpdateVisible=true"
-                        >更新</el-button>
-                      </el-form-item>
-                      <el-form-item>
-                        <el-button type="primary"
-                        plain
-                        size="small"
-                        @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
-                      </el-form-item> -->
                       <el-form-item>
                         <el-dropdown class="avatar-container right-menu-item" trigger="click">
                           <div class="avatar-wrapper">
