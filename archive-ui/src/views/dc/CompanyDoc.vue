@@ -267,6 +267,7 @@
                         @sort-change="sortchange"
                         style="width: 100%"
                         @header-dragend="onHeaderDragend"
+                        @row-dblclick="dbclick"
                         fit
                       >
                         <el-table-column
@@ -574,6 +575,9 @@ export default {
     _self.search();
   },
   methods: {
+    dbclick(row, column, event) {
+      this.showItemProperty(row);
+    },
     changeRadio(val) {
       let _self = this;
       if (val == "文件") {

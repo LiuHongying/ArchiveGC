@@ -107,7 +107,7 @@ export default {
     return {
       startHeight: 135,
       leftStorageName: 'ReceivingTCWidth',
-      leftPercent: 20,
+      leftPercent: 26,
       tables: {
         //移交单
         Delivery: {
