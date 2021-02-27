@@ -86,7 +86,6 @@
                     <el-col :xs="8" :sm="6" :md="6" :lg="4" :xl="3" v-for="card in cards" :key="card.id">
                     <el-checkbox
                       :label="card.name"
-                      checked
                       @change="handleCheckedTypeChange"
                     >{{card.name}}</el-checkbox>
                     </el-col>

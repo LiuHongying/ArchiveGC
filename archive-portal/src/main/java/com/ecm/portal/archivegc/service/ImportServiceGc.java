@@ -230,10 +230,10 @@ public class ImportServiceGc extends EcmService {
 
 							String excelFileName = getCellValue(sheet.getRow(i).getCell(0));
 							// String itemPath = getItemFilePath(excelFileName, files, uploadFolder);
-							UploadFile ufile =  getUploadFile(excelFileName, files, uploadFolder, i, sb);
+							//UploadFile ufile =  getUploadFile(excelFileName, files, uploadFolder, i, sb);
 
 
-							parentId = newDocument(token, parentType, ufile.fileName,null /*ufile.itemStream*/, sheet.getRow(i), fileList,
+							parentId = newDocument(token, parentType, null,null /*ufile.itemStream*/, sheet.getRow(i), fileList,
 									attrNames, null, null, number, 1, childStartIndex - 1, sameValues,
 									sameFields,id,idType);
 							if(parentId != null) {
