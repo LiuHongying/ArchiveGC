@@ -12,7 +12,7 @@
     <div class="topItem">
       {{archiveObject.C_ARC_CLASSIC}}
     </div>
-    <div style="height:432px">
+    <div style="height:382px">
 
     </div>
     <div class="titleItem"> 
@@ -89,12 +89,12 @@ export default {
 }
 .titleItem{
   line-height: 27px;
-  height: 70px;
+  height: 120px;
   text-align:left; 
   color: #000000;
   padding-left:270px;
-  padding-right:90px;
-  font-size:16pt;
+  padding-right:30px;
+  font-size:12pt;
   vertical-align: bottom;
   display: table-cell;
 }

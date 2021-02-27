@@ -1645,10 +1645,11 @@ export default {
     },
     //挂载成功触发事件
     afterMountFile(){
+      console.log("afterMountFile:"+this.mountParentDoc);
       if(this.mountParentDoc){
         this.loadGridData(this.currentFolder);
       }else{
-        this.showInnerFile(this.selectedRow);
+        this.showInnerFile(this.selectRow);
       }
     },
     getFormData(selId) {
@@ -2120,6 +2121,7 @@ export default {
         let mp=new Map();
         mp.set("folderId",indata.id);
         mp.set("condition"," and (IS_HIDDEN=0 and IS_CHILD=0)");
+        mp.set("noCount","true");
         _self
           .axios({
             headers: {

@@ -11,6 +11,10 @@
                     <MultiInput v-if="item.controlType=='TextBox' && item.isRepeat" v-model="item.defaultValue"></MultiInput>
                     <el-input v-if="item.controlType=='TextArea'" type="textarea" :name="item.attrName" v-model="item.defaultValue" :disabled="item.readOnly"></el-input>
                     <el-input v-else-if="item.controlType=='Integer'" :min="0" type="number" :name="item.attrName" v-model="item.defaultValue" :disabled="item.readOnly"></el-input>
+                    <el-input v-else-if="item.controlType=='InputSelect'" type="text" :name="item.attrName" v-model="item.defaultValue" @input="handleInputChange(item)" :disabled="item.readOnly"></el-input>
+                    <!--
+                    <el-autocomplete v-else-if="item.controlType=='InputSelect'" class="inline-input" v-model="item.defaultValue" :fetch-suggestions="queryInputSearch(queryString, cb,item)" @select="handleInputSelect(vitem,item)" ></el-autocomplete>
+                    -->
                     <el-checkbox v-else-if="item.controlType=='Boolean'"  :name="item.attrName" v-model="item.defaultValue" :disabled="item.readOnly"></el-checkbox>
                     <template v-else-if="item.controlType=='Date'">
                       <span v-if="item.readOnly" >{{datetimeFormat(item.defaultValue)}}</span>
@@ -128,6 +132,52 @@ export default {
     showTypeName: {type:Boolean, default: false},
   },
   methods: {
+    handleInputChange(item){
+      console.log(item);
+      var c;
+      for(c in this.dataList){
+        let dataRows = this.dataList[c].ecmFormItems;
+        var i;
+        for (i in dataRows) {
+          let row = dataRows[i];
+          if(row.dependName == item.attrName){
+            //row.defaultValue = "";
+            this.loadChildValue(row, item.defaultValue);
+            return;
+          }
+        }
+      }
+    },
+    loadChildValue(item, val){
+      let _self = this;
+      var m = new Map();
+      m.set("queryName", item.queryName);
+      m.set("dependValue", val);
+      _self.loading = true;
+      axios.post("/dc/getSelectList",JSON.stringify(m))
+        .then(function(response) {
+          if(response.data.code == 1){
+            if(response.data.data && response.data.data.length>0){
+              item.defaultValue = response.data.data[0];
+            }
+          }
+          _self.loading = false;
+        })
+        .catch(function(error) {
+          console.log(error);
+          _self.loading = false;
+        });
+    },
+    queryInputSearch(queryString, cb,item)
+    {
+      console.log(queryString);
+      console.log(cb);
+      console.log(item);
+    },
+    handleInputSelect(vitem,item){
+      console.log(vitem);
+      console.log(item);
+    },
     setMainObject(obj){
       this.mainObject=obj;
     },
@@ -192,12 +242,16 @@ export default {
     },
     onSelectChange(val, item){
       if(item.enableChange){
-        let i =0;
-        for(i in this.dataList){
-          let row = this.dataList[i];
-          if(row.dependName == item.attrName){
-            row.defaultValue = "";
-            this.loadChildList(row, item.defaultValue);
+        var c;
+        for(c in this.dataList){
+          let dataRows = this.dataList[c].ecmFormItems;
+          var i;
+          for (i in dataRows) {
+            let row = this.dataRows[i];
+            if(row.dependName == item.attrName){
+              row.defaultValue = "";
+              this.loadChildList(row, item.defaultValue);
+            }
           }
         }
       }

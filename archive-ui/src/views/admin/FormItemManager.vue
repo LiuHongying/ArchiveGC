@@ -40,6 +40,7 @@
                 <el-option label="TextArea" value="TextArea"></el-option>
                 <el-option label="Select" value="Select"></el-option>
                 <el-option label="ValueSelect" value="ValueSelect"></el-option>
+                <el-option label="InputSelect" value="InputSelect"></el-option>
                 <el-option label="SQLSelect" value="SQLSelect"></el-option>
                 <el-option label="RoleSelect" value="RoleSelect"></el-option>
                 <!-- <el-option label="ScopeOfKnowledgeSelect" value="ScopeOfKnowledgeSelect"></el-option> -->
