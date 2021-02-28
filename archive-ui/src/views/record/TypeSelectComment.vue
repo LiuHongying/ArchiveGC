@@ -44,7 +44,6 @@
       type="primary"
       plain
       size="small"
-      icon="el-icon-edit"
       @click="showdialog"
     >
       <slot>{{$t('application.newDocument')}}</slot>

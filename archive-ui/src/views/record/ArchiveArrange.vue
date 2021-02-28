@@ -277,7 +277,6 @@
                         type="primary"
                         plain
                         size="small"
-                        icon="el-icon-upload2"
                         @onImported="onBatchImported"
                         @click="batchDialogVisible=true"
                         title="批量导入"
@@ -289,33 +288,15 @@
                         plain
                         size="small"
                         title="挂载文件"
-                        icon="el-icon-upload2"
                         @click="beforeMount(selectedItems,true);"
                       >挂载文件</el-button>
                       </el-form-item>
-                      <!-- <el-form-item>
-                      <el-button
-                        type="warning"
-                        plain
-                        size="small"
-                        icon="el-icon-delete"
-                        @click="logicallyDel(selectedItems,function(){
-                          let _self=this;
-                          if(_self.$refs.leftDataGrid){
-                              _self.$refs.leftDataGrid.itemDataList = [];
-                            }
-                          _self.loadGridData(_self.currentFolder);
-                        })"
-                        :title="$t('application.delete')+$t('application.document')"
-                      >{{$t('application.delete')}}</el-button> 
-                      </el-form-item> -->
                       <el-form-item>
                       <el-button
                         type="primary"
                         plain
                         :loading="getNumLoading"
                         size="small"
-                        icon="el-icon-s-order"
                         @click="takeNumbers"
                         title="文档取号"
                       >文档取号</el-button>
@@ -326,41 +307,10 @@
                         plain
                         :loading="getInfoLoading"
                         size="small"
-                        icon="el-icon-notebook-2"
                         @click="fetchInformation"
                         :title="$t('application.fetchInformation')"
                       >{{$t('application.fetchInformation')}}</el-button>
                       </el-form-item>
-                       <!--
-                      <el-form-item>
-                      <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-printer"
-                        @click="beforePrintRidge(selectRow,'printRidgeGrid','打印背脊')"
-                        title="打印"
-                      ></el-button> 
-                      <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-printer"
-                        @click="beforePrintBarCode(selectedItems,'打印条码')"
-                        title="打印条码"
-                      ></el-button>
-                      
-                      <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-printer"
-                        @click="beforePrintArchiveCode(selectedItems,'打印档号')"
-                        title="打印档号"
-                      >打印档号</el-button>
-                     
-                      </el-form-item>
-                       -->
                       <el-form-item>
                         <el-dropdown class="avatar-container right-menu-item" trigger="click">
                           <div class="avatar-wrapper">
@@ -414,7 +364,6 @@
                         type="primary"
                         plain
                         size="small"
-                        icon="el-icon-folder-add"
                         @click="pieceNumVisible=true"
                         title="生成批次号"
                       >生成批次号</el-button>
@@ -424,7 +373,6 @@
                         type="primary"
                         plain
                         size="small"
-                        icon="el-icon-right"
                         @click="arrangeComplete('已整编')"
                         title="完成整编"
                       >完成整编</el-button>
@@ -434,7 +382,6 @@
                         type="primary"
                         plain
                         size="small"
-                        icon="el-icon-check"
                         @click="arrangeComplete('已质检')"
                         title="完成质检"
                       >完成质检</el-button>
@@ -445,7 +392,6 @@
                         plain
                         :loading="releaseLoading"
                         size="small"
-                        icon="el-icon-right"
                         @click="moveToPreFilling"
                         title="提交预归档库"
                       >提交预归档库</el-button>
@@ -456,7 +402,6 @@
                           plain
                           :loading="releaseLoading"
                           size="small"
-                          icon="el-icon-right"
                           @click="checkDC"
                           title="提交入库"
                         >提交入库</el-button>
