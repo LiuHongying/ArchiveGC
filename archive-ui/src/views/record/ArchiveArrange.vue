@@ -747,6 +747,7 @@ export default {
       selectedInnerItems: [],
       selectedChildrenType: "",
       selectRow: [],
+      selectRow4delete:[],
       importdialogVisible: false,
       selectedFileId: "",
       fileList: [],
@@ -877,7 +878,7 @@ export default {
             // _self.$message('请选择一条文件数据');
             _self.$message({
                     showClose: true,
-                    message: _self.$t("请选择一条文件数据！单击下方子表任意一行来选择要添加附件的文件数据"),
+                    message:"请选择一条文件数据！单击任意一行来选择要添加附件的文件数据",
                     duration: 2000,
                     type: "warning"
                 });
@@ -896,7 +897,7 @@ export default {
             // _self.$message('请选择一条文件数据');
             _self.$message({
                     showClose: true,
-                    message: _self.$t('message.PleaseSelectOneFile'),
+                    message:"请选择一条文件数据！单击任意一行来选择要添加附件的文件数据",
                     duration: 2000,
                     type: "warning"
                 });
@@ -1658,8 +1659,16 @@ export default {
           data: formdata,
           url: _self.uploadUrl
         })
-        .then(function(response) {
+        .then(function(response) {         
           _self.importdialogVisible = false;
+          if(_self.radio=='案卷'){
+            _self.$refs.leftDataGrid.loadGridData()
+            _self.$refs.mainDataGrid.loadGridData()
+            }
+          if(_self.radio=='文件'){
+            _self.$refs.mainDataGrid.loadGridData()
+          }
+
           if( _self.mountParentDoc){
             _self.searchItem();
           }else{
@@ -1754,7 +1763,6 @@ export default {
         formdata.append("uploadFile", file.raw, file.name);
       });
       }
-      console.log(ids);
       _self.uploading=true;
       _self
         .axios({
@@ -1772,6 +1780,13 @@ export default {
           _self.uploading = false;
           _self.isAttach = false
           _self.isInnerAttach = false
+          if(_self.radio=='案卷'){
+            _self.$refs.leftDataGrid.loadGridData()
+            _self.$refs.mainDataGrid.loadGridData()
+            }
+          if(_self.radio=='文件'){
+            _self.$refs.mainDataGrid.loadGridData()
+          }
           // _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
           _self.$message({
                 showClose: true,
@@ -1802,8 +1817,17 @@ export default {
       })
     },
     submitModify(){
-      let ids = []
       let _self = this
+          _self.$confirm(
+      "确认要进行批量修改?",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
+      let ids = []
       let attr=''
       if(this.isModify==true){
       for(let i=0;i<this.selectedItems.length;i++){
@@ -1862,6 +1886,7 @@ export default {
         .catch(function(error) {
           console.log(error);
         });
+      })
     },
     getTypeNamesByMainList(keyName) {
       let _self = this;
@@ -1891,6 +1916,7 @@ export default {
       // console.log(row.TYPE_NAME)
       // this.getTypeNamesByMainList(row.TYPE_NAME)
       let _self = this;
+      _self.selectRow4delete = row
       this.innerSelectedOne = [];
       _self.leftParam.childCondition = "and a.NAME='irel_children' and b.IS_HIDDEN=0"
       _self.leftParam.childUrl = "/dc/getDocuByRelationParentId"
@@ -2534,6 +2560,15 @@ export default {
     },
     checkDC(){
       let _self = this
+      _self.$confirm(
+      "是否要提交入库?",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
       if (_self.selectedItems.length == 0) {
         //  _self.$message("请选择一条卷盒数据！");
         _self.$message({
@@ -2602,6 +2637,7 @@ export default {
         _self.$message(response.data.message);
         console.log(error);
       });
+    });
     },
     moveToPreFilling(){
       let _self=this;
@@ -2667,6 +2703,22 @@ export default {
     },
     arrangeComplete(statusVal){
       let _self=this;
+      let status = statusVal
+      if(status=="已整编"){
+        status='整编'
+      }
+      if(status=="已质检"){
+        status='质检'
+      }
+          _self.$confirm(
+        "是否要完成"+status+"?",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
       let p=new Array();
       _self.selectedItems.forEach(e=>{
         let m=new Map();
@@ -2679,6 +2731,7 @@ export default {
              _self.$refs.leftDataGrid.itemDataList = [];
           }
         _self.searchItem();
+      });
       });
     },
     fetchInformation() {
@@ -2891,6 +2944,15 @@ export default {
         });
         return;
       }
+          _self.$confirm(
+        "是否要进行取号?",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
       let tab = _self.selectedItems;
       let m = [];
       let i;
@@ -2951,21 +3013,44 @@ export default {
           });
           console.log(error);
         });
+          })
     },
     onMenuRemoveItem(selectedItems){
       let _self=this;
+  _self.$confirm(
+      "是否要进行删除？",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
       this.logicallyDel(selectedItems,function(){
          
         if(_self.$refs.leftDataGrid){
             _self.$refs.leftDataGrid.itemDataList = [];
           }
+    
         _self.loadGridData(_self.currentFolder);
       })
+      });
     },
     onRemoveFileInVol(selectedItems){
        let _self=this;
-      this.logicallyDel(selectedItems,function(){
-         _self.showInnerFile(_selft.selectedRow);
+           _self.$confirm(
+      _self.$t("message.deleteInfo"),
+      _self.$t("application.info"),
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
+      _self.logicallyDel(selectedItems,function(){
+         _self.showInnerFile(_self.selectRow4delete);
+      })
       })
     }
   }
