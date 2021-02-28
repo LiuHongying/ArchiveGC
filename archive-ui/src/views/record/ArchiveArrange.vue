@@ -271,7 +271,6 @@
                         type="primary"
                         plain
                         size="small"
-                        icon="el-icon-copy-document"
                         @click="fileAttrsCopy(1)">复制著录</el-button>
                         <el-button
                         type="primary"

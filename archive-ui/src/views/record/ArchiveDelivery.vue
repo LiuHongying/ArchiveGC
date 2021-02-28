@@ -154,12 +154,12 @@
       </div>
     </el-dialog>
     <el-row v-loading="loading">
-      <el-col :span="7" class="topbar-button">
+      <el-col :span="6" class="topbar-button">
           <!-- <el-button type="primary" icon="el-icon-circle-plus" 
           plain
           size="small" @click="onNewFolder()" :title="$t('application.newTransfer')">{{$t('application.new')}}</el-button> -->
           
-          <el-button type="primary" icon="el-icon-circle-plus" 
+          <el-button type="primary" 
           plain
           size="small" @click="onNewTransfer('移交单')" 
           :title="$t('application.newTransfer')">{{$t('application.new')}}</el-button>
@@ -167,7 +167,7 @@
           type="primary"
            plain
             size="small"
-          icon="el-icon-printer"
+        
           @click="beforePrint(selectedOneTransfer,'PrintDelivery','文档移交单')"
         >打印</el-button>
           <!-- <el-button type="primary"
@@ -175,11 +175,11 @@
           size="small" icon="el-icon-right" @click="onArchived">移交</el-button> -->
           <el-button type="primary"
           plain
-          size="small" icon="el-icon-right" @click="startworkflow()" :loading="butt">发起流程</el-button>
+          size="small"  @click="startworkflow()" :loading="butt">发起流程</el-button>
           
           <el-button type="primary"
           plain
-          size="small" icon="el-icon-delete"  @click="onDeleteTransfer()">{{$t('application.delete')}}</el-button>
+          size="small"   @click="onDeleteTransfer()">{{$t('application.delete')}}</el-button>
           
       </el-col>
       <el-col :span="4" class="topbar-input">
@@ -211,13 +211,13 @@
           type="primary"
           plain
           size="small"
-          icon="el-icon-copy-document"
+
           @click="fileAttrsCopy(1)">复制著录</el-button>
         <el-button
           type="primary"
            plain
             size="small"
-          icon="el-icon-edit"
+   
           @click="beforeNewDocument(selectedOneTransfer)"
         >{{$t('application.newDocument')}}</el-button>
         <el-button type="primary" plain size="small" icon="el-icon-upload2"
@@ -230,7 +230,7 @@
           type="primary"
            plain
             size="small"
-          icon="el-icon-printer"
+
           @click="beforePrint(selectRow,'PrintDelivery','文件清单')"
         >打印清单</el-button>
 
@@ -243,7 +243,6 @@
           type="primary"
           plain
           size="small"
-          icon="el-icon-delete"
           @click="onDeleleItem()"
         >{{$t('application.delete')}}</el-button>
         <el-button type="primary" size="small" plain  @click="SearchBusinessDC()" >商务文件查询</el-button>
