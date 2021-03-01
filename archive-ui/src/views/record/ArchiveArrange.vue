@@ -2504,15 +2504,7 @@ export default {
     },
     checkDC(){
       let _self = this
-      _self.$confirm(
-      "是否要提交入库?",
-      {
-        confirmButtonText: _self.$t("application.ok"),
-        cancelButtonText: _self.$t("application.cancel"),
-        type: "warning"
-      }
-    )
-      .then(() => {
+
       if (_self.selectedItems.length == 0) {
         //  _self.$message("请选择一条卷盒数据！");
         _self.$message({
@@ -2523,6 +2515,15 @@ export default {
         });
         return;
       }
+    _self.$confirm(
+      "是否要提交入库?",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
       for(var i=0;i<_self.selectedItems.length;i++){
          if(_self.selectedItems[i].C_BATCH_CODING2==null || _self.selectedItems[i].C_BATCH_CODING2.length == 0){
            _self.$message({

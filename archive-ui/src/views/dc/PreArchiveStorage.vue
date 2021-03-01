@@ -970,15 +970,6 @@ export default {
 
     penddingStorage() {
       let _self = this;
-      _self.$confirm(
-        "是否要提交入库？",
-      {
-        confirmButtonText: _self.$t("application.ok"),
-        cancelButtonText: _self.$t("application.cancel"),
-        type: "warning"
-      }
-    )
-      .then(() => {
       if (_self.selectedItems.length == 0) {
         _self.$message({
           showClose: true,
@@ -988,6 +979,15 @@ export default {
         });
         return;
       }
+      _self.$confirm(
+        "是否要提交入库？",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
       var m = [];
       let error =""
       let tab = _self.selectedItems;
