@@ -119,6 +119,7 @@ export default {
           isEditProperty:false,
           isShowChangeList:false,
           isshowOption:true,
+          optionWidth:2,
           isshowSelection:true,
         },
         //设计文件

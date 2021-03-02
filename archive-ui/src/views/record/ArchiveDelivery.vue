@@ -269,6 +269,7 @@
                   :isshowicon="false"
                   :isShowMoreOption="false"
                   :isShowChangeList="false"
+                  :optionWidth = "1"
                   showOptions="查看内容"
                   v-bind:itemCount="transferCount"
                   v-bind:tableHeight="layout.height-136"
