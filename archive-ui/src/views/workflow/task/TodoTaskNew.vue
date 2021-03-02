@@ -247,6 +247,7 @@ import ViolationStartUp from "@/views/workflow/ViolationStartUp.vue";
 import ViolationViewReadOnly from "@/views/workflow/ViolationViewReadOnly.vue";
 import DestoryViewUpdate from "@/views/workflow/DestoryViewUpdate.vue";
 import BorrowViewPrint from "@/views/workflow/BorrowViewPrint.vue";
+import CommonViewRelyFolder4Modify from "@/views/workflow/CommonViewRelyFolder4Modify.vue"
 export default {
   name: "TodoTask",
   permit: 1,
@@ -276,7 +277,8 @@ export default {
     ViolationStartUp: ViolationStartUp,
     ViolationViewReadOnly: ViolationViewReadOnly,
     DestoryViewUpdate: DestoryViewUpdate,
-    BorrowViewPrint: BorrowViewPrint
+    BorrowViewPrint: BorrowViewPrint,
+    CommonViewRelyFolder4Modify:CommonViewRelyFolder4Modify
   },
   data() {
     return {
