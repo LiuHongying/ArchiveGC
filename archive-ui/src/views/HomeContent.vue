@@ -404,7 +404,7 @@ export default {
       loadingNewDocData: false,
       loadingNoticeData: false,
       loadingReData: false,
-      checkAll: true,
+      checkAll: false,
       isIndeterminate: false,
       checkedCards: [],
       propertyOnly: false,

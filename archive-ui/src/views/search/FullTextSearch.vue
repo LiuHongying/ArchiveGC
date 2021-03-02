@@ -285,7 +285,7 @@ export default {
       currentItem: "",
       cardsLabel: [],
       checkedTerms: [],
-      checkAll: true,
+      checkAll: false,
       isScend: false,
       isSearched:false,
       searched: false,
