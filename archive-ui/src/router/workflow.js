@@ -312,5 +312,14 @@ path: '/workflow/BorrowViewPrint',
 name: 'BorrowViewPrint',
 component: () => import('@/views/workflow/BorrowViewPrint.vue')
 },
+{meta:{
+  requireAuth: true,
+  permit: 1,
+  title: 'RelyOnFolderSelectStartup4Modify'
+},
+path: '/workflow/RelyOnFolderSelectStartup4Modify',
+name: 'RelyOnFolderSelectStartup4Modify',
+component: () => import('@/views/workflow/RelyOnFolderSelectStartup4Modify.vue')
+},
     ]
   }
