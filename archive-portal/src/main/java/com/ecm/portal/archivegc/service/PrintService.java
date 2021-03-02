@@ -41,7 +41,7 @@ public class PrintService extends EcmService{
 				ids = "'"+id+"'";
 			}
 		}
-		String sql = "select ID,TYPE_NAME,C_ITEM_TYPE,C_ARC_CLASSIC,C_ARCHIVE_CODING,C_FROM_CODING,C_STORE_CODING,CODING,REVISION,C_PROJECT_CODE,C_PROJECT_NUM,C_SECURITY_LEVEL,C_RETENTION,C_SET_COUNT,C_VOLUME_COUNT,C_COUNT2,C_COPY_COUNT,C_COUNT1,C_ARCHIVE_DATE " + 
+		String sql = "select ID,TYPE_NAME,C_ITEM_TYPE,C_ARC_CLASSIC,C_ARCHIVE_CODING,C_FROM_CODING,C_STORE_CODING,CODING,REVISION,C_PROJECT_CODE,C_PROJECT_NUM,C_SECURITY_LEVEL,C_RETENTION,C_SET_COUNT,C_VOLUME_COUNT,C_COUNT2,C_COPY_COUNT,C_COUNT1,C_COUNT4,C_ARCHIVE_DATE " + 
 				" from ecm_document where id in("+ids+") order by TYPE_NAME,CODING,C_ARCHIVE_DATE";
 		List<Map<String,Object>> dataList = documentService.getMapList(token, sql);
 		for(Map<String,Object> data: dataList) {
@@ -80,6 +80,20 @@ public class PrintService extends EcmService{
 			int volCount = 0;
 
 			if("商务管理".equals(archiveClassic)) {
+				
+				//setCount = getCount(data,"C_COUNT4");
+				volCount = getCount(data,"C_VOLUME_COUNT");
+				if(volCount>1) {
+					for(int i=0;i<volCount;i++) {
+						String tempStr = "第"+volCount+"_"+(i+1)+"册";
+						PrintEntity tempEn = en.clone();
+						tempEn.setVolString(tempStr);
+						list.add(tempEn);
+					}
+				}else {
+					list.add(en);
+				}
+				/*
 				if("正本".equals(printType) || "复制件".equals(printType)) {
 //					正本套数	C_SET_COUNT
 //					正本册数	C_COUNT2
@@ -92,40 +106,40 @@ public class PrintService extends EcmService{
 //					副本册数	C_COUNT1
 					setCount = getCount(data,"C_COPY_COUNT");
 					volCount = getCount(data,"C_COUNT1");
-				}
+				}*/
 			}else {
 				//归档套数	C_SET_COUNT
 				//册数	C_VOLUME_COUNT
 				setCount = getCount(data,"C_SET_COUNT");
 				volCount = getCount(data,"C_VOLUME_COUNT");
 				
-			}
-			if(volCount>1) {
-				for(int i=0; i<volCount; i++) {
+				if(volCount>1) {
+					for(int i=0; i<volCount; i++) {
+						if(setCount>1) {
+							for(int j=0; j<setCount; j++) {
+								String tempStr = "第"+volCount+"_"+(i+1)+"册 第"+setCount+"_"+(j+1)+"套";
+								PrintEntity tempEn = en.clone();
+								tempEn.setVolString(tempStr);
+								list.add(tempEn);
+							}
+						}else {
+							String tempStr = "第"+volCount+"_"+(i+1)+"册";
+							PrintEntity tempEn = en.clone();
+							tempEn.setVolString(tempStr);
+							list.add(tempEn);
+						}
+					}
+				}else {
 					if(setCount>1) {
 						for(int j=0; j<setCount; j++) {
-							String tempStr = "第"+volCount+"_"+(i+1)+"册 第"+setCount+"_"+(j+1)+"套";
+							String tempStr = "第"+setCount+"_"+(j+1)+"套";
 							PrintEntity tempEn = en.clone();
 							tempEn.setVolString(tempStr);
 							list.add(tempEn);
 						}
 					}else {
-						String tempStr = "第"+volCount+"_"+(i+1)+"册";
-						PrintEntity tempEn = en.clone();
-						tempEn.setVolString(tempStr);
-						list.add(tempEn);
+						list.add(en);
 					}
-				}
-			}else {
-				if(setCount>1) {
-					for(int j=0; j<setCount; j++) {
-						String tempStr = "第"+setCount+"_"+(j+1)+"套";
-						PrintEntity tempEn = en.clone();
-						tempEn.setVolString(tempStr);
-						list.add(tempEn);
-					}
-				}else {
-					list.add(en);
 				}
 			}
 		}
