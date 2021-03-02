@@ -322,6 +322,7 @@ import DesignChangeFileStartup from "@/views/workflow/DesignChangeFileStartup.vu
 import RelyOnFolderSelectStartUp from "@/views/workflow/RelyOnFolderSelectStartUp.vue";
 import CancelStartUp from "@/views/workflow/CancelStartUp.vue";
 import ViolationStartUp from "@/views/workflow/ViolationStartUp.vue";
+import RelyOnFolderSelectStartup4Modify from "@/views/workflow/RelyOnFolderSelectStartup4Modify.vue"
 export default {
   data() {
     return {
@@ -384,7 +385,7 @@ export default {
           icon: "ecm-icon-scdoc",
           name: "科研文件修改流程",
           type: "dialog",
-          openpath: "RelyOnFolderSelectStartUp",
+          openpath: "RelyOnFolderSelectStartup4Modify",
         },
         {
           title: "作废通知单",
@@ -427,6 +428,7 @@ export default {
     RelyOnFolderSelectStartUp: RelyOnFolderSelectStartUp,
     CancelStartUp: CancelStartUp,
     ViolationStartUp: ViolationStartUp,
+    RelyOnFolderSelectStartup4Modify:RelyOnFolderSelectStartup4Modify
   },
   created() {
     let _self = this;

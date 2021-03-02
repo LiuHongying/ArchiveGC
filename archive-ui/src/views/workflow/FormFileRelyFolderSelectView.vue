@@ -12,7 +12,7 @@
       >
         <FolderSelect
         ref="folderSelectDoc"
-        folderPath="/预归档库"
+        :folderPath= folderPath
         gridViewName="ResearchBorrowGrid"
         @selectchange="fileSelect"
         ></FolderSelect>
@@ -146,7 +146,8 @@ export default {
     processDefinitionId: { type: String, default: "" },
     activityName: { type: String, default: "" },
     isShowReject: { type: Boolean, default: false },
-    param: { type: Object, default: null }
+    param: { type: Object, default: null },
+    folderPath:{type:String,default:"/预归档库"}
   },
   data() {
     return {
