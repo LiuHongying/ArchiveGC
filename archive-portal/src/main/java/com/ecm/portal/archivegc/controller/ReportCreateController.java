@@ -406,7 +406,7 @@ public class ReportCreateController extends ControllerAbstract {
 		try {
 			Map<String, Object> projMap = new HashMap<String, Object>(); 
 			
-			String[] filetypeS = {"鉴定证书","设计变更","公司刊物","设备文件","行政文件","项目归档文件","参考资料"};
+			String[] filetypeS = {"奖状证书","设计变更","公司刊物","设备文件","党群行政","项目归档文件","参考资料"};
 			
 			String sqlEngine = "select ed.C_ARC_CLASSIC, " + 
 					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-01-01' and '"+ year +"-03-31') and ed2.TYPE_NAME = ed.TYPE_NAME) as quarter1," + 
@@ -424,8 +424,26 @@ public class ReportCreateController extends ControllerAbstract {
 					"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
 					"where ed.C_ARC_CLASSIC = '工程建设' and ed.TYPE_NAME <> '工程管理案卷' and ed.TYPE_NAME <> '工程管理文件' ";
 			
+			String sqlOperate = "select ed.C_ARC_CLASSIC, " + 
+					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-01-01' and '"+ year +"-03-31') and ed2.C_ARC_CLASSIC = ed.C_ARC_CLASSIC) as quarter1," + 
+					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-04-01' and '"+ year +"-06-30') and ed2.C_ARC_CLASSIC = ed.C_ARC_CLASSIC) as quarter2," + 
+					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-07-01' and '"+ year +"-09-30') and ed2.C_ARC_CLASSIC = ed.C_ARC_CLASSIC) as quarter3," + 
+					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-10-01' and '"+ year +"-12-31') and ed2.C_ARC_CLASSIC = ed.C_ARC_CLASSIC) as quarter4 " + 
+					"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
+					"where ed.C_ARC_CLASSIC = '经营管理' and ed.STATUS = '入库' ";	
+			
+			String sqlQualityAndSafety = "select ed.C_ARC_CLASSIC, " + 
+					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-01-01' and '"+ year +"-03-31') and ed2.C_ARC_CLASSIC = ed.C_ARC_CLASSIC) as quarter1," + 
+					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-04-01' and '"+ year +"-06-30') and ed2.C_ARC_CLASSIC = ed.C_ARC_CLASSIC) as quarter2," + 
+					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-07-01' and '"+ year +"-09-30') and ed2.C_ARC_CLASSIC = ed.C_ARC_CLASSIC) as quarter3," + 
+					"(select count(*) from ecm_audit_general eag2 left join ecm_document ed2 on eag2.DOC_ID = ed2.ID where (eag2.EXCUTE_DATE between '"+ year +"-10-01' and '"+ year +"-12-31') and ed2.C_ARC_CLASSIC = ed.C_ARC_CLASSIC) as quarter4 " + 
+					"from ecm_audit_general eag left join ecm_document ed on eag.DOC_ID = ed.ID " + 
+					"where ed.C_ARC_CLASSIC = '质量与安全' and ed.STATUS = '入库' ";
+			
 			List<Map<String, Object>> listEngineStatistic = documentService.getMapList(getToken(), sqlEngine);
 			List<Map<String, Object>> listProcessStatistic = documentService.getMapList(getToken(), sqlProcess);
+			List<Map<String, Object>> listOperate = documentService.getMapList(getToken(), sqlOperate);
+			List<Map<String, Object>> listQualityAndSafety = documentService.getMapList(getToken(), sqlQualityAndSafety);
 			
 			for(String filetype :filetypeS) {
 				String sqlQuarter = "select distinct 'a' as aaa, " + 
@@ -466,6 +484,22 @@ public class ReportCreateController extends ControllerAbstract {
 			projMap.put("quarterTwo", getSponsorT(listEngineStatistic, "quarter2"));
 			projMap.put("quarterThree", getSponsorT(listEngineStatistic, "quarter3"));
 			projMap.put("quarterFour", getSponsorT(listEngineStatistic, "quarter4"));
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>();
+			projMap.put("fileType", "经营管理");
+			projMap.put("quarterOne", getSponsorT(listOperate, "quarter1"));
+			projMap.put("quarterTwo", getSponsorT(listOperate, "quarter2"));
+			projMap.put("quarterThree", getSponsorT(listOperate, "quarter3"));
+			projMap.put("quarterFour", getSponsorT(listOperate, "quarter4"));
+			outList.add(projMap);
+			
+			projMap = new HashMap<String, Object>();
+			projMap.put("fileType", "质量与安全");
+			projMap.put("quarterOne", getSponsorT(listQualityAndSafety, "quarter1"));
+			projMap.put("quarterTwo", getSponsorT(listQualityAndSafety, "quarter2"));
+			projMap.put("quarterThree", getSponsorT(listQualityAndSafety, "quarter3"));
+			projMap.put("quarterFour", getSponsorT(listQualityAndSafety, "quarter4"));
 			outList.add(projMap);
 			
 			mp.put("data", outList);
