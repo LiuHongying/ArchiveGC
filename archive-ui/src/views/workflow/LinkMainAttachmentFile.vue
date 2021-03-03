@@ -43,8 +43,7 @@
         </template>
         <template v-slot:main="{layout}">
             <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
-                <split-pane v-on:resize="onSplitResize" :min-percent='20' :default-percent='topPercent' split="horizontal">
-                    <template slot="paneL">
+                    <template >
                         <DataGrid
                             ref="mainDataGrid"
                             key="main"
@@ -65,7 +64,7 @@
                             @selectchange="selectChange"
                         ></DataGrid>
                     </template>
-                    <template slot="paneR">
+                    <template >
                         <el-tabs  v-model="selectedTabName">
                             <el-tab-pane  label="流程文件" name="t03" >
                                 <el-row v-if="allowChangeDoc">
