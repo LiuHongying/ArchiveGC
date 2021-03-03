@@ -6,9 +6,9 @@
       :show-timeout="200"
       :default-active="$route.path"
       :collapse="isCollapse"
-      background-color="#6959CD"
+      background-color="#004EA2"
       text-color="white"
-      active-text-color="#42b983"
+      active-text-color="#59cbff"
     >
       <sidebar-item ></sidebar-item>
     </el-menu>
@@ -21,13 +21,27 @@ import SidebarItem from './SidebarItem'
 import logo from './logo'
 export default {
   components: { SidebarItem, logo },
+  data() {
+    return {
+      backColor:"#004EA2"
+    }
+  },
   computed: {
     ...mapGetters([
       'sidebar'
     ]),
     isCollapse() {
       return !this.sidebar.opened
-    }
+    },
+    loadColor(){
+      let tv = localStorage.getItem('themeValue')
+      if(tv){
+        if(tv=='Blue'){
+           this.backColor = "#409EFF";
+        }
+       
+      }
+    },
   }
 }
 </script>

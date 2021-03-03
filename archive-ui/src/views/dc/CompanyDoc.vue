@@ -267,6 +267,7 @@
                         @sort-change="sortchange"
                         style="width: 100%"
                         @header-dragend="onHeaderDragend"
+                        @row-dblclick="dbclick"
                         fit
                       >
                         <el-table-column
@@ -479,7 +480,7 @@ export default {
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
-      topbarHeight: 55,
+      topbarHeight: 45,
       // 底部除列表高度
       bottomHeight: 35,
       AddConds: "",
@@ -574,6 +575,9 @@ export default {
     _self.search();
   },
   methods: {
+    dbclick(row, column, event) {
+      this.showItemProperty(row);
+    },
     changeRadio(val) {
       let _self = this;
       if (val == "文件") {
@@ -727,6 +731,7 @@ export default {
     },
     handleNodeClick(indata) {
       let _self = this;
+      _self.AddConds = "";
       _self.disable = false;
       _self.exportAble = true;
       _self.currentFolder = indata;
@@ -807,8 +812,7 @@ export default {
         }
       }
       if (_self.AddConds != "") {
-        key +=
-          " and C_ITEM_TYPE = " + _self.radioValue + " and " + _self.AddConds;
+        m.set("advCondition", _self.AddConds);
       }
       _self.gridViewTrans = indata.gridView;
       _self.idTrans = indata.id;
@@ -842,6 +846,7 @@ export default {
       m.set("gridName", indata.gridView);
       m.set("folderId", indata.id);
       m.set("condition", key);
+      m.set("advCondition", _self.AddConds);
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", _self.currentPage - 1);
       m.set("orderBy", "MODIFIED_DATE desc");

@@ -12,7 +12,7 @@
       >
         <FolderSelect
         ref="folderSelectDoc"
-        folderPath="/预归档库"
+        :folderPath= folderPath
         gridViewName="ResearchBorrowGrid"
         @selectchange="folderDocSelect"
         ></FolderSelect>
@@ -97,7 +97,8 @@ export default {
     allowEdit: { type: Boolean, default: true },
     isShowPage:{type:Boolean,default:true},
     files:{type:Array,default:[]},
-    workflowObj:{type:Object,default:{}}
+    workflowObj:{type:Object,default:{}},
+    folderPath:{type:String,default:'/预归档库'}
   },
   data() {
     return {

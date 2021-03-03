@@ -37,7 +37,10 @@
       <el-button @click="handleScendSearch()" type="primary">{{$t('application.scendSearch')}}</el-button>
       </div>
     </el-dialog>
-    <div v-if="searched==false" style="height:60px;"></div>
+    <div v-if="searched==false" style="height:180px;padding-top:60px;text-align:center;padding-right:280px;">
+      <img src="../../../static/img/search_bar.png" width="205px" height="120px" alt="logo" style="vertical-align: middle;" />
+      <!-- <h1>{{$t("application.name")}}</h1>-->
+      </div>
     <div class="searchInput" >
       <!-- <el-autocomplete
         class="inline-input"
@@ -69,8 +72,8 @@
           <el-col :xs="8" :sm="6" :md="6" :lg="4" :xl="3" v-for="card in cards" :key="card.id">
           <el-checkbox
             :label="card.name"
-            checked
             @change="handleCheckedTypeChange"
+            style="padding-top:5px;"
           >{{card.name}}</el-checkbox>
           </el-col>
         </el-checkbox-group>
@@ -282,7 +285,7 @@ export default {
       currentItem: "",
       cardsLabel: [],
       checkedTerms: [],
-      checkAll: true,
+      checkAll: false,
       isScend: false,
       isSearched:false,
       searched: false,

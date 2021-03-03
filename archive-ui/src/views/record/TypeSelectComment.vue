@@ -44,7 +44,6 @@
       type="primary"
       plain
       size="small"
-      icon="el-icon-edit"
       @click="showdialog"
     >
       <slot>{{$t('application.newDocument')}}</slot>
@@ -65,13 +64,26 @@ export default {
       selectedClassic: ""
     };
   },
-  props: {},
+  props: {
+    currentFolder:{type: Object, default: null}
+  },
   mounted() {
     this.getClassicNames("ClassicNames");
   },
   methods: {
     showdialog(){
-      this.typeSelectVisible=true
+      this.typeSelectVisible=true;
+      if(this.currentFolder!=null && this.classicNames != null && this.classicNames.length>0){
+        var i;
+        for(i in this.classicNames){
+          if(this.currentFolder.folderPath.indexOf(this.classicNames[i])>-1){
+            this.selectedClassic = this.classicNames[i];
+            this.getTypeNameByClassic(this.selectedClassic);
+            return;
+            //
+          }
+        }
+      }
     },
     getTypeNameByClassic(keyName) {
       let _self = this;

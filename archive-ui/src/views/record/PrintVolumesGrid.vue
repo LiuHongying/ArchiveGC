@@ -3,9 +3,12 @@
         <div class="table">
            <div class="table-tr" style="height:30px;text-align: center;color:#000000;font-size:28px">  
               卷内目录
-          </div> 
+          </div>
+
+        <button  @click="exportExcel4Print(names)" class="no-print" >导出文件内清单</button>
           <div class="table-tr">
                        <el-table
+                       ref='report-table'
                         :height="tableHeight"
                         :data="innerDataList"
                         border="1"
@@ -55,6 +58,8 @@
 import Print from '@/plugins/print'
 import Vue from 'vue';
 import QRCode from 'qrcodejs2'// 引入qrcode
+import XLSX from 'xlsx'
+import FileSaver from 'file-saver'
 Vue.use(Print)
 export default {
    name: 'test',
@@ -67,6 +72,7 @@ export default {
       gridList:[],
       volumeTitle:"",
       condition:"",
+      names:"文件清单"
     };
   },
   mounted() {
@@ -122,6 +128,27 @@ export default {
       _self.loadGridInfo(_self.gridName); 
       _self.loadInnerFile();
     },
+      exportExcel4Print(excelName) {
+       //excelName --设置导出的excel名称
+       //report-table --对应的要导出的el-table的ref名称
+      try {
+        const $e = this.$refs['report-table'].$el;
+        // 如果表格加了fixed属性，则导出的文件会生产两份一样的数据，所以可在这里判断一下
+        let $table = $e.querySelector('.el-table__fixed');
+        if (!$table) {
+          $table = $e;
+        }
+        // 为了返回单元格原始字符串，设置{ raw: true }
+        const wb = XLSX.utils.table_to_book($table, { raw: true });
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'array' });
+        FileSaver.saveAs(
+          new Blob([wbout], { type: 'application/octet-stream' }),
+          `${excelName}.xlsx`,
+        );
+      } catch (e) {
+        if (typeof console !== 'undefined') console.error(e);
+      }
+ },
   }
 }
 </script>

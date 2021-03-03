@@ -21,10 +21,10 @@
             <el-row>
               <el-form :inline="true" @submit.native.prevent>
                 <el-form-item>
-                    <el-button type="primary" @click="submitArrange()">提交整编</el-button>
+                    <el-button type="primary" plain @click="submitArrange()">提交整编</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="warning" @click="beforeRejectDE()">驳回</el-button>
+                    <el-button type="warning" plain @click="beforeRejectDE()">驳回</el-button>
                 </el-form-item>
               </el-form>
             </el-row>
@@ -54,20 +54,20 @@
                   ></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="search()">{{
+                  <el-button type="primary" plain @click="search()">{{
                     $t("application.SearchData")
                   }}</el-button>
                 </el-form-item>
                 <!-- 接收 -->
                 <el-form-item>
-                    <el-button type="success" @click="submit()">{{$t('application.Receive')}}</el-button>
+                    <el-button type="primary" plain @click="submit()">{{$t('application.Receive')}}</el-button>
                 </el-form-item>
                 <!-- 驳回 -->
                 <el-form-item>
-                    <el-button type="warning" @click="beforeRejectDC()">驳回</el-button>
+                    <el-button type="warning" plain @click="beforeRejectDC()">驳回</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="beforeCheck()">四性检查</el-button>
+                    <el-button type="primary" plain @click="beforeCheck()">四性检查</el-button>
                 </el-form-item>
               </el-form>
             </el-row>
@@ -107,7 +107,7 @@ export default {
     return {
       startHeight: 135,
       leftStorageName: 'ReceivingTCWidth',
-      leftPercent: 20,
+      leftPercent: 26,
       tables: {
         //移交单
         Delivery: {
@@ -119,6 +119,7 @@ export default {
           isEditProperty:false,
           isShowChangeList:false,
           isshowOption:true,
+          optionWidth:2,
           isshowSelection:true,
         },
         //设计文件

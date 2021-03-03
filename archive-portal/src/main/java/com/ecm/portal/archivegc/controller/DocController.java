@@ -467,27 +467,24 @@ public class DocController  extends ControllerAbstract  {
 			pager.setPageIndex(pageIndex); 
 			pager.setPageSize(pageSize);
 			String newCondition = args.get("condition").toString();
+			String advCondition = args.get("advCondition")!=null?args.get("advCondition").toString():null;
 			if (!EcmStringUtils.isEmpty(newCondition)) {
-				condition.append(" and"+newCondition+ " and FOLDER_ID in (SELECT id from ecm_folder where folder_path like '"
+				condition.append(" and "+newCondition);
+			}
+			if(EcmStringUtils.isEmpty(advCondition)){
+				condition.append(" AND FOLDER_ID='").append(folderId.replace("'", "")).append("'");
+			}else {
+				condition.append(" AND (").append(advCondition).append(") and FOLDER_ID in (SELECT id from ecm_folder where folder_path like '"
 						+ ecmFolder.getFolderPath() + "%')");
 			}
-			if (EcmStringUtils.isEmpty(newCondition)) {
-				condition.append(" AND FOLDER_ID='").append(folderId.replace("'", "")).append("'");
+
 				List<Map<String, Object>> list = documentService.getObjectsByConditon(getToken(),
 						args.get("gridName").toString(), null, pager, condition.toString(),
 						args.get("orderBy").toString());
 				mp.put("data", list);
 				mp.put("pager", pager);
 				mp.put("code", ActionContext.SUCESS);
-			} else {
-				
-				List<Map<String, Object>> list = documentService.getObjectsByConditon(getToken(),
-						args.get("gridName").toString(), folderId, pager, condition.toString(),
-						args.get("orderBy").toString());
-				mp.put("data", list);
-				mp.put("pager", pager);
-				mp.put("code", ActionContext.SUCESS);
-			}
+			
 		} catch (AccessDeniedException e) {
 			mp.put("code", ActionContext.TIME_OUT);
 		} catch(Exception ex) {

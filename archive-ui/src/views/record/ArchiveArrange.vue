@@ -52,6 +52,15 @@
 
     </el-dialog>
 
+ <el-dialog :visible.sync="printVolumesVisible4Documents"  width="80%"
+    > <div>
+      <PrintVolumes4Docu
+        ref="PrintVolumes4Documents"
+      ></PrintVolumes4Docu>
+      </div>
+    </el-dialog>
+
+
     <el-dialog :visible.sync="printsVisible">
       <PrintPage ref="printPage" v-bind:archiveId="this.archiveId"></PrintPage>
     </el-dialog>
@@ -228,13 +237,17 @@
                   <el-form inline="true">
                   <el-row>
                     <el-col :span="3" class="topbar-input">
+                      <el-row>
                       <el-input
                         v-model="inputkey"
                         :placeholder="$t('message.pleaseInput')+$t('application.keyword')"
                         @change="searchItem"
                         prefix-icon="el-icon-search"
                       ></el-input>
-                       
+                      </el-row>
+                      <el-row style="padding-top:10px;">
+                       <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
+                      </el-row>
                     </el-col>
                     <el-col :span="3" class="topbar-input">
                       <el-select v-model="archiveStatus" placeholder="请选择状态" @change="searchItem">
@@ -249,21 +262,20 @@
                       </div>
                     </el-col>
                     <el-col :span="18" style="padding-left:10px;">
+                      <div style="min-width:400px;width:100%;">
                       <el-form-item>
-                        <TypeSelectComment ref="TypeSelectComment" @afterSelecteType="newArchiveItem"></TypeSelectComment>
+                        <TypeSelectComment ref="TypeSelectComment" :currentFolder="currentFolder" @afterSelecteType="newArchiveItem"></TypeSelectComment>
                       </el-form-item>
                       <el-form-item>
                         <el-button
                         type="primary"
                         plain
                         size="small"
-                        icon="el-icon-copy-document"
                         @click="fileAttrsCopy(1)">复制著录</el-button>
                         <el-button
                         type="primary"
                         plain
                         size="small"
-                        icon="el-icon-upload2"
                         @onImported="onBatchImported"
                         @click="batchDialogVisible=true"
                         title="批量导入"
@@ -275,33 +287,15 @@
                         plain
                         size="small"
                         title="挂载文件"
-                        icon="el-icon-upload2"
                         @click="beforeMount(selectedItems,true);"
                       >挂载文件</el-button>
                       </el-form-item>
-                      <!-- <el-form-item>
-                      <el-button
-                        type="warning"
-                        plain
-                        size="small"
-                        icon="el-icon-delete"
-                        @click="logicallyDel(selectedItems,function(){
-                          let _self=this;
-                          if(_self.$refs.leftDataGrid){
-                              _self.$refs.leftDataGrid.itemDataList = [];
-                            }
-                          _self.loadGridData(_self.currentFolder);
-                        })"
-                        :title="$t('application.delete')+$t('application.document')"
-                      >{{$t('application.delete')}}</el-button> 
-                      </el-form-item> -->
                       <el-form-item>
                       <el-button
                         type="primary"
                         plain
                         :loading="getNumLoading"
                         size="small"
-                        icon="el-icon-s-order"
                         @click="takeNumbers"
                         title="文档取号"
                       >文档取号</el-button>
@@ -312,41 +306,10 @@
                         plain
                         :loading="getInfoLoading"
                         size="small"
-                        icon="el-icon-notebook-2"
                         @click="fetchInformation"
                         :title="$t('application.fetchInformation')"
                       >{{$t('application.fetchInformation')}}</el-button>
                       </el-form-item>
-                       <!--
-                      <el-form-item>
-                      <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-printer"
-                        @click="beforePrintRidge(selectRow,'printRidgeGrid','打印背脊')"
-                        title="打印"
-                      ></el-button> 
-                      <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-printer"
-                        @click="beforePrintBarCode(selectedItems,'打印条码')"
-                        title="打印条码"
-                      ></el-button>
-                      
-                      <el-button
-                        type="primary"
-                        plain
-                        size="small"
-                        icon="el-icon-printer"
-                        @click="beforePrintArchiveCode(selectedItems,'打印档号')"
-                        title="打印档号"
-                      >打印档号</el-button>
-                     
-                      </el-form-item>
-                       -->
                       <el-form-item>
                         <el-dropdown class="avatar-container right-menu-item" trigger="click">
                           <div class="avatar-wrapper">
@@ -385,6 +348,12 @@
                                 打印备考表
                               </span>
                             </el-dropdown-item>
+                            <el-dropdown-item divided>
+                              <span @click="beforePrintDocuments(selectedItems,'BorrowPrintGrid','文件清单')" style="display:block;">
+                                <i class="el-icon-printer"></i>
+                                打印文件清单
+                              </span>
+                            </el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
                       </el-form-item>
@@ -394,7 +363,6 @@
                         type="primary"
                         plain
                         size="small"
-                        icon="el-icon-folder-add"
                         @click="pieceNumVisible=true"
                         title="生成批次号"
                       >生成批次号</el-button>
@@ -404,7 +372,6 @@
                         type="primary"
                         plain
                         size="small"
-                        icon="el-icon-right"
                         @click="arrangeComplete('已整编')"
                         title="完成整编"
                       >完成整编</el-button>
@@ -414,7 +381,6 @@
                         type="primary"
                         plain
                         size="small"
-                        icon="el-icon-check"
                         @click="arrangeComplete('已质检')"
                         title="完成质检"
                       >完成质检</el-button>
@@ -425,7 +391,6 @@
                         plain
                         :loading="releaseLoading"
                         size="small"
-                        icon="el-icon-right"
                         @click="moveToPreFilling"
                         title="提交预归档库"
                       >提交预归档库</el-button>
@@ -436,35 +401,9 @@
                           plain
                           :loading="releaseLoading"
                           size="small"
-                          icon="el-icon-right"
                           @click="checkDC"
                           title="提交入库"
                         >提交入库</el-button>
-                      </el-form-item>
-                      <!-- <el-form-item>
-                        <el-button
-                          type="primary"
-                          size="small"
-                          plain
-                          @click="beforeModify()"
-                        >修改</el-button>
-                       </el-form-item>
-                      <el-form-item>
-                        <el-button
-                          type="primary"
-                          size="small"
-                          plain
-                          @click="batchUpdateVisible=true"
-                        >更新</el-button>
-                      </el-form-item>
-                      <el-form-item>
-                        <el-button type="primary"
-                        plain
-                        size="small"
-                        @click.native="exportData">{{$t("application.ExportExcel")}}</el-button>
-                      </el-form-item> -->
-                      <el-form-item>
-                      <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
                       </el-form-item>
                       <el-form-item>
                         <el-dropdown class="avatar-container right-menu-item" trigger="click">
@@ -520,7 +459,8 @@
                           </el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
-                      </el-form-item>                      
+                      </el-form-item>  
+                      </div>                    
                     </el-col>
                   </el-row>
                   </el-form>
@@ -660,7 +600,7 @@ import ExcelUtil from "@/utils/excel.js";
 import BatchUpdate from "@/views/record/BatchUpdate.vue" 
 import BatchFileMount from "@/views/record/BatchFileMount.vue" 
 import AddToArchive from "@/views/record/AddToArchive.vue"
-
+import PrintVolumes4Docu from "@/views/record/Print4Borrow";
 export default {
   name: "ArchiveArrange",
   components: {
@@ -680,7 +620,8 @@ export default {
     BatchImport:BatchImport,
     AddCondition:AddCondition,
     PrintCoverpage:PrintCoverpage,
-    AddToArchive:AddToArchive
+    AddToArchive:AddToArchive,
+    PrintVolumes4Docu:PrintVolumes4Docu,
   },
   data() {
     return {
@@ -708,6 +649,7 @@ export default {
       currentLanguage: this.getLang(),
       printsVisible: false,
       printVolumesVisible: false,
+      printVolumesVisible4Documents:false,
       archiveId: "",
       dataList: [],
       showFields: [],
@@ -749,6 +691,7 @@ export default {
       selectedInnerItems: [],
       selectedChildrenType: "",
       selectRow: [],
+      selectRow4delete:[],
       importdialogVisible: false,
       selectedFileId: "",
       fileList: [],
@@ -879,7 +822,7 @@ export default {
             // _self.$message('请选择一条文件数据');
             _self.$message({
                     showClose: true,
-                    message: _self.$t('message.PleaseSelectOneFile'),
+                    message:"请选择一条文件数据！单击任意一行来选择要添加附件的文件数据",
                     duration: 2000,
                     type: "warning"
                 });
@@ -898,7 +841,7 @@ export default {
             // _self.$message('请选择一条文件数据');
             _self.$message({
                     showClose: true,
-                    message: _self.$t('message.PleaseSelectOneFile'),
+                    message:"请选择一条文件数据！单击任意一行来选择要添加附件的文件数据",
                     duration: 2000,
                     type: "warning"
                 });
@@ -1093,6 +1036,37 @@ export default {
         });
       }
     },
+    beforePrintDocuments(selectedRow,gridName,vtitle){
+      let _self=this;
+      let ids =[]
+      for(let i = 0;i < _self.selectedItems.length;i++){
+        ids[i] = _self.selectedItems[i].ID
+      }
+      console.log(_self.$refs.printVolumes)
+      //console.log(_self.selectedArchives[0].ID)
+      if(_self.selectedItems.length==0){
+        // _self.$message('请选择一条数据进行打印');
+        _self.$message({
+                showClose: true,
+                message: '请选择一条数据进行打印!',
+                duration: 2000,
+                type: "warning"
+              });
+        return;
+      }
+      _self.printVolumesVisible4Documents = true;
+
+      setTimeout(()=>{
+        _self.$refs.PrintVolumes4Documents.dialogQrcodeVisible = false
+        _self.$refs.PrintVolumes4Documents.getArchiveObj(ids,
+        gridName,
+        vtitle); 
+      },10);
+
+      _self.printGridName=gridName;
+      _self.printObjId=selectedRow.ID;
+    },
+
     //复制著录方法
     beforeCreateLevel1File(row,parentId){
       let _self=this;
@@ -1594,10 +1568,11 @@ export default {
     },
     //挂载成功触发事件
     afterMountFile(){
+      console.log("afterMountFile:"+this.mountParentDoc);
       if(this.mountParentDoc){
         this.loadGridData(this.currentFolder);
       }else{
-        this.showInnerFile(this.selectedRow);
+        this.showInnerFile(this.selectRow);
       }
     },
     getFormData(selId) {
@@ -1628,8 +1603,16 @@ export default {
           data: formdata,
           url: _self.uploadUrl
         })
-        .then(function(response) {
+        .then(function(response) {         
           _self.importdialogVisible = false;
+          if(_self.radio=='案卷'){
+            _self.$refs.leftDataGrid.loadGridData()
+            _self.$refs.mainDataGrid.loadGridData()
+            }
+          if(_self.radio=='文件'){
+            _self.$refs.mainDataGrid.loadGridData()
+          }
+
           if( _self.mountParentDoc){
             _self.searchItem();
           }else{
@@ -1724,7 +1707,6 @@ export default {
         formdata.append("uploadFile", file.raw, file.name);
       });
       }
-      console.log(ids);
       _self.uploading=true;
       _self
         .axios({
@@ -1742,6 +1724,13 @@ export default {
           _self.uploading = false;
           _self.isAttach = false
           _self.isInnerAttach = false
+          if(_self.radio=='案卷'){
+            _self.$refs.leftDataGrid.loadGridData()
+            _self.$refs.mainDataGrid.loadGridData()
+            }
+          if(_self.radio=='文件'){
+            _self.$refs.mainDataGrid.loadGridData()
+          }
           // _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
           _self.$message({
                 showClose: true,
@@ -1772,8 +1761,17 @@ export default {
       })
     },
     submitModify(){
-      let ids = []
       let _self = this
+          _self.$confirm(
+      "确认要进行批量修改?",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
+      let ids = []
       let attr=''
       if(this.isModify==true){
       for(let i=0;i<this.selectedItems.length;i++){
@@ -1832,6 +1830,7 @@ export default {
         .catch(function(error) {
           console.log(error);
         });
+      })
     },
     getTypeNamesByMainList(keyName) {
       let _self = this;
@@ -1861,6 +1860,7 @@ export default {
       // console.log(row.TYPE_NAME)
       // this.getTypeNamesByMainList(row.TYPE_NAME)
       let _self = this;
+      _self.selectRow4delete = row
       this.innerSelectedOne = [];
       _self.leftParam.childCondition = "and a.NAME='irel_children' and b.IS_HIDDEN=0"
       _self.leftParam.childUrl = "/dc/getDocuByRelationParentId"
@@ -2008,7 +2008,7 @@ export default {
           key=key+" and status='"+_self.archiveStatus+"'";
         }
       if(_self.AddConds!=''){
-        key = key + " and "+_self.AddConds
+        key = key + " and ("+_self.AddConds+")";
       }
       _self.mainParam.condition=key;
       _self.mainParam.folderId=indata.id;
@@ -2042,12 +2042,13 @@ export default {
     },
     // 文件夹节点点击事件
     handleNodeClick(indata) {
-      this.currentFolder = indata
-      let archiveType = indata.name
-      let gridView = this.currentFolder.gridView
+      this.currentFolder = indata;
+      let archiveType = indata.name;
+      let gridView = this.currentFolder.gridView;
       let _self = this;
-      this.AttachParentID=""
-      this.InnerAttachParentID=""
+      this.AttachParentID="";
+      this.InnerAttachParentID="";
+      _self.AddConds="";
       _self.selectRow = [];
       _self.selectedFileId = "";
       _self.currentFolder = indata;
@@ -2068,6 +2069,7 @@ export default {
         let mp=new Map();
         mp.set("folderId",indata.id);
         mp.set("condition"," and (IS_HIDDEN=0 and IS_CHILD=0)");
+        mp.set("noCount","true");
         _self
           .axios({
             headers: {
@@ -2502,6 +2504,7 @@ export default {
     },
     checkDC(){
       let _self = this
+
       if (_self.selectedItems.length == 0) {
         //  _self.$message("请选择一条卷盒数据！");
         _self.$message({
@@ -2512,6 +2515,15 @@ export default {
         });
         return;
       }
+    _self.$confirm(
+      "是否要提交入库?",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
       for(var i=0;i<_self.selectedItems.length;i++){
          if(_self.selectedItems[i].C_BATCH_CODING2==null || _self.selectedItems[i].C_BATCH_CODING2.length == 0){
            _self.$message({
@@ -2570,6 +2582,7 @@ export default {
         _self.$message(response.data.message);
         console.log(error);
       });
+    });
     },
     moveToPreFilling(){
       let _self=this;
@@ -2635,6 +2648,22 @@ export default {
     },
     arrangeComplete(statusVal){
       let _self=this;
+      let status = statusVal
+      if(status=="已整编"){
+        status='整编'
+      }
+      if(status=="已质检"){
+        status='质检'
+      }
+          _self.$confirm(
+        "是否要完成"+status+"?",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
       let p=new Array();
       _self.selectedItems.forEach(e=>{
         let m=new Map();
@@ -2647,6 +2676,7 @@ export default {
              _self.$refs.leftDataGrid.itemDataList = [];
           }
         _self.searchItem();
+      });
       });
     },
     fetchInformation() {
@@ -2859,6 +2889,15 @@ export default {
         });
         return;
       }
+          _self.$confirm(
+        "是否要进行取号?",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
       let tab = _self.selectedItems;
       let m = [];
       let i;
@@ -2919,21 +2958,44 @@ export default {
           });
           console.log(error);
         });
+          })
     },
     onMenuRemoveItem(selectedItems){
       let _self=this;
+  _self.$confirm(
+      "是否要进行删除？",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
       this.logicallyDel(selectedItems,function(){
          
         if(_self.$refs.leftDataGrid){
             _self.$refs.leftDataGrid.itemDataList = [];
           }
+    
         _self.loadGridData(_self.currentFolder);
       })
+      });
     },
     onRemoveFileInVol(selectedItems){
        let _self=this;
-      this.logicallyDel(selectedItems,function(){
-         _self.showInnerFile(_selft.selectedRow);
+           _self.$confirm(
+      _self.$t("message.deleteInfo"),
+      _self.$t("application.info"),
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
+      _self.logicallyDel(selectedItems,function(){
+         _self.showInnerFile(_self.selectRow4delete);
+      })
       })
     }
   }

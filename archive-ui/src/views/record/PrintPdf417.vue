@@ -121,13 +121,19 @@ export default {
       if(data){
         _self.archiveObjects = data;
       }
+      let isbusiness = false;
       for(let i=0;i< _self.archiveObjects.length;i++){
         let obj = _self.archiveObjects[i];
         if(obj["C_ARC_CLASSIC"] && obj["C_ARC_CLASSIC"]=="商务管理"){
           _self.printTypeList = _self.printTypeListBussiness;
           _self.printType ="正本";
+          isbusiness = true;
           break;
         }
+      }
+      if(!isbusiness){
+        _self.printTypeList = _self.printTypeListGeneral;
+        _self.printType ="原件";
       }
       setTimeout(() => {
         _self.getPrintObjects();

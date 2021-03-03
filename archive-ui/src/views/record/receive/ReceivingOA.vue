@@ -23,15 +23,15 @@
                   ></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="searchD()">{{
+                  <el-button type="primary" plain @click="searchD()">{{
                     $t("application.SearchData")
                   }}</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary">提交整编</el-button>
+                    <el-button type="primary" plain>提交整编</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="success" @click="beforeRejectDE()">驳回</el-button>
+                    <el-button type="success" plain @click="beforeRejectDE()">驳回</el-button>
                 </el-form-item>
               </el-form>
             </el-row>
@@ -41,7 +41,7 @@
                   ref="DeliveryDataGrid"
                   key="Delivery"
                   v-bind="tables.Delivery"
-                  :tableHeight="layout.height-196"
+                  :tableHeight="layout.height-210"
                   @selectchange="selectDEChange"
                   @rowclick="onDataGridRowClick"
                 >
@@ -60,27 +60,27 @@
                   ></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="search()">{{
+                  <el-button type="primary" plain @click="search()">{{
                     $t("application.SearchData")
                   }}</el-button>
                 </el-form-item>
                 <!-- 接收 -->
                 <el-form-item>
-                    <el-button type="success" @click="submit()">{{$t('application.Receive')}}</el-button>
+                    <el-button type="primary" plain @click="submit()">{{$t('application.Receive')}}</el-button>
                 </el-form-item>
                 <!-- 驳回 -->
                 <el-form-item>
-                    <el-button type="success" @click="beforeReject()">驳回</el-button>
+                    <el-button type="warning" plain @click="beforeReject()">驳回</el-button>
                 </el-form-item>
               </el-form>
             </el-row>
-            <el-row>
+            <el-row style="background-color: white;">
               <el-col :span="24">
                 <DataGrid
                   ref="Drawing"
                   key="Drawing"
                   v-bind="tables.Drawing"
-                  :tableHeight="layout.height-166"
+                  :tableHeight="layout.height-180"
                   @selectchange="selectDCChange"
                 >
                 <template slot="sequee" slot-scope="scope">
@@ -113,11 +113,11 @@ export default {
         Delivery: {
           gridViewName: "DeliveryGrid",
           dataUrl: "/dc/getDocuments",
-          condition: "TYPE_NAME='移交单' AND STATUS!='整编'",
+          condition: "TYPE_NAME='移交单' AND STATUS!='整编' AND FOLDER_ID in(SELECT ID from ecm_folder where FOLDER_PATH='/移交库/OA')",
         },
-        //设计文件
+        //
         Drawing: {
-          gridViewName: "DrawingGridT",
+          gridViewName: "ArrangeGridDQXZ",
           dataUrl: "/dc/getDocuments",
           condition: "TYPE_NAME='设计文件'",
           isInitData:false,
@@ -135,8 +135,18 @@ export default {
     setTimeout(() => {
       this.leftPercent = this.getStorageNumber(this.leftStorageName,20)
     }, 300);
+    this.init();
   },
   methods: {
+    init(){
+      let _self = this;
+      _self.condition = "SELECT ID from ecm_folder where FOLDER_PATH='/移交库/OA'"
+      _self.$refs.DeliveryDataGrid.condition ="TYPE_NAME='移交单' AND FOLDER_ID IN("+_self.condition+") AND STATUS <>'整编'"
+      _self.tables.Delivery.condition = _self.$refs.DeliveryDataGrid.condition;
+      _self.$refs.DeliveryDataGrid.currentPage = 1;
+      _self.$refs.DeliveryDataGrid.loadGridInfo();
+      _self.$refs.DeliveryDataGrid.loadGridData();
+    },
     // 水平分屏事件
     onHorizontalSplitResize(leftPercent){
       // 左边百分比*100
@@ -337,5 +347,6 @@ export default {
 .el-table td,
 .el-table th {
   text-align: center !important;
+  
 }
 </style>

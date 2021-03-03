@@ -89,7 +89,6 @@
       </el-col>
       <el-col :span="6">
         <el-button
-          icon="el-icon-search"
           size="small"
           @click="clickShowDialog(typeName)"
         >{{$t('route.advSearch')}}</el-button>

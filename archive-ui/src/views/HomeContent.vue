@@ -86,7 +86,6 @@
                     <el-col :xs="8" :sm="6" :md="6" :lg="4" :xl="3" v-for="card in cards" :key="card.id">
                     <el-checkbox
                       :label="card.name"
-                      checked
                       @change="handleCheckedTypeChange"
                     >{{card.name}}</el-checkbox>
                     </el-col>
@@ -205,7 +204,7 @@
             </div>
             <el-row class="person-row">
             <el-col :span="8" v-if="!outUser">
-              <i style="font-size: 28px;color: #409EFF;" class="el-icon-star-off"></i>
+              <i style="font-size: 28px;" class="el-icon-star-off el-checkbox__label"></i>
               <el-link
                 :underline="false"
                 @click="$router.push('/ShopingCart')"
@@ -213,7 +212,7 @@
               >
             </el-col>
             <el-col :span="8">
-              <i style="font-size: 28px;color: #409EFF;" class="el-icon-user"></i>
+              <i style="font-size: 28px;" class="el-icon-user el-checkbox__label"></i>
               <el-link
                 :underline="false"
                 @click="$router.push(jumpPath.userCenter)"
@@ -221,7 +220,7 @@
               >
             </el-col>
             <el-col :span="8">
-              <i style="font-size: 28px;color: #409EFF;" class="el-icon-finished "></i>
+              <i style="font-size: 28px;" class="el-icon-finished el-checkbox__label"></i>
               <el-link
                 :underline="false"
                 @click="$router.push('/user/userroleinfo')"
@@ -323,6 +322,7 @@ import DesignChangeFileStartup from "@/views/workflow/DesignChangeFileStartup.vu
 import RelyOnFolderSelectStartUp from "@/views/workflow/RelyOnFolderSelectStartUp.vue";
 import CancelStartUp from "@/views/workflow/CancelStartUp.vue";
 import ViolationStartUp from "@/views/workflow/ViolationStartUp.vue";
+import RelyOnFolderSelectStartup4Modify from "@/views/workflow/RelyOnFolderSelectStartup4Modify.vue"
 export default {
   data() {
     return {
@@ -385,7 +385,7 @@ export default {
           icon: "ecm-icon-scdoc",
           name: "科研文件修改流程",
           type: "dialog",
-          openpath: "RelyOnFolderSelectStartUp",
+          openpath: "RelyOnFolderSelectStartup4Modify",
         },
         {
           title: "作废通知单",
@@ -404,7 +404,7 @@ export default {
       loadingNewDocData: false,
       loadingNoticeData: false,
       loadingReData: false,
-      checkAll: true,
+      checkAll: false,
       isIndeterminate: false,
       checkedCards: [],
       propertyOnly: false,
@@ -428,6 +428,7 @@ export default {
     RelyOnFolderSelectStartUp: RelyOnFolderSelectStartUp,
     CancelStartUp: CancelStartUp,
     ViolationStartUp: ViolationStartUp,
+    RelyOnFolderSelectStartup4Modify:RelyOnFolderSelectStartup4Modify
   },
   created() {
     let _self = this;

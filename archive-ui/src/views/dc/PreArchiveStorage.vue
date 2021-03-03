@@ -795,6 +795,7 @@ export default {
 
     handleNodeClick(indata,node,current) {
       let _self = this;
+      _self.advCondition = "";
       _self.selectRow = [];
       _self.selectedFileId = "";
       // let gridView = indata.gridView
@@ -856,7 +857,7 @@ export default {
       }
 
       if (_self.advCondition != undefined && _self.advCondition.length > 0) {
-        key += " and " + _self.advCondition;
+        key += " and (" + _self.advCondition+")";
       }
 
       _self.$refs.mainDataGrid.condition += key;
@@ -978,6 +979,15 @@ export default {
         });
         return;
       }
+      _self.$confirm(
+        "是否要提交入库？",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      }
+    )
+      .then(() => {
       var m = [];
       let error =""
       let tab = _self.selectedItems;
@@ -1035,6 +1045,7 @@ export default {
           });
           console.log(error);
         });
+          });
     },
   },
 

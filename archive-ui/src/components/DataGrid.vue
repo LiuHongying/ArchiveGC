@@ -184,6 +184,18 @@
             />
           </template>
         </el-table-column>
+        <el-table-column width="60">
+         <template slot-scope="scope">
+                            <el-button
+                              type="primary"
+                              plain
+                              size="small"
+                              :title="$t('application.viewContent')"
+                              icon="el-icon-picture-outline"
+                              @click="showItemContent(scope.row)"
+                            ></el-button>
+                          </template>
+        </el-table-column>
         <template>
           <template v-for="(citem, idx) in columnList">
             <template v-if="citem.visibleType == 1">
@@ -1168,9 +1180,9 @@ export default {
       this.loadGridData();
     },
     sortchange(column) {
-      console.log(JSON.stringify(column));
-      console.log(column.column.property);
-      console.log(column.column.order); //ascending, descending
+      //console.log(JSON.stringify(column));
+      //console.log(column.column.property);
+      //console.log(column.column.order); //ascending, descending
       if(column.column.order == null){
         this.orderBy = "";
       }else if(column.column.order == "ascending"){
@@ -1201,9 +1213,20 @@ export default {
       }
       this.$emit("rowclick", row);
     },
-    dbclick(row) {
+    getCurrentIndex(row){
+      var i=0;
+      for(i=0;i<this.itemDataList.length;i++){
+        if(this.itemDataList[i].ID==row.ID){
+          return i;
+        }
+      }
+      return -1;
+    },
+    dbclick(row, column, event) {
+      this.showItemProperty(this.getCurrentIndex(row),row);
       this.$emit("dbclick", row);
     },
+
     selectChange(val) {
       this.selectedRows = val;
       this.$emit("selectchange", val);

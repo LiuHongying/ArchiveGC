@@ -22,6 +22,7 @@ export default {
     return {
       skins: [
         { name: 'Blue', label: 'Blue' },
+        { name: 'Blue1', label: 'Blue1' },
         { name: 'Green', label: 'Green' },
         { name: 'Red', label: 'Red' },
         { name: 'Purple', label: 'Purple' },
