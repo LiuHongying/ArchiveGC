@@ -8,7 +8,7 @@
       :collapse="isCollapse"
       background-color="#004EA2"
       text-color="white"
-      active-text-color="#42b983"
+      active-text-color="#59cbff"
     >
       <sidebar-item ></sidebar-item>
     </el-menu>
