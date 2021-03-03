@@ -1,14 +1,12 @@
 <template>
     <DataLayout>
         <template v-slot:header>
-            <!-- 创建附件 -->
             <el-dialog :title="$t('application.Import')" :visible.sync="importdialogVisible" width="70%" :close-on-click-modal="false" :append-to-body="true">
                 <el-form size="mini" :label-width="formLabelWidth" v-loading='uploading'>
                     <div style="height:150px;overflow-y:scroll; overflow-x:scroll;">
                     <el-upload
                         :limit="1"
-                        :on-exceed ="limitMessage"
-                        :file-list="fileList"
+                        :file-list="fileListA"
                         action
                         :on-change="handleChange"
                         :auto-upload="false"
@@ -16,13 +14,6 @@
                     >
                         <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
                     </el-upload>
-                    </div>
-                    <div style="height:100px;">
-                    <el-input
-                    type="textarea"
-                    placeholder="请输入具体修改内容"
-                    v-model="changeDetail">
-                    </el-input>
                     </div>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
@@ -76,15 +67,18 @@
                     </template>
                     <template slot="paneR">
                         <el-tabs  v-model="selectedTabName">
-                            <el-tab-pane  :label="$t('application.Attachment')" name="t03" >
+                            <el-tab-pane  label="流程文件" name="t03" >
                                 <el-row v-if="allowChangeDoc">
                                     <el-col :span="24">
                                         <el-form :inline="true" :model="filters" @submit.native.prevent>
-                                            <el-form-item>
+                                            <!-- <el-form-item>
                                             <el-button type="primary" @click="beforeUploadFile('/dc/addAttachment')">{{$t('application.new')}}</el-button>
                                             </el-form-item>
                                             <el-form-item>
                                             <el-button type="warning" @click="onDeleleItem(selectedAttachment,[$refs.attachmentDoc])">{{$t('application.delete')}}</el-button>
+                                            </el-form-item> -->
+                                            <el-form-item>
+                                            <el-button type="primary" @click="beforeUploadFile('/dc/updatePrimaryContent')">替换电子文件</el-button> 
                                             </el-form-item>
                                         </el-form>
                                     </el-col>
@@ -96,7 +90,7 @@
                                     dataUrl="/dc/getDocuByRelationParentId"
                                     v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
                                     v-bind:isshowOption="true" v-bind:isshowSelection ="true"
-                                    gridViewName="ChangeAttachmentGrid"
+                                    gridViewName="ResearchBorrowGrid"
                                     condition=" and a.NAME='irel_children'"
                                     :optionWidth = "2"
                                     :isshowCustom="false"
@@ -105,6 +99,7 @@
                                     showOptions="查看内容,查看属性"
                                     :isShowChangeList="false"
                                     :isShowPropertyButton="false"
+                                    @rowclick="rwClick"
                                     @selectchange="attachmentDocSelect"
                                 ></DataGrid>
                             </el-tab-pane>
@@ -160,7 +155,7 @@ export default {
             selectRow:[],
             relationName:"",
             importdialogVisible:false,
-            fileList: [],
+            fileListA: [],
             uploading:false,
             selectedAttachment:[],
             uploadUrl:'',
@@ -171,7 +166,9 @@ export default {
             selectedTabName:'t03',
             docId:"",
             isOnly:false,
-            changeDetail:""
+            changeDetail:"",
+            parentId4Update:""
+            //importdialogVisible4Update:false
         }
     },
     created(){
@@ -191,6 +188,62 @@ export default {
         }, 300);
     },
     methods: {
+        rwClick(val){
+            this.parentId4Update = val.ID
+            console.log(this.parentId4Update)
+},
+        handleChange(file, fileList) {
+            this.fileListA = fileList;
+        },
+        beforeUploadFile(uploadpath){
+            let _self=this;
+            if(_self.parentId4Update==undefined||_self.parentId4Update==''){
+                _self.$message({
+                        showClose: true,
+                        message: "请单击流程文件子表里任意一条数据来进行替换电子文件!",
+                        duration: 2000,
+                        type: "warning"
+                    });
+                return;
+            }
+            _self.uploadUrl=uploadpath;
+            _self.fileListA=[];
+            _self.importdialogVisible=true;
+        },
+          uploadData() {
+            let _self = this;
+            let formdata = _self.getFormData();
+            _self.uploading=true;
+            formdata.append("id",_self.parentId4Update)
+            console.log(formdata)
+            _self
+                .axios({
+                headers: {
+                    "Content-Type": "application/json;charset=UTF-8"
+                },
+                datatype: "json",
+                method: "post",
+                data: formdata,
+                url: _self.uploadUrl
+                })
+                .then(function(response) {
+                _self.importdialogVisible = false;
+                _self.uploading=false;
+                _self.$refs.attachmentDoc.loadGridData()
+                _self.parentId4Update=""
+                _self.$message({
+                        showClose: true,
+                        message: _self.$t('application.Import')+_self.$t('message.success'),
+                        duration: 2000,
+                        type: 'success'
+                    });
+                })
+                .catch(function(error) {
+                _self.uploading=false;
+                console.log(error);
+                });
+            },
+
         limitMessage(){
         this.$message({
                 showClose: true,
@@ -247,22 +300,6 @@ export default {
         handleChange(file, fileList) {
             this.fileList = fileList;
         },
-        beforeUploadFile(uploadpath){
-            let _self=this;
-            if(_self.parentId==undefined||_self.parentId==''){
-                _self.$message({
-                        showClose: true,
-                        message: _self.$t('message.PleaseSelectOneFile'),
-                        duration: 2000,
-                        type: "warning"
-                    });
-                return;
-            }
-            _self.uploadUrl=uploadpath;
-            _self.fileList=[];
-            _self.importdialogVisible=true;
-        },
-
         getFormData() {
             let _self = this;
             let formdata = new FormData();
@@ -324,36 +361,36 @@ export default {
             
         },
         //上传文件
-        uploadData() {
-            let _self = this;
-            let formdata = _self.getFormData();
-            _self.uploading=true;
-            _self
-                .axios({
-                headers: {
-                    "Content-Type": "application/json;charset=UTF-8"
-                },
-                datatype: "json",
-                method: "post",
-                data: formdata,
-                url: _self.uploadUrl
-                })
-                .then(function(response) {
-                _self.importdialogVisible = false;
-                _self.uploading=false;
-                _self.$refs.attachmentDoc.loadGridData();
-                _self.$message({
-                        showClose: true,
-                        message: _self.$t('application.Import')+_self.$t('message.success'),
-                        duration: 2000,
-                        type: 'success'
-                    });
-                })
-                .catch(function(error) {
-                _self.uploading=false;
-                console.log(error);
-                });
-            },
+        // uploadData() {
+        //     let _self = this;
+        //     let formdata = _self.getFormData();
+        //     _self.uploading=true;
+        //     _self
+        //         .axios({
+        //         headers: {
+        //             "Content-Type": "application/json;charset=UTF-8"
+        //         },
+        //         datatype: "json",
+        //         method: "post",
+        //         data: formdata,
+        //         url: _self.uploadUrl
+        //         })
+        //         .then(function(response) {
+        //         _self.importdialogVisible = false;
+        //         _self.uploading=false;
+        //         _self.$refs.attachmentDoc.loadGridData();
+        //         _self.$message({
+        //                 showClose: true,
+        //                 message: _self.$t('application.Import')+_self.$t('message.success'),
+        //                 duration: 2000,
+        //                 type: 'success'
+        //             });
+        //         })
+        //         .catch(function(error) {
+        //         _self.uploading=false;
+        //         console.log(error);
+        //         });
+        //     },
         rowClick(row){
             this.selectRow=row;
             this.parentId=row.ID;
