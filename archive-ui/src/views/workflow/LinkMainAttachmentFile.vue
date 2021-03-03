@@ -126,7 +126,7 @@ export default {
         return{
             topStorageName: 'SubmissiondcHeight',
             startHeight: 135,
-            topPercent: 65,
+            topPercent: 50,
             topbarHeight: 35,
             bottomHeight: 120,
             formLabelWidth: "120px",
