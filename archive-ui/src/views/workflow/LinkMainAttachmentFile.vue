@@ -44,6 +44,11 @@
         <template v-slot:main="{layout}">
             <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
                     <template >
+                        <el-form :inline="true" :model="filters" @submit.native.prevent>
+                            <el-form-item>
+                                <el-button type="primary" @click="beforeUploadFile4Mainfile('/dc/updatePrimaryContent')">替换电子文件</el-button> 
+                            </el-form-item>
+                        </el-form>
                         <DataGrid
                             ref="mainDataGrid"
                             key="main"
@@ -56,7 +61,7 @@
                             condition=" and a.name = 'irel_children' "
                             :optionWidth = "2"
                             :isshowCustom="false"
-                            :isEditProperty="false"
+                            :isEditProperty="isEdit"
                             showOptions="查看内容,查看属性"
                             :isShowPropertyButton="false"
                             :isShowChangeList="false"
@@ -166,7 +171,10 @@ export default {
             docId:"",
             isOnly:false,
             changeDetail:"",
-            parentId4Update:""
+            parentId4Update:"",
+            isEdit:true,
+            parentId4UpdateMain:"",
+            isUpdateMain:true
             //importdialogVisible4Update:false
         }
     },
@@ -189,10 +197,25 @@ export default {
     methods: {
         rwClick(val){
             this.parentId4Update = val.ID
-            console.log(this.parentId4Update)
-},
+        },
         handleChange(file, fileList) {
             this.fileListA = fileList;
+        },
+        beforeUploadFile4Mainfile(uploadpath){
+            let _self=this;
+            if(_self.parentId4UpdateMain==undefined||_self.parentId4UpdateMain==''){
+                _self.$message({
+                        showClose: true,
+                        message: "请单击流程文件主表里任意一条数据来进行替换电子文件!",
+                        duration: 2000,
+                        type: "warning"
+                    });
+                return;
+            }
+            _self.isUpdateMain=true
+            _self.uploadUrl=uploadpath;
+            _self.fileListA=[];
+            _self.importdialogVisible=true;
         },
         beforeUploadFile(uploadpath){
             let _self=this;
@@ -213,8 +236,12 @@ export default {
             let _self = this;
             let formdata = _self.getFormData();
             _self.uploading=true;
-            formdata.append("id",_self.parentId4Update)
-            console.log(formdata)
+            if(this.isUpdateMain==true){
+            formdata.append("id",_self.parentId4UpdateMain)
+            }
+            else if(this.isUpdateMain==false){
+            formdata.append("id",_self.parentId4UpdateMain)
+            }
             _self
                 .axios({
                 headers: {
@@ -229,7 +256,10 @@ export default {
                 _self.importdialogVisible = false;
                 _self.uploading=false;
                 _self.$refs.attachmentDoc.loadGridData()
+                _self.$refs.mainDataGrid.loadGridData()
                 _self.parentId4Update=""
+                _self.parentId4UpdateMain=""
+                _self.isUpdateMain=false
                 _self.$message({
                         showClose: true,
                         message: _self.$t('application.Import')+_self.$t('message.success'),
@@ -392,6 +422,13 @@ export default {
         //     },
         rowClick(row){
             this.selectRow=row;
+            this.parentId4UpdateMain = row.ID
+             if(row.C_ITEM_TYPE=='案卷'){
+                 this.isEdit=false
+             }
+             if(row.C_ITEM_TYPE!='文件'){
+                 this.isEdit=true
+             }
             this.parentId=row.ID;
             let _self=this;
             _self.$nextTick(()=>{
