@@ -1995,14 +1995,14 @@ export default {
         if (_self.radio == "案卷") {
           key= key + " and C_ITEM_TYPE='案卷' and IS_HIDDEN=0 ";
         } else {
-          key= key + " and C_ITEM_TYPE='文件' and IS_CHILD=0 and IS_HIDDEN=0 ";
+          key= key + " and C_ITEM_TYPE='文件' and not exists(select 1 from ecm_relation b,ecm_document c where b.child_id=ecm_document.ID and b.NAME='irel_children' and b.PARENT_ID=c.ID and c.C_ITEM_TYPE='案卷') and IS_HIDDEN=0 ";
         }
         
       } else {
         if (_self.radio == "案卷") {
           key=key+ " C_ITEM_TYPE='案卷' and IS_HIDDEN=0 ";
         } else {
-          key=key+" C_ITEM_TYPE='文件' and IS_CHILD=0 and IS_HIDDEN=0";
+          key=key+" C_ITEM_TYPE='文件' and not exists(select 1 from ecm_relation b,ecm_document c where b.child_id=ecm_document.ID and b.NAME='irel_children' and b.PARENT_ID=c.ID and c.C_ITEM_TYPE='案卷') and IS_HIDDEN=0";
         }
        
       }

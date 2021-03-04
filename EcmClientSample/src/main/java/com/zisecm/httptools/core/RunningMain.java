@@ -25,6 +25,25 @@ public class RunningMain {
 		String username = ecmClient.getConfig().getUsername();
 		String password = ecmClient.getConfig().getPassword();
 		String token = ecmClient.login(username, password, httpClient);
+		
+		//String condition="SYNC_ID='"+tcId+"'";
+		String condition="ID='a5f69c6a59e14e759adc24689a3da31b'";
+		ds.queryDocument(httpClient, token, ecmClient, condition);
+		
+		InputStream stream = new FileInputStream("c:\\temp\\1.pdf");
+		
+		JSONObject jsObj = new JSONObject();
+		//系统属性
+		jsObj.put("ID", "a5f69c6a59e14e759adc24689a3da31b");
+		// 业务属性
+	    jsObj.put("CODING", "TEST-009862111");
+		jsObj.put("C_COMMENT","测试移交单1111");
+		
+		ds.upateDocument(httpClient, token, ecmClient, jsObj, stream, "测试文件.pdf");
+		
+		
+		/*
+		
 		InputStream stream = new FileInputStream("c:\\temp\\1.pdf");
 		//创建移交单
 		JSONObject jsObj = new JSONObject();
@@ -83,6 +102,7 @@ public class RunningMain {
 		ds.addAttachments(httpClient, token, ecmClient, stream, "附件1.pdf", designId);
 		//登出
 		ecmClient.logout(token, httpClient);
+		*/
 	}
 
 }

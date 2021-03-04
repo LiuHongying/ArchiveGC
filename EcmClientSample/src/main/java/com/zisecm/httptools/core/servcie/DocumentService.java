@@ -2,6 +2,7 @@ package com.zisecm.httptools.core.servcie;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.http.Consts;
@@ -38,7 +39,7 @@ public class DocumentService {
 	/**
 	 * 查询文档
 	 */
-	public void queryDocument(CloseableHttpClient httpClient,String token,EcmHttp ecmClient) {
+	public void queryDocument(CloseableHttpClient httpClient,String token,EcmHttp ecmClient,String condition) {
 		System.out.println("[METHOD]GetDocument");
 		HttpPost httpPost=null;
 		
@@ -51,10 +52,10 @@ public class DocumentService {
 			httpPost.setConfig(timeoutConfig);
 			JSONObject jsObj = new JSONObject();
 			jsObj.put("pageSize", 20);
-			jsObj.put("pageIndex", 1);
-			jsObj.put("gridName", "RecyclebinGrid");
+			jsObj.put("pageIndex", 0);
+			jsObj.put("gridName", "GeneralGrid");
 			jsObj.put("folderId", "");
-			jsObj.put("condition", "");
+			jsObj.put("condition", condition);
 			jsObj.put("orderBy", "");
 			StringEntity strEntity=new StringEntity(jsObj.toJSONString());
 			strEntity.setContentType("text/json");
@@ -89,6 +90,48 @@ public class DocumentService {
 		}
 	}
 	
+	public void deleteDocument(CloseableHttpClient httpClient,String token,EcmHttp ecmClient,List<String> ids) {
+		System.out.println("[METHOD]deleteDocument");
+		HttpPost httpPost=null;
+		
+		String url = ecmClient.getConfig().getBaseurl()+"/dc/delDocument";
+		httpPost=new HttpPost(url);
+		try {
+			RequestConfig timeoutConfig = RequestConfig.custom()
+					.setConnectTimeout(5000).setConnectionRequestTimeout(1000)
+					.setSocketTimeout(5000).build();
+			httpPost.setConfig(timeoutConfig);
+
+			StringEntity strEntity=new StringEntity(JSONObject.toJSONString(ids));
+			strEntity.setContentType("text/json");
+			httpPost.addHeader("token", token);
+			httpPost.setEntity(strEntity);
+			
+			HttpResponse response = httpClient.execute(httpPost);
+			
+			StatusLine statusLine = response.getStatusLine();
+			int statusCode = statusLine.getStatusCode();
+			// 请求成功
+	        if (statusCode == 200) {
+	        	HttpEntity responseResult = response.getEntity();
+	        	String responseEntityStr = EntityUtils.toString(responseResult, "UTF-8");
+	        	JSONObject jsonResult = JSON.parseObject(responseEntityStr);
+	        	
+	        	if(jsonResult.containsKey("code")) {
+	        		int code = jsonResult.getInteger("code");
+	        		if(code==1) {
+	        			System.out.println("删除成功！");
+	        		}else {
+	        			System.out.println(jsonResult.getString("message"));
+	        		}
+	        	}
+	        	
+	        }
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * 
 	 * @param httpClient 连接
@@ -103,6 +146,66 @@ public class DocumentService {
 		System.out.println("[METHOD]createDocument");
 		HttpPost httpPost=null;
 		String url = ecmClient.getConfig().getBaseurl()+"/dc/newDocument";
+		httpPost=new HttpPost(url);
+		try {
+			RequestConfig timeoutConfig = RequestConfig.custom()
+					.setConnectTimeout(5000).setConnectionRequestTimeout(1000)
+					.setSocketTimeout(5000).build();
+			httpPost.setConfig(timeoutConfig);
+			// 使用表单形式提交参数
+	        MultipartEntityBuilder fileBuilder = MultipartEntityBuilder.create();
+	        fileBuilder.setMode(HttpMultipartMode.RFC6532);
+	        
+			// file为提交参数名,stream为要上传的文件的文件流 inputStream，最后一个参数为上传文件名称
+			if(stream!=null) {
+				fileBuilder.addBinaryBody("uploadFile", stream, ContentType.create("multipart/form-data"), fileName);
+			}
+			StringBody metaData = new StringBody(jsObj.toString(), ContentType.create("text/plain", Consts.UTF_8));
+			fileBuilder.addPart("metaData", metaData);
+	        HttpEntity fileEntity = fileBuilder.build();
+	        httpPost.addHeader("token", token);
+	        httpPost.setEntity(fileEntity);
+	        HttpResponse response = httpClient.execute(httpPost);
+			StatusLine statusLine = response.getStatusLine();
+	        // 响应码
+	        int statusCode = statusLine.getStatusCode();
+			// 请求成功
+	        if (statusCode == 200) {
+	        	HttpEntity responseResult = response.getEntity();
+	        	String responseEntityStr = EntityUtils.toString(responseResult, "UTF-8");
+	        	JSONObject jsonResult = JSON.parseObject(responseEntityStr);
+	        	
+	        	if(jsonResult.containsKey("code")) {
+	        		int code = jsonResult.getInteger("code");
+	        		if(code==1) {
+	        			if(jsonResult.containsKey("id")) {
+	        				System.out.println(jsonResult.get("id"));
+	        				return jsonResult.getString("id");
+	        			}
+	        		}
+	        	}
+	        	
+	        }
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 更新文档
+	 * @param httpClient
+	 * @param token
+	 * @param ecmClient
+	 * @param jsObj ID必需，其他属性添加需要更新的即可
+	 * @param stream
+	 * @param fileName
+	 * @return
+	 */
+	public String upateDocument(CloseableHttpClient httpClient,String token,EcmHttp ecmClient,JSONObject jsObj,InputStream stream,String fileName) {
+		System.out.println("[METHOD]upateDocument");
+		HttpPost httpPost=null;
+		String url = ecmClient.getConfig().getBaseurl()+"/dc/createOrUpdateDoc";
 		httpPost=new HttpPost(url);
 		try {
 			RequestConfig timeoutConfig = RequestConfig.custom()
