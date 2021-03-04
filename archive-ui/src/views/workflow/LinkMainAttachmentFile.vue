@@ -132,7 +132,7 @@ export default {
             startHeight: 135,
             topPercent: 50,
             topbarHeight: 35,
-            bottomHeight: 120,
+            bottomHeight: 155,
             formLabelWidth: "120px",
             buttLoading:false,
             filters: {
@@ -426,9 +426,10 @@ export default {
              if(row.C_ITEM_TYPE=='案卷'){
                  this.isEdit=false
              }
-             if(row.C_ITEM_TYPE!='文件'){
+             if(row.C_ITEM_TYPE!='案卷'){
                  this.isEdit=true
              }
+            console.log(this.isEdit)
             this.parentId=row.ID;
             let _self=this;
             _self.$nextTick(()=>{
