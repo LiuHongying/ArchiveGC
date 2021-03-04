@@ -164,6 +164,7 @@ import CommonView from "@/views/workflow/CommonView.vue";
 import CommonViewRelyDocType from "@/views/workflow/CommonViewRelyDocType.vue";
 import DeliverFormTask from "@/views/workflow/DeliverFormTask.vue"
 import UpdateDocContent from "@/views/workflow/LinkMainAttachmentFile.vue";
+import UpdateDesignDocContent from "@/views/workflow/LinkDesignMainAttachmentFile.vue";
 import UpdateDocContentByReviewer from "@/views/workflow/LinkMainAttachmentFileByReviewer.vue";
 import BorrowView from "@/views/workflow/BorrowView.vue"
 import BorrowViewReadOnly from "@/views/workflow/BorrowViewReadOnly.vue"
@@ -183,6 +184,7 @@ export default {
     borrow1: borrow1,
     CommonView: CommonView,
     UpdateDocContent: UpdateDocContent,
+    UpdateDesignDocContent: UpdateDesignDocContent,
     UpdateDocContentByReviewer: UpdateDocContentByReviewer,
     DeliverFormTask:DeliverFormTask,
     BorrowViewReadOnly:BorrowViewReadOnly,
