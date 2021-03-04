@@ -1192,10 +1192,6 @@ public class ReportCreateController extends ControllerAbstract {
 			
 			List<Map<String, Object> > classMapList = new ArrayList<Map<String, Object>>();
 			Map<String, Object> classMap = new HashMap<String, Object>();
-			classMap.put("type", "设备管理");
-			classMap.put("name", "设备文件");
-			classMapList.add(classMap);
-			classMap = new HashMap<String, Object>();
 			classMap.put("type", "商务管理");
 			classMap.put("name", "商务文件");
 			classMapList.add(classMap);
