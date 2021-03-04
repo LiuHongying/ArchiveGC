@@ -1563,6 +1563,7 @@ export default {
       }
       _self.importdialogVisible = true;
       setTimeout(()=>{
+        _self.$refs.BatchFileMount.fileList = [];
         _self.$refs.BatchFileMount.archiveObjects = selrow;
       },100);
     },
@@ -1684,9 +1685,10 @@ export default {
 
         uploadAttachData() {
       let _self = this;
-      let formdata = new FormData()
-      var data = {}
-      let ids = []
+      let formdata = new FormData();
+      var data = {};
+      let ids = [];
+      data["relationName"]="附件";
       if(_self.isAttach==true){
       // for(let i = 0;i<_self.selectedItems.length;i++){
       //   ids[i] = _self.selectedItems[i].ID 

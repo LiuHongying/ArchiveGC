@@ -763,6 +763,17 @@ TCR试验澄清关闭单
 					if(frmItem.getRequired()!=null
 							&&frmItem.getRequired().booleanValue() 
 							&& attributes.get(frmItem.getAttrName())==null) {
+						//依赖必填处理
+						if(frmItem.getDependName()!=null) {
+							if(frmItem.getValidatePolicy()!=null) {
+								String[] ps = frmItem.getValidatePolicy().split(":");
+								if(ps.length>1) {
+									if(attributes.get(ps[0])!=null && !attributes.get(ps[0]).equals(ps[1])) {
+										continue;
+									}
+								}
+							}
+						}
 						if(msg .length()>0) {
 							msg += ",";
 						}

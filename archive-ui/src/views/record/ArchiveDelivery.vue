@@ -220,7 +220,7 @@
    
           @click="beforeNewDocument(selectedOneTransfer)"
         >{{$t('application.newDocument')}}</el-button>
-        <el-button type="primary" plain size="small" icon="el-icon-upload2"
+        <el-button type="primary" plain size="small"
          @click="batchDialogVisible=true">批量导入</el-button> 
        
         <!-- <el-button type="primary" icon="el-icon-s-release"  @click="onClosePage()">{{$t('application.sealVolume')}}</el-button>
@@ -257,7 +257,7 @@
                 <DataGrid
                   ref="transferDataGrid"
                   key="transfer"
-                  v-bind:isshowPage="false"
+                  :isshowPage="false"
                   v-bind:itemDataList="transferDataList"
                   v-bind:columnList="transferColumnList"
                   @pagesizechange="handleSizeChange"
@@ -435,7 +435,7 @@ export default {
       innerDataListFull: [],
       outerDataList: [],
       outerDataListFull: [],
-      transferPageSize: 20,
+      transferPageSize: 200,
       transferCurrentPage: 1,
       transferDataList: [],
       transferDataListFull: [],
@@ -2470,6 +2470,7 @@ export default {
           _self.importdialogVisible = false;
           // _self.refreshData();
           _self.uploading=false;
+          _self.showInnerFile(_self.selectRow);
           // _self.$message(_self.$t('application.Import')+_self.$t('message.success'));
           _self.$message({
                 showClose: true,
@@ -2488,25 +2489,26 @@ export default {
       let formdata = new FormData()
       var data = {}
       let ids = []
+      data["relationName"]="附件";
       if(_self.isAttach==true){
-      // for(let i = 0;i<_self.selectedItems.length;i++){
-      //   ids[i] = _self.selectedItems[i].ID 
-      // }
-      data["parentDocId"] = _self.AttachParentID
-      formdata.append("metaData", JSON.stringify(data));
-      _self.files4Attach.forEach(function(file) {
-        formdata.append("uploadFile", file.raw, file.name);
-      });
+        // for(let i = 0;i<_self.selectedItems.length;i++){
+        //   ids[i] = _self.selectedItems[i].ID 
+        // }
+        data["parentDocId"] = _self.AttachParentID
+        formdata.append("metaData", JSON.stringify(data));
+        _self.files4Attach.forEach(function(file) {
+            formdata.append("uploadFile", file.raw, file.name);
+          });
       }
       else if(_self.isInnerAttach==true){
-      // for(let i = 0;i<_self.selectedInnerItems.length;i++){
-      //   ids[i] = _self.selectedInnerItems[i].ID 
-      // }
-      data["parentDocId"] = _self.InnerAttachParentID
-      formdata.append("metaData", JSON.stringify(data));
-      _self.files4Attach.forEach(function(file) {
-        formdata.append("uploadFile", file.raw, file.name);
-      });
+        // for(let i = 0;i<_self.selectedInnerItems.length;i++){
+        //   ids[i] = _self.selectedInnerItems[i].ID 
+        // }
+        data["parentDocId"] = _self.InnerAttachParentID
+        formdata.append("metaData", JSON.stringify(data));
+        _self.files4Attach.forEach(function(file) {
+          formdata.append("uploadFile", file.raw, file.name);
+        });
       }
       console.log(ids);
       _self.uploading=true;

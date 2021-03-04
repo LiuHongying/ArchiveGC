@@ -320,6 +320,18 @@
                             />
                           </template> </el-table-column
                         >>
+                        <el-table-column width="60">
+                         <template slot-scope="scope">
+                            <el-button
+                              type="primary"
+                              plain
+                              size="small"
+                              :title="$t('application.viewContent')"
+                              icon="el-icon-picture-outline"
+                              @click="showItemContent(scope.row)"
+                            ></el-button>
+                          </template>
+                        </el-table-column>
                         <div v-for="(citem, idx) in gridList" :key="idx">
                           <div v-if="citem.visibleType == 1">
                             <el-table-column
@@ -374,14 +386,6 @@
                             ></el-button>
                           </template>
                           <template slot-scope="scope">
-                            <el-button
-                              type="primary"
-                              plain
-                              size="small"
-                              :title="$t('application.viewContent')"
-                              icon="el-icon-picture-outline"
-                              @click="showItemContent(scope.row)"
-                            ></el-button>
                             <el-button
                               type="primary"
                               plain
