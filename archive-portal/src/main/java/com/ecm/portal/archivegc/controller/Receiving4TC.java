@@ -153,6 +153,8 @@ public class Receiving4TC extends ControllerAbstract {
 						EcmFolder folder = folderService.getObjectById(getToken(), folderId);
 						doc.put("ACL_NAME", folder.getAclName());
 						doc.put("STATUS", "整编");
+						doc.put("C_RECEIVER", documentService.getSession(getToken()).getCurrentUser().getUserName());
+						doc.put("C_RECEIVE_DATE", new Date());
 						documentService.updateObject(getToken(), doc);
 					}else {
 						mp.put("code", ActionContext.FAILURE);

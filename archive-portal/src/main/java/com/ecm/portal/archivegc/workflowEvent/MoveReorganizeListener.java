@@ -1,5 +1,6 @@
 package com.ecm.portal.archivegc.workflowEvent;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +60,8 @@ public class MoveReorganizeListener implements TaskListener{
 					EcmFolder folder= folderService.getObjectById(token, folderId);
 					arrchive.setFolderId(folderId);
 					arrchive.setAclName(folder.getAclName());
-					
+					arrchive.getAttributes().put("C_RECEIVER", task.getAssignee());
+					arrchive.getAttributes().put("C_RECEIVE_DATE", new Date());
 					documentService.updateObject(token, arrchive, null);
 					
 				}

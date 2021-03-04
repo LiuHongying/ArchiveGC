@@ -8,6 +8,7 @@
       style="width:100%"
       :close-on-click-modal="false"
       @open="searchItem"
+      :append-to-body="true"
       v-dialogDrag
     >
       <DataLayout>
