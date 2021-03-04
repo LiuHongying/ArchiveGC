@@ -249,7 +249,7 @@
       </el-col>
     </el-row>
     <template v-slot:main="{layout}">
-      <div :style="{position:'relative',height: layout.height-startHeight+45+'px'}">
+      <div :style="{position:'relative',height: layout.height-startHeight+35+'px'}">
         <split-pane split="vertical" @resize="onHorizontalSplitResize" :min-percent='1' :default-percent='leftPercent'>
           <template slot="paneL">
             <el-row>
@@ -413,7 +413,7 @@ export default {
       // 本地存储高度名称
       topStorageName: 'ArchiveDeliveryHeight',
       // 非split pan 控制区域高度
-      startHeight: 175,
+      startHeight: 170,
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
