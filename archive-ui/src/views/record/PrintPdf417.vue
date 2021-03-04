@@ -31,27 +31,28 @@
       <div id='print' ref='print' :style="'top:0px;'">
         <div v-for="(item,keys) in printObjects" :key="'divk'+keys" :style="'width:'+divWidth+';padding:5px;'">
           <el-row>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{item.typeName}}</el-col>
-            <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{item.itemType}}</el-col>
-            <el-col :span="6" style="color: #000000;text-align: left;font-size:18px;padding:4px;">{{printType}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:16px;padding:4px;">{{item.archiveClassic}}</el-col>
+            <el-col :span="6" style="color: #000000;text-align: left;font-size:16px;padding:4px;">{{item.itemType}}</el-col>
+            <el-col :span="6" style="color: #000000;text-align: left;font-size:16px;padding:4px;">{{printType}}</el-col>
           </el-row>
           <el-row>
             <el-col :span="24" style="color: #000000;text-align: left;font-size:28px;padding:4px;">{{item.coding}}&nbsp;</el-col>
           </el-row>
           <el-row>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">密级：{{item.securityLevel}}</el-col>
-            <el-col v-if="item.revision" :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">版本：{{item.revision}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:16px;padding:4px;">密级：{{item.securityLevel}}</el-col>
+            <el-col v-if="item.revision" :span="12" style="color: #000000;text-align: left;font-size:16px;padding:4px;">版本：{{item.revision}}</el-col>
           </el-row>
           <el-row>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">保管期限：{{item.retention}}</el-col>
-            <el-col :span="12" style="color: #000000;text-align: left;font-size:18px;padding:4px;">工程号：{{item.projectCode}}</el-col>
+            <el-col :span="12" style="color: #000000;text-align: left;font-size:16px;padding:4px;">保管期限：{{item.retention}}</el-col>
+            <el-col v-if="item.archiveClassic=='科技与信息'" :span="12" style="color: #000000;text-align: left;font-size:16px;padding:4px;">项目代码：{{item.projectCode}}</el-col>
+            <el-col v-else :span="12" style="color: #000000;text-align: left;font-size:16px;padding:4px;">工程号：{{item.projectCode}}</el-col>
           </el-row>
           <el-row>
-            <el-col :span="24" style="color: #000000;text-align: left;font-size:18px;padding:4px;">归档日期：{{item.archiveDate}}</el-col>
+            <el-col :span="24" style="color: #000000;text-align: left;font-size:16px;padding:4px;">归档日期：{{item.archiveDate}}</el-col>
           </el-row>
           <el-row style="padding-bottom:15px;">
             <el-col :span="10" style="padding-top:10px;">
-              <el-row style="color: #000000;text-align: left;font-size:18px;padding:2px;">{{item.volString}}</el-row>
+              <el-row style="color: #000000;text-align: left;font-size:16px;padding:2px;">{{item.volString}}</el-row>
               <el-row style="color: #000000;text-align: center;font-size:46px;padding-top:10px;">{{item.storeCoding}}</el-row>
             </el-col>
             <el-col :span="14">

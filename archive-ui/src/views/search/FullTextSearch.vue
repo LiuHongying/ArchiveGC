@@ -37,7 +37,7 @@
       <el-button @click="handleScendSearch()" type="primary">{{$t('application.scendSearch')}}</el-button>
       </div>
     </el-dialog>
-    <div v-if="searched==false" style="height:180px;padding-top:60px;text-align:center;padding-right:280px;">
+    <div v-if="searched==false" style="height:180px;padding-top:60px;text-align:center;padding-right:180px;">
       <img src="../../../static/img/search_bar.png" width="205px" height="120px" alt="logo" style="vertical-align: middle;" />
       <!-- <h1>{{$t("application.name")}}</h1>-->
       </div>
@@ -57,7 +57,7 @@
         style="width:35%;padding-top:10px;margin-left:20%"></el-input>
       <el-button style="margin-left:5px;width:60px" type="primary" plain @click="enterDown">{{$t('application.search')}}</el-button>
       <el-checkbox style="margin-left:5px" :label="$t('application.propertyOnly')" v-model="propertyOnly"></el-checkbox>
-      <el-button style="margin-left:5px" type="primary" plain @click="beforeSecondSearch()">{{$t('application.scendSearch')}}</el-button>
+      <el-button v-if="searched" style="margin-left:5px" type="primary" plain @click="beforeSecondSearch()">{{$t('application.scendSearch')}}</el-button>
     </div>
     <el-row>
       <el-col :span="13" style="text-align:left;margin-left:20%;margin-top:5px">
@@ -137,6 +137,7 @@
             border
             default-expand-all
             @header-dragend="onHeaderDragend"
+            @row-dblclick="dbclick"
           >
             <el-table-column type="expand"  :key="1">
               <template slot-scope="scope">
@@ -335,6 +336,10 @@ export default {
     _self.loadGridInfo();
   },
   methods: {
+    dbclick(row, column, event) {
+      this.showItemProperty(row);
+      this.$emit("dbclick", row);
+    },
     enterDown() {
       this.currentPage = 1;
       this.search(false);
