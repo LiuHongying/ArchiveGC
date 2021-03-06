@@ -23,6 +23,32 @@
                 </div>
             </el-dialog>
             <el-dialog
+            :visible.sync="updateBoxVisible"
+            :append-to-body="true"
+            width="70%"
+            >
+                <ShowProperty
+                ref="ShowBoxProperty"
+                @onSaved="onSaved"
+                width="100%"
+                folderPath
+                v-bind:typeName="typeName"
+                :itemId="boxId"
+                ></ShowProperty>
+                <div slot="footer" class="dialog-footer">
+
+          <slot name="saveButton" :data="propertiesData">
+            <el-button @click="saveItem()">{{
+              $t("application.save")
+            }}</el-button>
+          </slot>
+
+          <el-button @click="updateBoxVisible = false">{{
+            $t("application.cancel")
+          }}</el-button>
+        </div>
+            </el-dialog>
+            <el-dialog
             title="更新主文件"
             :visible.sync="udialogVisible"
             v-loading="mainFileUploading"
@@ -79,6 +105,9 @@
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="updateDocContent()">{{$t('application.replace')}}</el-button>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="changeBoxAttrs()">修改文件的案卷属性</el-button>
                 </el-form-item>
                 </el-form>
             </el-row>
@@ -199,7 +228,9 @@ export default {
             selectedTabName:'t03',
             docId:"",
             isOnly:false,
-            attachmentId:""
+            attachmentId:"",
+            boxId:"",
+            updateBoxVisible:false
         }
     },
     created(){
@@ -424,6 +455,47 @@ export default {
                 _self.mainFileUploading = false;
             });
         },
+        changeBoxAttrs(){
+            let _self = this;
+            if ( _self.selectedItems==undefined || _self.selectedItems.length<1) {
+                _self.$message({
+                    showClose: true,
+                    message: _self.$t('message.PleaseSelectOneFile'),
+                    duration: 2000,
+                    type: "warning"
+                    });
+                    return;
+            }
+            var m = new Map();
+            m.set("childId",_self.selectedItems[0].ID)
+            axios
+            .post("/dc/getBoxDocByChildId", JSON.stringify(m))
+            .then(function (response) {
+                if(response.data.code == "1"){
+                    if(response.data.isBox){
+                        _self.updateBoxVisible = true;
+                        _self.boxId = response.data.boxId;
+                        _self.$nextTick(() => {
+                        _self.$refs.ShowBoxProperty.loadFormInfo();
+                        });
+                    }else{
+                        _self.$message({
+                            showClose: true,
+                            message: "此文件不包含卷",
+                            duration: 2000,
+                            type: "warning"
+                            });
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+        saveItem(){
+            this.$refs.ShowBoxProperty.saveItem();
+            this.updateBoxVisible = false;
+        }
     },
     props: {
         formId: {type: String,default: ""},
