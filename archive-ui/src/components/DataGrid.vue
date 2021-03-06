@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>
+    <div style="background:#FFFFFF;">
       <!-- 创建分发 -->
       <!--  -->
       <el-dialog

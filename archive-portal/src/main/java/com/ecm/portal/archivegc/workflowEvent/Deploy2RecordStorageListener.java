@@ -1,5 +1,6 @@
 package com.ecm.portal.archivegc.workflowEvent;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +51,8 @@ public class Deploy2RecordStorageListener implements JavaDelegate {
 		String sql="select child_id as ID from ecm_relation where name='irel_children' and parent_id='"+formId+"'"
 				+ " union select child_id as ID from ecm_relation where parent_id in(select child_id from ecm_relation"
 				+ " where parent_id ='"+formId+"')";
+		String processId =execution.getProcessInstanceId();
+		String receiver = getReceiver(token, processId);
 		try {
 			List<Map<String,Object>> objList= documentService.getMapList(token, sql);
 			for (Map<String, Object> map : objList) {
@@ -62,6 +65,10 @@ public class Deploy2RecordStorageListener implements JavaDelegate {
 				arrchive.setFolderId(folderId);
 				arrchive.setAclName(folder.getAclName());
 				arrchive.setStatus("整编");
+				if(receiver!=null) {
+					arrchive.getAttributes().put("C_RECEIVE", receiver);
+					arrchive.getAttributes().put("C_RECEIVE_DATE", new Date());
+				}
 				documentService.updateObject(token, arrchive, null);
 				
 			}
@@ -76,6 +83,21 @@ public class Deploy2RecordStorageListener implements JavaDelegate {
 			}
 		}
 	
+	}
+	
+	private String getReceiver(String token, String processId) {
+		String sql = "select ASSIGNEE from ecm_audit_workitem where PROCESS_INSTANCE_ID='"+processId+"' and TASK_NAME='文档提交检查' order by CREATE_TIME desc";
+		List<Map<String, Object>> objList;
+		try {
+			objList = documentService.getMapList(token, sql);
+			for (Map<String, Object> map : objList) {
+				return map.get("ASSIGNEE").toString();
+			}
+		} catch (EcmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

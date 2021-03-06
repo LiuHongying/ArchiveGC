@@ -63,6 +63,8 @@ public class Receiving4TC extends ControllerAbstract {
 			for(String childId : list) {
 				EcmDocument doc= documentService.getObjectById(getToken(), childId);
 				doc.setStatus("已接收");
+				doc.getAttributes().put("C_RECEIVE", documentService.getSession(getToken()).getCurrentUser().getUserName());
+				doc.getAttributes().put("C_RECEIVE_DATE", new Date());
 				documentService.updateObject(getToken(), doc, null);
 			}
 			mp.put("code", ActionContext.SUCESS);
@@ -153,13 +155,21 @@ public class Receiving4TC extends ControllerAbstract {
 						EcmFolder folder = folderService.getObjectById(getToken(), folderId);
 						doc.put("ACL_NAME", folder.getAclName());
 						doc.put("STATUS", "整编");
-						doc.put("C_RECEIVER", documentService.getSession(getToken()).getCurrentUser().getUserName());
+						doc.put("C_RECEIVE", documentService.getSession(getToken()).getCurrentUser().getUserName());
 						doc.put("C_RECEIVE_DATE", new Date());
 						documentService.updateObject(getToken(), doc);
 					}else {
-						mp.put("code", ActionContext.FAILURE);
-						mp.put("message", "文件"+coding+"没有对应案卷");
-						return mp;
+						String folderId=folderPathService.getFolderId(getToken(), doc, "2");
+						EcmFolder folder = folderService.getObjectById(getToken(), folderId);
+						doc.put("ACL_NAME", folder.getAclName());
+						doc.put("STATUS", "整编");
+						doc.put("C_RECEIVE", documentService.getSession(getToken()).getCurrentUser().getUserName());
+						doc.put("C_RECEIVE_DATE", new Date());
+						documentService.updateObject(getToken(), doc);
+						
+						//mp.put("code", ActionContext.FAILURE);
+						//mp.put("message", "文件"+coding+"没有对应案卷");
+						//return mp;
 					}
 				}
 				documentService.updateStatus(getToken(), id, "整编", "");

@@ -60,7 +60,7 @@ public class MoveReorganizeListener implements TaskListener{
 					EcmFolder folder= folderService.getObjectById(token, folderId);
 					arrchive.setFolderId(folderId);
 					arrchive.setAclName(folder.getAclName());
-					arrchive.getAttributes().put("C_RECEIVER", task.getAssignee());
+					arrchive.getAttributes().put("C_RECEIVE", task.getAssignee());
 					arrchive.getAttributes().put("C_RECEIVE_DATE", new Date());
 					documentService.updateObject(token, arrchive, null);
 					

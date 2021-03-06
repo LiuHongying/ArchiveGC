@@ -44,6 +44,7 @@
                   :tableHeight="layout.height-210"
                   @selectchange="selectDEChange"
                   @rowclick="onDataGridRowClick"
+                  :pageSize="500"
                 >
                 </DataGrid>
               </el-col>

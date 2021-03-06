@@ -332,7 +332,7 @@
                             ></el-button>
                           </template>
                         </el-table-column>
-                        <div v-for="(citem, idx) in gridList" :key="idx">
+                        <div v-for="(citem, idx) in gridList" :key="idx + '_C'">
                           <div v-if="citem.visibleType == 1">
                             <el-table-column
                               v-if="(citem.width + '').indexOf('%') > 0"
@@ -830,6 +830,7 @@ export default {
       axios
         .post("/exchange/doc/getExceptBoxDocuments", JSON.stringify(m))
         .then(function (response) {
+          _self.currentPage = 1;
           _self.itemDataList = response.data.data;
           _self.itemDataListFull = response.data.data;
           _self.itemCount = response.data.pager.total;
@@ -857,6 +858,7 @@ export default {
       axios
         .post("/dc/getContainBoxDocuments", JSON.stringify(m))
         .then(function (response) {
+          _self.currentPage = 1;
           _self.itemDataList = response.data.data;
           _self.itemDataListFull = response.data.data;
           _self.itemCount = response.data.pager.total;

@@ -257,7 +257,6 @@
                 <DataGrid
                   ref="transferDataGrid"
                   key="transfer"
-                  :isshowPage="false"
                   v-bind:itemDataList="transferDataList"
                   v-bind:columnList="transferColumnList"
                   @pagesizechange="handleSizeChange"
@@ -272,15 +271,15 @@
                   :optionWidth = "1"
                   showOptions="查看内容"
                   v-bind:itemCount="transferCount"
-                  v-bind:tableHeight="layout.height-136"
+                  v-bind:tableHeight="layout.height-170"
                   @rowclick="beforeLoadGridData"
                   @selectchange="transferselectChange"
                 ></DataGrid>
               </el-col>
             </el-row>
           </template>
-          <template slot="paneR">
-                <div :style="{position:'relative',height: layout.height-startHeight+'px'}">
+          <template slot="paneR" style="background:#FFFFFF;">
+                <div :style="{position:'relative',height: layout.height-startHeight+'px','background':'#FFFFFF'}">
                   <split-pane v-on:resize="onSplitResize" :min-percent='20' :default-percent='topPercent' split="horizontal">
                     <template slot="paneL">
                       <DataGrid
@@ -413,7 +412,7 @@ export default {
       // 本地存储高度名称
       topStorageName: 'ArchiveDeliveryHeight',
       // 非split pan 控制区域高度
-      startHeight: 170,
+      startHeight: 165,
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
@@ -1545,7 +1544,7 @@ export default {
       m.set("id", _self.selectedOneTransfer.ID);
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", _self.currentPage - 1);
-      m.set("orderBy", "");
+      m.set("orderBy", "CREATION_DATE");
       // console.log('pagesize:', _self.pageSize);
       _self
         .axios({

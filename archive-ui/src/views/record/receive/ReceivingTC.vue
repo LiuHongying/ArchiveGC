@@ -143,6 +143,7 @@ export default {
       condition:"",
       condition1:"",
       Check4Visible:false,
+      currentDeliver:null
     };
   },
   mounted() {
@@ -154,6 +155,7 @@ export default {
   methods: {
     init(){
       let _self = this;
+      _self.currentDeliver = null;
       _self.condition = "SELECT ID from ecm_folder where FOLDER_PATH='/移交库/TC'"
       _self.$refs.DeliveryDataGrid.condition ="TYPE_NAME='移交单' AND FOLDER_ID IN("+_self.condition+") AND STATUS <>'整编'"
       _self.tables.Delivery.condition = _self.$refs.DeliveryDataGrid.condition;
@@ -169,6 +171,7 @@ export default {
     },
     //单击行
     onDataGridRowClick: function (row) {
+      this.currentDeliver = row;
       let key1 =
         "SELECT CHILD_ID from ecm_relation where NAME='irel_children'and PARENT_ID ='" +row.ID +"'";
       this.condition1 = "ID IN (" + key1 + ")";
@@ -234,8 +237,9 @@ export default {
       })
       .then(function(response){
         if(response.data.code==1){
-          _self.$refs.Drawing.loadGridInfo();
-          _self.$refs.Drawing.loadGridData();
+          _self.onDataGridRowClick(_self.currentDeliver);
+          // _self.$refs.Drawing.loadGridInfo();
+          // _self.$refs.Drawing.loadGridData();
           _self.$message({
               showClose: true,
               message: "接收成功",

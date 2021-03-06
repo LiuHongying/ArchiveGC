@@ -6,7 +6,7 @@
 
             <template v-for="(item,itemIndex) in citem.ecmFormItems">
                 <el-col v-show="itemId || (!itemId && !item.readOnly)" :span="showCellValue(item)" v-bind:key="itemIndex" style="text-align:left;">
-                  <el-form-item :hidden="item.isHide" :label="item.label+':'">
+                  <el-form-item :hidden="item.isHide" :label="item.label+':'" label-width="150px">
                   {{getDisplayValue(item)}}
                   </el-form-item>
                 </el-col>
