@@ -25,7 +25,8 @@
             <el-dialog
             :visible.sync="updateBoxVisible"
             :append-to-body="true"
-            width="70%"
+            title="案卷属性"
+            width="90%"
             >
                 <ShowProperty
                 ref="ShowBoxProperty"
@@ -107,7 +108,7 @@
                     <el-button type="primary" @click="updateDocContent()">{{$t('application.replace')}}</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="changeBoxAttrs()">修改文件的案卷属性</el-button>
+                    <el-button type="primary" @click="changeBoxAttrs()">案卷属性</el-button>
                 </el-form-item>
                 </el-form>
             </el-row>
@@ -180,7 +181,7 @@ export default {
     data(){
         return{
             // 本地存储高度名称
-            topStorageName: 'SubmissiondcHeight',
+            topStorageName: 'LinkMainReviewerHeight',
             // 非split pan 控制区域高度
             startHeight: 135,
             // 顶部百分比*100
@@ -237,13 +238,6 @@ export default {
         
     },
     mounted(){
-        if(!this.validataPermission()){
-            //跳转至权限提醒页
-            let _self=this;
-            _self.$nextTick(()=>{
-                _self.$router.push({ path: '/NoPermission' })
-            })
-        }
         setTimeout(() => {
             this.topPercent = this.getStorageNumber(this.topStorageName,60)
         }, 300);
@@ -363,10 +357,11 @@ export default {
                 url: _self.uploadUrl
                 })
                 .then(function(response) {
-                _self.importdialogVisible = false;
-                _self.uploading=false;
-                _self.$refs.attachmentDoc.loadGridData();
-                _self.$message({
+                    _self.importdialogVisible = false;
+                    _self.uploading=false;
+                    
+                    _self.$refs.attachmentDoc.loadGridData();
+                    _self.$message({
                         showClose: true,
                         message: _self.$t('application.Import')+_self.$t('message.success'),
                         duration: 2000,
@@ -374,8 +369,8 @@ export default {
                     });
                 })
                 .catch(function(error) {
-                _self.uploading=false;
-                console.log(error);
+                    _self.uploading=false;
+                    console.log(error);
                 });
             },
         rowClick(row){
@@ -410,8 +405,9 @@ export default {
         showUpdateFile(indata) {
             let _self = this;
             if (this.selectedItems && this.selectedItems.length > 0) {
-            this.uploadFile = [];
-            this.udialogVisible = true;
+                this.fileList = [];
+                this.newFileList = [];
+                this.udialogVisible = true;
             }else{
             _self.$message({
                 showClose: true,
@@ -438,13 +434,14 @@ export default {
             let formdata = new FormData();
             formdata.append("id", _self.selectedItems[0].ID);
             if (_self.uploadFile != "") {
-            formdata.append("uploadFile", _self.uploadFile.raw);
+                formdata.append("uploadFile", _self.uploadFile.raw);
             }
             axios
             .post("/dc/updatePrimaryContent", formdata, {
                 "Content-Type": "multipart/form-data",
             })
             .then(function (response) {
+                _self.$refs.mainDataGrid.loadGridData();
                 _self.udialogVisible = false;
                 _self.$message("更新成功!");
                 _self.mainFileUploading = false;
