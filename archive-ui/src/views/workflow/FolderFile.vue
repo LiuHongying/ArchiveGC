@@ -132,6 +132,16 @@ export default {
    
   },
   methods: {
+         clean(){
+      this.selectedRemoveFiles = []
+      this.selectedFiles = []
+      this.$refs.folderSelectDoc.clean()
+      let j = 0
+      for(let i = 0;i<this.$refs.fileList.itemDataList.length;i++){
+        this.$refs.fileList.itemDataList.splice(i, 1);
+        i--
+      }
+    },
     beforeAddFile() {
       let _self=this;
       this.getEcmcfgActive(this.workflowObj.ID,"start",function(ecmCfgActivity){

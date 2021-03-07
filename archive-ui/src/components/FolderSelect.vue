@@ -88,6 +88,9 @@ export default {
         _self.getFolders(_self.folderPath);
     },
     methods:{
+    clean(){
+        this.$refs.mainDataGrid.loadGridData()
+    },
         docSelect(val){
             let _self = this;
             _self.finalDataList = val

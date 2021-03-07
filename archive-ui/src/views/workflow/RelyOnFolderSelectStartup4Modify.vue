@@ -82,6 +82,9 @@
                 console.log(workflowObj);
             },
             methods:{
+            clean(){
+                this.$refs.workflowFile.clean()
+            },
                 loadFormInfo(){
                     this.$refs.ShowProperty.myTypeName=this.workflowObj.FORMNAME;
                     this.$refs.ShowProperty.loadFormInfo();
@@ -246,6 +249,7 @@
                 closePage(){
                     let flag = false;
                     this.$emit("closedialog", flag);
+                    this.$refs.workflowFile.clean()
                 },
                 // 保存文档
                 saveItem()
