@@ -133,6 +133,55 @@ public class DocumentService {
 	}
 	
 	/**
+	 * 删除附件
+	 * @param httpClient
+	 * @param token
+	 * @param ecmClient
+	 * @param parentId
+	 */
+	public void deleteAttachment(CloseableHttpClient httpClient,String token,EcmHttp ecmClient,String parentId) {
+		System.out.println("[METHOD]deleteAttachment");
+		HttpPost httpPost=null;
+		
+		String url = ecmClient.getConfig().getBaseurl()+"/dc/deleteAttachment";
+		httpPost=new HttpPost(url);
+		try {
+			RequestConfig timeoutConfig = RequestConfig.custom()
+					.setConnectTimeout(5000).setConnectionRequestTimeout(1000)
+					.setSocketTimeout(5000).build();
+			httpPost.setConfig(timeoutConfig);
+
+			StringEntity strEntity=new StringEntity(parentId);
+			strEntity.setContentType("text/json");
+			httpPost.addHeader("token", token);
+			httpPost.setEntity(strEntity);
+			
+			HttpResponse response = httpClient.execute(httpPost);
+			
+			StatusLine statusLine = response.getStatusLine();
+			int statusCode = statusLine.getStatusCode();
+			// 请求成功
+	        if (statusCode == 200) {
+	        	HttpEntity responseResult = response.getEntity();
+	        	String responseEntityStr = EntityUtils.toString(responseResult, "UTF-8");
+	        	JSONObject jsonResult = JSON.parseObject(responseEntityStr);
+	        	
+	        	if(jsonResult.containsKey("code")) {
+	        		int code = jsonResult.getInteger("code");
+	        		if(code==1) {
+	        			System.out.println("删除成功！");
+	        		}else {
+	        			System.out.println(jsonResult.getString("message"));
+	        		}
+	        	}
+	        	
+	        }
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * 
 	 * @param httpClient 连接
 	 * @param token 

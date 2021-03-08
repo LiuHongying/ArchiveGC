@@ -26,6 +26,8 @@ public class RunningMain {
 		String password = ecmClient.getConfig().getPassword();
 		String token = ecmClient.login(username, password, httpClient);
 		
+		ds.deleteAttachment(httpClient, token, ecmClient, "a5f69c6a59e14e759adc24689a3da31b");
+		/*
 		//String condition="SYNC_ID='"+tcId+"'";
 		String condition="ID='a5f69c6a59e14e759adc24689a3da31b'";
 		ds.queryDocument(httpClient, token, ecmClient, condition);
@@ -42,7 +44,7 @@ public class RunningMain {
 		ds.upateDocument(httpClient, token, ecmClient, jsObj, stream, "测试文件.pdf");
 		
 		
-		/*
+		
 		
 		InputStream stream = new FileInputStream("c:\\temp\\1.pdf");
 		//创建移交单

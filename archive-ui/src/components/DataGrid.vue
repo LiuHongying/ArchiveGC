@@ -1167,7 +1167,7 @@ export default {
     handleCurrentChange(val) {
       this.currentPage = val;
       //console.log('handleCurrentChange', val);
-      // this.$emit("pagechange", this.currentPage);
+      this.$emit("pagechange", this.currentPage);
       this.loadGridData();
     },
     // 分页 页数改变
@@ -1176,7 +1176,7 @@ export default {
       this.pageSize = val;
       localStorage.setItem("docPageSize", val);
       //console.log('handleSizeChange', val);
-      // this.$emit("pagesizechange", this.pageSize);
+      this.$emit("pagesizechange", this.pageSize);
       this.loadGridData();
     },
     sortchange(column) {
