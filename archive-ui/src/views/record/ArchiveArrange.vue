@@ -983,7 +983,16 @@ export default {
           let code=response.data.code;
           if(code=='1'){
             let fileType = response.data.archiveType
-            _self.copyArchiveItem(fileType,response.data.copyInfo,_self.selectRow.ID,'irel_children');
+            if( fileType == null){
+              _self.$message({
+                showClose: true,
+                message: '读取配置失败，请联系管理员！',
+                duration: 5000,
+                type: "error"
+              });
+            }else{
+              _self.copyArchiveItem(fileType,response.data.copyInfo,_self.selectRow.ID,'irel_children');
+            }
           }else{
             _self.$message({
                 showClose: true,
