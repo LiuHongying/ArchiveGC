@@ -354,7 +354,7 @@
                       <el-row>
                         <el-col :span="24">
                           <DataGrid
-                            ref="leftDataGrid"
+                            ref="innerDataGrid"
                             key="left"
                             v-bind:itemDataList="innerDataList"
                             v-bind:columnList="innerGridList"
@@ -783,7 +783,7 @@ export default {
     },
     //批量导入完成
     onBatchImported(){
-      this.loadGridData();
+      this.loadGridData(this.selectedOneTransfer);
     },
     addReuseToVolume() {
       let _self = this;
@@ -1074,7 +1074,7 @@ export default {
           _self.innerDataList = response.data.data;
           _self.innerDataListFull = response.data.data;
           _self.innerCount = response.data.pager.total;
-         
+         _self.$refs.innerDataGrid.itemCount = response.data.pager.total;
           //console.log(JSON.stringify(response.data.data));
           _self.loading = false;
         })
@@ -1558,8 +1558,8 @@ export default {
         .then(function(response) {
           _self.itemDataList = response.data.data;
           _self.itemDataListFull = response.data.data;
-          _self.itemCount = response.data.pager.total;
-          //console.log(JSON.stringify(response.data.datalist));
+          _self.$refs.mainDataGrid.itemCount = response.data.pager.total;
+          console.log(JSON.stringify(_self.itemCount));
           _self.loading = false;
         })
         .catch(function(error) {
@@ -1632,6 +1632,7 @@ export default {
           _self.innerDataList = response.data.data;
           _self.innerDataListFull = response.data.data;
           _self.innerCount = response.data.pager.total;
+          _self.$refs.innerDataGrid.itemCount = response.data.pager.total;
           //console.log(JSON.stringify(response.data.datalist));
           _self.loading = false;
         })
@@ -1643,18 +1644,21 @@ export default {
     pageSizeChange(val) {
       this.pageSize = val;
       localStorage.setItem("docPageSize", val);
-      this.loadGridData();
+      this.$refs.mainDataGrid.pageSize = val;
+      this.loadGridData(this.selectedOneTransfer);
     },
     // 分页 当前页改变
     pageChange(val) {
       this.currentPage = val;
-      this.loadGridData();
+      this.$refs.mainDataGrid.currentPage = val;
+      this.loadGridData(this.selectedOneTransfer);
       //console.log('handleCurrentChange', val);
     },
     // 分页 当前页改变
     handleCurrentChange(val) {
       this.currentPage = val;
-      this.loadGridData();
+      this.$refs.mainDataGrid.currentPage = val;
+      this.loadGridData(this.selectedOneTransfer);
       //console.log('handleCurrentChange', val);
     },
     //刷新文件夹数据

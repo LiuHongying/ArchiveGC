@@ -2014,7 +2014,7 @@ export default {
       }
       _self.mainParam.condition=key;
       _self.mainParam.folderId=indata.id;
-      _self.$refs.mainDataGrid.pageIndex = 1;
+      _self.$refs.mainDataGrid.currentPage = 1;
       _self.$refs.mainDataGrid.loadCustomGridInfo(indata.gridView);
       //_self.$refs.leftDataGrid.cachePrefix = indata.gridView;
       _self.$refs.leftDataGrid.itemDataList = [];
