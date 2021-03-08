@@ -6,6 +6,8 @@
       <el-option label="商务文件副本" value="商务文件移交单副本"></el-option>
       </el-select>
     <button @click="printPage" v-print="'#print'">打印</button>
+    <!-- <button @click="exportdata()" >导出所有EXCEL</button> -->
+    <button @click="exportExcel()" >导出所有EXCEL</button>
      <el-container style="width:100%;height:540px;overflow:auto;">
       <div id='print' ref='print' style="height:100%;width:100%;">
          <div v-for="(item,idx) in archiveObjects" :key="'divk'+idx" :style="'width:'+divWidth+';padding:5px;'">
@@ -21,11 +23,13 @@
 import PrintVolumesGrid from '@/views/record/PrintVolumesGrid.vue'
 import Print from '@/plugins/print'
 import Vue from 'vue';
+import ExcelUtil from "@/utils/excel.js";
 Vue.use(Print)
 export default {
    name: 'printArchiveInnerFile',
    components: { 
-     PrintVolumesGrid:PrintVolumesGrid
+     PrintVolumesGrid:PrintVolumesGrid,
+     ExcelUtil:ExcelUtil
    },
   // name: "printPage",
   data() {
@@ -34,7 +38,10 @@ export default {
       isBusiness:false,
       Choice:"通用打印",
       condition:"and IS_HIDDEN=0",
-      selectedRows:[]
+      selectedRows:[],
+      condition4Export:"",
+      ids:[],
+      gridViewName:"ArrangeInnerGridPrint"
     };
   },
   mounted() {
@@ -46,20 +53,48 @@ export default {
     archiveObjects:{type:Array,default:() => []},
   },
   methods: {
+    exportExcel(){
+      if(this.ids.length!=0){
+        let id4Export=""      //准备进行导出工作，先把ids数组转换成字符串
+        for(let i = 0;i<this.ids.length;i++){
+          id4Export += "'"
+          id4Export += this.ids[i]
+          id4Export +="'"
+          if(i!=this.ids.length-1){
+            id4Export += ","
+          }
+        }
+      this.condition4Export=" id in (select CHILD_ID AS ID from ecm_relation where PARENT_ID IN ("+id4Export+") )"
+      }
+      let dataUrl = "/exchange/doc/export";
+      let params = {
+        gridName: this.gridViewName,
+        lang: "zh-cn",
+        condition: this.condition4Export,
+        filename:
+          "导出文件列表总和_" + new Date().Format("yyyy-MM-dd hh:mm:ss") + ".xlsx",
+        sheetname: "Result",
+      };
+      //console.log(params)
+      ExcelUtil.export(params);
+    },
     onChoiceChange(){
       let _self = this
       if(this.Choice=='商务文件移交单正本'){
         this.condition = "and C_TYPE1='正本' and is_hidden=0"
+        this.gridViewName = "BusinessFilePrintGrid"
         //this.$refs.PrintVolumesGrid.condition = "and C_TYPE1='正本'"
         this.refreshDataGrid(this.selectedRows,"BusinessFilePrintGrid")
       }
       if(this.Choice=='商务文件移交单副本'){
         this.condition = "and C_TYPE1='副本' and is_hidden=0"
+        this.gridViewName = "BusinessFilePrintGrid4Content"
         // this.$refs.PrintVolumesGrid.condition = "and C_TYPE1='副本'"
         this.refreshDataGrid(this.selectedRows,"BusinessFilePrintGrid4Content")
       }
       if(this.Choice=='通用打印'){
       this.condition = "and is_hidden=0"
+      this.gridViewName = "ArrangeInnerGridPrint"
       //this.$refs.PrintVolumesGrid.condition = ''
       this.refreshDataGrid(this.selectedRows,"ArrangeInnerGridPrint")
       }
@@ -70,6 +105,8 @@ export default {
       if(objs){
          setTimeout(() => {
         for(var i=0;i<objs.length;i++){
+          _self.ids[i] = objs[i].ID
+          console.log(_self.ids)
           _self.$refs['innerGrid'+i][0].condition = _self.condition
           _self.$refs['innerGrid'+i][0].loadArchiveData(objs[i].ID,gridName);
         }},100);
