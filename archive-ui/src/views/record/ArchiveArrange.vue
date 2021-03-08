@@ -84,7 +84,7 @@
     </el-dialog>
     
     <el-dialog
-      width="96%"
+      width="100%"
       :title="dialogName+$t('application.property')"
       :visible.sync="propertyVisible"
       @close="propertyVisible = false"
@@ -93,7 +93,7 @@
       <ShowProperty
         ref="ShowProperty"
         @onSaved="onSaved"
-        width="560"
+         width="100%"
         :folderPath="folderPath"
         v-bind:itemId="selectedItemId"
         v-bind:folderId="currentFolder.id"

@@ -88,7 +88,7 @@ public class TCService {
 				EcmDocument doc = documentService.getObjectById(token, id);
 				if(doc != null) {
 					mp.put("uid", (String)doc.getAttributeValue("SYN_ID"));
-					mp.put("message", message);
+					mp.put("msg", message);
 					list.add(mp);
 				}
 			}

@@ -42,7 +42,7 @@
         :title="typeName + $t('application.property')"
         :visible.sync="propertyVisible"
         @close="propertyVisible = false"
-        width="96%"
+        width="100%"
         style="text-align: center"
         :close-on-click-modal="false"
       >

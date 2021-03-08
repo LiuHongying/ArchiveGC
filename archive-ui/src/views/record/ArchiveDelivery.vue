@@ -122,7 +122,7 @@
       :title="dialogName+$t('application.property')"
       :visible.sync="propertyVisible"
       @close="propertyVisible = false"
-      width="96%"
+      width="100%"
       :close-on-click-modal="false"
     >
       <ShowProperty

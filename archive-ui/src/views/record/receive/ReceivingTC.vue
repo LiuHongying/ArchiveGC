@@ -126,7 +126,7 @@ export default {
           condition: "",
           isInitData:false,
           isshowCustom:false,
-          isEditProperty:false,
+          isEditProperty:true,
           isShowChangeList:false,
           isshowOption:true,
           isshowSelection:true,
