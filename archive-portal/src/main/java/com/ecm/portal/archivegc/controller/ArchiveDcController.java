@@ -174,6 +174,33 @@ public class ArchiveDcController extends ControllerAbstract {
 		return mp;
 
 	}
+	
+	@RequestMapping(value = "/dc/getFileArchiveConfig", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> getFileArchiveConfig(@RequestBody String childId) throws Exception {
+		Map<String, Object> mp = new HashMap<String, Object>();
+				EcmDocument doc = documentService.getObjectById(getToken(), childId);
+				
+				if (doc != null) {
+					String condition = " TYPE_NAME='案卷文件配置' and C_TO='" + doc.getTypeName() + "'";
+					
+					AttrCopyCfgEntity en = customCacheService.getAttrCopyCfgFromChild(getToken(), doc.getTypeName());
+					if (en != null) {
+						Map<String, Object> valmp = new HashMap<String, Object>();
+						for (String attr : en.getAttrNames().keySet()) {
+							valmp.put(en.getAttrNames().get(attr), doc.getAttributeValue(attr));
+						}
+						mp.put("copyInfo", valmp);
+						mp.put("archiveType", en.getFromType());
+					}
+
+				}
+			mp.put("code", ActionContext.SUCESS);
+		
+
+		return mp;
+
+	}
 
 	/**
 	 * 根据配置获取卷盒下的文件类型

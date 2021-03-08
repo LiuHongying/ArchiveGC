@@ -266,6 +266,15 @@
                       <el-form-item>
                         <TypeSelectComment ref="TypeSelectComment" :currentFolder="currentFolder" @afterSelecteType="newArchiveItem"></TypeSelectComment>
                       </el-form-item>
+                      <el-form-item v-if="currentFolder && currentFolder.folderPath && currentFolder.folderPath.indexOf('工程设计')>0">
+                      <el-button 
+                        type="primary"
+                        plain
+                        size="small"
+                        @click="createArchiveByChild"
+                        title="著录案卷"
+                      >著录案卷</el-button>
+                      </el-form-item>
                       <el-form-item>
                         <el-button
                         type="primary"
@@ -772,7 +781,8 @@ export default {
       },
       loadInfo:false,
       volumeInArchiveGridName:"",
-      innerGridName:""
+      innerGridName:"",
+      childFileId:''
     };
   },
   
@@ -958,6 +968,50 @@ export default {
           console.log('(*￣︶￣)')
       }
     },
+    createArchiveByChild(){
+      let _self = this;
+      if(_self.selectRow.ID!=undefined && _self.selectRow.TYPE_NAME.indexOf('案卷')<0){
+        _self
+        .axios({
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          },
+          method: "post",
+          data: _self.selectRow.ID,
+          url: "/dc/getFileArchiveConfig"
+        }).then(function(response){
+          let code=response.data.code;
+          if(code=='1'){
+            let fileType = response.data.archiveType
+            _self.copyArchiveItem(fileType,response.data.copyInfo,_self.selectRow.ID,'irel_children');
+          }else{
+            _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          }
+        }).catch(function(error) {
+          // _self.$message("添加失败！");
+          _self.$message({
+                showClose: true,
+                message: '添加失败！',
+                duration: 5000,
+                type: "error"
+              });
+          console.log(error);
+        });
+      }else{
+         _self.$message({
+                showClose: true,
+                message: "请选择一条文件著录",
+                duration: 5000,
+                type: "warning"
+              });
+        return;
+      }
+    },
     changeDataGridName(val){
       this.innerGridName = val;
     },
@@ -995,8 +1049,9 @@ export default {
       this.setStorageNumber(this.topStorageName, topPercent)
       //console.log(JSON.stringify(topPercent))
     },
-    copyArchiveItem(typeName,copyInfo) {
+    copyArchiveItem(typeName,copyInfo,childId,relationName) {
       let _self = this;
+      _self.childFileId = childId;
       _self.newChildDoc = false;
       if (_self.currentFolder.id) {
         _self.selectedItemId = "";
@@ -1135,7 +1190,7 @@ export default {
           let code=response.data.code;
           if(code=='1'){
             let fileType = row.TYPE_NAME
-            _self.copyArchiveItem(fileType,response.data.copyInfo);
+            _self.copyArchiveItem(fileType,response.data.copyInfo,null,null);
           }else{
             _self.$message({
                 showClose: true,
@@ -2210,6 +2265,10 @@ export default {
         }
         m.set("folderId",_self.currentFolder.id);
         m.set("STATUS","整编");
+        if(_self.childFileId !=null && _self.childFileId !=''){
+          m.set("childFileId", _self.childFileId);
+          _self.childFileId = '';
+        }
       }
       if(_self.extendMap){
         _self.extendMap.forEach(function(e,b,i){
