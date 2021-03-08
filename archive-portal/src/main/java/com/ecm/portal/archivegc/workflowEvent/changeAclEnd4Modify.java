@@ -17,8 +17,8 @@ import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
 import com.ecm.icore.service.IEcmSession;
-@Component(value = "changeAclListener")
-public class changeAclListener implements JavaDelegate {
+@Component(value = "changeAclEnd4Modify")
+public class changeAclEnd4Modify implements JavaDelegate {
 	@Autowired
 	private AuthService authService;
 	@Autowired
@@ -41,32 +41,32 @@ public class changeAclListener implements JavaDelegate {
 			EcmDocument ecmObject = documentService.getObjectById(ecmSession.getToken(), formId);
 			Map<String,Object> ecmAttr = ecmObject.getAttributes();
 			//开始改文件Acl
-			String sql = "select * from ecm_relation where parent_id = '"+formId+"'";		
-			List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);		//找到表单挂载文件关系集
-			if(mps!=null) {				//有文件就改，没文件就跳过
-			for(Map<String,Object> mp : mps) {
-			//String id = mp.get("ID").toString();
-			String child_id = mp.get("CHILD_ID").toString();
-			//开始改文件本体ACL
-			EcmDocument ecm = documentService.getObjectById(ecmSession.getToken(), child_id);
-			Map<String,Object> ecmMp = ecm.getAttributes();
-			ecmMp.put("ACL_NAME", "acl_all_write");
-			documentService.updateObject(ecmSession.getToken(), ecmMp);
-			//文件本体ACL修改完毕，下面执行卷内文件修改操作
-			String sql4AJ = "select * from ecm_relation where parent_id = '"+child_id+"'";
-			List<Map<String,Object>> AJmps = documentService.getMapList(ecmSession.getToken(), sql4AJ);
-			if(AJmps!=null) {
-			for(Map<String,Object> AJmp:AJmps) {
-				String childId = AJmp.get("CHILD_ID").toString();
-				EcmDocument child = documentService.getObjectById(ecmSession.getToken(), childId);
-				Map<String,Object> childAttr = child.getAttributes();
-				childAttr.put("ACL_NAME", "acl_all_write");
-				documentService.updateObject(ecmSession.getToken(),childAttr);
+				String sql = "select * from ecm_relation where parent_id = '"+formId+"'";		
+				List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);		//找到表单挂载文件关系集
+				if(mps!=null) {				//有文件就改，没文件就跳过
+				for(Map<String,Object> mp : mps) {
+				//String id = mp.get("ID").toString();
+				String child_id = mp.get("CHILD_ID").toString();
+				//开始改文件本体ACL
+				EcmDocument ecm = documentService.getObjectById(ecmSession.getToken(), child_id);
+				Map<String,Object> ecmMp = ecm.getAttributes();
+				ecmMp.put("ACL_NAME",ecmMp.get("C_REVIEWER7").toString());				//把ACL该回去
+				documentService.updateObject(ecmSession.getToken(), ecmMp);
+				//文件本体ACL修改完毕，下面执行卷内文件修改操作
+				String sql4AJ = "select * from ecm_relation where parent_id = '"+child_id+"'";
+				List<Map<String,Object>> AJmps = documentService.getMapList(ecmSession.getToken(), sql4AJ);
+				if(AJmps!=null) {
+				for(Map<String,Object> AJmp:AJmps) {
+					String childId = AJmp.get("CHILD_ID").toString();
+					EcmDocument child = documentService.getObjectById(ecmSession.getToken(), childId);
+					Map<String,Object> childAttr = child.getAttributes();
+					childAttr.put("ACL_NAME", childAttr.get("C_REVIEWER7").toString());
+					documentService.updateObject(ecmSession.getToken(),childAttr);		//把ACL该回去
+					}
 				}
-			}
 
+			}
 		}
-	}
 				
 		
 	}

@@ -17,8 +17,8 @@ import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
 import com.ecm.icore.service.IEcmSession;
-@Component(value = "changeAclListener")
-public class changeAclListener implements JavaDelegate {
+@Component(value = "changeAcl4Modify")
+public class changeAcl4Modify implements JavaDelegate {
 	@Autowired
 	private AuthService authService;
 	@Autowired
@@ -50,7 +50,8 @@ public class changeAclListener implements JavaDelegate {
 			//开始改文件本体ACL
 			EcmDocument ecm = documentService.getObjectById(ecmSession.getToken(), child_id);
 			Map<String,Object> ecmMp = ecm.getAttributes();
-			ecmMp.put("ACL_NAME", "acl_all_write");
+			ecmMp.put("C_REVIEWER7", ecmMp.get("ACL_NAME").toString());			//记下原来的ACL，待会儿改回去
+			ecmMp.put("ACL_NAME", "acl_pre_archive");
 			documentService.updateObject(ecmSession.getToken(), ecmMp);
 			//文件本体ACL修改完毕，下面执行卷内文件修改操作
 			String sql4AJ = "select * from ecm_relation where parent_id = '"+child_id+"'";
@@ -60,7 +61,8 @@ public class changeAclListener implements JavaDelegate {
 				String childId = AJmp.get("CHILD_ID").toString();
 				EcmDocument child = documentService.getObjectById(ecmSession.getToken(), childId);
 				Map<String,Object> childAttr = child.getAttributes();
-				childAttr.put("ACL_NAME", "acl_all_write");
+				childAttr.put("C_REVIEWER7",childAttr.get("ACL_NAME").toString());	//记下原来的ACL，待会儿改回去
+				childAttr.put("ACL_NAME", "acl_pre_archive");
 				documentService.updateObject(ecmSession.getToken(),childAttr);
 				}
 			}

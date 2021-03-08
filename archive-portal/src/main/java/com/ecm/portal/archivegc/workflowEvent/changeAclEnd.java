@@ -45,8 +45,15 @@ public class changeAclEnd implements JavaDelegate {
 				List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);		//找到表单挂载文件关系集
 				if(mps!=null) {				//有文件就改，没文件就跳过
 				for(Map<String,Object> mp : mps) {
-				String id = mp.get("ID").toString();
-				String sql4AJ = "select * from ecm_relation where parent_id = '"+id+"'";
+				//String id = mp.get("ID").toString();
+				String child_id = mp.get("CHILD_ID").toString();
+				//开始改文件本体ACL
+				EcmDocument ecm = documentService.getObjectById(ecmSession.getToken(), child_id);
+				Map<String,Object> ecmMp = ecm.getAttributes();
+				ecmMp.put("ACL_NAME", "acl_pre_archive");
+				documentService.updateObject(ecmSession.getToken(), ecmMp);
+				//文件本体ACL修改完毕，下面执行卷内文件修改操作
+				String sql4AJ = "select * from ecm_relation where parent_id = '"+child_id+"'";
 				List<Map<String,Object>> AJmps = documentService.getMapList(ecmSession.getToken(), sql4AJ);
 				if(AJmps!=null) {
 				for(Map<String,Object> AJmp:AJmps) {

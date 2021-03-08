@@ -423,13 +423,13 @@ export default {
         rowClick(row){
             this.selectRow=row;
             this.parentId4UpdateMain = row.ID
-             if(row.C_ITEM_TYPE=='案卷'){
-                 this.isEdit=false
-             }
-             if(row.C_ITEM_TYPE!='案卷'){
-                 this.isEdit=true
-             }
-            console.log(this.isEdit)
+            //  if(row.C_ITEM_TYPE=='案卷'){
+            //      this.isEdit=false
+            //  }
+            //  if(row.C_ITEM_TYPE!='案卷'){
+            //      this.isEdit=true
+            //  }
+            // console.log(this.isEdit)
             this.parentId=row.ID;
             let _self=this;
             _self.$nextTick(()=>{
