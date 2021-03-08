@@ -349,7 +349,7 @@
                               </span>
                             </el-dropdown-item>
                             <el-dropdown-item divided>
-                              <span @click="beforePrintDocuments(selectedItems,'BorrowPrintGrid','文件清单')" style="display:block;">
+                              <span @click="beforePrintDocuments(selectedItems,'BorrowPrintGrid','PrintDelivery')" style="display:block;">
                                 <i class="el-icon-printer"></i>
                                 打印文件清单
                               </span>
