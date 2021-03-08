@@ -29,6 +29,7 @@ import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
 import com.ecm.core.service.RelationService;
 import com.ecm.portal.archivegc.entity.ReplyCfgEntity;
+import com.ecm.portal.archivegc.tc.TCService;
 import com.ecm.portal.controller.ControllerAbstract;
 import com.ecm.portal.service.CustomCacheService;
 import com.ecm.portal.util.CustomInfo;
@@ -48,6 +49,10 @@ public class Receiving4TC extends ControllerAbstract {
 	
 	@Autowired
 	private FolderPathService folderPathService;
+	
+	@Autowired
+	private TCService tCService;
+	
     /**
 	 *接收文档
 	 */
@@ -89,14 +94,7 @@ public class Receiving4TC extends ControllerAbstract {
 			String idsStr=args.get("ids").toString();
 			List<String> list = JSONUtils.stringToArray(idsStr);
 			String rejectCommon=args.get("rejectCommon")!=null?args.get("rejectCommon").toString():"";
-			for(String childId : list) {
-				EcmDocument doc= documentService.getObjectById(getToken(), childId);
-				doc.setStatus("已驳回");
-				doc.addAttribute("C_REJECT_COMMENT", rejectCommon);
-				doc.addAttribute("C_REJECTOR", this.getSession().getCurrentUser().getUserName());
-				doc.addAttribute("C_REJECT_DATE", DBFactory.getDBConn().getDBUtils().getDBDateNow());
-				documentService.updateObject(getToken(), doc, null);
-			}
+			tCService.rejectToTc(getToken(), list, rejectCommon);
 			mp.put("code", ActionContext.SUCESS);
 			
 		}catch (Exception e) {

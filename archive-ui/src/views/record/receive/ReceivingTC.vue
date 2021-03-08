@@ -23,9 +23,6 @@
                 <el-form-item>
                     <el-button type="primary" plain @click="submitArrange()">提交整编</el-button>
                 </el-form-item>
-                <el-form-item>
-                    <el-button type="warning" plain @click="beforeRejectDE()">驳回</el-button>
-                </el-form-item>
               </el-form>
             </el-row>
             <el-row>
@@ -83,7 +80,7 @@
                 >
                 <template slot="sequee" slot-scope="scope">
                   <span :style="(scope.data.row['STATUS']!=null
-                  &&scope.data.row['STATUS']=='已驳回')?{'background':'red'}:''">{{(scope.currentPage-1) * scope.pageSize+ scope.data.$index+1}}</span>
+                  &&scope.data.row['STATUS']=='驳回')?{'background':'red'}:''">{{(scope.currentPage-1) * scope.pageSize+ scope.data.$index+1}}</span>
                 </template>
                 </DataGrid>
               </el-col>
@@ -206,7 +203,7 @@ export default {
       
       var i;
       for (i in tab) {
-          if(tab[i]["STATUS"]=="已驳回"){
+          if(tab[i]["STATUS"]=="驳回"){
              _self.$message({
             showClose: true,
             message:"文件"+tab[i]["CODING"]+"为驳回文件不能接收",
@@ -286,11 +283,11 @@ export default {
       }
       else{
         _self.selectedDCItems.forEach(function(item){
-          if(item.STATUS=='已驳回'){
+          if(item.STATUS=='驳回'){
             _self.$message({
                 showClose: true,
                 message: "不能重复驳回",
-                duration: 2000,
+                duration: 3000,
                 type: 'warning' 
             });
             return
@@ -347,7 +344,7 @@ export default {
         }else{
           _self.$message({
             showClose: true,
-            message: _self.$t("message.operationFaild"),
+            message: _self.$t("message.operationFaild")+":"+ response.data.message,
             duration: 5000,
             type: 'error'
           });
