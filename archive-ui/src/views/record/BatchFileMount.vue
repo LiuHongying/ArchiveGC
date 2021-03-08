@@ -25,7 +25,7 @@
                   </el-upload>
                 </el-form-item>
               </el-col>
-              <el-col :span="16" style="float: left;text-align:left;padding:5px;">
+              <el-col :span="16" style="float: center;text-align:center;padding:5px;">
                 <el-button type="primary" plain icon="el-icon-upload2" @click="batchMount()">开始挂载</el-button>
                 <el-button plain type="primary" @click="cleanFiles()">{{$t('message.ClearFiles')}}</el-button>
               </el-col>
