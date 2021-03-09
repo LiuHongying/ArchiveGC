@@ -123,8 +123,60 @@ public class TCService {
 		return false;
 	}
 	
+	public void updateTCStatus(String token, List<String> ids) throws Exception {
+		String url  = env.getProperty("tc.url");
+		if(ids.size()>0) {
+			String idStr = String.join(",", ids);
+			String msg = updateStatus(url,idStr);
+			if(!"1".equals("msg")) {
+				throw new Exception(msg);
+			}
+		}
+	}
+	
+	private String updateStatus(String url,String jsObj) {
+		HttpPost httpPost=new HttpPost(url+"/putArchiveStatus");
+		logger.info(url);
+		try {
+			RequestConfig timeoutConfig = RequestConfig.custom()
+					.setConnectTimeout(30000).setConnectionRequestTimeout(5000)
+					.setSocketTimeout(30000).build();
+			httpPost.setConfig(timeoutConfig);
+			httpPost.getParams().setParameter("uids", jsObj);
+			
+			HttpResponse response = httpClient.execute(httpPost);
+			
+			StatusLine statusLine = response.getStatusLine();
+			int statusCode = statusLine.getStatusCode();
+			// 请求成功
+	        if (statusCode == 200) {
+	        	HttpEntity responseResult = response.getEntity();
+	        	String responseEntityStr = EntityUtils.toString(responseResult, "UTF-8");
+	        	logger.info(responseEntityStr);
+	        	JSONObject jsonResult = JSON.parseObject(responseEntityStr);
+	        	
+	        	if(jsonResult.containsKey("code")) {
+	        		String code = jsonResult.getString("code");
+	        		if("1".equals(code)) {
+	        			return "1";
+	        		}else {
+	        			return jsonResult.getString("message");
+	        		}
+	        	}else {
+	        		return "返回参数错误:"+jsonResult.toJSONString();
+	        	}
+	        	
+	        }else {
+	        	return "调用TC接口状态错误::"+statusCode;
+	        }
+		}catch (Exception e) {
+			e.printStackTrace();
+			return e.getMessage();
+		}
+	}
+	
 	private String executeMethod(String url,String jsObj) {
-		HttpPost httpPost=new HttpPost(url);
+		HttpPost httpPost=new HttpPost(url+"/returnWF");
 		logger.info(url);
 		try {
 			RequestConfig timeoutConfig = RequestConfig.custom()

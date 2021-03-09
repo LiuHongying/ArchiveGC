@@ -162,6 +162,10 @@ export default {
   width:90% !important;
 }
 
+.redlabel .el-form-item__label{
+  color: #ff0000 ;
+}
+
 /* .el-message{
   background-color: #67c23acc !important;
 }

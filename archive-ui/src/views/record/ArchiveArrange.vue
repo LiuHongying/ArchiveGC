@@ -1060,7 +1060,11 @@ export default {
     },
     copyArchiveItem(typeName,copyInfo,childId,relationName) {
       let _self = this;
-      _self.childFileId = childId;
+      if(childId != null){
+        _self.childFileId = _self.selectedItems;
+      }else{
+        _self.childFileId = null;
+      }
       _self.newChildDoc = false;
       if (_self.currentFolder.id) {
         _self.selectedItemId = "";
@@ -2280,8 +2284,12 @@ export default {
         m.set("folderId",_self.currentFolder.id);
         m.set("STATUS","整编");
         if(_self.childFileId !=null && _self.childFileId !=''){
-          m.set("childFileId", _self.childFileId);
-          _self.childFileId = '';
+          let ids=new Array();
+          _self.childFileId.forEach((e)=>{
+            ids.push(e.ID);
+          })
+          m.set("childFileId", ids);
+          
         }
       }
       if(_self.extendMap){
@@ -2313,6 +2321,7 @@ export default {
             let code = response.data.code;
             //console.log(JSON.stringify(response));
             if (code == 1) {
+              _self.childFileId = '';
               // _self.$message(_self.$t('message.newSuccess'));
               _self.$message({
                 showClose: true,
@@ -2330,7 +2339,7 @@ export default {
                   }
                  _self.loadGridData(_self.currentFolder);
               }
-              
+             
               
             } else {
               // _self.$message(_self.$t('message.newFailured'));

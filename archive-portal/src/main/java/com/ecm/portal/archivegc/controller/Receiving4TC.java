@@ -1,6 +1,7 @@
 package com.ecm.portal.archivegc.controller;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -117,6 +118,7 @@ public class Receiving4TC extends ControllerAbstract {
 			Map<String, Object> args = JSONUtils.stringToMap(argStr);
 			String idsStr=args.get("ids").toString();
 			List<String> list = JSONUtils.stringToArray(idsStr);
+			List<String> tcIds = new ArrayList<String>();
 			for(String id : list) {
 				//查询移交单下的文件的id
 				String sql = "select CHILD_ID from ecm_relation where PARENT_ID='"+id+"' and NAME !='附件'";
@@ -125,6 +127,9 @@ public class Receiving4TC extends ControllerAbstract {
 					//查询移交单下文件的属性信息
 					Map<String, Object> doc = documentService.getObjectMapById(getToken(), a.get("CHILD_ID").toString());
 					String coding=doc.get("CODING").toString();
+					if(doc.get("SYN_ID")!=null) {
+						tcIds.add((String)doc.get("SYN_ID"));
+					}
 					//查询是否存在相同coding的文件
 					String condition = "CODING='"+coding+"' and C_ITEM_TYPE='文件' and id !='"+a.get("CHILD_ID")+"'";
 					List<EcmDocument> res = documentService.getObjects(getToken(), condition);
@@ -172,6 +177,7 @@ public class Receiving4TC extends ControllerAbstract {
 				}
 				documentService.updateStatus(getToken(), id, "整编", "");
 			}
+			tCService.updateTCStatus(getToken(), tcIds);
 			mp.put("code", ActionContext.SUCESS);
 			
 		}catch (Exception e) {
