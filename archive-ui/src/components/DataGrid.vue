@@ -665,6 +665,9 @@ export default {
     },
     // 加载表格数据
     loadGridData(gvname) {
+      if(this.dataUrl=="" || this.dataUrl  == null){
+        return;
+      }
       let _self = this;
       _self.selectedRows = [];
       // let tbHeight = _self.tableHeight;
