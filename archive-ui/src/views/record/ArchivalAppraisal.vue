@@ -234,7 +234,7 @@ export default {
       }
       _self.$refs.ArchiveAppraisal.condition=key;
       _self.$refs.ArchiveAppraisal.currentPage = 1;
-      _self.$refs.AppraisalFile.itemDataList=[];
+      _self.$refs.AppraisalFile.cleanData();
       _self.$refs.ArchiveAppraisal.loadGridInfo();
       _self.$refs.ArchiveAppraisal.loadGridData();
     },
@@ -280,7 +280,7 @@ export default {
             });
             _self.propertyVisible = false;
             _self.search()
-            _self.$refs.AppraisalFile.itemDataList=[];
+            _self.$refs.AppraisalFile.cleanData();
           } else {
             _self.$message({
               showClose: true,

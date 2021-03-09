@@ -84,7 +84,7 @@
     </el-dialog>
     
     <el-dialog
-      width="96%"
+      width="100%"
       :title="dialogName+$t('application.property')"
       :visible.sync="propertyVisible"
       @close="propertyVisible = false"
@@ -93,7 +93,7 @@
       <ShowProperty
         ref="ShowProperty"
         @onSaved="onSaved"
-        width="560"
+         width="100%"
         :folderPath="folderPath"
         v-bind:itemId="selectedItemId"
         v-bind:folderId="currentFolder.id"
@@ -983,7 +983,16 @@ export default {
           let code=response.data.code;
           if(code=='1'){
             let fileType = response.data.archiveType
-            _self.copyArchiveItem(fileType,response.data.copyInfo,_self.selectRow.ID,'irel_children');
+            if( fileType == null){
+              _self.$message({
+                showClose: true,
+                message: '读取配置失败，请联系管理员！',
+                duration: 5000,
+                type: "error"
+              });
+            }else{
+              _self.copyArchiveItem(fileType,response.data.copyInfo,_self.selectRow.ID,'irel_children');
+            }
           }else{
             _self.$message({
                 showClose: true,
@@ -1548,7 +1557,7 @@ export default {
         _self.topPercent=65;
         _self.$nextTick(()=>{
           if(_self.$refs.leftDataGrid){
-             _self.$refs.leftDataGrid.itemDataList = [];
+             _self.$refs.leftDataGrid.cleanData();
           }
         });
         
@@ -1961,7 +1970,7 @@ export default {
       }
       _self.$nextTick(()=>{
         if(_self.$refs.leftDataGrid){
-             _self.$refs.leftDataGrid.itemDataList = [];
+             _self.$refs.leftDataGrid.cleanData();
              
              _self.$refs.leftDataGrid.loadGridData();
           }
@@ -2022,10 +2031,11 @@ export default {
     // 表格行选择
     selectChange(val) {
       this.ChoiceTypeName=''
-      this.ChoiceTypeName = val[0].TYPE_NAME
-      this.getTypeNamesByMainList(this.ChoiceTypeName)
-      this.selectedItems = val;
-      
+      if(val && val[0] && val[0].TYPE_NAME){
+        this.ChoiceTypeName = val[0].TYPE_NAME
+        this.getTypeNamesByMainList(this.ChoiceTypeName)
+        this.selectedItems = val;
+      }
     },
     // 表格行选择
     selectOutChange(val) {
@@ -2034,9 +2044,11 @@ export default {
     },
     selectInnerChange(val) {
       this.ChoiceTypeName=''
-      this.ChoiceTypeName = val[0].TYPE_NAME
-      this.getTypeNamesByMainList(this.ChoiceTypeName)
-      this.selectedInnerItems = val;
+      if(val && val[0] && val[0].TYPE_NAME){
+        this.ChoiceTypeName = val[0].TYPE_NAME
+        this.getTypeNamesByMainList(this.ChoiceTypeName)
+        this.selectedInnerItems = val;
+      }
     },
     
     // 加载表格数据
@@ -2072,7 +2084,9 @@ export default {
       _self.$refs.mainDataGrid.currentPage = 1;
       _self.$refs.mainDataGrid.loadCustomGridInfo(indata.gridView);
       //_self.$refs.leftDataGrid.cachePrefix = indata.gridView;
-      _self.$refs.leftDataGrid.itemDataList = [];
+      if(_self.$refs.leftDataGrid){
+        _self.$refs.leftDataGrid.cleanData();
+      }
     },
     beforeInnerModify(){
       this.isInnerModify = true
@@ -2312,7 +2326,7 @@ export default {
                
               }else{
                  if(_self.$refs.leftDataGrid){
-                    _self.$refs.leftDataGrid.itemDataList = [];
+                    _self.$refs.leftDataGrid.cleanData();
                   }
                  _self.loadGridData(_self.currentFolder);
               }
@@ -2555,7 +2569,7 @@ export default {
               type: "success"
             });
             if(_self.$refs.leftDataGrid){
-              _self.$refs.leftDataGrid.itemDataList = [];
+              _self.$refs.leftDataGrid.cleanData();
             }
             _self.searchItem();
           })
@@ -2699,7 +2713,7 @@ export default {
               type: "success"
             });
             if(_self.$refs.leftDataGrid){
-              _self.$refs.leftDataGrid.itemDataList = [];
+              _self.$refs.leftDataGrid.cleanData();
             }
             _self.searchItem();
           })
@@ -2734,7 +2748,7 @@ export default {
       });
       _self.updateData(p,function(){
         if(_self.$refs.leftDataGrid){
-             _self.$refs.leftDataGrid.itemDataList = [];
+             _self.$refs.leftDataGrid.cleanData();
           }
         _self.searchItem();
       });
@@ -2820,7 +2834,7 @@ export default {
                 if (response.data.code == "1") {
                   _self.loadGridData(_self.currentFolder);
                   if(_self.$refs.leftDataGrid){
-                      _self.$refs.leftDataGrid.itemDataList = [];
+                      _self.$refs.leftDataGrid.cleanData();
                     }
                   // _self.showInnerFile(null);
                   // _self.$message(_self.$t("message.fetchInformationSuccess"));
@@ -2881,7 +2895,7 @@ export default {
       });
       _self.updateData(p,function(){
         if(_self.$refs.leftDataGrid){
-             _self.$refs.leftDataGrid.itemDataList = [];
+             _self.$refs.leftDataGrid.cleanData();
           }
           _self.pieceNumVisible = false;
         _self.searchItem();
@@ -2986,7 +3000,7 @@ export default {
           _self.loadGridData(_self.currentFolder);
           // _self.showInnerFile(null);
           if(_self.$refs.leftDataGrid){
-             _self.$refs.leftDataGrid.itemDataList = [];
+             _self.$refs.leftDataGrid.cleanData();
           }
          
           let code = response.data.code;
@@ -3035,7 +3049,7 @@ export default {
       this.logicallyDel(selectedItems,function(){
          
         if(_self.$refs.leftDataGrid){
-            _self.$refs.leftDataGrid.itemDataList = [];
+            _self.$refs.leftDataGrid.cleanData();
           }
     
         _self.loadGridData(_self.currentFolder);

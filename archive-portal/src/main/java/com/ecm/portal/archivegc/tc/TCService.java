@@ -88,7 +88,7 @@ public class TCService {
 				EcmDocument doc = documentService.getObjectById(token, id);
 				if(doc != null) {
 					mp.put("uid", (String)doc.getAttributeValue("SYN_ID"));
-					mp.put("message", message);
+					mp.put("msg", message);
 					list.add(mp);
 				}
 			}
@@ -125,6 +125,7 @@ public class TCService {
 	
 	private String executeMethod(String url,String jsObj) {
 		HttpPost httpPost=new HttpPost(url);
+		logger.info(url);
 		try {
 			RequestConfig timeoutConfig = RequestConfig.custom()
 					.setConnectTimeout(30000).setConnectionRequestTimeout(5000)
@@ -132,7 +133,7 @@ public class TCService {
 			httpPost.setConfig(timeoutConfig);
 			
 			StringEntity strEntity=new StringEntity(jsObj);
-			strEntity.setContentType("text/json");
+			strEntity.setContentType("application/json");
 			httpPost.setEntity(strEntity);
 			
 			HttpResponse response = httpClient.execute(httpPost);
@@ -143,6 +144,7 @@ public class TCService {
 	        if (statusCode == 200) {
 	        	HttpEntity responseResult = response.getEntity();
 	        	String responseEntityStr = EntityUtils.toString(responseResult, "UTF-8");
+	        	logger.info(responseEntityStr);
 	        	JSONObject jsonResult = JSON.parseObject(responseEntityStr);
 	        	
 	        	if(jsonResult.containsKey("code")) {
@@ -152,13 +154,16 @@ public class TCService {
 	        		}else {
 	        			return jsonResult.getString("message");
 	        		}
+	        	}else {
+	        		return "返回参数错误:"+jsonResult.toJSONString();
 	        	}
 	        	
+	        }else {
+	        	return "调用TC接口状态错误::"+statusCode;
 	        }
 		}catch (Exception e) {
 			e.printStackTrace();
 			return e.getMessage();
 		}
-		return null;
 	}
 }

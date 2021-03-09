@@ -42,7 +42,7 @@
         :title="typeName + $t('application.property')"
         :visible.sync="propertyVisible"
         @close="propertyVisible = false"
-        width="96%"
+        width="100%"
         style="text-align: center"
         :close-on-click-modal="false"
       >
@@ -504,6 +504,9 @@ export default {
     }
   },
   methods: {
+    cleanData(){
+      this.itemDataList = [];
+    },
     //Matthew changes on 2021年1月26日15:48:46
     refreshMainConfigList(){
       this.loadCustomListConfig(this.gridviewInfo.gridviewName);
@@ -665,6 +668,9 @@ export default {
     },
     // 加载表格数据
     loadGridData(gvname) {
+      if(this.dataUrl=="" || this.dataUrl  == null){
+        return;
+      }
       let _self = this;
       _self.selectedRows = [];
       // let tbHeight = _self.tableHeight;

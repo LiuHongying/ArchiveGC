@@ -119,7 +119,7 @@ public class Receiving4TC extends ControllerAbstract {
 			List<String> list = JSONUtils.stringToArray(idsStr);
 			for(String id : list) {
 				//查询移交单下的文件的id
-				String sql = "select CHILD_ID from ecm_relation where PARENT_ID='"+id+"'";
+				String sql = "select CHILD_ID from ecm_relation where PARENT_ID='"+id+"' and NAME !='附件'";
 				List<Map<String, Object>> lis = relationService.getMapList(getToken(), sql);
 				for(Map<String,Object> a:lis) {
 					//查询移交单下文件的属性信息

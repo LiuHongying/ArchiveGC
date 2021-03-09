@@ -11,6 +11,12 @@
               </div>
             </el-row>
             <el-row>
+              <el-col :span="24" style="float: left;text-align:left;padding-left:120px;">
+                <el-button type="primary" plain icon="el-icon-upload2" @click="batchMount()">开始挂载</el-button>
+                <el-button plain type="primary" @click="cleanFiles()">{{$t('message.ClearFiles')}}</el-button>
+              </el-col>
+            </el-row>
+            <el-row>
               <el-col :span="8">
                 <el-form-item :label="'Excel'+$t('message.ElectronicFiles')" style="float: left;">
                   <el-upload
@@ -26,8 +32,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="16" style="float: center;text-align:center;padding:5px;">
-                <el-button type="primary" plain icon="el-icon-upload2" @click="batchMount()">开始挂载</el-button>
-                <el-button plain type="primary" @click="cleanFiles()">{{$t('message.ClearFiles')}}</el-button>
+                &nbsp;
               </el-col>
             </el-row>
         <el-row>

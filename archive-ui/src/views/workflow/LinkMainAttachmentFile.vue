@@ -228,6 +228,7 @@ export default {
                     });
                 return;
             }
+            _self.isUpdateMain=false;
             _self.uploadUrl=uploadpath;
             _self.fileListA=[];
             _self.importdialogVisible=true;
@@ -240,7 +241,7 @@ export default {
             formdata.append("id",_self.parentId4UpdateMain)
             }
             else if(this.isUpdateMain==false){
-            formdata.append("id",_self.parentId4UpdateMain)
+            formdata.append("id",_self.parentId4Update)
             }
             _self
                 .axios({
@@ -422,7 +423,8 @@ export default {
         //     },
         rowClick(row){
             this.selectRow=row;
-            this.parentId4UpdateMain = row.ID
+            this.parentId4UpdateMain = row.ID;
+            this.parentId4Update = "";
             //  if(row.C_ITEM_TYPE=='案卷'){
             //      this.isEdit=false
             //  }
