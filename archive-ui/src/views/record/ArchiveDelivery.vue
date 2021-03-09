@@ -1561,6 +1561,9 @@ export default {
           _self.itemDataList = response.data.data;
           _self.itemDataListFull = response.data.data;
           _self.$refs.mainDataGrid.itemCount = response.data.pager.total;
+          if(_self.$refs.innerDataGrid){
+            _self.$refs.innerDataGrid.cleanData();
+          }
           console.log(JSON.stringify(_self.itemCount));
           _self.loading = false;
         })

@@ -169,7 +169,7 @@ export default {
     },
     changeRadio(val) {
       let _self = this;
-      _self.$refs.leftDataGrid.itemDataList=[];
+      _self.$refs.leftDataGrid.cleanData();
       _self.loadGridData(_self.currentFolder);
       
     },
@@ -357,7 +357,7 @@ export default {
           });
           _self.loadTree();
           _self.$nextTick(()=>{
-            _self.$refs.leftDataGrid.itemDataList=[];
+            _self.$refs.leftDataGrid.cleanData();
             _self.loadGridData(_self.currentFolder);
           });
          

@@ -504,6 +504,9 @@ export default {
     }
   },
   methods: {
+    cleanData(){
+      this.itemDataList = [];
+    },
     //Matthew changes on 2021年1月26日15:48:46
     refreshMainConfigList(){
       this.loadCustomListConfig(this.gridviewInfo.gridviewName);

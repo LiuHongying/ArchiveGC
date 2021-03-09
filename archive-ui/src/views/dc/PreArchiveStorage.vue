@@ -554,7 +554,7 @@ export default {
       console.log(p)
       _self.updateData(p,function(){
         if(_self.$refs.relevantFileDataGrid){
-             _self.$refs.relevantFileDataGrid.itemDataList = [];
+             _self.$refs.relevantFileDataGrid.cleanData();
           }
           _self.pieceNumVisible = false;
         _self.searchItem();
@@ -773,7 +773,7 @@ export default {
       _self.tables.main.folderId = indata.id;
       _self.$nextTick(() => {
         _self.$refs.mainDataGrid.loadGridData();
-        _self.$refs.relevantFileDataGrid.itemDataList = [];
+        _self.$refs.relevantFileDataGrid.cleanData();
       });
     },
 
@@ -879,7 +879,7 @@ export default {
       var key1 = "ID IN (" + condition1 + ") AND IS_HIDDEN=0";
       this.$refs.relevantFileDataGrid.condition = key1;
       this.$refs.relevantFileDataGrid.gridViewName = "GeneralPre";
-      this.$refs.relevantFileDataGrid.itemDataList = [];
+      this.$refs.relevantFileDataGrid.cleanData();
       this.$refs.relevantFileDataGrid.loadGridData();
     },
 
@@ -898,7 +898,7 @@ export default {
         _self.topPercent = 65;
         _self.$nextTick(() => {
           if (_self.$refs.relevantFileDataGrid) {
-            _self.$refs.relevantFileDataGrid.itemDataList = [];
+            _self.$refs.relevantFileDataGrid.cleanData();
           }
         });
       }
