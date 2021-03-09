@@ -64,8 +64,17 @@ export default {
             id4Export += ","
           }
         }
-      this.condition4Export=" id in (select CHILD_ID AS ID from ecm_relation where PARENT_ID IN ("+id4Export+") )"
+      if(this.Choice=="商务文件移交单副本"){
+        this.condition4Export=" C_TYPE1='副本' and is_hidden=0 and id in (select CHILD_ID AS ID from ecm_relation where PARENT_ID IN ("+id4Export+") )"
       }
+      if(this.Choice=="通用打印"){
+      this.condition4Export=" id in (select CHILD_ID AS ID from ecm_relation where PARENT_ID IN ("+id4Export+") ) and is_hidden=0"
+      }
+      if(this.Choice=="商务文件移交单正本"){
+        this.condition4Export="C_TYPE1='正本' and is_hidden=0 and id in (select CHILD_ID AS ID from ecm_relation where PARENT_ID IN ("+id4Export+") )"
+      }
+      }
+
       let dataUrl = "/exchange/doc/export";
       let params = {
         gridName: this.gridViewName,
