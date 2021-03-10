@@ -1,24 +1,22 @@
 <template>
   <div class="login-container pull-height" v-title :data-title="$t('application.name')">
-    <div class="login-info text-white animated fadeInLeft">
-      <div class="logo" style="margin-top:-326px">
-          <img src="../../../static/img/logo.png" width="160px" height="160px" alt="logo" style="vertical-align: middle;" />
-      </div>
-      <br>
-      <br>
-      <h1 class="login-info-title">{{$t("application.name")}}</h1>
-
-    </div>
-    <div class="login-border  animated fadeInRight">
-      <div class="login-main">
-        <h4 class="login-title">{{$t("application.login")}}{{$t("application.name")}}
-        </h4>
+    <div class="login-border">
         <template v-if="isSSO==false">
-        <el-tabs v-model="activeName">
-          <el-tab-pane v-bind:label="$t('application.user')+$t('application.password')" name="user">
-            <userLogin></userLogin>
-          </el-tab-pane>
-        </el-tabs>
+          <el-row>
+            <el-col :span="12">
+              <div>
+                <img src="../../assets/images/top_images/logo.png" width="80px" height="80px" alt="logo" style="vertical-align: middle;" />
+              </div>
+              <div>
+                <h2 class="login-info-title">{{$t("application.name")}}</h2>
+              </div>
+            </el-col>
+            <el-col :span="12">
+              <h4 class="login-title">用户登录
+              </h4>
+              <userLogin></userLogin>
+            </el-col>
+          </el-row>
         </template>
         <template v-else>
           <el-table
@@ -30,8 +28,6 @@
           </el-table>
         </template>
       </div>
-    </div>
-
   </div>
 </template>
 <script>
@@ -150,7 +146,7 @@ export default {
   justify-content: space-around;
   background: rgba(0, 0, 0, 0.2);
   position: relative;
-  height: 800px;
+  height: 760px;
 }
 .login-container::before {
   z-index: -999;
@@ -160,16 +156,17 @@ export default {
   top: 0;
   width: 100%;
   height: 100%;
-  background-image: url("../../assets/images/top_images/login_bg_cnpe.jpg");
+  background-image: url("../../assets/images/top_images/login_bg_cnpe2.jpg");
   background-repeat: no-repeat;
-  background-position-y: 200px;
-  background-size: contain;
+
+  background-size:100% 100%;
 }
 .login-info {
   padding-left: 60px;
 }
 .login-info-title {
   line-height: 90px;
+  color: #fff;
 }
 .login-info-item {
   font-size: 14px;
@@ -180,13 +177,17 @@ export default {
   flex-direction: column;
   padding: 30px 50px 25px 50px;
   background-color: #fff;
-  border-radius: 6px;
+  border-radius: 8px;
   box-shadow: 1px 1px 2px #eee;
+  background-image: url("../../assets/images/top_images/login_box.png");
+  background-repeat: no-repeat;
+  background-size:100% 100%;
 }
 .login-main {
   border-radius: 3px;
   box-sizing: border-box;
   background-color: #fff;
+
 }
 .login-main > h3 {
   margin-bottom: 20px;
@@ -201,21 +202,20 @@ export default {
   letter-spacing: 3px;
 }
 .login-submit {
-  margin-top: 20px;
   width: 100%;
   border-radius: 28px;
 }
 .login-form {
   margin: 10px 0;
   .el-form-item__content {
-    width: 270px;
+    width: 200px;
   }
   .el-form-item {
     margin-bottom: 12px;
+    margin-left: 10px;
   }
   .el-input {
     input {
-      text-indent: 5px;
       border-color: #dcdcdc;
       border-radius: 3px;
     }

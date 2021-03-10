@@ -51,6 +51,9 @@
           <el-form-item>
             <el-button type="primary" v-on:click="searchItem">{{$t('application.SearchData')}}</el-button>
           </el-form-item>
+          <el-form-item>
+            <el-button type="primary" v-on:click="autoSearch">自动匹配</el-button>
+          </el-form-item>
         </el-form>
         <!--searchView
         dataUrl="/dc/getDocuments"
@@ -64,7 +67,7 @@
           v-bind:tableHeight="tableHeight"
           v-bind:isshowOption="true"
           v-bind:isshowSelection="true"
-          :gridViewName="param.searchViewName"
+          gridViewName="ArrangeGridSWGL"
           :condition="searchFileCondition+' and '+param.searchViewCondition"
           :optionWidth="1"
           :isShowMoreOption="false"
@@ -108,7 +111,7 @@
             v-bind:isshowOption="true"
             v-bind:isshowSelection="true"
             :dataUrl="param.childViewUrl"
-            :gridViewName="param.childViewName"
+            :gridViewName="param.searchViewName"
             :condition="param.childviewCondition"
             :optionWidth="1"
             :isShowPropertyButton="false"
@@ -174,7 +177,7 @@
               v-bind:tableHeight="tableHeight"
               v-bind:isshowOption="true"
               v-bind:isshowSelection="true"
-              :gridViewName="param.archiveViewName"
+              gridViewName="ArrangeGridSWGL"
               :condition="param.archiveViewCondition"
               :optionWidth="1"
               :isshowCustom="false"
@@ -427,18 +430,27 @@ export default {
           _self.loading = false;
         });
     },
+    autoSearch(){
+      let _self = this;
+      let key = " STATUS='已入库' and C_ITEM_TYPE='案卷'";
+      
+      key += " AND ID in(select e.PARENT_ID from ecm_relation b,ecm_document c,ecm_document d,ecm_relation e where b.PARENT_ID ='"+this.parentId+"' and c.ID =b.CHILD_ID and c.C_OTHER_ARC_CODING is not null and c.C_TYPE1 is not null and d.C_OTHER_ARC_CODING =c.C_OTHER_ARC_CODING and c.C_TYPE1 =d.C_TYPE1 and d.IS_RELEASED =1 and e.CHILD_ID =d.ID and e.NAME ='irel_children')"
+
+      if (key != "") {
+        _self.$refs.searchDoc.condition = key;
+      }
+      _self.$refs.searchDoc.loadGridData();
+    },
     searchItem() {
       let _self = this;
-      let key = " 1=1 ";
+      let key = " STATUS='已入库' and C_ITEM_TYPE='案卷'";
       if (_self.searchFileCondition != "") {
         key += " and (" + _self.searchFileCondition + ")";
       }
 
       if (_self.filters.docType != "") {
         key +=
-          " and TYPE_NAME = '" +
-          _self.filters.docType +
-          "' and STATUS='已入库' and IS_HIDDEN =0 ";
+          " and TYPE_NAME = '" +_self.filters.docType +"'";
       } else {
         if (_self.param.searchViewCondition != "") {
           key += " and (" + _self.param.searchViewCondition + ")";

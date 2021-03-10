@@ -52,7 +52,7 @@
 
     </el-dialog>
 
- <el-dialog :visible.sync="printVolumesVisible4Documents"  width="80%"
+ <el-dialog :visible.sync="printVolumesVisible4Documents"  width="90%"
     > <div>
       <PrintVolumes4Docu
         ref="PrintVolumes4Documents"

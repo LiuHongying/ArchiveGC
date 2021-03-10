@@ -5,6 +5,7 @@
       :visible.sync="itemDialogVisible"
       width="96%"
       @close="itemDialogVisible = false"
+      :append-to-body="true"
     >
       <InnerItemViewer
         ref="innerItemViewer"
@@ -17,6 +18,7 @@
       :visible.sync="propertyVisible"
       @close="propertyVisible = false"
       width="90%"
+      :append-to-body="true"
     >
       <ShowProperty
         ref="ShowProperty"
@@ -39,6 +41,7 @@
       center
       top="15vh"
       :close-on-click-modal="false"
+      :append-to-body="true"
     >
       <el-checkbox
         :indeterminate="columnsInfo.isIndeterminate"
@@ -547,7 +550,7 @@ export default {
       _self.tableLoading = true;
       var key = _self.sqlStringFilter(_self.inputkey);
       if(_self.inputkey!=""&&_self.inputkey!=undefined){
-        key = "CODING LIKE '%"+key+"%' "
+        key = "CODING LIKE '%"+key+"%' or TITLE like '%"+key+"%'"
       }
       if(this.ShowFileType){
         if(key!=''&&key!=undefined){
@@ -574,7 +577,7 @@ export default {
       m.set("folderId", indata.id);
       m.set("condition", key);
       m.set("pageSize", _self.pageSize);
-      m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
+      m.set("pageIndex", _self.currentPage - 1);
       m.set("orderBy", "MODIFIED_DATE desc");
       axios
         .post(_self.dataUrl, JSON.stringify(m))
@@ -616,7 +619,7 @@ export default {
       m.set("folderId", indata.id);
       m.set("condition", key);
       m.set("pageSize", _self.pageSize);
-      m.set("pageIndex", (_self.currentPage - 1) * _self.pageSize);
+      m.set("pageIndex", _self.currentPage - 1);
       m.set("orderBy", "MODIFIED_DATE desc");
       axios
         .post(_self.dataUrl, JSON.stringify(m))

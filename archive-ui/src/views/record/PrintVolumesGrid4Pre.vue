@@ -13,7 +13,7 @@
                         :height="tableHeight"
                         :data="innerDataList"
                         border="1"
-                        style="width: 100%;border:1px solid #000000">
+                        style="width: 100%;">
                         <el-table-column key="#1" :label="$t('field.indexNumber')"  width="70">
                                 <template slot-scope="scope">
                                     <span>{{ scope.$index+1}}</span>
@@ -133,20 +133,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1,
-h2 {
-  font-weight: normal;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+.el-table td, .el-table th.is-leaf {
+    border-bottom: 1px solid #000000;
 }
 /* .table-a table{border:1px solid #212121}  */
 .v-auto-out .auto-in {
@@ -184,20 +172,17 @@ transform: translateY(-50%);
   
 .table-tr {display: table-row; height: 30px;}   
 .table-th {display: table-cell;font-weight: bold;height: 100%;/*border: 1px solid gray;*/text-align: center;vertical-align: middle;}   
-.table-td {display: table-cell; height: 100%;}   
+.table-td {display: table-cell; height: 100%; border-bottom: 1px solid rgb(0, 0, 0);}   
   
 .sub-table {width: 100%;height: 100%;display: table;}   
 .sub-table-tr {display: table-row; height: 100%;}   
 .sub-table-td {display: table-cell; height: 100%;
-/* border-top: 1px solid gray; 
-border-left: 1px solid gray;
-border-right: 1px solid gray; */
 border-top: 1px solid #000000; 
 border-left: 1px solid #000000;
 border-right: 1px solid #000000;
-/* border:1px solid #212121; */
+border-bottom: 1px solid #000000;
 text-align: center;vertical-align: middle;}
 .sub-table-td1 {display: table-cell; height: 100%;
-/* border-left: 1px solid #212121; */
+border-bottom: 1px solid rgb(0, 0, 0);
 text-align: center;vertical-align: middle;}
 </style>

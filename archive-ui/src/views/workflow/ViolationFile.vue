@@ -264,7 +264,7 @@ export default {
                 this.cost = this.cost + 500
                 continue
             }
-            if(this.selectedRemoveFiles[tab].C_SECURITY_LEVEL == '核心商密'){
+            if(this.selectedFiles[tab].C_SECURITY_LEVEL == '核心商密'){
                 this.cost = this.cost + 1000
                 continue
             }

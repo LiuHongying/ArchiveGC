@@ -176,12 +176,7 @@
                             //console.log(JSON.stringify(response));
                             if (code == 1) {
                                 
-                                _self.$message({
-                                    showClose: true,
-                                    message: _self.$t('message.newSuccess'),//_self.$t('message.newSuccess')
-                                    duration: 2000,
-                                    type: "success"
-                                });
+                                console.log("创建表单成功！");
                                 //发起流程
 
                                 _self.butt=false;
