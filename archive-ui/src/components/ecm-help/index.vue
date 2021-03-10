@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-tooltip effect="dark" content="帮助" placement="bottom">
-      <el-button class=" btn-text can-hover" type="text" @click="dialogVisible = true">
+      <el-button class=" btn-text can-hover" type="text" @click="toHelp">
         <i class="el-icon-question"></i>
       </el-button>
     </el-tooltip>
@@ -31,6 +31,11 @@ export default {
   data() {
     return {
       dialogVisible: false
+    }
+  },
+  methods:{
+    toHelp(){
+      this.$router.push({path:'/dc/folderviewer?cfgName=HelpFolder'});
     }
   }
 }
