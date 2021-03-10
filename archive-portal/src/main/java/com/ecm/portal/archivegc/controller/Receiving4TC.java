@@ -65,6 +65,7 @@ public class Receiving4TC extends ControllerAbstract {
 			Map<String, Object> args = JSONUtils.stringToMap(argStr);
 			String idsStr=args.get("ids").toString();
 			List<String> list = JSONUtils.stringToArray(idsStr);
+			List<String> tcIds = new ArrayList<String>();
 			//
 			for(String childId : list) {
 				EcmDocument doc= documentService.getObjectById(getToken(), childId);
@@ -72,7 +73,11 @@ public class Receiving4TC extends ControllerAbstract {
 				doc.getAttributes().put("C_RECEIVE", documentService.getSession(getToken()).getCurrentUser().getUserName());
 				doc.getAttributes().put("C_RECEIVE_DATE", new Date());
 				documentService.updateObject(getToken(), doc, null);
+				if(doc.getAttributes().get("SYN_ID")!=null) {
+					tcIds.add((String)doc.getAttributes().get("SYN_ID"));
+				}
 			}
+			tCService.updateTCStatus(getToken(), tcIds);
 			mp.put("code", ActionContext.SUCESS);
 			
 		}catch (Exception e) {
@@ -127,11 +132,11 @@ public class Receiving4TC extends ControllerAbstract {
 					//查询移交单下文件的属性信息
 					Map<String, Object> doc = documentService.getObjectMapById(getToken(), a.get("CHILD_ID").toString());
 					String coding=doc.get("CODING").toString();
-					if(doc.get("SYN_ID")!=null) {
+					if(doc.get("SYN_ID")!=null && doc.get("STATUS")!=null && !"已接收".equals((String)doc.get("STATUS"))) {
 						tcIds.add((String)doc.get("SYN_ID"));
 					}
 					//查询是否存在相同coding的文件
-					String condition = "CODING='"+coding+"' and C_ITEM_TYPE='文件' and id !='"+a.get("CHILD_ID")+"'";
+					String condition = "CODING='"+coding+"' and C_ITEM_TYPE='文件' and id !='"+a.get("CHILD_ID")+"' and IS_RELEASED=1";
 					List<EcmDocument> res = documentService.getObjects(getToken(), condition);
 					if(res != null && res.size() > 0) {
 						//获取文件的案卷id

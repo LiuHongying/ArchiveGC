@@ -12,7 +12,7 @@
                         :height="tableHeight"
                         :data="innerDataList"
                         border="1"
-                        style="width: 100%;border:1px solid #000000" row-class-name="cellClassName">
+                        style="width: 100%;border:1px solid #000000" :row-class-name="cellClassName">
                         <el-table-column key="#1" :label="$t('field.indexNumber')"  width="70">
                                 <template slot-scope="scope">
                                     <span>{{ scope.$index+1}}</span>
@@ -155,10 +155,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.el-table td, .el-table th.is-leaf {
-    border-bottom: 1px solid #000000 !important;
-}
+<style>
 .rowclass{
    border-bottom: 1px solid #000000 !important;
 }

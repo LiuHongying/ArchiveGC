@@ -2,8 +2,8 @@
   <div>
       <el-select v-if="isBusiness" @change="onChoiceChange" v-model="Choice" >
       <el-option label="通用打印" value="通用打印"></el-option>
-      <el-option label="商务文件正本" value="商务文件移交单正本"></el-option>
-      <el-option label="商务文件副本" value="商务文件移交单副本"></el-option>
+      <el-option label="商务文件正本" value="商务文件正本"></el-option>
+      <el-option label="商务文件副本" value="商务文件副本"></el-option>
       </el-select>
     <button @click="printPage" v-print="'#print'">打印</button>
     <!-- <button @click="exportdata()" >导出所有EXCEL</button> -->
@@ -64,13 +64,13 @@ export default {
             id4Export += ","
           }
         }
-      if(this.Choice=="商务文件移交单副本"){
+      if(this.Choice=="商务文件副本"){
         this.condition4Export=" C_TYPE1='副本' and is_hidden=0 and id in (select CHILD_ID AS ID from ecm_relation where PARENT_ID IN ("+id4Export+") )"
       }
       if(this.Choice=="通用打印"){
       this.condition4Export=" id in (select CHILD_ID AS ID from ecm_relation where PARENT_ID IN ("+id4Export+") ) and is_hidden=0"
       }
-      if(this.Choice=="商务文件移交单正本"){
+      if(this.Choice=="商务文件正本"){
         this.condition4Export="C_TYPE1='正本' and is_hidden=0 and id in (select CHILD_ID AS ID from ecm_relation where PARENT_ID IN ("+id4Export+") )"
       }
       }
@@ -89,13 +89,13 @@ export default {
     },
     onChoiceChange(){
       let _self = this
-      if(this.Choice=='商务文件移交单正本'){
+      if(this.Choice=='商务文件正本'){
         this.condition = "and C_TYPE1='正本' and is_hidden=0"
         this.gridViewName = "BusinessFilePrintGrid"
         //this.$refs.PrintVolumesGrid.condition = "and C_TYPE1='正本'"
         this.refreshDataGrid(this.selectedRows,"BusinessFilePrintGrid")
       }
-      if(this.Choice=='商务文件移交单副本'){
+      if(this.Choice=='商务文件副本'){
         this.condition = "and C_TYPE1='副本' and is_hidden=0"
         this.gridViewName = "BusinessFilePrintGrid4Content"
         // this.$refs.PrintVolumesGrid.condition = "and C_TYPE1='副本'"
