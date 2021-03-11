@@ -2377,7 +2377,7 @@ export default {
           })
           .then(function(response) {
             let code = response.data.code;
-            //console.log(JSON.stringify(response));
+            console.log(JSON.stringify(response));
             if (code == 1) {
               _self.$emit("onSaved", "update");
             } else {

@@ -536,7 +536,16 @@ export default {
             _self.$emit("onSaveSuccess",m);
           }
           else{
-             _self.$message(_self.$t('message.saveFailured'));
+            let msg = _self.$t('message.newFailured');
+              if(response.data.message){
+                msg += ":" + response.data.message;
+              }
+              _self.$message({
+                showClose: true,
+                message: msg,
+                duration: 2000,
+                type: "error"
+              });
           }
         })
         .catch(function(error) {
