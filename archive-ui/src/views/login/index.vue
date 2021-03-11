@@ -1,5 +1,6 @@
 <template>
-  <div class="login-container pull-height" v-title :data-title="$t('application.name')">
+  <div class="login-container pull-height" ref="loginContainer" :style="{height: containerHeight+'px'}" v-title :data-title="$t('application.name')">
+    
     <div class="login-border">
         <template v-if="isSSO==false">
           <el-row>
@@ -41,7 +42,8 @@ export default {
   data() {
     return {
       activeName: 'user',
-      isSSO : false
+      isSSO : false,
+      containerHeight: window.innerHeight - 1
     }
   },
   created() {
@@ -88,7 +90,9 @@ export default {
     //   console.log("外部登录")
     // }
   },
-  mounted() {},
+  mounted() {
+
+  },
   computed: {
     ...mapGetters(['website'])
   },
@@ -146,7 +150,6 @@ export default {
   justify-content: space-around;
   background: rgba(0, 0, 0, 0.2);
   position: relative;
-  height: 760px;
 }
 .login-container::before {
   z-index: -999;
