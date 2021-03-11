@@ -3,6 +3,8 @@ package com.zisecm.httptools.core;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Date;
+
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
@@ -17,6 +19,10 @@ public class RunningMain {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		
+		Date d = new Date();
+		System.out.println(d.getTime());
+		
+		/*
 		String folderId = "f665a97d6986400481079c98f7183b33";
 		
 		EcmHttp ecmClient = new EcmHttp();
@@ -27,7 +33,7 @@ public class RunningMain {
 		String token = ecmClient.login(username, password, httpClient);
 		
 		ds.deleteAttachment(httpClient, token, ecmClient, "a5f69c6a59e14e759adc24689a3da31b");
-		/*
+		
 		//String condition="SYNC_ID='"+tcId+"'";
 		String condition="ID='a5f69c6a59e14e759adc24689a3da31b'";
 		ds.queryDocument(httpClient, token, ecmClient, condition);

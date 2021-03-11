@@ -91,7 +91,10 @@ export default {
     // }
   },
   mounted() {
-
+    let _self = this;
+    window.addEventListener("resize",function(){
+      _self.containerHeight = window.innerHeight - 1;
+    });
   },
   computed: {
     ...mapGetters(['website'])

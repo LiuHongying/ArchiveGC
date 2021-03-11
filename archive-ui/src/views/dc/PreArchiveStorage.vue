@@ -305,6 +305,7 @@
                     @rowclick="onDataGridRowClick"
                     dataUrl="/dc/getDocuments"
                     :showBatchCheck="true"
+                    :sortBackData="true"
                   >
                   </DataGrid>
                 </template>

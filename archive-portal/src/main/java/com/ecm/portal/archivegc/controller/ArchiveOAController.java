@@ -72,14 +72,20 @@ public class ArchiveOAController extends ControllerAbstract {
 		Map<String, Object> args = JSONUtils.stringToMap(metaData);
 		//获取登录名
 		String loginName = (String) args.get("loginName");
+		loginName = loginName.toLowerCase();
 		//获取参数签名
 		String sign = (String) args.get("sign");
 		String[] signArr = sign.split("\\|");
 		Date d = new Date();
-		//判断OA跳转链接是否已经过期，限时一分钟
-		if(Long.valueOf(d.getTime())-Long.valueOf(signArr[2])>60000) {
+		//判断OA跳转链接是否已经过期，限时5分钟
+		long loginTime = Long.valueOf(d.getTime())-Long.valueOf(signArr[2])*1000;
+		if(loginTime>300000) {
+			System.out.println("sign:"+sign);
+			System.out.println("Now:"+Long.valueOf(d.getTime()));
+			System.out.println("OA time:"+Long.valueOf(signArr[2])*1000);
+			System.out.println("SSO out time:"+loginTime);
 			mp.put("code", ActionContext.FAILURE);
-			mp.put("msg", "链接超时，转至用户名密码登录");
+			mp.put("msg", "链接超时，转至用户名密码登录:"+loginTime/1000);
 			return mp;
 		}
 		//获取MD5加密后的sign

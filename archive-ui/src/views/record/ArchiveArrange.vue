@@ -2381,10 +2381,14 @@ export default {
             if (code == 1) {
               _self.$emit("onSaved", "update");
             } else {
+              let msg = _self.$t('message.saveFailured');
+              if(response.data.message){
+                msg += ":" + response.data.message;
+              }
               // _self.$message(_self.$t('message.saveFailured'));
               _self.$message({
                 showClose: true,
-                message: _self.$t('message.saveFailured'),
+                message: msg,
                 duration: 5000,
                 type: "error"
               });
