@@ -126,9 +126,14 @@ public class TCService {
 	public void updateTCStatus(String token, List<String> ids) throws Exception {
 		String url  = env.getProperty("tc.url");
 		if(ids.size()>0) {
-			String idStr = String.join(",", ids);
-			String msg = updateStatus(url,idStr);
-			if(!"1".equals("msg")) {
+			List<Map<String,String>> list = new ArrayList<Map<String,String>>();
+			for(String id : ids) {
+				Map<String,String> mp = new HashMap<String,String>();
+				mp.put("uid", id);
+				list.add(mp);
+			}
+			String msg = updateStatus(url,JSONObject.toJSONString(list));
+			if(!"1".equals(msg)) {
 				throw new Exception(msg);
 			}
 		}
@@ -142,7 +147,10 @@ public class TCService {
 					.setConnectTimeout(30000).setConnectionRequestTimeout(5000)
 					.setSocketTimeout(30000).build();
 			httpPost.setConfig(timeoutConfig);
-			httpPost.getParams().setParameter("uids", jsObj);
+			//httpPost.getParams().setParameter("uids", jsObj);
+			StringEntity strEntity=new StringEntity(jsObj);
+			strEntity.setContentType("application/json");
+			httpPost.setEntity(strEntity);
 			
 			HttpResponse response = httpClient.execute(httpPost);
 			

@@ -2,6 +2,7 @@ package com.ecm.portal.archivegc.controller;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +31,7 @@ import com.ecm.common.util.ExcelUtil;
 import com.ecm.common.util.FileUtils;
 import com.ecm.common.util.JSONUtils;
 import com.ecm.core.ActionContext;
+import com.ecm.core.PermissionContext;
 import com.ecm.core.cache.manager.CacheManagerOper;
 import com.ecm.core.db.SqlUtils;
 import com.ecm.core.entity.EcmContent;
@@ -43,6 +45,7 @@ import com.ecm.core.entity.Pager;
 import com.ecm.core.exception.AccessDeniedException;
 import com.ecm.core.exception.EcmException;
 import com.ecm.core.exception.NoPermissionException;
+import com.ecm.core.service.ContentService;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.ExcSynDetailService;
 import com.ecm.core.service.FolderPathService;
@@ -52,6 +55,7 @@ import com.ecm.core.service.GridViewService;
 import com.ecm.core.service.RelationService;
 import com.ecm.portal.archivegc.controller.param.DocParam;
 import com.ecm.portal.controller.ControllerAbstract;
+import com.ecm.portal.service.ZipDownloadService;
 
 @RestController
 @RequestMapping("/exchange/doc")
@@ -76,6 +80,12 @@ public class DocController  extends ControllerAbstract  {
 	@Autowired
 	private GridViewItemService gridViewItemService;
 	private final String queryBase = "SELECT ID,APP_NAME, CREATION_DATE, EXPORT_DATE, IMPORT_DATE, STATUS, ERROR_MESSAGE FROM exc_syn_detail";
+	
+	@Autowired
+	private ZipDownloadService zipDownloadService;
+	
+	@Autowired
+	private ContentService contentService;
 	
 	@PostMapping("exportTC")
 	@ResponseBody
@@ -178,6 +188,102 @@ public class DocController  extends ControllerAbstract  {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@RequestMapping(value = "/downloadFiles")
+	public void downloadFiles(HttpServletResponse response, String objectIds) {
+		String[] objectIdsList = objectIds.split(",");
+		List<File> files = new ArrayList<File>();
+		List<String> fileNames = new ArrayList<String>();
+		try {
+			for (int i = 0; i < objectIdsList.length; i++) {
+				
+				int permit = documentService.getPermit(getToken(), objectIdsList[i]);
+				EcmDocument docObj = documentService.getObjectById(getToken(), objectIdsList[i]);
+				String coding = docObj.getCoding() == null ? docObj.getTitle() : docObj.getCoding();
+				String revision= docObj.getRevision()==null?"":docObj.getRevision();
+				if (permit >= PermissionContext.ObjectPermission.DOWNLOAD) {
+					//List<EcmContent> parentEnList= contentMapper.getContents(objectIdsList[i], 1);
+					List<EcmContent> parentEnList= contentService.getContents(getToken(),objectIdsList[i], 1);
+					if(parentEnList!=null&&parentEnList.size()>0) {
+						EcmContent en=parentEnList.get(0);
+						String storePath = CacheManagerOper.getEcmStores().get(en.getStoreName()).getStorePath();
+						files.add(new File(storePath + en.getFilePath()));
+						fileNames.add(coding+"_"+revision+"/"+coding+"_"+revision + "." + en.getFormatName());
+					}
+					
+					String sql="select CHILD_ID,NAME from ecm_relation where ( NAME='附件' or name='irel_children') " + 
+							"and PARENT_ID ='"+objectIdsList[i]+"'";
+					List<Map<String,Object>> childrenIds= documentService.getMapList(getToken(),sql);
+					for(int j=0;childrenIds!=null&&j<childrenIds.size();j++) {
+						Map<String,Object> idObj= childrenIds.get(j);
+						if(idObj!=null) {
+							String childId=idObj.get("CHILD_ID").toString();
+							String relationName=idObj.get("NAME").toString();
+							permit = documentService.getPermit(getToken(), childId);
+							if (permit >= PermissionContext.ObjectPermission.DOWNLOAD) {
+								EcmDocument childDoc= documentService.getObjectById(getToken(), childId);
+								if(childDoc==null) {
+									continue;
+								}
+								String childCoding=childDoc.getCoding();
+								if(childCoding == null) {
+									childCoding = childDoc.getTitle();
+								}
+								String childRevision=childDoc.getRevision();
+								if(childRevision==null) {
+									childRevision = "";
+								}
+								//List<EcmContent> enList= contentMapper.getContents(childId, 1);
+								List<EcmContent> enList= contentService.getContents(getToken(),childId, 1);
+								if(enList!=null&&enList.size()>0) {
+									EcmContent en=enList.get(0);
+									String storePath = CacheManagerOper.getEcmStores().get(en.getStoreName()).getStorePath();
+									files.add(new File(storePath + en.getFilePath()));
+									if("附件".equals(relationName)) {
+										fileNames.add(coding+"_"+revision+"/"+relationName+"/"
+												+coding+"_"+revision +"_附件_"+(j+1)+ "." + en.getFormatName());
+									}else {
+										fileNames.add(coding+"_"+revision+"/"
+												+childCoding+"_"+childRevision +"/"
+												+childCoding+"_"+childRevision + "." + en.getFormatName());
+									}
+									
+								}
+								String childAttachSql="select CHILD_ID,NAME from ecm_relation where NAME='附件'  " + 
+										"and PARENT_ID ='"+childId+"'";
+								List<Map<String,Object>> attacheFiles= documentService.getMapList(getToken(),childAttachSql);
+								for(int x=0;attacheFiles!=null&&x<attacheFiles.size();x++) {
+									Map<String,Object> attacheFile= attacheFiles.get(x);
+									if(attacheFile!=null) {
+										String attachID=attacheFile.get("CHILD_ID").toString();
+										EcmDocument attachDoc= documentService.getObjectById(getToken(), attachID);
+										if(attachDoc==null) {
+											continue;
+										}
+										//List<EcmContent> attachDocEnList= contentMapper.getContents(attachID, 1);
+										List<EcmContent> attachDocEnList= contentService.getContents(getToken(),attachID, 1);
+										if(attachDocEnList!=null&&attachDocEnList.size()>0) {
+											EcmContent attachDocEn=attachDocEnList.get(0);
+											String storePath = CacheManagerOper.getEcmStores().get(attachDocEn.getStoreName()).getStorePath();
+											files.add(new File(storePath + attachDocEn.getFilePath()));
+											fileNames.add(coding+"_"+revision+"/"
+													+childCoding+"_"+childRevision +"/"+"附件"+"/"+childCoding+"_"+childRevision +"_附件_"+(x+1) +"." + attachDocEn.getFormatName());
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				
+			}
+			zipDownloadService.createZipFiles(files, fileNames, response);
+		}catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		
 	}
 	
 	@PostMapping("export")

@@ -40,6 +40,23 @@ Vue.prototype.packDownloadByMain = function(selectedItems){
     //   });
 }
 
+
+Vue.prototype.packDownloadByIds = function(selectedItems){
+  var m = [];
+  let tab = selectedItems;
+  let _self=this;
+  var i;
+  for (i in tab) {
+    m.push(tab[i]["ID"]);
+  }
+  window.open(
+      _self.axios.defaults.baseURL +
+        "/exchange/doc/downloadFiles?objectIds=" +
+        m+"&token="+sessionStorage.getItem('access-token'),
+      "_blank"
+    );
+ }
+
     //打包下载子文件/dc/downloadSubFile
     Vue.prototype.packDownloadSubFile = function(selectedItems){
         var m = [];
