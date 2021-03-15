@@ -219,7 +219,7 @@
           <template slot="paneL">
             <el-container :style="{height:asideHeight+'px',width:asideWidth,overflow:'auto'}">
               <el-tree
-                style="width:100%"
+                :style="{width: asideWidth,overflow:'scroll'}"
                 :props="defaultProps"
                 :data="dataList"
                 node-key="id"

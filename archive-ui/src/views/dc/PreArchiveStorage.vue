@@ -3,16 +3,16 @@
     <split-pane
       split="vertical"
       @resize="resize"
-      :min-percent="1"
+      :min-percent="12"
       :default-percent="leftPercent"
     >
       <template slot="paneL">
         <el-container
           :style="{
-            height: treeHeight + 'px',
-            width: asideWidth,
-            overflow: 'auto',
-          }"
+              height: treeHeight + 'px',
+              width: asideWidth,
+              overflow: 'auto',
+            }"
         >
           <el-header>
             <el-input
@@ -30,7 +30,7 @@
             :props="defaultProps"
             :data="dataList"
             node-key="id"
-            style="width: 100%"
+            :style="{width: asideWidth,height: treeHeight + 'px',overflow:'scroll'}"
             :render-content="renderContent"
             :default-expand-all="isExpand"
             @node-click="handleNodeClick"
@@ -377,7 +377,7 @@ export default {
 
       rightTableHeight: (window.innerHeight - 150) / 2,
       asideHeight: window.innerHeight - 80,
-      treeHight: window.innerHeight - 135,
+      treeHeight: window.innerHeight - 90,
       asideWidth: "100%",
 
       defaultProps: {

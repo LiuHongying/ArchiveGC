@@ -91,6 +91,10 @@ export default {
   font-weight: bold;
   color: #000000 !important;
 }
+.el-tree>.el-tree-node {
+  display: inline-block;
+  min-width: 100%;
+}
 .el-main {
   padding: 2px !important;
 }

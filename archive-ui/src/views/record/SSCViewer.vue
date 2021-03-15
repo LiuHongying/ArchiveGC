@@ -105,13 +105,6 @@
         :default-percent="leftPercent"
       >
         <template slot="paneL">
-          <el-breadcrumb style="padding-top: 10px; padding-bottom: 10px">
-            <el-breadcrumb-item class="title16">
-              <i class="el-icon-receiving"></i>
-              &nbsp; {{ $t("route.companyDoc") }}
-            </el-breadcrumb-item>
-          </el-breadcrumb>
-
           <el-container
             :style="{
               height: treeHeight + 'px',
@@ -119,6 +112,7 @@
               overflow: 'auto',
             }"
           >
+          <!--
             <el-header>
               <el-input
                 style="width: 150px"
@@ -130,9 +124,9 @@
                 $t("application.SearchData")
               }}</el-button>
             </el-header>
-
+          -->
             <el-tree
-              style="width: 100%"
+              :style="{width: asideWidth,overflow:'scroll'}"
               :props="defaultProps"
               :data="dataList"
               node-key="id"
@@ -162,9 +156,8 @@
                     type="primary"
                     plain
                     size="medium"
-                    icon="el-icon-folder-add"
                     @click="addToShopingCart()"
-                    >添加到收藏</el-button
+                    >收藏</el-button
                   >
                 </el-form-item>
                 <el-form-item>
@@ -172,13 +165,12 @@
                     type="primary"
                     plain
                     size="medium"
-                    icon="el-icon-right"
                     @click="getWorkFlow"
                     >发起借阅</el-button
                   >
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click.native="exportData">{{
+                  <el-button type="primary" plain @click.native="exportData">{{
                     $t("application.ExportExcel")
                   }}</el-button>
                 </el-form-item>
@@ -201,8 +193,7 @@
                     <el-row>
                       <el-table
                         :height="
-                          ((layout.height - startHeight) * topPercent) / 100 -
-                          topbarHeight
+                         layout.height - startHeight
                         "
                         :data="itemDataList"
                         border
@@ -396,7 +387,7 @@ export default {
       leftStorageName: "PreArchiveftHeight",
       topStorageName: "PreArchiveTopHeight",
       // 非split pan 控制区域高度
-      startHeight: 135,
+      startHeight: 165,
       // 顶部百分比*100
       topPercent: 65,
       // 顶部除列表高度
@@ -466,20 +457,11 @@ export default {
       radioValue: "案卷",
       isFile: true,
       isExpand: false,
+      basePath: "/系统配置/配置项/SSC"
     };
   },
   created() {
     this.leftPercent = this.getStorageNumber(this.leftStorageName, 20);
-    var username = sessionStorage.getItem("access-userName");
-    let _self = this;
-    axios.post("/user/getGroupByUserName", username).then(function (response) {
-      var groupList = response.data.data;
-      groupList.forEach(function (val, index, arr) {
-        if (val.name == "档案管理员") {
-          _self.isFileAdmin = true;
-        }
-      });
-    });
   },
   mounted() {
     let _self = this;
@@ -491,6 +473,7 @@ export default {
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
     _self.search();
+    _self.loadGridInfo(null);
   },
   methods: {
     dbclick(row, column, event) {
@@ -512,34 +495,20 @@ export default {
 
     search() {
       let _self = this;
-      if (_self.inputValueNum != "" && _self.inputValueNum != undefined) {
         var m = new Map();
+        var path = _self.basePath;
         m.set("NAME", _self.inputValueNum);
-        m.set("parentPath", "/系统配置/配置项/SSC");
+        m.set("parentPath", path);
         axios
           .post("/admin/searchFolder", JSON.stringify(m))
           .then(function (response) {
             _self.dataList = response.data.data;
-            _self.loadGridInfo(_self.defaultData);
             _self.loading = false;
           })
           .catch(function (error) {
             console.log(error);
             _self.loading = false;
           });
-      } else {
-        axios
-          .post("/admin/getArchivesFolder", 0)
-          .then(function (response) {
-            _self.dataList = response.data.data;
-            _self.loadGridInfo(_self.defaultData);
-            _self.loading = false;
-          })
-          .catch(function (error) {
-            console.log(error);
-            _self.loading = false;
-          });
-      }
     },
     getWorkFlow() {
       let _self = this;
@@ -562,42 +531,6 @@ export default {
     resize() {
       //console.log('resize')
       this.asideWidth = "100%";
-    },
-    // 加载表格样式
-    initGridInfo() {
-      let _self = this;
-      _self.loading = true;
-      var m = new Map();
-      m.set("gridName", "GeneralGrid");
-      m.set("lang", _self.currentLanguage);
-      axios
-        .post("/dc/getGridViewInfo", JSON.stringify(m))
-        .then(function (response) {
-          _self.showFields = [];
-          _self.gridList = response.data.data;
-          _self.gridList.forEach((element) => {
-            if (element.visibleType == 1) {
-              _self.showFields.push(element.attrName);
-            }
-          });
-          _self.loading = false;
-        })
-        .catch(function (error) {
-          console.log(error);
-          _self.loading = false;
-        });
-    },
-    rowClick(row) {
-      this.currentId = row.ID;
-      if (row.TYPE_NAME == "卷盒" || row.C_ITEM_TYPE == "案卷") {
-        //this.itemDialogVisible = true;
-        let _self = this;
-        setTimeout(() => {
-          _self.$refs.innerItemViewer.id = _self.currentId;
-          _self.$refs.innerItemViewer.loadGridInfo();
-          //_self.$refs.innerItemViewer.bindData();
-        }, 100);
-      }
     },
     renderContent: function (h, { node, data, store }) {
       if (data.extended) {
@@ -641,7 +574,6 @@ export default {
           .post("/admin/getFolder", indata.id)
           .then(function (response) {
             indata.children = response.data.data;
-            //console.log(JSON.stringify(indata));
             _self.inputkey = "";
             indata.extended = true;
             _self.loading = false;
@@ -651,7 +583,7 @@ export default {
             _self.loading = false;
           });
       }
-      _self.loadGridInfo(indata);
+    
       _self.loadGridData(indata);
     },
     showOrHiden(b) {
@@ -668,7 +600,7 @@ export default {
       let _self = this;
       _self.loading = true;
       var m = new Map();
-      m.set("gridName", indata.gridView);
+      m.set("gridName", "SSCViewGrid");
       m.set("lang", _self.currentLanguage);
       axios
         .post("/dc/getGridViewInfo", JSON.stringify(m))
@@ -690,9 +622,11 @@ export default {
     // 加载表格数据
     loadGridData(indata) {
       let _self = this;
-      _self.tableLoading = true;
+      _self.currentFolder = indata;
+      console.log(indata);
+     
       var key = this.sqlStringFilter(_self.inputkey);
-      var cond = " IS_RELEASED=1 AND " + indata.description ;
+      var cond = " TYPE_NAME='设计文件' AND IS_RELEASED=1 ";
       var m = new Map();
       if (key != "") {
         cond += " AND (coding like '%" + key + "%' or title like '%" + key + "%') ";
@@ -700,17 +634,22 @@ export default {
       if (_self.AddConds != "") {
        cond += " AND (" +_self.AddConds + ")";
       }
+      if(_self.currentFolder.description && _self.currentFolder.description != ""){
+        cond += " AND (" + _self.currentFolder.description +")";
+      }else{
+        return;
+      }
+       _self.tableLoading = true;
       _self.gridViewTrans = indata.gridView;
       _self.idTrans = indata.id;
-      m.set("gridName", indata.gridView);
+      m.set("gridName", "SSCViewGrid");
       m.set("folderId", null);
-      m.set("condition", key);
+      m.set("condition", cond);
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", _self.currentPage - 1);
       m.set("orderBy", "CREATION_DATE");
-      console.log(m);
       axios
-        .post("/doc/getDocuments", JSON.stringify(m))
+        .post("/dc/getDocuments", JSON.stringify(m))
         .then(function (response) {
           _self.currentPage = 1;
           _self.itemDataList = response.data.data;
@@ -931,6 +870,7 @@ export default {
 .el-container {
   height: 100%;
 }
+
 /* .el-aside {
   height: 680px;
 } */
