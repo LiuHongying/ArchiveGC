@@ -450,12 +450,14 @@
                                 导出EXCEL
                               </el-button>
                             </el-dropdown-item>
+                            <!--
                              <el-dropdown-item divided>
                               <el-button @click="packDownloadByIds(selectedItems)" style="display:block;width:117px" type="primary" plain size="small"> 
                                 <i class="el-icon-download"></i>
                                 打包下载
                               </el-button>
                             </el-dropdown-item>
+                            -->
                             <el-dropdown-item divided>
                               <el-button @click="SearchBusinessDC()" style="display:block;width:117px" type="primary" plain size="small"> 
                                 <i class="el-icon-search"></i>

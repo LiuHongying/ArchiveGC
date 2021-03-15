@@ -43,18 +43,6 @@
       <!-- <router-link  to="/borroworder"></router-link> -->
     </el-dialog>
     <el-dialog
-      title="文件列表"
-      :visible.sync="itemDialogVisible"
-      width="96%"
-      @close="itemDialogVisible = false"
-    >
-      <InnerItemViewer
-        ref="innerItemViewer"
-        v-bind:id="currentId"
-        v-bind:tableHeight="innerTableHeight"
-      ></InnerItemViewer>
-    </el-dialog>
-    <el-dialog
       :title="$t('application.property')"
       :visible.sync="propertyVisible"
       @close="propertyVisible = false"
@@ -138,7 +126,7 @@
                 placeholder="请输入文件夹名称"
                 @keyup.enter.native="search()"
               ></el-input>
-              <el-button type="primary"  plain @click="search()">{{
+              <el-button type="primary" @click="search()">{{
                 $t("application.SearchData")
               }}</el-button>
             </el-header>
@@ -174,6 +162,7 @@
                     type="primary"
                     plain
                     size="medium"
+                    icon="el-icon-folder-add"
                     @click="addToShopingCart()"
                     >添加到收藏</el-button
                   >
@@ -183,12 +172,13 @@
                     type="primary"
                     plain
                     size="medium"
+                    icon="el-icon-right"
                     @click="getWorkFlow"
                     >发起借阅</el-button
                   >
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary"  plain @click.native="exportData">{{
+                  <el-button type="primary" @click.native="exportData">{{
                     $t("application.ExportExcel")
                   }}</el-button>
                 </el-form-item>
@@ -199,22 +189,6 @@
                     @change="searchItem"
                   ></AddCondition>
                 </el-form-item>
-                <el-form-item>
-                  <el-radio
-                    style="margin-right: 5px"
-                    v-model="radioValue"
-                    label="案卷"
-                    @change="changeRadio"
-                    >案卷</el-radio
-                  >
-                  <el-radio
-                    style="margin-left: 5px"
-                    v-model="radioValue"
-                    label="文件"
-                    @change="changeRadio"
-                    >文件</el-radio
-                  >
-                </el-form-item>
               </el-form>
             </template>
             <template v-slot:main="{ layout }">
@@ -224,13 +198,6 @@
                   height: layout.height - startHeight + 'px',
                 }"
               >
-                <split-pane
-                  v-on:resize="onSplitResize"
-                  :min-percent="20"
-                  :default-percent="topPercent"
-                  split="horizontal"
-                >
-                  <template slot="paneL">
                     <el-row>
                       <el-table
                         :height="
@@ -386,32 +353,6 @@
                         :total="itemCount"
                       ></el-pagination>
                     </el-row>
-                  </template>
-                  <template slot="paneR" v-if="isFile">
-                    <el-row>
-                      <el-col>
-                        <DataGrid
-                          ref="relevantFileDataGrid"
-                          key="relevantFile"
-                          v-bind="tables.relevantFileDataGrid"
-                          v-bind:tableHeight="
-                            ((layout.height - startHeight) *
-                              (100 - topPercent)) /
-                              100 -
-                            bottomHeight
-                          "
-                          :isshowOption="true"
-                          :isshowSelection="true"
-                          :optionWidth = "2"
-                          :isEditProperty="false"
-                          showOptions="查看内容"
-                          dataUrl="/dc/getDocuments"
-                        >
-                        </DataGrid>
-                      </el-col>
-                    </el-row>
-                  </template>
-                </split-pane>
               </div>
             </template>
           </DataLayout>
@@ -425,9 +366,7 @@ import DataLayout from "@/components/ecm-data-layout";
 import DataGrid from "@/components/DataGrid";
 import AddCondition from "@/views/record/AddCondition";
 import ShowPropertyReadOnly from "@/components/ShowPropertyReadOnly";
-import InnerItemViewer from "./InnerItemViewer.vue";
 import BorrwoForm from "@/components/form/Borrow";
-import BorrowFile from "@/views/workflow/BorrowFile.vue";
 import BorrowStartUp from "@/views/workflow/BorrowStartUp.vue";
 import ExcelUtil from "@/utils/excel.js";
 export default {
@@ -435,7 +374,6 @@ export default {
     DataLayout: DataLayout,
     DataGrid: DataGrid,
     ShowPropertyReadOnly: ShowPropertyReadOnly,
-    InnerItemViewer: InnerItemViewer,
     BorrwoForm: BorrwoForm,
     BorrowStartUp: BorrowStartUp,
     ExcelUtil: ExcelUtil,
@@ -531,7 +469,6 @@ export default {
     };
   },
   created() {
-    this.topPercent = this.getStorageNumber(this.topStorageName, 60);
     this.leftPercent = this.getStorageNumber(this.leftStorageName, 20);
     var username = sessionStorage.getItem("access-userName");
     let _self = this;
@@ -553,32 +490,13 @@ export default {
     }
     _self.currentLanguage = localStorage.getItem("localeLanguage") || "zh-cn";
     _self.loading = true;
-    _self.topPercent = 65;
     _self.search();
   },
   methods: {
     dbclick(row, column, event) {
       this.showItemProperty(row);
     },
-    changeRadio(val) {
-      let _self = this;
-      if (val == "文件") {
-        _self.isFile = false;
-        _self.topPercent = 99;
-        _self.startHeight = 145;
-      } else {
-        _self.startHeight = 135;
-        _self.isFile = true;
-        _self.topPercent = 65;
-        _self.$nextTick(() => {
-          if (_self.$refs.relevantFileDataGrid) {
-            _self.$refs.relevantFileDataGrid.itemDataList = [];
-          }
-        });
-      }
-
-      _self.loadGridData(_self.currentFolder);
-    },
+    
 
     resize(leftPercent) {
       // 左边百分比*100
@@ -597,7 +515,7 @@ export default {
       if (_self.inputValueNum != "" && _self.inputValueNum != undefined) {
         var m = new Map();
         m.set("NAME", _self.inputValueNum);
-        m.set("parentPath", "/档案库");
+        m.set("parentPath", "/系统配置/配置项/SSC");
         axios
           .post("/admin/searchFolder", JSON.stringify(m))
           .then(function (response) {
@@ -734,11 +652,7 @@ export default {
           });
       }
       _self.loadGridInfo(indata);
-      if (_self.showBox) {
-        _self.loadAllGridData(indata);
-      } else {
-        _self.loadGridData(indata);
-      }
+      _self.loadGridData(indata);
     },
     showOrHiden(b) {
       this.shopingCartDialogVisible = b;
@@ -777,36 +691,26 @@ export default {
     loadGridData(indata) {
       let _self = this;
       _self.tableLoading = true;
-      var key = _self.inputkey;
+      var key = this.sqlStringFilter(_self.inputkey);
+      var cond = " IS_RELEASED=1 AND " + indata.description ;
       var m = new Map();
       if (key != "") {
-        key = " (coding like '%" + key + "%' or title like '%" + key + "%') ";
-        if (_self.radioValue == "案卷") {
-          key = key + " and C_ITEM_TYPE='案卷' ";
-        } else {
-          key = key + " and C_ITEM_TYPE='文件' ";
-        }
-      } else {
-        if (_self.radioValue == "案卷") {
-          key = key + " C_ITEM_TYPE='案卷' ";
-        } else {
-          key = key + " C_ITEM_TYPE='文件' ";
-        }
+        cond += " AND (coding like '%" + key + "%' or title like '%" + key + "%') ";
       }
       if (_self.AddConds != "") {
-        m.set("advCondition", _self.AddConds);
+       cond += " AND (" +_self.AddConds + ")";
       }
       _self.gridViewTrans = indata.gridView;
       _self.idTrans = indata.id;
       m.set("gridName", indata.gridView);
-      m.set("folderId", indata.id);
+      m.set("folderId", null);
       m.set("condition", key);
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", _self.currentPage - 1);
-      m.set("orderBy", "MODIFIED_DATE desc");
+      m.set("orderBy", "CREATION_DATE");
       console.log(m);
       axios
-        .post("/exchange/doc/getExceptBoxDocuments", JSON.stringify(m))
+        .post("/doc/getDocuments", JSON.stringify(m))
         .then(function (response) {
           _self.currentPage = 1;
           _self.itemDataList = response.data.data;
@@ -820,33 +724,7 @@ export default {
         _self.tableLoading = false;
       });
     },
-    //获取包含卷盒在内的所有信息
-    loadAllGridData(indata) {
-      let _self = this;
-      _self.tableLoading = true;
-      var key = _self.sqlStringFilter(_self.inputkey);
-      var m = new Map();
-      m.set("gridName", indata.gridView);
-      m.set("folderId", indata.id);
-      m.set("condition", key);
-      m.set("advCondition", _self.AddConds);
-      m.set("pageSize", _self.pageSize);
-      m.set("pageIndex", _self.currentPage - 1);
-      m.set("orderBy", "MODIFIED_DATE desc");
-      axios
-        .post("/dc/getContainBoxDocuments", JSON.stringify(m))
-        .then(function (response) {
-          _self.currentPage = 1;
-          _self.itemDataList = response.data.data;
-          _self.itemDataListFull = response.data.data;
-          _self.itemCount = response.data.pager.total;
-          //console.log(JSON.stringify(response.data.datalist));
-          _self.tableLoading = false;
-        }).catch(function(error) {
-        console.log(error);
-        _self.tableLoading = false;
-      });
-    },
+    
     selectChange(selection) {
       this.selectedItemList = [];
       if (selection.length > 0) {
@@ -854,20 +732,6 @@ export default {
           this.selectedItemList.push(selection[i]);
         }
       }
-    },
-
-    refRowClick: function (row) {
-      this.parentID = row.ID;
-      var typeChose = row.C_ITEM_TYPE;
-      var condition1 =
-        "SELECT CHILD_ID from ecm_relation where NAME='irel_children' and PARENT_ID ='" +
-        row.ID +
-        "'";
-      var key1 = "ID IN (" + condition1 + ") AND IS_HIDDEN=0";
-      this.$refs.relevantFileDataGrid.condition = key1;
-      this.$refs.relevantFileDataGrid.gridViewName = "GeneralPre";
-      this.$refs.relevantFileDataGrid.itemDataList = [];
-      this.$refs.relevantFileDataGrid.loadGridData();
     },
     //展示勾选弹框
     dialogFormShow() {
@@ -940,132 +804,6 @@ export default {
       }
       _self.borrowDialogVisible = true;
     },
-    //导出Excel
-    // exportExcel() {
-    //   var url = "/dc/getExportExcel";
-    //   var m = new Map();
-    //   if (this.exportAble) {
-    //     if (this.showBox) {
-    //       m.set("showBox", true);
-    //     } else {
-    //       m.set("showBox", false);
-    //     }
-    //     m.set("gridName", this.currentFolder.gridView);
-    //     m.set("lang", this.currentLanguage);
-    //     m.set("folderId", this.currentFolder.id);
-    //     m.set("orderBy", "MODIFIED_DATE desc");
-    //     axios
-    //       .post(url, JSON.stringify(m), {
-    //         responseType: "blob",
-    //       })
-    //       .then((res) => {
-    //         let fileName = res.headers["content-disposition"]
-    //           .split(";")[1]
-    //           .split("=")[1]
-    //           .replace(/\"/g, "");
-    //         let type = res.headers["content-type"];
-    //         let blob = new Blob([res.data], { type: type });
-    //         // IE
-    //         if (window.navigator.msSaveBlob) {
-    //           window.navigator.msSaveBlob(blob, fileName);
-    //         } else {
-    //           // console.log(3)
-    //           var link = document.createElement("a");
-    //           link.href = window.URL.createObjectURL(blob);
-    //           link.download = fileName;
-    //           link.click();
-    //           //释放内存
-    //           window.URL.revokeObjectURL(link.href);
-    //         }
-    //       });
-    //   } else {
-    //     this.$message({
-    //       showClose: true,
-    //       message: "请在文档目录下进行操作!",
-    //       duration: 2000,
-    //     });
-    //   }
-    // },
-    //下架文档
-    obtainItem() {
-      let _self = this;
-      var obtainItemId = [];
-      if (this.selectedItemList.length > 0) {
-        for (var i = 0; i < this.selectedItemList.length; i++) {
-          obtainItemId.push(this.selectedItemList[i].ID);
-        }
-        axios
-          .post("/dc/obtainDocument", JSON.stringify(obtainItemId))
-          .then(function (response) {
-            if (response.data.code) {
-              if (_self.showBox) {
-                _self.loadAllGridData(_self.currentFolder);
-              } else {
-                _self.loadGridData(_self.currentFolder);
-              }
-              _self.$message({
-                showClose: true,
-                message: response.data.msg,
-                duration: 2000,
-                type: "success",
-              });
-            } else {
-              _self.$message({
-                showClose: true,
-                message: response.data.msg,
-                duration: 2000,
-                type: "warning",
-              });
-            }
-          });
-      } else {
-        this.$message({
-          showClose: true,
-          message: "请勾选待下架文件!",
-          duration: 2000,
-        });
-      }
-    },
-    //销毁文档
-    destroyItem() {
-      let _self = this;
-      var deletItemId = [];
-      if (this.selectedItemList.length > 0) {
-        for (var i = 0; i < this.selectedItemList.length; i++) {
-          deletItemId.push(this.selectedItemList[i].ID);
-        }
-        axios
-          .post("/dc/destroyDocuments", JSON.stringify(deletItemId))
-          .then(function (response) {
-            if (response.data.code) {
-              if (_self.showBox) {
-                _self.loadAllGridData(_self.currentFolder);
-              } else {
-                _self.loadGridData(_self.currentFolder);
-              }
-              _self.$message({
-                showClose: true,
-                message: "销毁成功!",
-                duration: 2000,
-                type: "success",
-              });
-            } else {
-              _self.$message({
-                showClose: true,
-                message: "销毁失败!",
-                duration: 2000,
-                type: "warning",
-              });
-            }
-          });
-      } else {
-        this.$message({
-          showClose: true,
-          message: "请勾选待销毁文件!",
-          duration: 2000,
-        });
-      }
-    },
     //添加到收藏夹
     addToShopingCart() {
       let _self = this;
@@ -1118,38 +856,6 @@ export default {
       _self.$router.push({
         path: "/borrow",
       });
-      /*       if (
-        _self.$refs.ShowShopingCart &&
-        _self.$refs.ShowShopingCart.componentName == "shopingCart"
-      ) {
-        _self.$refs.ShowShopingCart.openShopingCart();
-      } */
-      // var arg = [];
-      //   axios
-      //     .post("/dc/openShopingCart", JSON.stringify(arg))
-      //     .then(function(response) {
-      //       if (response.data.code) {
-      //         _self.shopingCartDialogVisible = true;
-      //         // setTimeout(()=>{
-      //           // _self.$refs.ShopingCart.dataList = response.data.data;
-      //           _self.$router.push({
-      //             path:'/ShopingCart',
-      //              query: { tabledata: response.data.data }
-      //           });
-      //           if(_self.$refs.ShowShopingCart && _self.$refs.ShowShopingCart.componentName=="shopingCart"){
-      //              _self.$refs.ShowShopingCart.openShopingCart();
-      //           }
-      //         // },10);
-
-      //       } else {
-      //         _self.$message({
-      //           showClose: true,
-      //           message: "打开失败!",
-      //           duration: 2000,
-      //           type: "warning"
-      //         });
-      //       }
-      //     });
     },
     //查看属性
     showItemProperty(indata) {

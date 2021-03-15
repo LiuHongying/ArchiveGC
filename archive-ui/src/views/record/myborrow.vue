@@ -27,7 +27,7 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search()">{{
+          <el-button type="primary"  plain @click="search()">{{
             $t("application.SearchData")
           }}</el-button>
         </el-form-item>

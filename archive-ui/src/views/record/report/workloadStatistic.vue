@@ -44,17 +44,17 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="dialogVisible = true"
+          <el-button type="primary"  plain @click="dialogVisible = true"
             >年度档案统计</el-button
           >
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleReport()">{{
+          <el-button type="primary"  plain @click="handleReport()">{{
             $t("application.SearchData")
           }}</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click.native="exportMonth">{{
+          <el-button type="primary"  plain @click.native="exportMonth">{{
             $t("application.ExportExcel")
           }}</el-button>
         </el-form-item>

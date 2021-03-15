@@ -28,24 +28,23 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search()">{{
+          <el-button type="primary"  plain @click="search()">{{
             $t("application.SearchData")
           }}</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submit('主表')">入库</el-button>
+          <el-button type="primary"  plain @click="submit('主表')">入库</el-button>
         </el-form-item>
         <el-form-item>
           <el-button
             type="primary"
-            size="small"
-            icon="el-icon-printer"
+             plain
             @click="beforePrint(selectedItems,'FormDcGridUnSort')"
             title="打印清单"
             >打印清单</el-button>
         </el-form-item>
         <el-form-item>
-        <el-button type="primary" @click.native="exportData">{{
+        <el-button type="primary"  plain @click.native="exportData">{{
             $t("application.ExportExcel")
           }}</el-button>
         </el-form-item>
@@ -82,6 +81,7 @@
                   <el-form-item>
                     <el-input
                       style="width: 200px"
+                      plain
                       v-model="inputdcing"
                       placeholder='请输入编码'
                       @keyup.enter.native="searchDCing()"
@@ -89,12 +89,12 @@
                     ></el-input>
                   </el-form-item>
                   <el-form-item>
-                    <el-button type="primary" @click="searchDCing()">{{
+                    <el-button type="primary"  plain @click="searchDCing()">{{
                       $t("application.SearchData")
                     }}</el-button>
                   </el-form-item>
                   <el-form-item>
-                    <el-button type="primary" @click="submit('')">入库</el-button>
+                    <el-button type="primary"  plain @click="submit('')">入库</el-button>
                   </el-form-item>
                 </el-form>
                 <DataGrid
@@ -126,7 +126,7 @@
                     ></el-input>
                   </el-form-item>
                   <el-form-item>
-                    <el-button type="primary" @click="searchDCed()">{{
+                    <el-button type="primary"  plain @click="searchDCed()">{{
                       $t("application.SearchData")
                     }}</el-button>
                   </el-form-item>

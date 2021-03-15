@@ -31,8 +31,8 @@
               <el-radio style="margin-left:5px;" v-model="radio" label="文件" @change="changeRadio">文件</el-radio>
             </el-col>
              <el-col :span="16" style="padding-top:8px;">
-               <el-button type="warning" @click="onDeleleItem()">删除</el-button>
-               <el-button type="primary" @click="reset()">恢复</el-button>
+               <el-button type="warning"  plain @click="onDeleleItem()">删除</el-button>
+               <el-button type="primary"  plain @click="reset()">恢复</el-button>
             </el-col>
           </el-row>
           <el-row>

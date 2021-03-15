@@ -88,8 +88,9 @@
         <input value="value1" type="hidden" />
       </el-col>
       <el-col :span="6">
-        <el-button
+        <el-button plain
           size="small"
+          type="primary"
           @click="clickShowDialog(typeName)"
         >{{$t('route.advSearch')}}</el-button>
       </el-col>

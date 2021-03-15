@@ -39,12 +39,12 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search()">{{
+          <el-button type="primary"  plain @click="search()">{{
             $t("application.SearchData")
           }}</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="getWorkFlow">发起流程</el-button>
+          <el-button type="primary"  plain @click="getWorkFlow">发起流程</el-button>
         </el-form-item>
       </el-form>
     </template>

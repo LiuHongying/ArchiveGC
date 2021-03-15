@@ -21,7 +21,7 @@
               placeholder="请输入文件夹名称"
               @keyup.enter.native="searchFolder()"
             ></el-input>
-            <el-button type="primary" @click="searchFolder()">{{
+            <el-button type="primary" plain @click="searchFolder()">{{
               $t("application.SearchData")
             }}</el-button>
           </el-header>
@@ -139,9 +139,18 @@
                 ></el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="search()">{{
+                <el-button type="primary" plain @click="search()">{{
                   $t("application.SearchData")
                 }}</el-button>
+              </el-form-item>
+              <el-form-item>
+                <AddCondition
+                  @change="searchItem"
+                  v-model="advCondition"
+                  v-bind:typeName="typeName"
+                  :inputValue="advCondition"
+                  :inputType="hiddenInput"
+                ></AddCondition>
               </el-form-item>
               <el-form-item>
                 <el-radio
@@ -164,15 +173,35 @@
                   type="primary"
                   plain
                   size="medium"
-                  icon="el-icon-folder-add"
                   @click="addToShopingCart()"
                   >收藏</el-button
                 >
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click.native="exportData">{{
+                <el-button type="primary" plain @click.native="exportData">{{
                   $t("application.ExportExcel")
                 }}</el-button>
+              </el-form-item>
+              
+              
+              <el-form-item>
+                <el-button
+                    type="primary"
+                    plain
+                    size="small"
+                    @click="pieceNumVisible=true"
+                    title="生成批次号"
+                  >生成批次号</el-button>
+              </el-form-item>
+              <el-form-item>
+                <el-button
+                  type="primary"
+                  plain
+                  :loading="releaseLoading"
+                  size="small"
+                  @click="penddingStorage"
+                  title="提交入库"
+                  >提交入库</el-button>
               </el-form-item>
               <el-form-item>
                 <el-dropdown
@@ -239,36 +268,6 @@
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
-              </el-form-item>
-              <el-form-item>
-                <AddCondition
-                  @change="searchItem"
-                  v-model="advCondition"
-                  v-bind:typeName="typeName"
-                  :inputValue="advCondition"
-                  :inputType="hiddenInput"
-                ></AddCondition>
-              </el-form-item>
-              <el-form-item>
-                <el-button
-                  type="primary"
-                  plain
-                  :loading="releaseLoading"
-                  size="small"
-                  icon="el-icon-right"
-                  @click="penddingStorage"
-                  title="提交入库"
-                  >提交入库</el-button>
-              </el-form-item>
-              <el-form-item>
-                <el-button
-                    type="primary"
-                    plain
-                    size="small"
-                    icon="el-icon-folder-add"
-                    @click="pieceNumVisible=true"
-                    title="生成批次号"
-                  >生成批次号</el-button>
               </el-form-item>
             </el-form>
           </template>

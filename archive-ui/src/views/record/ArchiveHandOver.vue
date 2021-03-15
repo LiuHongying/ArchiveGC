@@ -96,24 +96,24 @@
           ></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search()">{{
+          <el-button type="primary"  plain @click="search()">{{
             $t("application.SearchData")
           }}</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="propertyVisible=true">添加库位号</el-button>
+          <el-button type="primary"  plain @click="propertyVisible=true">添加库位号</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handOver()">入库</el-button>
+          <el-button type="primary"  plain @click="handOver()">入库</el-button>
         </el-form-item>
         <el-form-item>
-        <el-button type="primary" @click="pendNot">退回</el-button>
+        <el-button type="primary"  plain @click="pendNot">退回</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" size="small" plain  @click="batchUpdateVisible=true" >更新库位号</el-button>
+          <el-button type="primary"  plain  @click="batchUpdateVisible=true" >更新库位号</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click.native="exportData">{{
+          <el-button type="primary" plain  @click.native="exportData">{{
             $t("application.ExportExcel")
           }}</el-button>
         </el-form-item>

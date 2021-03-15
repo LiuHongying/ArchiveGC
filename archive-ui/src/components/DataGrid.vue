@@ -184,7 +184,7 @@
             />
           </template>
         </el-table-column>
-        <el-table-column width="60">
+        <el-table-column width="60" v-if="showLeftOpenButton">
          <template slot-scope="scope">
                             <el-button
                               type="primary"
@@ -454,7 +454,8 @@ export default {
     isLoadGridInfo: { type: Boolean, default: true },
     showBatchCheck: { type: Boolean, default: false },
     sortBackData: { type: Boolean, default: false },//后台排序
-    extparam:{type:Map,default:null}
+    extparam:{type:Map,default:null},
+    showLeftOpenButton: { type: Boolean, default: true },
   },
   watch: {
     showFields(val, oldVal) {
@@ -1046,7 +1047,7 @@ export default {
         path: "/viewdoc",
         query: {
           id: condition,
-          //token: sessionStorage.getItem('access-token')
+          token: sessionStorage.getItem('access-token')
         },
       });
       //console.log(href);

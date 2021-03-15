@@ -57,7 +57,7 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search()">{{
+          <el-button type="primary"  plain @click="search()">{{
             $t("application.SearchData")
           }}</el-button>
         </el-form-item>
@@ -72,7 +72,7 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary"  @click="propertyVisible=true">新建专题</el-button>
+            <el-button type="primary"  plain  @click="propertyVisible=true">新建专题</el-button>
         </el-form-item>
         <el-form-item>
           <MountFile :selectedItem="selectedThItems" @refresh='search' :title="$t('application.ReplaceDoc')">更新内容</MountFile>
@@ -106,10 +106,10 @@
               <el-col :span="24">
               <el-form :inline="true" @submit.native.prevent>
                 <el-form-item>
-                    <el-button type="primary" @click="beforeCreat">添加文档</el-button>
+                    <el-button type="primary"  plain @click="beforeCreat">添加文档</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="warning" @click="DelRelation" >移除文档</el-button>
+                    <el-button type="warning"  plain @click="DelRelation" >移除文档</el-button>
                 </el-form-item>
               </el-form>
               </el-col>
