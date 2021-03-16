@@ -64,7 +64,7 @@ public class IsCurrentCompany implements JavaDelegate{
 				if(department.equals(creatorGroup)||department.equals(toDepartment)) {		//要是自己部门的文件就先设置为true
 					execution.setVariable("IS_CURRENT_COMPANY", "是");
 				}
-				if(!department.equals(creatorGroup)||!department.equals(toDepartment)) {		//只要遇到一次不是自己部门的文件，就直接设为false，后跳出循环
+				if(!department.equals(creatorGroup)&&!department.equals(toDepartment)) {		//只要遇到一次不是自己部门的文件，就直接设为false，后跳出循环
 					execution.setVariable("IS_CURRENT_COMPANY", "否");
 					isCurrentDepartment = true;
 					break;
