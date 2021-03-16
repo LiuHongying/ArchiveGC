@@ -236,7 +236,7 @@
                 <template slot="paneL">
                   <el-form inline="true">
                   <el-row>
-                    <el-col :span="3" class="topbar-input">
+                    <el-col :span="4" class="topbar-input">
                       <el-row>
                       <el-input
                         v-model="inputkey"
@@ -261,7 +261,7 @@
                         <el-radio style="margin-left:5px;" v-model="radio" label="文件" @change="changeRadio">文件</el-radio>
                       </div>
                     </el-col>
-                    <el-col :span="18" style="padding-left:10px;">
+                    <el-col :span="17" style="padding-left:10px;">
                       <div style="min-width:400px;width:100%;">
                       <el-form-item>
                         <TypeSelectComment ref="TypeSelectComment" :currentFolder="currentFolder" @afterSelecteType="newArchiveItem"></TypeSelectComment>
@@ -281,6 +281,8 @@
                         plain
                         size="small"
                         @click="fileAttrsCopy(1)">复制著录</el-button>
+                      </el-form-item>
+                      <el-form-item>
                         <el-button
                         type="primary"
                         plain

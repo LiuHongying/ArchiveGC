@@ -126,7 +126,7 @@
             </el-header>
           -->
             <el-tree
-              :style="{width: asideWidth,overflow:'scroll'}"
+              :style="{width: asideWidth,height: treeHeight + 'px',overflow:'scroll'}"
               :props="defaultProps"
               :data="dataList"
               node-key="id"

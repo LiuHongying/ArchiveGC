@@ -169,7 +169,9 @@ export default {
 .redlabel .el-form-item__label{
   color: #ff0000 ;
 }
-
+.el-form--inline .el-form-item {
+    margin-right: 5px;
+}
 /* .el-message{
   background-color: #67c23acc !important;
 }
