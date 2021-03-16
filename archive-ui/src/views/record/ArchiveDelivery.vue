@@ -274,6 +274,7 @@
                   v-bind:tableHeight="layout.height-170"
                   @rowclick="beforeLoadGridData"
                   @selectchange="transferselectChange"
+                  :showLeftOpenButton="false"
                 ></DataGrid>
               </el-col>
             </el-row>

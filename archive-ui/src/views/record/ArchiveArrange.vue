@@ -52,7 +52,7 @@
 
     </el-dialog>
 
- <el-dialog :visible.sync="printVolumesVisible4Documents"  width="80%"
+ <el-dialog :visible.sync="printVolumesVisible4Documents"  width="90%"
     > <div>
       <PrintVolumes4Docu
         ref="PrintVolumes4Documents"
@@ -219,7 +219,7 @@
           <template slot="paneL">
             <el-container :style="{height:asideHeight+'px',width:asideWidth,overflow:'auto'}">
               <el-tree
-                style="width:100%"
+                :style="{width: asideWidth,overflow:'scroll'}"
                 :props="defaultProps"
                 :data="dataList"
                 node-key="id"
@@ -450,6 +450,14 @@
                                 导出EXCEL
                               </el-button>
                             </el-dropdown-item>
+                            <!--
+                             <el-dropdown-item divided>
+                              <el-button @click="packDownloadByIds(selectedItems)" style="display:block;width:117px" type="primary" plain size="small"> 
+                                <i class="el-icon-download"></i>
+                                打包下载
+                              </el-button>
+                            </el-dropdown-item>
+                            -->
                             <el-dropdown-item divided>
                               <el-button @click="SearchBusinessDC()" style="display:block;width:117px" type="primary" plain size="small"> 
                                 <i class="el-icon-search"></i>
@@ -2377,14 +2385,18 @@ export default {
           })
           .then(function(response) {
             let code = response.data.code;
-            //console.log(JSON.stringify(response));
+            console.log(JSON.stringify(response));
             if (code == 1) {
               _self.$emit("onSaved", "update");
             } else {
+              let msg = _self.$t('message.saveFailured');
+              if(response.data.message){
+                msg += ":" + response.data.message;
+              }
               // _self.$message(_self.$t('message.saveFailured'));
               _self.$message({
                 showClose: true,
-                message: _self.$t('message.saveFailured'),
+                message: msg,
                 duration: 5000,
                 type: "error"
               });

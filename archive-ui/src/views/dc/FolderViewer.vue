@@ -17,17 +17,16 @@
         <el-button @click="propertyVisible = false">{{$t('application.cancel')}}</el-button>
       </div>
     </el-dialog>
-  <el-container>
-    <el-header style="height:48px;">
+
+    <el-row>
       <el-col :span="5" class="topbar-input">
         <el-input v-model="inputKey" :placeholder="$t('application.placeholderSearch')" @keyup.enter.native="search"></el-input>
       </el-col>
-    </el-header>
-    <el-main>
+    </el-row>
       <DataGrid
           ref="mainDataGrid"
           key="main"
-          gridViewName = "GeneralGrid"
+          gridViewName = "General"
           v-bind:itemDataList="itemDataList"
           v-bind:columnList="gridList"
           @pagesizechange="pageSizeChange"
@@ -37,8 +36,6 @@
           v-bind:isshowOption="true" v-bind:isshowSelection ="false"
           v-bind:propertyComponent="this.$refs.ShowProperty"
         ></DataGrid>
-    </el-main>
-  </el-container>
 </div>
 </template>
 
@@ -66,7 +63,7 @@ export default {
         currentPage: 1,
         itemDialogVisible: false,
         pageSize:20,
-        tableHeight: window.innerHeight - 130
+        tableHeight: window.innerHeight - 160
     };
   },
   mounted() {

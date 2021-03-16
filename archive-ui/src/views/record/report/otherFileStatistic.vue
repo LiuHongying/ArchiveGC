@@ -10,12 +10,12 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleReport()">{{
+          <el-button type="primary"  plain @click="handleReport()">{{
             $t("application.SearchData")
           }}</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click.native="exportStatistic">{{
+          <el-button type="primary"  plain @click.native="exportStatistic">{{
             $t("application.ExportExcel")
           }}</el-button>
         </el-form-item>

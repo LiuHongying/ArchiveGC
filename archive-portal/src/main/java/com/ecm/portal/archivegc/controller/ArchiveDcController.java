@@ -1114,10 +1114,13 @@ public class ArchiveDcController extends ControllerAbstract {
 	public Map<String, Object> searchFolder(@RequestBody String argStr) {
 		Map<String, Object> args = JSONUtils.stringToMap(argStr);
 		Map<String, Object> mp = new HashMap<String, Object>();
-		String NAME = args.get("NAME").toString();
+		String NAME = (String)args.get("NAME");
 		String parentPath = args.get("parentPath").toString();
 		List<EcmFolder> list = null;
-		String cond = "NAME like '%" + NAME + "%' and FOLDER_PATH like '%" + parentPath + "%' ";
+		String cond = " FOLDER_PATH = '" + parentPath + "' ";
+		if(!StringUtils.isEmpty(NAME)) {
+			cond = "NAME like '%" + NAME + "%' and FOLDER_PATH = '" + parentPath + "' ";
+		}
 		list = ecmFolderMapper.selectByCondition(cond);
 		mp.put("code", ActionContext.SUCESS);
 		mp.put("data", list);

@@ -139,7 +139,7 @@
             @header-dragend="onHeaderDragend"
             @row-dblclick="dbclick"
           >
-            <el-table-column type="expand"  :key="1">
+            <el-table-column type="expand"  :key="'m_'+1">
               <template slot-scope="scope">
                 <el-table
                   :data="scope.row.childrens"
@@ -149,18 +149,18 @@
                 >
                   <el-table-column>
                     <template slot-scope="scope">
-                      <div style="color : #CCCCCC;" v-html="'摘要：'+scope.row.highlightText"></div>
+                      <div style="color : #999999;" v-html="'摘要：'+scope.row.highlightText"></div>
                     </template>
                   </el-table-column>
                 </el-table>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('field.indexNumber')" width="60"  :key="2">
+            <el-table-column :label="$t('field.indexNumber')" width="60"  :key="'m_'+2">
               <template slot-scope="scope">
                 <span>{{(currentPage-1) * pageSize + scope.$index+1}}</span>
               </template>
             </el-table-column>
-            <el-table-column width="40"  :key="3">
+            <el-table-column width="40"  :key="'m_'+3">
               <template slot-scope="scope">
                   <img v-if="scope.row.C_ITEM_TYPE=='案卷'"
                     :src="'./static/img/box.gif'"
@@ -307,6 +307,7 @@ export default {
       keywords: [],
       dialogVisible: false,
       tableHeight: window.innerHeight - 170,
+      tableWidth: window.innerWidth - 270,
       formLabelWidth: "120px",
       loadData:false,
       searched:false,
@@ -374,8 +375,8 @@ export default {
       let href = this.$router.resolve({
         path: "/viewdoc",
         query: {
-          id: condition
-          //token: sessionStorage.getItem('access-token')
+          id: condition,
+          token: sessionStorage.getItem('access-token')
         }
       });
       //console.log(href);
@@ -619,9 +620,7 @@ li {
   display: inline-block;
   margin: 0 10px;
 }
-a {
-  color: #42b983;
-}
+
 .searchInput {
   display: inline;
   padding-top:10px;
@@ -653,6 +652,9 @@ a {
      background: 0 0;
      border-top: 1px dashed #9fa0a1;
  } 
+ .searchhighlight{
+   background-color: #fceb01;
+ }
  .ecmtitle{
   font-size: 16px;
   font-weight: bold;

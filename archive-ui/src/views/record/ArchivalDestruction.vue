@@ -50,7 +50,7 @@
           ></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search()">{{
+          <el-button type="primary"  plain @click="search()">{{
             $t("application.SearchData")
           }}</el-button>
         </el-form-item>
@@ -65,10 +65,10 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" @click="propertyVisible=true">新建</el-button>
+            <el-button type="primary"  plain @click="propertyVisible=true">新建</el-button>
         </el-form-item>
         <el-form-item v-if="showFlow">
-            <el-button type="primary"  @click="getWorkFlow">发起流程</el-button>
+            <el-button type="primary"  plain @click="getWorkFlow">发起流程</el-button>
         </el-form-item>
       </el-form>
     </template>
@@ -100,10 +100,10 @@
               <el-col :span="24">
               <el-form :inline="true" @submit.native.prevent>
                 <el-form-item>
-                    <el-button type="primary" @click="beforeAdd()">添加</el-button>
+                    <el-button type="primary"  plain @click="beforeAdd()">添加</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="warning" @click="DelRelation" >移除</el-button>
+                    <el-button type="warning"  plain @click="DelRelation" >移除</el-button>
                 </el-form-item>
               </el-form>
               </el-col>

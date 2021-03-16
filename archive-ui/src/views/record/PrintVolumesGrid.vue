@@ -12,7 +12,7 @@
                         :height="tableHeight"
                         :data="innerDataList"
                         border="1"
-                        style="width: 100%;border:1px solid #000000" :row-class-name="cellClassName">
+                        style="width: 100%;border:1px solid #000000;" cell-style="border-top: 1px solid black;">
                         <el-table-column key="#1" :label="$t('field.indexNumber')"  width="70">
                                 <template slot-scope="scope">
                                     <span>{{ scope.$index+1}}</span>
@@ -155,8 +155,58 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-.rowclass{
-   border-bottom: 1px solid #000000 !important;
+<style scoped>
+
+/* .table-a table{border:1px solid #212121}  */
+.v-auto-out .auto-in {
+position: absolute;
+top: 50%;
+border: 1px dashed #ddd;
+/* 这里有兼容性问题 */
+-webkit-transform: translateY(-50%);
+-ms-transform: translateY(-50%);
+-o-transform: translateY(-50%);
+transform: translateY(-50%);
 }
+
+  .bg-purple-dark {
+    background: #99a9bf;
+  }
+  .bg-purple {
+    background: #d3dce6;
+  }
+  .bg-purple-light {
+    background: #e5e9f2;
+  }
+  .grid-content {
+    border-radius: 4px;
+    min-height: 36px;
+  }
+  .row-bg {
+    padding: 10px 0;
+    background-color: #f9fafc;
+  }
+/* 样式 */
+  .table, .table * {margin: 0 auto; padding: 0;font-size: 14px;
+  font-family: Arial, 宋体, Helvetica, sans-serif;}   
+.table {display: table; width: 80%; border-collapse: collapse;/*border-bottom: 1px solid gray;*/}   
+  
+.table-tr {display: table-row; height: 30px;}   
+.table-th {display: table-cell;font-weight: bold;height: 100%;/*border: 1px solid gray;*/text-align: center;vertical-align: middle;}   
+.table-td {display: table-cell; height: 100%;}   
+  
+.sub-table {width: 100%;height: 100%;display: table;}   
+.sub-table-tr {display: table-row; height: 100%;}   
+.sub-table-td {display: table-cell; height: 100%;
+/* border-top: 1px solid gray; 
+border-left: 1px solid gray;
+border-right: 1px solid gray; */
+border-top: 1px solid #000000; 
+border-left: 1px solid #000000;
+border-right: 1px solid #000000;
+/* border:1px solid #212121; */
+text-align: center;vertical-align: middle;}
+.sub-table-td1 {display: table-cell; height: 100%;
+/* border-left: 1px solid #212121; */
+text-align: center;vertical-align: middle;}
 </style>
