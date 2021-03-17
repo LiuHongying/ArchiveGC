@@ -100,10 +100,10 @@ public class MountFileService extends EcmService{
 					if(name.indexOf(")")>0) {
 						revision = temp[1].split("\\)")[0];
 					}else {
-						revision = temp[1].split(".")[0];
+						revision = temp[1].split("\\.")[0];
 					}
 				}else {
-					coding = name.split(".")[0];
+					coding = name.split("\\.")[0];
 				}
 				String sql = "select ID from ecm_document where C_ITEM_TYPE='文件' AND ID in("+idSql +") AND CODING='"+coding+"'";
 				if(revision.length()>0) {
