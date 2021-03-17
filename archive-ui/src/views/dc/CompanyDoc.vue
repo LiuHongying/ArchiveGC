@@ -135,7 +135,7 @@
               <el-input
                 style="width: 150px"
                 v-model="inputValueNum"
-                placeholder="请输入文件夹名称"
+                placeholder="请输入"
                 @keyup.enter.native="search()"
               ></el-input>
               <el-button type="primary"  plain @click="search()">{{
@@ -528,6 +528,7 @@ export default {
       radioValue: "案卷",
       isFile: true,
       isExpand: false,
+      basePath: "/档案库"
     };
   },
   created() {
@@ -597,7 +598,14 @@ export default {
       if (_self.inputValueNum != "" && _self.inputValueNum != undefined) {
         var m = new Map();
         m.set("NAME", _self.inputValueNum);
-        m.set("parentPath", "/档案库");
+        //console.log(_self.currentFolder);
+        if(_self.currentFolder.folderPath){
+          //console.log(_self.currentFolder.folderPath);
+          m.set("parentPath", _self.currentFolder.folderPath);
+        }else{
+          m.set("parentPath", _self.basePath);
+        }
+        
         axios
           .post("/admin/searchFolder", JSON.stringify(m))
           .then(function (response) {

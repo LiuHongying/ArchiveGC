@@ -18,7 +18,7 @@
             <el-input
               style="width: 150px"
               v-model="inputFolder"
-              placeholder="请输入文件夹名称"
+              placeholder="请输入"
               @keyup.enter.native="searchFolder()"
             ></el-input>
             <el-button type="primary" plain @click="searchFolder()">{{
@@ -409,6 +409,7 @@ export default {
       judgement: "",
       currentFolder: [],
       currentTreeNode:null,
+      basePath: "/预归档库",
       tables: {
         main: {
           gridViewName: "GeneralPre",
@@ -723,7 +724,12 @@ export default {
       if (_self.inputFolder != "" && _self.inputFolder != undefined) {
         var m = new Map();
         m.set("NAME", _self.inputFolder);
-        m.set("parentPath", "/预归档库");
+        if(_self.currentFolder.folderPath){
+          //console.log(_self.currentFolder.folderPath);
+          m.set("parentPath", _self.currentFolder.folderPath);
+        }else{
+          m.set("parentPath", _self.basePath);
+        }
         axios
           .post("/admin/searchFolder", JSON.stringify(m))
           .then(function (response) {

@@ -66,6 +66,7 @@ export default {
   background-color: #eef1f6 !important;
 }
 .el-form-item {
+  margin-left: 5px !important;
   margin-top: 1px !important;
   margin-bottom: 1px !important;
 }
@@ -99,7 +100,7 @@ export default {
   padding: 2px !important;
 }
 .el-header {
-  padding: 0 15px !important;
+  padding: 5 10px !important;
   box-sizing: border-box;
 }
 .el-tabs__header {

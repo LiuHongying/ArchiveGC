@@ -1119,7 +1119,7 @@ public class ArchiveDcController extends ControllerAbstract {
 		List<EcmFolder> list = null;
 		String cond = " FOLDER_PATH = '" + parentPath + "' ";
 		if(!StringUtils.isEmpty(NAME)) {
-			cond = "NAME like '%" + NAME + "%' and FOLDER_PATH = '" + parentPath + "' ";
+			cond = "NAME like '%" + NAME + "%' and FOLDER_PATH like '" + parentPath + "%' ";
 		}
 		list = ecmFolderMapper.selectByCondition(cond);
 		mp.put("code", ActionContext.SUCESS);

@@ -173,6 +173,7 @@ public class Receiving4TC extends ControllerAbstract {
 						doc.put("STATUS", "整编");
 						doc.put("C_RECEIVE", documentService.getSession(getToken()).getCurrentUser().getUserName());
 						doc.put("C_RECEIVE_DATE", new Date());
+						doc.put("FOLDER_ID", folderId);
 						documentService.updateObject(getToken(), doc);
 						
 						//mp.put("code", ActionContext.FAILURE);

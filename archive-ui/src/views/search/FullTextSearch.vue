@@ -144,10 +144,10 @@
                 <el-table
                   :data="scope.row.childrens"
                   border
-                  style="width: 100%"
+                  :style="'width: '+(tableWidth+10)+'px'"
                   :show-header="false"
                 >
-                  <el-table-column>
+                  <el-table-column :width="tableWidth+'px'">
                     <template slot-scope="scope">
                       <div style="color : #999999;" v-html="'摘要：'+scope.row.highlightText"></div>
                     </template>

@@ -35,7 +35,7 @@ export default {
       let matched = this.$route.matched.filter(item => item.name)
       const first = matched[0]
       if (first && first.name !== 'home') {
-        matched = [{ path: '/home', meta: { title: 'home' }}].concat(matched)
+        //matched = [{ path: '/home', meta: { title: 'home' }}].concat(matched)
       }
       if(matched.length==2 && (matched[0].path == matched[1].path) ){
           matched[1].path=(matched[1].path+"").replace("/","")

@@ -124,7 +124,6 @@ export default {
         Drawing: {
           gridViewName: "DrawingGrid",
           dataUrl: "/dc/getDocuments",
-          condition: "",
           isInitData:false,
           isshowCustom:false,
           isEditProperty:true,

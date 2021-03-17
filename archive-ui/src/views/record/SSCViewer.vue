@@ -112,19 +112,19 @@
               overflow: 'auto',
             }"
           >
-          <!--
-            <el-header>
+            <el-header style="height:40px;padding:5px;">
               <el-input
                 style="width: 150px"
+                
                 v-model="inputValueNum"
-                placeholder="请输入文件夹名称"
+                placeholder="请输入"
                 @keyup.enter.native="search()"
               ></el-input>
-              <el-button type="primary" @click="search()">{{
+              <el-button type="primary" plain @click="search()">{{
                 $t("application.SearchData")
               }}</el-button>
             </el-header>
-          -->
+
             <el-tree
               :style="{width: asideWidth,height: treeHeight + 'px',overflow:'scroll'}"
               :props="defaultProps"
@@ -397,7 +397,7 @@ export default {
       AddConds: "",
       innerTableHeight: window.innerHeight - 360,
       asideHeight: window.innerHeight - 80,
-      treeHeight: window.innerHeight - 120,
+      treeHeight: window.innerHeight - 80,
       asideWidth: "100%",
       currentLanguage: "zh-cn",
       propertyVisible: false,
@@ -497,6 +497,9 @@ export default {
       let _self = this;
         var m = new Map();
         var path = _self.basePath;
+        if(_self.currentFolder.folderPath){
+          path = _self.currentFolder.folderPath;
+        }
         m.set("NAME", _self.inputValueNum);
         m.set("parentPath", path);
         axios
