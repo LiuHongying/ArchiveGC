@@ -31,7 +31,7 @@
             </div>
         </el-dialog>
         <el-button
-            type="primary"
+            type="primary"  plain
             @click="beforeUploadFile()"
           ><slot>挂载文件</slot></el-button>
     </div>
