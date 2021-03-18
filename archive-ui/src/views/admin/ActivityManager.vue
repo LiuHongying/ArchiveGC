@@ -287,7 +287,10 @@ export default {
         this.currentUser().systemPermission
       );
     if(systemPermission<9){
-      _self.$router.push({ path: '/NoPermission' });   
+      //跳转至权限提醒页
+      _self.$nextTick(()=>{
+         _self.$router.push({ path: '/NoPermission' })
+      })     
     }
     this.refreshData();
   },
