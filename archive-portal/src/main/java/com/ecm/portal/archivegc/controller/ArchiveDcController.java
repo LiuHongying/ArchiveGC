@@ -1226,8 +1226,15 @@ public class ArchiveDcController extends ControllerAbstract {
 				EcmDocument docu= documentService.getObjectById(getToken(), fileId);
 				docu.addAttribute("IS_CHILD", "1");
 				documentService.updateObject(getToken(), docu, null);
-				EcmRelation relation=new EcmRelation("irel_children",archiveIdStr,fileId);
-				relationService.newObject(getToken(), relation);
+				log.info("archiveIdStr:"+archiveIdStr);
+				log.info("fileId:"+fileId);
+				try {
+					EcmRelation relation=new EcmRelation("irel_children",archiveIdStr,fileId);
+					relationService.newObject(getToken(), relation);
+				}
+				catch(Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 			mp.put("code", ActionContext.SUCESS);
 		}catch (Exception e) {
