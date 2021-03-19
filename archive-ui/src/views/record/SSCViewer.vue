@@ -497,7 +497,7 @@ export default {
       let _self = this;
         var m = new Map();
         var path = _self.basePath;
-        if(_self.currentFolder.folderPath){
+        if(_self.currentFolder.folderPath && _self.inputValueNum !=null && _self.inputValueNum!=''){
           path = _self.currentFolder.folderPath;
         }
         m.set("NAME", _self.inputValueNum);
