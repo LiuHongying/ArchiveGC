@@ -11,13 +11,13 @@
                 >
                 </ShowProperty>
         <el-form :inline="true">
-        <el-form-item label="本单位/部门领导:" label-width="150px">
+        <el-form-item label="本单位/部门领导:" label-width="170px">
         <UserSelectInput :roleName='departmentLeader' v-model="reviewer1" v-bind:inputValue="reviewer1" ></UserSelectInput>
         </el-form-item>
         <el-form-item label="文件形成单位/部门领导:" label-width="170px">
         <UserSelectInput :roleName='departmentLeader' v-model="reviewer2" v-bind:inputValue="reviewer2" :isRepeat="true"></UserSelectInput>
         </el-form-item>
-        <el-form-item label="公司主管领导:" label-width="130px">
+        <el-form-item label="公司主管领导:" label-width="170px">
         <UserSelectInput :roleName='companyLeader' v-model="reviewer3" v-bind:inputValue="reviewer3" ></UserSelectInput>                
         </el-form-item>
         </el-form>

@@ -387,18 +387,13 @@ export default {
       })
       .then(function(response){
         if(response.data.code==1){
-          _self.init()
+          _self.init();
           _self.$message({
               showClose: true,
               message: "整编成功",
               duration: 2000,
               type: 'success'
           });
-          _self.$refs.Drawing.itemDataList=[];
-          var j;
-          for (j in tab) {
-            writeAudit(tab[j]["ID"]);
-          }
         }else{
               
           _self.$message({
@@ -425,7 +420,7 @@ export default {
     writeAudit(docId){
       var m = new Map();
       m.set("docId",docId)
-      m.set("actionName","ecm_read")
+      m.set("actionName","接收")
       m.set("appName","portal")
       axios
         .post("/audit/addAudit", JSON.stringify(m))

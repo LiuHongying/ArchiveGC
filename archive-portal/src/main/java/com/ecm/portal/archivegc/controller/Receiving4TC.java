@@ -25,6 +25,7 @@ import com.ecm.core.entity.EcmDocument;
 import com.ecm.core.entity.EcmFolder;
 import com.ecm.core.entity.EcmRelation;
 import com.ecm.core.exception.AccessDeniedException;
+import com.ecm.core.service.AuditService;
 import com.ecm.core.service.DocumentService;
 import com.ecm.core.service.FolderPathService;
 import com.ecm.core.service.FolderService;
@@ -40,7 +41,7 @@ public class Receiving4TC extends ControllerAbstract {
 	private DocumentService documentService;
 
 	@Autowired
-	private CustomCacheService customCacheService;
+	private AuditService auditService;
 
 	@Autowired
 	private RelationService relationService;
@@ -166,6 +167,7 @@ public class Receiving4TC extends ControllerAbstract {
 						doc.put("C_RECEIVE", documentService.getSession(getToken()).getCurrentUser().getUserName());
 						doc.put("C_RECEIVE_DATE", new Date());
 						documentService.updateObject(getToken(), doc);
+						auditService.newAudit(getToken(), "portal", "接收",(String)doc.get("ID"), null,"TC");
 					}else {
 						String folderId=folderPathService.getFolderId(getToken(), doc, "2");
 						EcmFolder folder = folderService.getObjectById(getToken(), folderId);
@@ -175,7 +177,7 @@ public class Receiving4TC extends ControllerAbstract {
 						doc.put("C_RECEIVE_DATE", new Date());
 						doc.put("FOLDER_ID", folderId);
 						documentService.updateObject(getToken(), doc);
-						
+						auditService.newAudit(getToken(), "portal", "接收",(String)doc.get("ID"), null,"TC");
 						//mp.put("code", ActionContext.FAILURE);
 						//mp.put("message", "文件"+coding+"没有对应案卷");
 						//return mp;

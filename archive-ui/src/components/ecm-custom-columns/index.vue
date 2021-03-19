@@ -418,6 +418,7 @@ export default {
       axios.post(url,JSON.stringify(m)).then(function(response) {
         if(response.data.code==1){
           _self.tables.target.data = response.data.data
+          console.log(response.data.data);
           _self.selectedName = name
         }
       }).catch(function(error){
@@ -510,10 +511,16 @@ export default {
             }
           })
           if(isExist==false){
-            item.width="200"
-            item.visibleType="1"
-            item.allowOrderby=true
-            _self.tables.target.data.push(item)
+            let newItem = {
+              allowOrderby: true,
+              attrName: item.attrName,
+              id: item.id,
+              label: item.label,
+              orderIndex: item.orderIndex,
+              visibleType: '1',
+              width:"200"
+            }
+            _self.tables.target.data.push(newItem)
           }
       })
     },

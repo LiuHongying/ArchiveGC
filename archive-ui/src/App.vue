@@ -153,6 +153,10 @@ export default {
   display:block;
 }
 
+.el-table--border td, .el-table--border th, .el-table__body-wrapper .el-table--border.is-scrolling-left~.el-table__fixed {
+    border-right: 1px solid #dcdcdc !important;
+}
+
 .el-button-ecm{
     height: 30px !important;
   padding: 2px 3px !important;
