@@ -148,7 +148,7 @@ public class TCService {
 					.setSocketTimeout(30000).build();
 			httpPost.setConfig(timeoutConfig);
 			//httpPost.getParams().setParameter("uids", jsObj);
-			StringEntity strEntity=new StringEntity(jsObj);
+			StringEntity strEntity=new StringEntity(jsObj,"UTF-8");
 			strEntity.setContentType("application/json");
 			httpPost.setEntity(strEntity);
 			
@@ -192,7 +192,7 @@ public class TCService {
 					.setSocketTimeout(30000).build();
 			httpPost.setConfig(timeoutConfig);
 			
-			StringEntity strEntity=new StringEntity(jsObj);
+			StringEntity strEntity=new StringEntity(jsObj,"UTF-8");
 			strEntity.setContentType("application/json");
 			httpPost.setEntity(strEntity);
 			
