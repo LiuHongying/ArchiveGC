@@ -99,12 +99,14 @@
           v-model="showFields"
           @change="handleCheckedColsChange"
         >
-          <el-checkbox
-            v-for="item in columnList"
-            :label="item.attrName"
-            :key="item.attrName"
-            >{{ item.label }}</el-checkbox
-          >
+          <template  v-for="item in columnList">
+            <el-checkbox 
+              v-if="item.visibleType < 3"
+              :label="item.attrName"
+              :key="item.attrName"
+              >{{ item.label }}</el-checkbox
+            >
+          </template>
         </el-checkbox-group>
         <div slot="footer" class="dialog-footer">
           <el-button
@@ -456,6 +458,7 @@ export default {
     sortBackData: { type: Boolean, default: false },//后台排序
     extparam:{type:Map,default:null},
     showLeftOpenButton: { type: Boolean, default: true },
+    showSaveConfirm: { type: Boolean, default: false },
   },
   watch: {
     showFields(val, oldVal) {
@@ -463,7 +466,9 @@ export default {
       //console.log("a: "+val, oldVal);
       let _self = this;
       _self.columnList.forEach((element) => {
-        element.visibleType = 2;
+        if(element.visibleType <3){
+          element.visibleType = 2;
+        }
       });
       val.forEach((element) => {
         let item = _self.getgriditem(element);
@@ -1079,7 +1084,26 @@ export default {
     },
     // 保存文档
     saveItem() {
-      this.$refs.ShowProperty.saveItem();
+      let _self = this;
+      if(_self.showSaveConfirm){
+        _self
+        .$confirm(
+          "请确认是否需要保存?",
+          _self.$t("application.info"),
+          {
+            confirmButtonText: _self.$t("application.ok"),
+            cancelButtonText: _self.$t("application.cancel"),
+            type: "warning",
+          }
+        )
+        .then(() => {
+          _self.$refs.ShowProperty.saveItem();
+        })
+        .catch(() => {
+        });
+      }else{
+        _self.$refs.ShowProperty.saveItem();
+      }
     },
     //查看属性
     showItemProperty(i,indata) {
@@ -1161,7 +1185,9 @@ export default {
     confirmShow() {
       let _self = this;
       _self.columnList.forEach((element) => {
-        element.visibleType = 2;
+        if(element.visibleType != 3){
+          element.visibleType = 2;
+        }
       });
       _self.showFields.forEach((element) => {
         let item = _self.getgriditem(element);

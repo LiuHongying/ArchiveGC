@@ -252,7 +252,7 @@
                     <el-col :span="3" class="topbar-input">
                       <el-select v-model="archiveStatus" placeholder="请选择状态" @change="searchItem">
                         <el-option label="全部" value=""></el-option>
-                        <el-option label="整编" value="整编"></el-option>
+                        <el-option label="整编中" value="整编"></el-option>
                         <el-option label="已整编" value="已整编"></el-option>
                         <el-option label="已质检" value="已质检"></el-option>
                       </el-select>
@@ -311,16 +311,7 @@
                         title="文档取号"
                       >文档取号</el-button>
                       </el-form-item>
-                      <el-form-item>
-                      <el-button
-                        type="primary"
-                        plain
-                        :loading="getInfoLoading"
-                        size="small"
-                        @click="fetchInformation"
-                        :title="$t('application.fetchInformation')"
-                      >{{$t('application.fetchInformation')}}</el-button>
-                      </el-form-item>
+                      
                       <el-form-item>
                         <el-dropdown class="avatar-container right-menu-item" trigger="click">
                           <div class="avatar-wrapper">
@@ -423,6 +414,17 @@
                             <span>更多</span>
                           </div>
                           <el-dropdown-menu slot="dropdown">
+                             <el-dropdown-item divided>
+                              <el-button
+                                type="primary"
+                                style="display:block;width:117px"
+                                plain
+                                :loading="getInfoLoading"
+                                size="small"
+                                @click="fetchInformation"
+                                :title="$t('application.fetchInformation')"
+                              > <i class="el-icon-top"></i>{{$t('application.fetchInformation')}}</el-button>
+                              </el-dropdown-item>
                             <el-dropdown-item divided>
                               <el-button style="display:block;width:117px"
                                 plain
@@ -497,6 +499,7 @@
                         :folderId="mainParam.folderId"
                         showOptions="查看内容"
                         :isShowChangeList="true"
+                        :showSaveConfirm="true"
                         :isshowCustom="true"
                         :optionWidth = "3"
                         @rowclick="beforeShowInnerFile"
@@ -572,6 +575,7 @@
                         gridViewName='ArrangeInnerGrid'
                         :condition="leftParam.childCondition"
                         :parentId="parentId"
+                        :showSaveConfirm="true"
                         v-bind:tableHeight="(layout.height-startHeight)*(100-topPercent)/100-bottomHeight"
                         :isshowOption="true"
                         :isshowSelection="true"

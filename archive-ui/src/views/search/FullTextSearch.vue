@@ -135,7 +135,6 @@
             style="width: 100%;margin-bottom: 20px;"
             row-key="ID"
             border
-            default-expand-all
             @header-dragend="onHeaderDragend"
             @row-dblclick="dbclick"
           >

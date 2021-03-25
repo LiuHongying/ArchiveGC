@@ -27,8 +27,10 @@ export default {
     if(this.format==null && this.$route.query.format){
       this.format = this.$route.query.format;
     }
-    this.loadUrl();
-    this.writeAudit(this.id)
+    if(!isIE()){
+      this.loadUrl();
+      this.writeAudit(this.id);
+    }
   },
   methods: {
 	  loadUrl() {
@@ -36,6 +38,12 @@ export default {
       let getfileUrl =  _self.axios.defaults.baseURL+"/dc/getContent?id="+_self.id+"&token="+sessionStorage.getItem('access-token')+"&format=obj";
       _self.objUrl = "./static/threeviewer/threeviewer.html?file="+encodeURIComponent(getfileUrl)
 	},
+  isIE(){
+    if (window.navigator.userAgent.indexOf("MSIE")>=1) 
+      return true; 
+    else
+      return false; 
+  },
 	writeAudit(docId){
       var m = new Map();
       m.set("docId",docId)

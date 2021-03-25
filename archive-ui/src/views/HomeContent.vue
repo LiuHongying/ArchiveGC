@@ -390,7 +390,7 @@ export default {
         {
           title: "作废通知单",
           icon: "ecm-icon-cancelnotice",
-          name: "作废通知单作废流程",
+          name: "设计文件作废流程",
           type: "dialog",
           openpath: "CancelStartUp",
         },

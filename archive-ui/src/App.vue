@@ -75,8 +75,15 @@ export default {
   border-radius: 4px !important;
   padding-left: 10px;
   vertical-align: middle  !important;
+  top:0px !important;
+  padding-top: 0px !important;
   /* line-height: 0  !important; */
 }
+.el-input__prefix {
+    top: 2px !important;
+}
+
+.el-i
 .el-dialog__body {
   padding: 5px 20px !important;
 }

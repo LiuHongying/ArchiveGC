@@ -18,7 +18,7 @@
                             :auto-upload="false"
                             :multiple="false"
                         >
-                            <el-button slot="trigger" size="small" type="primary">{{$t('application.selectFile')}}</el-button>
+                            <el-button slot="trigger" plain size="small" type="primary">{{$t('application.selectFile')}}</el-button>
                         </el-upload>
                         </div>
                     </el-form>

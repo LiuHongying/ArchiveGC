@@ -135,7 +135,9 @@
           v-if="ecmCfgActivity.enableDelegate==true"
           @click="showOrHiddenDelegate()"
         >{{delegateButton}}</el-button>
+        <!--
         <el-button @click="claim(currentData)">认领任务</el-button>
+        -->
         <el-button @click="completetask(form)">完成任务</el-button>
         <button @click="printCode" v-print="'#print'">打印</button>
       </div>
@@ -183,6 +185,7 @@
     >
       <el-table-column type="selection" width="40"></el-table-column>
       <el-table-column type="index" width="50"></el-table-column>
+      <el-table-column prop="workflowName" label="流程名称" width="260" sortable></el-table-column>
       <el-table-column prop="name" label="任务名称" min-width="15%" sortable></el-table-column>
       <el-table-column prop="formId" label="表单Id" v-if="1==2" min-width="15%" sortable></el-table-column>
       <el-table-column prop="startUser" label="发起人" min-width="15%" sortable></el-table-column>
