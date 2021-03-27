@@ -44,7 +44,6 @@
           <el-button
             type="primary"
             plain
-            icon="el-icon-printer"
             @click="beforePrint(selectedItems,'FormDcGridUnSort')"
             title="打印清单"
             >打印清单</el-button>
@@ -149,14 +148,14 @@
                 </DataGrid>
               </el-tab-pane>
             </el-tabs>
-    <el-dialog :visible.sync="printVolumesVisible" width="80%"
-    modal-append-to-body="false"
-    :append-to-body="true" 
-    >
-      <PrintVolumes
-        ref="printVolumes"
-      ></PrintVolumes>
-    </el-dialog>
+            <el-dialog :visible.sync="printVolumesVisible" width="80%"
+            modal-append-to-body="false"
+            :append-to-body="true" 
+            >
+              <PrintVolumes
+                ref="printVolumes"
+              ></PrintVolumes>
+            </el-dialog>
 
           </template>
         </split-pane>

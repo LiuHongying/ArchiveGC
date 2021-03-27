@@ -2,7 +2,7 @@
     <div>
       <el-row style="text-align:left;padding-left:10px;padding-top:5px;padding-bottom:5px;">
             <el-button type="primary" plain
-                size="small" icon="el-icon-check" @click="giveback">归还</el-button>
+                size="small" @click="giveback">归还</el-button>
             
         </el-row>
         
