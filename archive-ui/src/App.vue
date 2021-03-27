@@ -77,11 +77,15 @@ export default {
   vertical-align: middle  !important;
   top:0px !important;
   padding-top: 0px !important;
-  /* line-height: 0  !important; */
+  line-height: 25px  !important;
+}
+.el-input__icon {
+    line-height: 26px !important;
 }
 .el-input__prefix {
     top: 2px !important;
 }
+
 
 .el-i
 .el-dialog__body {
@@ -182,7 +186,7 @@ export default {
   color: #ff0000 ;
 }
 .el-form--inline .el-form-item {
-    margin-right: 5px;
+    margin-right: 2px !important;
 }
 /* .el-message{
   background-color: #67c23acc !important;

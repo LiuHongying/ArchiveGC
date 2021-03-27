@@ -540,24 +540,26 @@
                       <el-form-item>
                     <el-button type="primary" plain size="small" title="上移" @click="onMoveUp()">上移</el-button>
                     </el-form-item>
-                      <el-form-item>
-                    <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
                     <el-form-item>
-                    <el-button 
-                      plain
-                      size="small"
-                      type="primary" 
-                      @click="beforeUploadInnerAttach('/exchange/doc/addAttachment')">添加附件
+                      <el-button type="primary" plain size="small" title="下移" @click="onMoveDown()">下移</el-button>
+                    </el-form-item>
+                    <el-form-item>
+                      <el-button 
+                        plain
+                        size="small"
+                        type="primary" 
+                        @click="beforeUploadInnerAttach('/exchange/doc/addAttachment')">添加附件
                       </el-button>
                     </el-form-item>
-                    </el-form-item>
-                      <el-form-item>
-                    <el-button
-                          type="primary"
-                          size="small"
-                          plain
-                          @click="beforeInnerModify()"
-                    >修改</el-button>
+                    <el-form-item>
+                      <el-button
+                            type="primary"
+                            size="small"
+                            plain
+                            @click="beforeInnerModify()"
+                      >修改</el-button>
+                     </el-form-item>
+                    <el-form-item>
                     <el-button type="warning" plain size="small" title="删除"  @click="onRemoveFileInVol(selectedInnerItems)">{{$t('application.delete')}}</el-button>
                     </el-form-item>
                       <el-form-item>
