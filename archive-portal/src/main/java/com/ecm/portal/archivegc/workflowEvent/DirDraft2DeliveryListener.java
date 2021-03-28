@@ -48,7 +48,7 @@ public class DirDraft2DeliveryListener implements ExecutionListener {
 			document.setAclName(folder.getAclName());
 			
 			documentService.updateObject(token, document, null);
-		} catch (EcmException | NoPermissionException | AccessDeniedException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			log.error(e.getMessage());

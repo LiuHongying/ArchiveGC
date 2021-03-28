@@ -748,7 +748,7 @@ public class ArchiveDcController extends ControllerAbstract {
 				doc.setFolderId(folderId);
 				doc.setAclName(folder.getAclName());
 				documentService.updateObject(getToken(), doc, null);
-			} catch (NoPermissionException | AccessDeniedException | EcmException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				mp.put("code", ActionContext.FAILURE);
@@ -784,7 +784,7 @@ public class ArchiveDcController extends ControllerAbstract {
 				doc.setFolderId(folderId);
 				doc.setAclName("acl_pre_archive");
 				documentService.updateObject(getToken(), doc, null);
-			} catch (NoPermissionException | AccessDeniedException | EcmException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				mp.put("code", ActionContext.FAILURE);
@@ -816,7 +816,8 @@ public class ArchiveDcController extends ControllerAbstract {
 				doc = documentService.getObjectById(getToken(), boxId);
 				String coding = "";
 				String storeNumber = (String) doc.getAttributeValue("C_STORE_CODING");
-				if (StringUtils.isEmpty(storeNumber)) {
+				String paper = (String)doc.getAttributeValue("C_INCLUDE_PAPER");
+				if (StringUtils.isEmpty(storeNumber) && "有".equals(paper)) {
 					storeNumber = numberService.getStoreNumber(getToken(), doc.getAttributes());
 					doc.getAttributes().put("C_STORE_CODING", storeNumber);
 				}

@@ -152,6 +152,7 @@
               :isShowChangeList="false"
               @selectchange="onSelectChange"
               @rowclick="onDataGridRowClick"
+              :sortBackData="true"
             >
             </DataGrid>
           </template>
@@ -172,6 +173,7 @@
               showOptions="查看内容"
               :isShowChangeList="false"
               @selectchange="onSelectChange"
+              :sortBackData="true"
             ></DataGrid>
           </template>
         </split-pane>

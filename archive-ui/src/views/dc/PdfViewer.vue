@@ -41,10 +41,9 @@ export default {
       var borrowHistory = hasBorrowHistory;
       var baseURL = _self.axios.defaults.baseURL;
       var params = "&showPrintButton="+showPrintButton+"&borrowHistory="+borrowHistory
-      let getfileUrl =  _self.axios.defaults.baseURL+"/dc/getContent4Water?id="+_self.id+"&token="+sessionStorage.getItem('access-token')+"&format=pdf";
+      let getfileUrl =  _self.axios.defaults.baseURL+"/dc/getContent?id="+_self.id+"&token="+sessionStorage.getItem('access-token')+"&format=pdf";
       let auditUrl = _self.axios.defaults.baseURL+"/archive/addAudit2?docId="+_self.id+"&actionName=ecm_print"+"&appName=portal"
-      let invokeUrl = _self.axios.defaults.baseURL+"/archive/revokeAcl2?docId="+_self.id
-      _self.pdfUrl = "./static/pdfviewer/web/viewer.html?file="+encodeURIComponent(getfileUrl)+"&.pdf"+params+"&audit="+encodeURIComponent(auditUrl)+"&invoke="+encodeURIComponent(invokeUrl)
+      _self.pdfUrl = "./static/pdfviewer/web/viewer.html?file="+encodeURIComponent(getfileUrl)+"&.pdf"+params+"&audit="+encodeURIComponent(auditUrl)
     },
     writeAudit(docId){
       var m = new Map();

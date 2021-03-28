@@ -102,7 +102,7 @@
        <RelationDocs :docId="docId"></RelationDocs>
       </template>
        <template v-if="dialog.title==$t('application.DCver')">
-        <DocVersion :docId="docId"></DocVersion>
+        <DocVersion ref="docVersion" :docId="docId"></DocVersion>
       </template>
        <template v-if="dialog.title==$t('application.Rendition')">
         <ViewRedition :docId="docId" :downloadEnable="doc.permit>=4"></ViewRedition>
@@ -392,7 +392,14 @@ export default {
     menuClick(type){
       console.log(this.$t('application.dcproper'))
       this.dialog.title=type;
-      this.dialog.visible=true
+      this.dialog.visible=true;
+      if(type=='文档版本'){
+         setTimeout(() => {
+           if(this.$refs.docVersion){
+             this.$refs.docVersion.loadData();
+           }
+        }, 100);
+      }
     },
     handleClose(done){
       this.dialog.visible = false

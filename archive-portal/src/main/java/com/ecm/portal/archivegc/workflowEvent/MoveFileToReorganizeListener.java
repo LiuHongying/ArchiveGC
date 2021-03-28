@@ -77,7 +77,7 @@ public class MoveFileToReorganizeListener implements TaskListener{
 					
 				}
 				
-			} catch (EcmException | NoPermissionException | AccessDeniedException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				log.error(e.getMessage());

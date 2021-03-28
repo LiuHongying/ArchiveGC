@@ -72,7 +72,7 @@ public class Deploy2RecordStorageListener implements JavaDelegate {
 				documentService.updateObject(token, arrchive, null);
 				
 			}
-		} catch (EcmException | NoPermissionException | AccessDeniedException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			log.error(e.getMessage());

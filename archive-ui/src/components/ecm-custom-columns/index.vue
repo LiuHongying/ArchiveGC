@@ -336,9 +336,12 @@ export default {
     getCustomization(keyName){
       this.selectedName = "";
       this.configId = "";
-      this.refreshConfigList(keyName)
-      this.loadCustomColumnInfo(keyName)
-      this.tables.target.data = []
+     
+      this.loadCustomColumnInfo(keyName);
+      if(keyName != "所有"){
+        this.refreshConfigList(keyName);
+        this.tables.target.data = [];
+      }
     },
     getClassicNames(keyName) {
       let _self = this;

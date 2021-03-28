@@ -236,37 +236,50 @@
                 <template slot="paneL">
                   <el-form inline="true">
                   <el-row>
-                    <el-col :span="4" class="topbar-input">
-                      <el-row>
+                      <el-form-item>
                       <el-input
                         v-model="inputkey"
                         :placeholder="$t('message.pleaseInput')+$t('application.keyword')"
                         @change="searchItem"
                         prefix-icon="el-icon-search"
+                        style="width: 200px"
                       ></el-input>
-                      </el-row>
-                      <el-row style="padding-top:10px;">
+                      </el-form-item>
+                      <el-form-item>
                        <AddCondition v-model="AddConds" :inputType="hiddenInput" @change="searchItem"></AddCondition>
-                      </el-row>
-                    </el-col>
-                    <el-col :span="3" class="topbar-input">
+                      </el-form-item>
+                      <el-form-item>
                       <el-select v-model="archiveStatus" placeholder="请选择状态" @change="searchItem">
                         <el-option label="全部" value=""></el-option>
                         <el-option label="整编中" value="整编"></el-option>
                         <el-option label="已整编" value="已整编"></el-option>
                         <el-option label="已质检" value="已质检"></el-option>
                       </el-select>
-                      <div style="padding-top:5px;">
+                      </el-form-item>
+                      <el-form-item>
                         <el-radio style="margin-right:5px;" v-model="radio" label="案卷" @change="changeRadio">案卷</el-radio>
                         <el-radio style="margin-left:5px;" v-model="radio" label="文件" @change="changeRadio">文件</el-radio>
-                      </div>
-                    </el-col>
-                    <el-col :span="17" style="padding-left:10px;">
-                      <div style="min-width:400px;width:100%;">
-                      <el-form-item>
-                        <TypeSelectComment ref="TypeSelectComment" :currentFolder="currentFolder" @afterSelecteType="newArchiveItem"></TypeSelectComment>
                       </el-form-item>
-                      <el-form-item v-if="currentFolder && currentFolder.folderPath && currentFolder.folderPath.indexOf('工程设计')>0">
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24" style="padding-left:5px;">
+                      <div style="min-width:400px;width:100%;">
+                        <el-form-item>
+                        <el-dropdown class="avatar-container right-menu-item" trigger="click">
+                          <div class="avatar-wrapper">
+                            <el-button 
+                              type="primary"
+                              plain
+                              size="small"
+                              title="著录"
+                            >著录</el-button>
+                          </div>
+                          <el-dropdown-menu slot="dropdown">
+                             <el-dropdown-item divided>
+                        <TypeSelectComment ref="TypeSelectComment" :currentFolder="currentFolder" @afterSelecteType="newArchiveItem"></TypeSelectComment>
+                      </el-dropdown-item>
+                      
+                      <el-dropdown-item divided v-if="currentFolder && currentFolder.folderPath && currentFolder.folderPath.indexOf('工程设计')>0">
                       <el-button 
                         type="primary"
                         plain
@@ -274,13 +287,16 @@
                         @click="createArchiveByChild"
                         title="著录案卷"
                       >著录案卷</el-button>
-                      </el-form-item>
-                      <el-form-item>
+                      </el-dropdown-item>
+                      <el-dropdown-item divided>
                         <el-button
                         type="primary"
                         plain
                         size="small"
                         @click="fileAttrsCopy(1)">复制著录</el-button>
+                      </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </el-dropdown>
                       </el-form-item>
                       <el-form-item>
                         <el-button
@@ -315,8 +331,12 @@
                       <el-form-item>
                         <el-dropdown class="avatar-container right-menu-item" trigger="click">
                           <div class="avatar-wrapper">
-                            <i class="el-icon-printer"></i>
-                            <span>打印</span>
+                            <el-button 
+                              type="primary"
+                              plain
+                              size="small"
+                              title="打印"
+                            >打印</el-button>
                           </div>
                           <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item divided>
@@ -451,7 +471,7 @@
                             <el-dropdown-item divided>
                               <el-button @click="exportData()" style="display:block;width:117px" type="primary" plain size="small"> 
                                 <i class="el-icon-download"></i>
-                                导出EXCEL
+                                导出查询结果
                               </el-button>
                             </el-dropdown-item>
                             <!--

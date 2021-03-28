@@ -21,6 +21,14 @@
             <el-row>
               <el-form :inline="true" @submit.native.prevent>
                 <el-form-item>
+                  <el-input
+                    style="width: 160px"
+                    v-model="inputValueProject"
+                    placeholder='输入项目号或项目名'
+                    @change="searchProject()"
+                  ></el-input>
+                </el-form-item>
+                <el-form-item>
                     <el-button type="primary" plain @click="submitArrange()">提交整编</el-button>
                 </el-form-item>
               </el-form>
@@ -109,7 +117,7 @@ export default {
       tables: {
         //移交单
         Delivery: {
-          gridViewName: "DeliveryGrid",
+          gridViewName: "DeliveryGridTC",
           dataUrl: "/dc/getDocuments",
           condition: "TYPE_NAME='移交单'",
           isInitData:false,
@@ -140,7 +148,8 @@ export default {
       condition:"",
       condition1:"",
       Check4Visible:false,
-      currentDeliver:null
+      currentDeliver:null,
+      inputValueProject:""
     };
   },
   mounted() {
@@ -155,6 +164,20 @@ export default {
       _self.currentDeliver = null;
       _self.condition = "SELECT ID from ecm_folder where FOLDER_PATH='/移交库/TC'"
       _self.$refs.DeliveryDataGrid.condition ="TYPE_NAME='移交单' AND FOLDER_ID IN("+_self.condition+") AND STATUS <>'整编'"
+      _self.tables.Delivery.condition = _self.$refs.DeliveryDataGrid.condition;
+      _self.$refs.DeliveryDataGrid.currentPage = 1;
+      _self.$refs.DeliveryDataGrid.loadGridInfo();
+      _self.$refs.DeliveryDataGrid.loadGridData();
+    },
+    searchProject(){
+      let _self = this;
+      _self.currentDeliver = null;
+      _self.condition = "SELECT ID from ecm_folder where FOLDER_PATH='/移交库/TC'"
+      let cond = "TYPE_NAME='移交单' AND FOLDER_ID IN("+_self.condition+") AND STATUS <>'整编'";
+      if(_self.inputValueProject!=''){
+        cond += " AND (C_PROJECT_NUM like '%"+_self.inputValueProject+"%'  OR C_PROJECT_NAME like '%"+_self.inputValueProject+"%')";
+      }
+       _self.$refs.DeliveryDataGrid.condition = cond;
       _self.tables.Delivery.condition = _self.$refs.DeliveryDataGrid.condition;
       _self.$refs.DeliveryDataGrid.currentPage = 1;
       _self.$refs.DeliveryDataGrid.loadGridInfo();

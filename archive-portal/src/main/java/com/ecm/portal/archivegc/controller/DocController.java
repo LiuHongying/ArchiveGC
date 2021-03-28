@@ -512,7 +512,7 @@ public class DocController  extends ControllerAbstract  {
 	}
 	@RequestMapping(value = "Reject", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> reject(String metaData) throws AccessDeniedException, NoPermissionException, EcmException {
+	public Map<String, Object> reject(String metaData) throws Exception {
 		LoginUser userObj=null;
 		Date now = new Date();
 		userObj=this.getSession().getCurrentUser();

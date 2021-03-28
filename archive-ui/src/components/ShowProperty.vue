@@ -143,7 +143,6 @@ export default {
           if(row.dependName == item.attrName){
             //row.defaultValue = "";
             this.loadChildValue(row, item.defaultValue);
-            return;
           }
         }
       }
