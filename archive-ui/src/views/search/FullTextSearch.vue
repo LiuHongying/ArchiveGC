@@ -55,8 +55,10 @@
       ></el-autocomplete> -->
       <el-input prefix-icon="el-icon-search" v-model="inputkey" :placeholder="$t('application.placeholderSearch')" @keyup.enter.native="enterDown"
         style="width:35%;padding-top:10px;margin-left:20%"></el-input>
-      <el-button style="margin-left:5px;width:60px" type="primary" plain @click="enterDown">{{$t('application.search')}}</el-button>
-      <el-checkbox style="margin-left:5px" :label="$t('application.propertyOnly')" v-model="propertyOnly"></el-checkbox>
+      <el-button style="margin-left:5px;width:60px;" type="primary" plain @click="enterDown">{{$t('application.search')}}</el-button>
+        <el-radio style="margin-left:5px;margin-right:0px;" v-model="searchType" label="1" @change="enterDown">标题</el-radio>
+        <el-radio style="margin-left:5px;margin-right:0px;" v-model="searchType" label="2" @change="enterDown">属性</el-radio>
+        <el-radio style="margin-left:5px;margin-right:0px;" v-model="searchType" label="3" @change="enterDown">内容</el-radio>
       <el-button v-if="searched" style="margin-left:5px" type="primary" plain @click="beforeSecondSearch()">{{$t('application.scendSearch')}}</el-button>
     </div>
     <el-row>
@@ -293,7 +295,7 @@ export default {
       imageViewVisible: false,
       imageViewer: Object,
       imageArray: [],
-      propertyOnly: false,
+      searchType: "1",
       searchTime: "",
       pageSize: 20,
       itemCount: 0,
@@ -323,7 +325,6 @@ export default {
       if (getMap != null) {
         _self.inputkey = getMap.get("inputkey");
         _self.checkedCards = getMap.get("checkedCards");
-        _self.propertyOnly = getMap.get("propertyOnly");
         _self.cardsLabel = getMap.get("checkedCards");
         _self.checkedFromRouter = getMap.get("checkedCards");
         _self.enterDown();
@@ -509,7 +510,7 @@ export default {
       m.set("pageSize", _self.pageSize);
       m.set("pageIndex", _self.currentPage - 1);
       m.set("typeNames", _self.checkedCards);
-      m.set("attrOnly", _self.propertyOnly);
+      m.set("searchType", _self.searchType);
       if (isScend) {
         var i;
         var terms = [];

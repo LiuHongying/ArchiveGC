@@ -76,6 +76,8 @@
     "by_format_name":"格式",
     "by_creator":"创建人",
     "by_sub_type":"文档子类",
+    "by_c_create_unit":"编制单位",
+    "by_c_drafter":"编制人",
     "selectDate":"选择日期",
     "start":"开始",
     "end":"结束",
