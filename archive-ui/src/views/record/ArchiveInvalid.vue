@@ -76,7 +76,7 @@ export default {
     //文档模糊查询
     search() {
       let _self = this;
-      let key="TYPE_NAME='设计文件' AND STATUS='已作废'";
+      let key="TYPE_NAME='设计文件' AND STATUS='作废'";
       if(_self.inputValueNum!=''&&_self.inputValueNum!=undefined){
         key+="and (CODING LIKE '%"+_self.inputValueNum+"%' OR TITLE LIKE '%"+_self.inputValueNum+"%')";
       }
