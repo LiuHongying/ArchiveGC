@@ -340,5 +340,6 @@ path: '/workflow/CommonViewRelyFolder4Modify',
 name: 'CommonViewRelyFolder4Modify',
 component: () => import('@/views/workflow/CommonViewRelyFolder4Modify.vue')
 },
+
     ]
   }

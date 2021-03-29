@@ -11,15 +11,26 @@ export const workflowCenter = [
 
   },
   {
+    meta:{
+      requireAuth: true,
+      permit: 1,
+      title: '业务流程'
+    },
+    path: '/workflow/startworkflowex',
+    name: '业务流程',
+    component: () => import('@/views/workflow/StartWorkflowEx.vue')
+  },
+  {
     meta: {
       requireAuth: true,
       permit: 1,
       title: 'todoTask'
     },
     path: '/workflow/todoTaskNew',
-    name: '代办任务',
+    name: '待办任务',
     component: () => import('@/views/workflow/task/TodoTaskNew.vue'),
   },
+
   {
     meta: {
       requireAuth: true,

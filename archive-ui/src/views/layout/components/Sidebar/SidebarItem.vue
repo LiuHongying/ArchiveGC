@@ -1,5 +1,43 @@
 <template>
   <div class="menu-wrapper">
+    <template>
+      <el-menu-item index="/home"  v-if="!outUser">
+        <i class="el-icon-s-home menu-white"></i>
+        <span slot="title">
+          <router-link to="/home">首页</router-link>
+        </span>
+      </el-menu-item>
+      <el-submenu index="workflowCenter" >
+	      <template slot="title">
+	        <i class="el-icon-date menu-white"></i>
+	            <span>任务中心<el-badge :value="totalCount" class="item"></el-badge></span>
+	          </template>
+	          <el-menu-item index="/workflow/todoTaskNew">
+	            <i class="el-icon-edit-outline menu-white"></i>
+	            <span slot="title">
+	              <router-link to="/workflow/todoTaskNew">待办任务<el-badge :value="totalCount" class="item"></el-badge></router-link>
+	            </span>
+	          </el-menu-item>
+			    <el-menu-item index="/workflow/doneTaskNew">
+	            <i class="el-icon-document-checked menu-white"></i>
+	            <span slot="title">
+	              <router-link to="/workflow/doneTaskNew">已办任务</router-link>
+	            </span>
+	          </el-menu-item>
+	          <el-menu-item index="/workflow/MyWorkflowNew" v-if="!outUser">
+	            <i class="el-icon-document menu-white"></i>
+	            <span slot="title">
+	              <router-link to="/workflow/MyWorkflowNew">我的流程</router-link>
+	            </span>
+	          </el-menu-item>
+            <el-menu-item index="/record/myborrow"  v-if="!outUser">
+              <i class="el-icon-s-order menu-white"></i>
+              <span slot="title">
+                <router-link to="/record/myborrow">我的借阅</router-link>
+              </span>
+            </el-menu-item>
+	        </el-submenu>
+      </template>
     <template v-for="item in dataList.menuItems">
       <template v-if="item.submenus && item.url==null">
         <el-submenu :index="item.id+''" :key="item.id">
@@ -95,6 +133,7 @@ export default {
       dataList: [],
       clientPermission: 0,
       outUser:false,
+      totalCount: 0
     };
   },
   props: {
@@ -104,7 +143,6 @@ export default {
     }
   },
   methods: {
-    generateTitle,
     hasOneShowingChildren(children) {
       const showingChildren = children.filter(item => {
         return !item.hidden;
@@ -113,6 +151,22 @@ export default {
         return true;
       }
       return false;
+    },
+     getToDoList() {
+      let _self = this;
+      var m = new Map();
+      m.set("condition", "");
+      m.set("pageSize", 1);
+      m.set("pageIndex", 0);
+      m.set("userId", sessionStorage.getItem("access-userName"));
+      axios
+        .post("/workflow/todoTask", JSON.stringify(m))
+        .then(function (response) {
+          _self.totalCount = response.data.totalCount;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     },
      urlIsExt(url){
       if(url!=null&&url.indexOf('http')==0){
@@ -175,7 +229,7 @@ export default {
           this.currentUser().clientPermission
         );
       }
-    this.loadMenu();
+    this.getToDoList();
   },
   watch:{
     '$store.state.app.language':function(nv,ov){

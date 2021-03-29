@@ -93,20 +93,20 @@ export const recordRouter =  [
         meta: {
             requireAuth: true,
             permit: 1,
-            title:'专题管理'
+            title:'编研管理'
         },
         path: '/record/ThematicManagement',
-        name: '专题管理',
+        name: '编研管理',
         component: () => import('@/views/record/ThematicManagement.vue')
     },
     {
         meta: {
             requireAuth: true,
             permit: 1,
-            title:'档案专题'
+            title:'编研成果'
         },
         path: '/record/ShowThematic',
-        name: '档案专题',
+        name: '编研成果',
         component: () => import('@/views/record/ShowThematic.vue')
     },
     {
@@ -254,6 +254,16 @@ export const recordRouter =  [
         path: '/record/archivebackup',
         name: '光盘刻录',
         component: () => import('@/views/record/ArchiveBackup.vue')
+    },
+    {
+        meta:{
+            requireAuth: true,
+            permit: 1,
+            title:'SSC视图'
+        },
+        path: '/record/sscviewer',
+        name: 'SSC视图',
+        component: () => import('@/views/record/SSCViewer.vue')
     },
     {
         meta: {

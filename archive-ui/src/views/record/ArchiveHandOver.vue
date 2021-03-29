@@ -474,8 +474,8 @@ export default {
         gridName: "ArchiveHandOverGrid",
         lang: "zh-cn",
         condition: this.$refs.mainDataGrid.condition,
-        filename: "File_HandOver_" + fileDateStr + ".xlsx",
-        sheetname: "移交入库",
+        filename: "档案入库_" + fileDateStr + ".xlsx",
+        sheetname: "档案入库",
       };
       ExcelUtil.export(params);
     },
