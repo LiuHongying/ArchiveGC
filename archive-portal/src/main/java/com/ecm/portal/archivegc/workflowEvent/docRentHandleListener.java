@@ -47,7 +47,7 @@ public class docRentHandleListener implements JavaDelegate {
 			String type = varMap.get("SUB_TYPE").toString();
 			Map<String,Object> ecmAttr = ecmObject.getAttributes();
 			ecmAttr.put("C_APPROVE_DATE", now);		//给表单加上出库时间
-			if(type.equals("纸质借阅")) {
+			if(type.equals("纸质到馆借阅")) {
 				String sql = "select * from ecm_relation where parent_id = '"+formId+"'";		
 				List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);		//找到表单挂载文件关系集
 				if(mps!=null) {

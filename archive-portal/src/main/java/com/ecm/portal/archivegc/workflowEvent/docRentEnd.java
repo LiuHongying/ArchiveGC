@@ -60,12 +60,12 @@ public class docRentEnd implements JavaDelegate {
 			}
 			}
 			//改密级完毕，现在开始改表单
-			if(!type.equals("纸质借阅")||!type.equals("纸质复制")) {
+			if(!type.equals("纸质到馆借阅")||!type.equals("纸质复制")) {
 				ecmAttr.put("STATUS", "已审批");
 				documentService.updateObject(ecmSession.getToken(), ecmAttr);
 			}
 			
-			if(type.equals("纸质借阅")||type.equals("纸质复制")) {
+			if(type.equals("纸质到馆借阅")||type.equals("纸质复制")) {
 				
 				String sql = "select * from ecm_relation where parent_id = '"+formId+"'";		
 				List<Map<String,Object>> mps = documentService.getMapList(ecmSession.getToken(), sql);		//找到表单挂载文件关系集

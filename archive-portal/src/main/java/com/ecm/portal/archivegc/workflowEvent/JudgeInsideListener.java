@@ -43,20 +43,20 @@ public class JudgeInsideListener implements JavaDelegate{
 			ecmSession = authService.login("workflow", workflowSpecialUserName, env.getProperty("ecm.password"));
 			Map<String, Object> varMap = execution.getVariables();
 			String formId = varMap.get("formId").toString();
-			if(varMap.get("SUB_TYPE").toString().equals("查阅")) {
+			if(varMap.get("SUB_TYPE").toString().equals("纸质到馆查阅")) {
 				execution.setVariable("isOK", "是");				//这个时候先默认是查阅&&密级为内部公开
 			
 			String sql = "select  distinct C_SECURITY_LEVEL from ecm_document where id in(select CHILD_ID from ecm_relation where parent_id = '"+formId+"')";
 			List<Map<String,Object>> Res = documentService.getMapList(ecmSession.getToken(), sql);
 			for(Map<String,Object> mp : Res) {
 			String level = mp.get("C_SECURITY_LEVEL").toString();
-			if((!level.equals("非密")||!level.equals("内部公开"))&&varMap.get("SUB_TYPE").toString().equals("查阅")) {
+			if((!level.equals("非密")||!level.equals("内部公开"))&&varMap.get("SUB_TYPE").toString().equals("纸质到馆查阅")) {
 				execution.setVariable("isOK", "否");				//有任意子文件不满足条件，跳出
 				break;
 			}
 			}
 			}
-			else if(!varMap.get("SUB_TYPE").toString().equals("查阅")) {
+			else if(!varMap.get("SUB_TYPE").toString().equals("纸质到馆查阅")) {
 				execution.setVariable("isOK", "否");
 			}
 		} catch (Exception e) {

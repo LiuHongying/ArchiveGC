@@ -157,7 +157,7 @@
                         _self.isCurrentCompany=false       //找到了，借阅文件不是当前部门的，需要形成部门领导
                         }
                     })
-                if(this.borrowType=='查阅'){                //默认都要验证选人，查阅的时候先默认不选人，然后判断密级
+                if(this.borrowType=='纸质到馆查阅'){                //默认都要验证选人，纸质到馆查阅的时候先默认不选人，然后判断密级
                     this.isLimited=false//无限制，可立即发起
                     this.workflowFileList.forEach(element => {
                         if(element.C_SECURITY_LEVEL!='非密'||element.C_SECURITY_LEVEL!='内部公开'){
@@ -178,7 +178,7 @@
                     ecmFormItems.forEach(element => {
                         if(element.attrName=="SUB_TYPE"){
                           _self.borrowType = element.defaultValue
-                          if(_self.borrowType=='纸质借阅'||_self.borrowType=='查阅'){
+                          if(_self.borrowType=='纸质到馆借阅'||_self.borrowType=='纸质到馆查阅'){
                           _self.$refs.workflowFile.setSubTypeCondition(true)}
                           else{
                           _self.$refs.workflowFile.setSubTypeCondition(false)
@@ -209,14 +209,14 @@
                         })
                     return
                 }
-                if(this.borrowType=='查阅'&&this.isLimited==true&&this.reviewer1==''){       //查阅提醒
-                    this.$message("查阅文件包含涉密和限制文件，请选择本部门领导!")
+                if(this.borrowType=='纸质到馆查阅'&&this.isLimited==true&&this.reviewer1==''){       //纸质到馆查阅提醒
+                    this.$message("纸质到馆查阅文件包含涉密和限制文件，请选择本部门领导!")
                 }
-                  if(this.reviewer1==''&&this.borrowType!='查阅'){
+                  if(this.reviewer1==''&&this.borrowType!='纸质到馆查阅'){
                       this.$message("请完成借阅单必填项！本部门领导为必填项!")
                       return
                     }
-                   if(this.isLimited==true){                     //查阅&普通借阅提醒
+                   if(this.isLimited==true){                     //纸质到馆查阅&普通借阅提醒
                    if(this.reviewer2=='' && this.isCurrentCompany==false){
                     this.$message("请完成借阅单必填项！形成部门领导为必填项!")
                       return                }
@@ -237,7 +237,7 @@
                     axios.post("/dc/countDocuments", JSON.stringify(m))
                                         .then(function (response) {
                         let code = response.data.code
-                        if(_self.reviewer3==''&&_self.isCore==true){            //不管是不是查阅，都得选公司领导
+                        if(_self.reviewer3==''&&_self.isCore==true){            //不管是不是纸质到馆查阅，都得选公司领导
                         _self.$message("所选借阅文件包含核心商密文件,需要选择公司领导!")
                         _self.butt = false
                         return

@@ -238,9 +238,9 @@ public class DocAuth implements JavaDelegate {
 				//if ("automaticAuthorization".equals(flowElementId)) {
 					String userName=varMap.get("startUser").toString();
 					int permit=PermissionContext.ObjectPermission.READ;
-					if ("在线浏览".equals(varMap.get("SUB_TYPE").toString())){
+					if ("电子文件在线浏览".equals(varMap.get("SUB_TYPE").toString())){
 						permit=PermissionContext.ObjectPermission.READ;
-					}else if("下载".equals(varMap.get("SUB_TYPE").toString())) {
+					}else if("电子文件下载".equals(varMap.get("SUB_TYPE").toString())) {
 						permit=PermissionContext.ObjectPermission.DOWNLOAD;
 					}
 					else if("打印".equals(varMap.get("SUB_TYPE").toString())) {
