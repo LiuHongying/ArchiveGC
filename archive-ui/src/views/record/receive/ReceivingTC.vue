@@ -14,6 +14,38 @@
         <Check4 :checkData="selectedDCItems" @close="Check4Visible = false"></Check4>
       </div>
     </el-dialog>
+    <!-- 批量修改 -->
+    <el-dialog :visible.sync="modifyVisible" style="width:80%">
+        <el-row style="padding:15px">
+        <span>选择修改字段</span>
+        <el-select v-model="resChoice" @change="onModifyChange" >
+          <div v-for="item in objectSrc" :key="item.id">
+              <el-option :label="item.label" :value="item.id"></el-option>
+          </div>
+          </el-select>
+        </el-row>
+        <el-row style="padding:15px">
+        <span>选择操作类型</span>
+        <el-select @change="onChoiceChange" v-model="Choice" >
+          <div v-for="items in modifyOption" :key="items">
+              <el-option :label="items" :value="items"></el-option>
+          </div>
+          </el-select>
+        </el-row>
+        <el-row v-if="isMF" style="padding:15px">
+          <span >输入部分替换内容</span>
+          <el-input style="width:220px" v-model="MFinput"></el-input>
+        </el-row>
+        <el-row style="padding:15px">
+          <span>输入修改内容</span>
+          <el-input style="width:220px" v-model="ChoiceInput"></el-input>
+        </el-row>
+        <el-row style="padding:15px;padding-left:200px">
+          <el-button @click="submitModify" type='primary' style="padding-left:200px">提交修改</el-button>
+          <el-button @click="close">取消</el-button>
+        </el-row>
+    </el-dialog>
+    
     <template v-slot:main="{ layout }">
       <div :style="{position:'relative',height: layout.height-startHeight+45+'px'}">
         <split-pane split="vertical" @resize="onHorizontalSplitResize" :min-percent='1' :default-percent='leftPercent'>
@@ -75,6 +107,9 @@
                 <el-form-item>
                     <el-button type="primary" plain @click="beforeCheck()">四性检查</el-button>
                 </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="beforeModify()" plain >批量修改</el-button>
+                </el-form-item>
               </el-form>
             </el-row>
             <el-row style="background:#FFFFFF;">
@@ -111,6 +146,17 @@ export default {
   name: "TC",
   data() {
     return {
+      isInnerModify:false,
+      isModify:false,
+      modifyVisible:false,
+      isMF:false,
+      MFinput:"",
+      resChoice:'',
+      selectedItems: [],
+      modifyOption:[],
+      ChoiceInput:'',
+      Choice:'',
+      hoiceTypeName:'',
       startHeight: 135,
       leftStorageName: 'ReceivingTCWidth',
       leftPercent: 26,
@@ -289,6 +335,11 @@ export default {
     },
     selectDCChange(val) {
       this.selectedDCItems = val;
+      if(val && val[0] && val[0].TYPE_NAME){
+        this.ChoiceTypeName = val[0].TYPE_NAME
+        this.getTypeNamesByMainList(this.ChoiceTypeName)
+        this.selectedItems = val;
+      }
     },
     selectDEChange(val) {
       this.selectedDEItems = val;
@@ -450,6 +501,131 @@ export default {
         .then(function(response){
           
         })
+    },
+    close(){
+      this.modifyVisible = false
+    },
+    beforeModify(){
+      this.isModify = true
+      this.isInnerModify = false
+      if(this.selectedItems.length==0){
+        this.$message("请选择至少一条文件进行修改！")
+        return
+      }
+      this.modifyVisible = true
+      this.getTypeNamesByMainList(this.ChoiceTypeName)
+    },
+    onModifyChange(id){
+      let _self = this
+      _self.objectSrc.forEach(item => {
+        if(item.id==id) {        //找到对应字段了
+        if (item.controlType=='ValueSelect'||item.controlType=='Date'||item.controlType=='Select'){
+          _self.modifyOption=['全部替换']
+          return
+        }else if(item.controlType=='TextBox'||item.controlType=='TextArea'){
+          _self.modifyOption=['加前缀','加后缀','全部替换','部分替换']
+        }
+      }                 
+      })
+    },
+    onChoiceChange(){
+      if(this.Choice=='部分替换'){
+      this.isMF = true}
+      if(this.Choice!='部分替换'){
+        this.isMF = false
+      }
+    },
+    submitModify(){
+      let _self = this
+          _self.$confirm(
+      "确认要进行批量修改?",
+      {
+        confirmButtonText: _self.$t("application.ok"),
+        cancelButtonText: _self.$t("application.cancel"),
+        type: "warning"
+      })
+      .then(() => {
+      let ids = []
+      let attr=''
+      if(this.isModify==true){
+      for(let i=0;i<this.selectedItems.length;i++){
+        ids.push(this.selectedItems[i].ID)
+      }}
+      if(this.isInnerModify==true){
+        for(let i=0;i<this.selectedInnerItems.length;i++){
+        ids.push(this.selectedInnerItems[i].ID)
+      }
+      }
+      _self.objectSrc.forEach(item => {
+        if(item.id==_self.resChoice) {        //找到对应字段了
+        attr = item.attrName
+        if(item.controlType=='Date'){
+        _self.isDates = true
+        }
+        }                 
+      })
+      var m = new Map();
+      m.set("ids",ids)
+      m.set("modifyType",this.Choice)
+      m.set("attr",attr)
+      m.set("MFinput",_self.MFinput)
+      if(this.isDates==true){
+         var r=this.ChoiceInput.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/); 
+          if(r==null){
+            this.$alert("请输入格式正确的日期\n\r日期格式：yyyy-mm-dd\n\r例    如：2021-01-01\n\r");
+             return false;
+          }
+          var d=new Date(r[1],r[3]-1,r[4]);   
+          var num = (d.getFullYear()==r[1]&&(d.getMonth()+1)==r[3]&&d.getDate()==r[4]);
+          if(num==0){
+           this.$alert("请输入格式正确的日期\n\r日期格式：yyyy-mm-dd\n\r例    如：2021-01-01\n\r");
+          return
+          }
+          
+      }
+      m.set("modifyResult",this.ChoiceInput)
+      let formdata = new FormData();
+      formdata.append("metaData",JSON.stringify(m));
+        axios
+        .post("/exchange/doc/modifty", formdata)
+        .then(function(response) {
+        if(response.data.code==1){
+          _self.$message("修改成功！")
+          _self.modifyVisible=false
+          _self.$refs.Drawing.loadGridData()
+          _self.resChoice = ""
+          _self.Choice = ""
+          _self.MFinput = ""
+          _self.isMF = false
+          _self.ChoiceInput = ""
+        }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+      })
+    },
+    getTypeNamesByMainList(keyName) {
+      let _self = this;
+      var m = new Map();
+      let j = 0
+      m.set('itemInfo',keyName);//ID 或类型
+      m.set('formName',keyName);
+      m.set('lang',_self.getLang());
+      axios
+        .post("/dc/getFormClassifications", JSON.stringify(m))
+        .then(function(response) {
+          let sourcedata = response.data.data
+          _self.objectSrc=[]
+          sourcedata.forEach(items =>{
+            items.ecmFormItems.forEach( item => {
+              _self.objectSrc.push(item)
+            })
+          })
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
     },
     beforeCheck(){
       let _self = this;
