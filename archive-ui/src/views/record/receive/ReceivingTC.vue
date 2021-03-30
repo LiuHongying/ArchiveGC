@@ -14,6 +14,7 @@
         <Check4 :checkData="selectedDCItems" @close="Check4Visible = false"></Check4>
       </div>
     </el-dialog>
+    
     <!-- 批量修改 -->
     <el-dialog :visible.sync="modifyVisible" style="width:80%">
         <el-row style="padding:15px">
