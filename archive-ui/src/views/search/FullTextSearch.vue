@@ -1,4 +1,7 @@
 <template>
+<DataLayout>
+    <template v-slot:header></template>
+    <template v-slot:main="{ layout }">
   <div v-loading="loading">
     <el-dialog
       :title="$t('application.property')"
@@ -135,6 +138,7 @@
           <el-table
             :data="dataList"
             style="width: 100%;margin-bottom: 20px;"
+            :style="{minHeight: layout.height - 280 +'px'}"
             row-key="ID"
             border
             @header-dragend="onHeaderDragend"
@@ -258,14 +262,18 @@
       </el-container>
     </div>
   </div>
+  </template>
+  </DataLayout>
 </template>
 
 <script type="text/javascript">
+import DataLayout from "@/components/ecm-data-layout";
 import ShowProperty from "@/components/ShowProperty";
 import ShowPropertyReadOnly from "@/components/ShowPropertyReadOnly"
 export default {
   name: "FullTextSearch",
   components: {
+  	DataLayout: DataLayout,
     ShowProperty: ShowProperty,
     ShowPropertyReadOnly: ShowPropertyReadOnly
   },
